@@ -5,19 +5,12 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const response = require("./src/helpers/responseFormatter");
 const { PORT } = process.env;
+const routeAPI = require("./src/routes/index");
 
 app.use(response);
 app.use(morgan("dev"));
 app.use(bodyParser.json());
-console.log("process.env => ", PORT);
-
-app.get("/", (req, res) => {
-  res.sendJson(200, true, "hello express", { token: "23456789sdfghj" });
-});
-
-app.get("/test", (req, res) => {
-  res.sendDataCreated("success create test", { token: "2345678qwghj" });
-});
+app.use("/api/v1", routeAPI);
 
 app.listen(PORT, () => {
   console.log("server running on port :", PORT);
