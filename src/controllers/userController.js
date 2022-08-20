@@ -20,7 +20,7 @@ module.exports = {
 
   create: async (req, res) => {
     try {
-      const { name, email, password } = req.body;
+      const { name, email, password, no_hp } = req.body;
 
       const createAuthFirebase = await admin.auth().createUser({
         email,
@@ -33,14 +33,17 @@ module.exports = {
 
       const created = await User.create({
         name,
+        no_hp,
         email,
         password: hashPassword,
         firebaseUID: createAuthFirebase.uid,
+        is_verified: false,
       });
 
       res.sendJson(201, true, "success create new user", {
         id: created.id,
         name: created.name,
+        no_hp: created.no_hp,
         email: created.email,
       });
     } catch (err) {
