@@ -86,11 +86,12 @@ module.exports = {
         password
       );
 
-      const token = await getAdminAuth().createCustomToken(credential.user.uid);
+      const token = credential._tokenResponse.idToken;
 
       return res.sendJson(200, true, "success login", {
         email: credential.user.email,
         token,
+        credential,
       });
     } catch (err) {
       console.log(err);

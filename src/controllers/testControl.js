@@ -18,7 +18,18 @@ admin.initializeApp({
 
 const getToken = async () => {
   const token =
-    "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTY2MTA3MDUyNiwiZXhwIjoxNjYxMDc0MTI2LCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay12bnpkakB0ZXN0LWV4cHJlc3MtYXV0aC5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInN1YiI6ImZpcmViYXNlLWFkbWluc2RrLXZuemRqQHRlc3QtZXhwcmVzcy1hdXRoLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwidWlkIjoiSUtLZ1o3aG1JSVhSSkQ3eURqU2FFZUNhUkdoMiJ9.l87kj85Nepxh48DIR6tFgzRtHYai2oMds36U8UDCtNbJdjKgLc6w3fEKXKCrzCYAdaBAZQ6DC3v2TzsVEN560DIjPSZo78wvj7MUNemmVKy1UYPV26A5rw4oASSluA5Vk-DLMjpWWkqsCdYZYyw7xfzCDWxESEm1WE94lvChgZpNzUwoJoZWoP8-pmTk9Rr4pOBg1o_ejF6FrA7Dxw0aqeDcKYUxEgFXQXTskwxkjUqgywmrwznet9RJdKeD014uTW83H76TUFfNBGYlFCO8adW2BYRC8RN3VVISeJdnXGjxxEePJq58btRaX8hg_3FKWOkhECTVHg8-zKDqp89i1A";
+    "eyJhbGciOiJSUzI1NiIsImtpZCI6ImE4YmZhNzU2NDk4ZmRjNTZlNmVmODQ4YWY5NTI5ZThiZWZkZDM3NDUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGVzdC1leHByZXNzLWF1dGgiLCJhdWQiOiJ0ZXN0LWV4cHJlc3MtYXV0aCIsImF1dGhfdGltZSI6MTY2MTA5NDc5MCwidXNlcl9pZCI6InE4eEdOaUNvWEpSWmI1eDBRRVNrYURBZjN0ZjEiLCJzdWIiOiJxOHhHTmlDb1hKUlpiNXgwUUVTa2FEQWYzdGYxIiwiaWF0IjoxNjYxMDk0NzkwLCJleHAiOjE2NjEwOTgzOTAsImVtYWlsIjoidGVzdEBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidGVzdEBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.W1Y-4DeUyVqgLFw9NIirSgqBpZAw_6fjJnEqjGYn-dd-_x1ARXACtXeA1x0UolnMVG0D2Fva0VMEQ1uh2Zo10u_-EsVm6cjf1aD_HaMiTTwY9LxU6FclhjB1PEmdeJiDfxEYAt2rKe4uLbjhQRs2OLS2s3Agl2FsiFW0P97Agft8HcgFpC6zZc6fH5pbIfCQ7zj5IgdgCXAKXwT5KS_SkUBkXqorsmBHoMvtNeenZA7_oii1W3DTNnROWdbOGcUzLJRWDzYMIxpCNWjiPcfMQ8a3rl3g7R6SCf-IBp7x9oIUAjJMDprIW4sZ4qh4vNFGBjnfE5lAJ0Rq2Ww59RCo0w";
+
+  // await getAdminAuth()
+  //   .updateUser("q8xGNiCoXJRZb5x0QESkaDAf3tf1", {
+  //     password: "gantipasswordnya",
+  //   })
+  //   .then((res) => {
+  //     console.log("success res : ", res);
+  //   })
+  //   .catch((err) => {
+  //     console.log("error res : ", err);
+  //   });
 
   await getAdminAuth()
     .verifyIdToken(token)
