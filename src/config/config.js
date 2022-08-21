@@ -1,4 +1,4 @@
-require("dotenv").config({ path: require("find-config")(".env") });
+require("dotenv").config();
 const { DB_USERNAME, DB_PASSWORD, DB_NAME, DB_PORT, DB_HOST, DB_DIALECT } =
   process.env;
 
