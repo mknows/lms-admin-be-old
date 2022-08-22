@@ -1,8 +1,11 @@
+require("dotenv").config({ path: "../config/.env" });
 const { User } = require("../models");
 const bcrypt = require("bcryptjs");
 const admin = require("firebase-admin");
 const serviceAccount = require("../config/serviceAccountKey_test-express-auth-firebase-adminsdk-vnzdj-17db49ab3a.json");
 const firebaseConfig = require("../config/webAccountKey.json");
+const jwt = require("jsonwebtoken");
+const { sendEmail } = require("../mails/mail");
 
 const {
   getAuth: getClientAuth,
@@ -17,6 +20,8 @@ initializeApp(firebaseConfig);
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
+
+const { JWT_SECRET_KEY } = process.env;
 
 module.exports = {
   /**
@@ -91,11 +96,99 @@ module.exports = {
       return res.sendJson(200, true, "success login", {
         email: credential.user.email,
         token,
-        credential,
       });
     } catch (err) {
       console.log(err);
       return res.sendJson(500, false, err.message, null);
+    }
+  },
+
+  /**
+   * @desc      request forgot password user, send email link to user
+   * @route     POST /api/v1/auth/reset-password
+   * @access    Public
+   */
+  requestResetPassword: async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      const emailFind = await getAdminAuth().getUserByEmail(email);
+
+      const payload = {
+        firebaseUID: emailFind.uid,
+        email: emailFind.email,
+      };
+
+      const tokenResetPassword = jwt.sign(payload, JWT_SECRET_KEY, {
+        expiresIn: "10m",
+      });
+
+      sendEmail(
+        email,
+        "forgot password",
+        `
+        <h2>forgot password</h2>
+        <br>
+        hello ${email}, you can update password after press this link below :
+        http://localhost:3000/api/v1/auth/reset-password/${tokenResetPassword}
+      `
+      );
+
+      return res.sendJson(200, true, "success send", {});
+    } catch (err) {
+      return res.sendJson(500, false, err, null);
+    }
+  },
+
+  /**
+   * @desc      verify id token
+   * @route     GET /api/v1/auth/reset-password/:token
+   * @access    Public
+   */
+  verifyResetPasswordToken: async (req, res) => {
+    try {
+      const token = req.params.token;
+
+      const user = jwt.verify(token, JWT_SECRET_KEY);
+
+      return res.sendJson(200, true, "token valid!", { token, user });
+    } catch (err) {
+      return res.sendJson(500, false, err, null);
+    }
+  },
+
+  /**
+   * @desc      process update password
+   * @route     POST /api/v1/auth/reset-password/:token
+   * @access    Public
+   */
+  resetPassword: async (req, res) => {
+    try {
+      const { token } = req.params;
+      const { password } = req.body;
+
+      const user = jwt.verify(token, JWT_SECRET_KEY);
+
+      const currentUser = await getAdminAuth().updateUser(user.firebaseUID, {
+        password,
+      });
+
+      const hashedPassword = bcrypt.hashSync(password, 10);
+
+      await User.update(
+        {
+          password: hashedPassword,
+        },
+        {
+          where: {
+            email: currentUser.email,
+          },
+        }
+      );
+
+      return res.sendJson(200, true, "berhasil update password", {});
+    } catch (err) {
+      return res.sendJson(500, false, err, null);
     }
   },
 };
