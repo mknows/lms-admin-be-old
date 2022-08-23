@@ -11,6 +11,8 @@ const {
   getAuth: getClientAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  sendEmailVerification,
 } = require("firebase/auth");
 
 const { getAuth: getAdminAuth } = require("firebase-admin/auth");
@@ -21,7 +23,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const { JWT_SECRET_KEY } = process.env;
+const { JWT_SECRET_KEY, PORT } = process.env;
 
 module.exports = {
   /**
@@ -65,7 +67,11 @@ module.exports = {
         is_verified: false,
       });
 
-      res.sendJson(201, true, "success create new user", {
+      // const user = getClientAuth().currentUser;
+
+      // await sendEmailVerification(user);
+
+      return res.sendJson(201, true, "success create new user", {
         id: created.id,
         name: created.name,
         no_hp: created.no_hp,
@@ -129,12 +135,90 @@ module.exports = {
         `
         <h2>forgot password</h2>
         <br>
-        hello ${email}, you can update password after press this link below :
+        hello ${email}, you can update password after press this link below : <br>
         http://localhost:3000/api/v1/auth/reset-password/${tokenResetPassword}
       `
       );
 
       return res.sendJson(200, true, "success send", {});
+    } catch (err) {
+      return res.sendJson(500, false, err, null);
+    }
+  },
+
+  /**
+   * @desc      request verify email, send email link to user
+   * @route     POST /api/v1/auth/req-verify-email
+   * @access    Public
+   */
+  requestVerifyEmail: async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      const user = await getAdminAuth().getUserByEmail(email);
+
+      if (!user) {
+        return res.sendJson(404, false, "email ini tidak terdaftar", {});
+      }
+
+      const payload = {
+        firebaseUID: user.uid,
+        email: user.email,
+      };
+
+      const tokenVerifyEmail = jwt.sign(payload, JWT_SECRET_KEY);
+
+      sendEmail(
+        user.email,
+        "verifikasi akun email",
+        `
+      <h3>verifikasi akun email anda</h3>
+      <br>
+      halo ${user.email},silahkan klik link dibawah ini untuk verifikasi akun email anda 
+      <br>
+      http://localhost:${PORT}/api/v1/auth/verify-email/${tokenVerifyEmail}
+      `
+      );
+
+      return res.sendJson(200, true, "success send email verify");
+    } catch (err) {
+      return res.sendJson(500, false, err, null);
+    }
+  },
+
+  /**
+   * @desc      verify email
+   * @route     GET /api/v1/auth/verify-email
+   * @access    Public
+   */
+  verifyEmail: async (req, res) => {
+    try {
+      const { token } = req.params;
+
+      console.log("token user verify email => ", token);
+
+      const user = jwt.verify(token, JWT_SECRET_KEY);
+
+      const updateVerify = await getAdminAuth().updateUser(user.firebaseUID, {
+        emailVerified: true,
+      });
+
+      console.log("update verify => ", updateVerify);
+
+      await User.update(
+        {
+          is_verified: true,
+        },
+        {
+          where: {
+            email: updateVerify.email,
+          },
+        }
+      );
+
+      res.sendJson(200, true, "success get verify data", {
+        status: updateVerify.emailVerified,
+      });
     } catch (err) {
       return res.sendJson(500, false, err, null);
     }

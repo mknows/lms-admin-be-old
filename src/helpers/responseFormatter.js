@@ -1,5 +1,5 @@
 module.exports = (req, res, next) => {
-  res.sendJson = (statusCode, status, message, data) => {
+  res.sendJson = (statusCode, status, message, data = {}) => {
     return res.status(statusCode).json({
       status,
       message,
