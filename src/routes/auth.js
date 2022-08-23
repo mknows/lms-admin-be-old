@@ -8,5 +8,7 @@ route.post("/register", userController.createUser);
 route.post("/reset-password", userController.requestResetPassword);
 route.get("/reset-password/:token", userController.verifyResetPasswordToken);
 route.post("/reset-password/:token", userController.resetPassword);
+route.post("/req-verify-email", userController.requestVerifyEmail);
+route.get("/verify-email/:token", userController.verifyEmail);
 
 module.exports = route;
