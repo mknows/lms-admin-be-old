@@ -5,5 +5,8 @@ const userController = require("../controllers/authController");
 route.get("/user", userController.getAllDataUser);
 route.post("/login", userController.loginUser);
 route.post("/register", userController.createUser);
+route.post("/reset-password", userController.requestResetPassword);
+route.get("/reset-password/:token", userController.verifyResetPasswordToken);
+route.post("/reset-password/:token", userController.resetPassword);
 
 module.exports = route;
