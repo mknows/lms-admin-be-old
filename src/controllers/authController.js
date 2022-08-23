@@ -67,18 +67,42 @@ module.exports = {
         is_verified: false,
       });
 
-      // const user = getClientAuth().currentUser;
+      const user = getClientAuth().currentUser;
 
-      // await sendEmailVerification(user);
+      await sendEmailVerification(user);
 
-      return res.sendJson(201, true, "success create new user", {
-        id: created.id,
-        name: created.name,
-        no_hp: created.no_hp,
-        email: created.email,
-      });
-    } catch (err) {
-      res.sendJson(500, false, err.message, null);
+      return res.sendJson(
+        201,
+        true,
+        "sukses buat akun baru, silahkan cek akun email masuk yang telah terdaftar di folder spam",
+        {
+          id: created.id,
+          name: created.name,
+          no_hp: created.no_hp,
+          email: created.email,
+        }
+      );
+    } catch (error) {
+      let message,
+        errorCode = error.code || 500;
+      switch (errorCode) {
+        case "auth/wrong-password": {
+          message = "Invalid Combination Email and Password.";
+          break;
+        }
+        case "auth/user-not-found": {
+          message = "Invalid Combination Email and Password.";
+          break;
+        }
+        case "auth/email-already-in-use": {
+          message = "Email already used.";
+          break;
+        }
+        default:
+          message = "Something went wrong";
+      }
+
+      return res.sendJson(403, false, message, {});
     }
   },
 
@@ -97,15 +121,33 @@ module.exports = {
         password
       );
 
-      const token = credential._tokenResponse.idToken;
+      const token = getClientAuth().currentUser.getIdToken();
 
       return res.sendJson(200, true, "success login", {
         email: credential.user.email,
         token,
       });
-    } catch (err) {
-      console.log(err);
-      return res.sendJson(500, false, err.message, null);
+    } catch (error) {
+      let message,
+        errorCode = error.code || 500;
+      switch (errorCode) {
+        case "auth/wrong-password": {
+          message = "Invalid Combination Email and Password.";
+          break;
+        }
+        case "auth/user-not-found": {
+          message = "Invalid Combination Email and Password.";
+          break;
+        }
+        case "auth/email-already-in-use": {
+          message = "Email already used.";
+          break;
+        }
+        default:
+          message = "Something went wrong";
+      }
+
+      return res.sendJson(403, false, message, {});
     }
   },
 
@@ -118,67 +160,29 @@ module.exports = {
     try {
       const { email } = req.body;
 
-      const emailFind = await getAdminAuth().getUserByEmail(email);
-
-      const payload = {
-        firebaseUID: emailFind.uid,
-        email: emailFind.email,
-      };
-
-      const tokenResetPassword = jwt.sign(payload, JWT_SECRET_KEY, {
-        expiresIn: "10m",
-      });
-
-      sendEmail(
-        email,
-        "forgot password",
-        `
-        <h2>forgot password</h2>
-        <br>
-        hello ${email}, you can update password after press this link below : <br>
-        http://localhost:3000/api/v1/auth/reset-password/${tokenResetPassword}
-      `
-      );
+      await sendPasswordResetEmail(getClientAuth(), email);
 
       return res.sendJson(200, true, "success send", {});
     } catch (err) {
-      return res.sendJson(500, false, err, null);
+      return res.sendJson(403, false, "something went wrong", {});
     }
   },
 
   /**
    * @desc      request verify email, send email link to user
-   * @route     POST /api/v1/auth/req-verify-email
+   * @route     POST /api/v1/auth/verify-email
    * @access    Public
    */
   requestVerifyEmail: async (req, res) => {
     try {
       const { email } = req.body;
 
-      const user = await getAdminAuth().getUserByEmail(email);
+      const result = await getAdminAuth().getUserByEmail(email);
 
-      if (!user) {
-        return res.sendJson(404, false, "email ini tidak terdaftar", {});
-      }
+      const user = getClientAuth().currentUser;
+      console.log("user => ", user);
 
-      const payload = {
-        firebaseUID: user.uid,
-        email: user.email,
-      };
-
-      const tokenVerifyEmail = jwt.sign(payload, JWT_SECRET_KEY);
-
-      sendEmail(
-        user.email,
-        "verifikasi akun email",
-        `
-      <h3>verifikasi akun email anda</h3>
-      <br>
-      halo ${user.email},silahkan klik link dibawah ini untuk verifikasi akun email anda 
-      <br>
-      http://localhost:${PORT}/api/v1/auth/verify-email/${tokenVerifyEmail}
-      `
-      );
+      await sendEmailVerification(result);
 
       return res.sendJson(200, true, "success send email verify");
     } catch (err) {
@@ -195,15 +199,11 @@ module.exports = {
     try {
       const { token } = req.params;
 
-      console.log("token user verify email => ", token);
-
       const user = jwt.verify(token, JWT_SECRET_KEY);
 
       const updateVerify = await getAdminAuth().updateUser(user.firebaseUID, {
         emailVerified: true,
       });
-
-      console.log("update verify => ", updateVerify);
 
       await User.update(
         {
@@ -216,7 +216,7 @@ module.exports = {
         }
       );
 
-      res.sendJson(200, true, "success get verify data", {
+      res.sendJson(200, true, `success verify data ${user.email}`, {
         status: updateVerify.emailVerified,
       });
     } catch (err) {

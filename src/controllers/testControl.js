@@ -7,6 +7,7 @@ const {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  sendPasswordResetEmail,
 } = require("firebase/auth");
 
 const { getAuth: getAdminAuth } = require("firebase-admin/auth");
@@ -20,7 +21,7 @@ admin.initializeApp({
 const verifyEmail = async () => {
   await signInWithEmailAndPassword(
     getClientAuth(),
-    "ibnuhidayat78@gmail.com",
+    "benlur167@gmail.com",
     "mypassword"
   )
     .then((res) => {
@@ -32,6 +33,8 @@ const verifyEmail = async () => {
 
   const user = getClientAuth().currentUser;
 
+  console.log("user => ", user);
+
   await sendEmailVerification(user)
     .then((res) => {
       console.log("success send email verification : ", res);
@@ -39,6 +42,22 @@ const verifyEmail = async () => {
     .catch((err) => {
       console.log("error send mail : ", err);
     });
+  // await sendPasswordResetEmail(getClientAuth(), "l.ibnuhidayatullah@gmail.com")
+  //   .then((res) => {
+  //     console.log("log res => ", res);
+  //   })
+  //   .catch((err) => {
+  //     console.log("log err => ", err);
+  //   });
+
+  // await getAdminAuth()
+  //   .getUserByEmail("benlur167@gmail.com")
+  //   .then((res) => {
+  //     console.log("log res => ", res);
+  //   })
+  //   .catch((err) => {
+  //     console.log("log err => ", err);
+  //   });
 };
 
 verifyEmail();
