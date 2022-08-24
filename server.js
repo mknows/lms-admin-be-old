@@ -19,7 +19,7 @@ initializeFirebase();
 app.use(response);
 app.use(morgan("dev"));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true, strict: false }));
 app.use(cookieParser());
 
 const PORT = process.env.PORT || 8080;
@@ -31,5 +31,5 @@ app.listen(PORT, () => {
 });
 
 app.all('*', (req, res) => {
-  return res.status(404).json({ success: false, message: "Page not found", data: {} });
+  return res.status(404).json({ success: false, message: "Page not found.", data: {} });
 });
