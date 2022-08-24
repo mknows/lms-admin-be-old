@@ -73,9 +73,13 @@ module.exports = {
         plain: true
       });
 
+      console.log("before data => ", data[1]);
+      
       delete data[1].dataValues['id'];
       delete data[1].dataValues['firebaseUID'];
       delete data[1].dataValues['password'];
+
+      console.log("after data => ", data[1]);
 
       await updateProfile(getClientAuth(), {
         fullName: titleCase(fullName)

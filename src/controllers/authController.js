@@ -60,7 +60,9 @@ module.exports = {
         fullName,
         email,
         password: hashPassword,
-        isVerified: false
+        isVerified: false,
+        phone,
+        role: "mahasiswa"
       });
 
       const user = getClientAuth().currentUser;
@@ -120,7 +122,7 @@ module.exports = {
       const token = await auth.currentUser.getIdToken();
 
       return res.sendJson(200, true, `Login success. Hi ${credential.user.displayName}!`, {
-        token
+        token : `Bearer ${token}`,
       }, {
         name: "token", value: token
       });
