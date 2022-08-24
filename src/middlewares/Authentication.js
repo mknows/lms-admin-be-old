@@ -33,6 +33,7 @@ exports.protection = async (req, res, next) => {
     });
 
     req.firebaseToken = token;
+    req.userData = user;
 
     next();
   } catch (error) {

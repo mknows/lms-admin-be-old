@@ -20,6 +20,12 @@ exports.validate = (method) => {
         body('email', 'Email address is invalid').notEmpty().trim().normalizeEmail().isEmail()
       ];
     }
+
+    case 'updateDataUser': {
+      return [
+        body('fullName', 'Full Name is invalid').notEmpty().trim().isAlpha('en-US', { ignore: ' ' })
+      ]
+    }
   }
 }
 
