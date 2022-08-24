@@ -26,8 +26,14 @@ module.exports = {
       role: {
         type: Sequelize.STRING,
       },
+      isLecturer: {
+        type: Sequelize.BOOLEAN,
+      },
       isVerified: {
         type: Sequelize.BOOLEAN,
+      },
+      gender: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
