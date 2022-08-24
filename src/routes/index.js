@@ -1,6 +1,7 @@
 const express = require("express");
 const route = express.Router();
-const userRoute = require("./auth");
+
+const userRoute = require("./Auth");
 
 route.use("/auth", userRoute);
 
