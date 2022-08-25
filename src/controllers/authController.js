@@ -40,7 +40,7 @@ module.exports = {
    */
   createUser: async (req, res) => {
     try {
-      const { fullName, email, password, phone } = req.body;
+      const { fullName, email, password, phone, gender } = req.body;
 
       const credential = await createUserWithEmailAndPassword(
         getClientAuth(),
@@ -60,9 +60,10 @@ module.exports = {
         fullName,
         email,
         password: hashPassword,
-        isVerified: false,
         phone,
-        role: "mahasiswa"
+        isLecturer: false,
+        isVerified: false,
+        gender,
       });
 
       const user = getClientAuth().currentUser;
