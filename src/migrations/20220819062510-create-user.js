@@ -8,10 +8,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      name: {
+      firebaseUID: {
         type: Sequelize.STRING,
       },
-      no_hp: {
+      fullName: {
         type: Sequelize.STRING,
       },
       email: {
@@ -20,10 +20,13 @@ module.exports = {
       password: {
         type: Sequelize.STRING,
       },
-      firebaseUID: {
+      phone: {
         type: Sequelize.STRING,
       },
-      is_verified: {
+      role: {
+        type: Sequelize.STRING,
+      },
+      isVerified: {
         type: Sequelize.BOOLEAN,
       },
       createdAt: {

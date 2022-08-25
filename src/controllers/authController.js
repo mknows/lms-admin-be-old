@@ -1,29 +1,21 @@
-require("dotenv").config({ path: "../config/.env" });
 const { User } = require("../models");
 const bcrypt = require("bcryptjs");
-const admin = require("firebase-admin");
-const serviceAccount = require("../config/serviceAccountKey_test-express-auth-firebase-adminsdk-vnzdj-17db49ab3a.json");
-const firebaseConfig = require("../config/webAccountKey.json");
 const jwt = require("jsonwebtoken");
-const { sendEmail } = require("../mails/mail");
 
 const {
   getAuth: getClientAuth,
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   sendEmailVerification,
+
+  createUserWithEmailAndPassword,
+  updateProfile,
+  sendVerificationEmail
 } = require("firebase/auth");
 
 const { getAuth: getAdminAuth } = require("firebase-admin/auth");
-const { initializeApp } = require("firebase/app");
 
-initializeApp(firebaseConfig);
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
-
-const { JWT_SECRET_KEY, PORT } = process.env;
+const { JWT_SECRET_KEY } = process.env;
 
 module.exports = {
   /**
@@ -48,7 +40,7 @@ module.exports = {
    */
   createUser: async (req, res) => {
     try {
-      const { name, email, password, no_hp } = req.body;
+      const { fullName, email, password, phone } = req.body;
 
       const credential = await createUserWithEmailAndPassword(
         getClientAuth(),
@@ -56,29 +48,58 @@ module.exports = {
         password
       );
 
+      await updateProfile(credential.user, {
+        displayName: titleCase(fullName).trim(),
+        emailVerified: false
+      });
+
       const hashPassword = bcrypt.hashSync(password, 10);
 
       const created = await User.create({
-        name,
-        no_hp,
+        firebaseUID: credential.user.uid,
+        fullName,
         email,
         password: hashPassword,
-        firebaseUID: credential.user.uid,
-        is_verified: false,
+        isVerified: false,
+        phone,
+        role: "mahasiswa"
       });
 
-      // const user = getClientAuth().currentUser;
+      const user = getClientAuth().currentUser;
 
-      // await sendEmailVerification(user);
+      await sendEmailVerification(user);
 
-      return res.sendJson(201, true, "success create new user", {
-        id: created.id,
-        name: created.name,
-        no_hp: created.no_hp,
-        email: created.email,
-      });
-    } catch (err) {
-      res.sendJson(500, false, err.message, null);
+      return res.sendJson(
+        201,
+        true,
+        "Register success. Please verify your email by click link at your mail inbox.",
+        {
+          id: created.id,
+          fullName: created.name,
+          email: created.email,
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      let message, errorCode = error.code || 500;
+      switch (errorCode) {
+        case "auth/wrong-password": {
+          message = "Invalid combination Email address and Password.";
+          break;
+        }
+        case "auth/user-not-found": {
+          message = "Invalid combination Email address and Password.";
+          break;
+        }
+        case "auth/email-already-in-use": {
+          message = "This email already used by another account.";
+          break;
+        }
+        default:
+          message = "Something went wrong.";
+      }
+
+      return res.sendJson(403, false, message, {});
     }
   },
 
@@ -91,188 +112,119 @@ module.exports = {
     try {
       const { email, password } = req.body;
 
+      const auth = getClientAuth();
       const credential = await signInWithEmailAndPassword(
-        getClientAuth(),
+        auth,
         email,
         password
       );
 
-      const token = credential._tokenResponse.idToken;
+      const token = await auth.currentUser.getIdToken();
 
-      return res.sendJson(200, true, "success login", {
-        email: credential.user.email,
-        token,
+      return res.sendJson(200, true, `Login success. Hi ${credential.user.displayName}!`, {
+        token : `Bearer ${token}`,
+      }, {
+        name: "token", value: token
       });
-    } catch (err) {
-      console.log(err);
-      return res.sendJson(500, false, err.message, null);
+    } catch (error) {
+      console.error(error);
+      let message, errorCode = error.code || 500;
+      switch (errorCode) {
+        case "auth/wrong-password": {
+          message = "Invalid combination Email address and Password.";
+          break;
+        }
+        case "auth/user-not-found": {
+          message = "Invalid combination Email address and Password.";
+          break;
+        }
+        case "auth/email-already-in-use": {
+          message = "This email already used by another account.";
+          break;
+        }
+        default:
+          message = "Something went wrong.";
+      }
+
+      return res.sendJson(403, false, message, {});
     }
   },
 
   /**
    * @desc      request forgot password user, send email link to user
-   * @route     POST /api/v1/auth/reset-password
+   * @route     POST /api/v1/auth/forget-password
    * @access    Public
    */
   requestResetPassword: async (req, res) => {
     try {
       const { email } = req.body;
 
-      const emailFind = await getAdminAuth().getUserByEmail(email);
+      await sendPasswordResetEmail(getClientAuth(), email);
 
-      const payload = {
-        firebaseUID: emailFind.uid,
-        email: emailFind.email,
-      };
-
-      const tokenResetPassword = jwt.sign(payload, JWT_SECRET_KEY, {
-        expiresIn: "10m",
-      });
-
-      sendEmail(
-        email,
-        "forgot password",
-        `
-        <h2>forgot password</h2>
-        <br>
-        hello ${email}, you can update password after press this link below : <br>
-        http://localhost:3000/api/v1/auth/reset-password/${tokenResetPassword}
-      `
-      );
-
-      return res.sendJson(200, true, "success send", {});
+      return res.sendJson(200, true, "Reset Password email has been send. Please check your mail inbox to reset your password.", {});
     } catch (err) {
-      return res.sendJson(500, false, err, null);
+      console.error(err);
+      return res.sendJson(403, false, "Something went wrong.", {});
     }
   },
 
   /**
    * @desc      request verify email, send email link to user
-   * @route     POST /api/v1/auth/req-verify-email
+   * @route     POST /api/v1/auth/verify-email
    * @access    Public
    */
-  requestVerifyEmail: async (req, res) => {
+  requestVerificationEmail: async (req, res) => {
     try {
-      const { email } = req.body;
+      let token = req.firebaseToken;
 
-      const user = await getAdminAuth().getUserByEmail(email);
-
-      if (!user) {
-        return res.sendJson(404, false, "email ini tidak terdaftar", {});
-      }
-
-      const payload = {
-        firebaseUID: user.uid,
-        email: user.email,
-      };
-
-      const tokenVerifyEmail = jwt.sign(payload, JWT_SECRET_KEY);
-
-      sendEmail(
-        user.email,
-        "verifikasi akun email",
-        `
-      <h3>verifikasi akun email anda</h3>
-      <br>
-      halo ${user.email},silahkan klik link dibawah ini untuk verifikasi akun email anda 
-      <br>
-      http://localhost:${PORT}/api/v1/auth/verify-email/${tokenVerifyEmail}
-      `
-      );
-
-      return res.sendJson(200, true, "success send email verify");
-    } catch (err) {
-      return res.sendJson(500, false, err, null);
-    }
-  },
-
-  /**
-   * @desc      verify email
-   * @route     GET /api/v1/auth/verify-email
-   * @access    Public
-   */
-  verifyEmail: async (req, res) => {
-    try {
-      const { token } = req.params;
-
-      console.log("token user verify email => ", token);
-
-      const user = jwt.verify(token, JWT_SECRET_KEY);
-
-      const updateVerify = await getAdminAuth().updateUser(user.firebaseUID, {
-        emailVerified: true,
+      if (!token) return res.status(409).json({
+        success: false,
+        message: "Invalid authorization.",
+        data: {}
       });
 
-      console.log("update verify => ", updateVerify);
+      const user = getClientAuth().currentUser;
 
-      await User.update(
-        {
-          is_verified: true,
-        },
-        {
-          where: {
-            email: updateVerify.email,
-          },
-        }
-      );
-
-      res.sendJson(200, true, "success get verify data", {
-        status: updateVerify.emailVerified,
-      });
-    } catch (err) {
-      return res.sendJson(500, false, err, null);
-    }
-  },
-
-  /**
-   * @desc      verify id token
-   * @route     GET /api/v1/auth/reset-password/:token
-   * @access    Public
-   */
-  verifyResetPasswordToken: async (req, res) => {
-    try {
-      const token = req.params.token;
-
-      const user = jwt.verify(token, JWT_SECRET_KEY);
-
-      return res.sendJson(200, true, "token valid!", { token, user });
-    } catch (err) {
-      return res.sendJson(500, false, err, null);
-    }
-  },
-
-  /**
-   * @desc      process update password
-   * @route     POST /api/v1/auth/reset-password/:token
-   * @access    Public
-   */
-  resetPassword: async (req, res) => {
-    try {
-      const { token } = req.params;
-      const { password } = req.body;
-
-      const user = jwt.verify(token, JWT_SECRET_KEY);
-
-      const currentUser = await getAdminAuth().updateUser(user.firebaseUID, {
-        password,
+      if (!user) return res.status(409).json({
+        success: false,
+        message: "Invalid authorization.",
+        data: {}
       });
 
-      const hashedPassword = bcrypt.hashSync(password, 10);
+      if (user.emailVerified) return res.status(400).json({
+        success: false,
+        message: "This email already verified.",
+        data: {}
+      });
 
-      await User.update(
-        {
-          password: hashedPassword,
-        },
-        {
-          where: {
-            email: currentUser.email,
-          },
-        }
-      );
+      await sendEmailVerification(user);
 
-      return res.sendJson(200, true, "berhasil update password", {});
+      return res.sendJson(200, true, "Email verification sent. Please check your email inbox.", {});
     } catch (err) {
+      console.log(err);
       return res.sendJson(500, false, err, null);
     }
-  },
+  }
 };
+
+// Usage for Capitalize Each Word
+function titleCase(str) {
+  var splitStr = str.toLowerCase().split(' ');
+  for (var i = 0; i < splitStr.length; i++) {
+    splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+  }
+
+  return splitStr.join(' ');
+}
+
+// Usage for Phone Number Validator (Firebase) (Example: +62 822 xxxx xxxx)
+function phoneNumber(number) {
+  var validationPhone = /^\+?([0-9]{2})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/;
+  if (number.value.match(validationPhone)) {
+    return true;
+  }
+  else {
+    alert("message");
+    return false;
+  }
+}

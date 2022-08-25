@@ -1,24 +1,25 @@
 "use strict";
-
 const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
+
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || "development";
 const config = require(__dirname + "/../config/config.js")[env];
-const db = {};
+
+const databases = {};
 
 let sequelize;
-if (config.use_env_variable) {
+
+if (config.use_env_variable)
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
-} else {
+else
   sequelize = new Sequelize(
     config.database,
     config.username,
     config.password,
     config
   );
-}
 
 fs.readdirSync(__dirname)
   .filter((file) => {
@@ -31,16 +32,17 @@ fs.readdirSync(__dirname)
       sequelize,
       Sequelize.DataTypes
     );
-    db[model.name] = model;
+
+    databases[model.name] = model;
   });
 
-Object.keys(db).forEach((modelName) => {
-  if (db[modelName].associate) {
-    db[modelName].associate(db);
+Object.keys(databases).forEach((modelName) => {
+  if (databases[modelName].associate) {
+    databases[modelName].associate(databases);
   }
 });
 
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
+databases.sequelize = sequelize;
+databases.Sequelize = Sequelize;
 
-module.exports = db;
+module.exports = databases;

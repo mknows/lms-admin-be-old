@@ -1,14 +1,14 @@
 const express = require("express");
 const route = express.Router();
+
 const userController = require("../controllers/authController");
+const { validate, validatorMessage } = require('../middlewares/Validator');
+const { protection } = require("../middlewares/Authentication");
 
 route.get("/user", userController.getAllDataUser);
-route.post("/login", userController.loginUser);
-route.post("/register", userController.createUser);
-route.post("/reset-password", userController.requestResetPassword);
-route.get("/reset-password/:token", userController.verifyResetPasswordToken);
-route.post("/reset-password/:token", userController.resetPassword);
-route.post("/req-verify-email", userController.requestVerifyEmail);
-route.get("/verify-email/:token", userController.verifyEmail);
+route.post("/login", validate('loginUser'), validatorMessage, userController.loginUser);
+route.post("/register", validate('createUser'), validatorMessage, userController.createUser);
+route.post("/verify-email", protection, userController.requestVerificationEmail);
+route.post("/forget-password", validate('forgetPasswordUser'), validatorMessage, userController.requestResetPassword);
 
 module.exports = route;
