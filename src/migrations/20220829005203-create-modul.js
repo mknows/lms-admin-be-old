@@ -4,11 +4,7 @@ module.exports = {
     await queryInterface.createTable('moduls', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      id: {
         type: Sequelize.STRING
       },
       pertemuan_id: {

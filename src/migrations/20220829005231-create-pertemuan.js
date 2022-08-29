@@ -4,9 +4,8 @@ module.exports = {
     await queryInterface.createTable('pertemuans', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       id: {
         type: Sequelize.STRING
@@ -15,10 +14,10 @@ module.exports = {
         type: Sequelize.STRING
       },
       pertemuan_ke: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       durasi: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       is_sinkronus: {
         type: Sequelize.BOOLEAN

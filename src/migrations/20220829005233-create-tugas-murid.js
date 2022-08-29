@@ -4,9 +4,8 @@ module.exports = {
     await queryInterface.createTable('tugas_murids', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       tugas_id: {
         type: Sequelize.STRING
@@ -21,7 +20,7 @@ module.exports = {
         type: Sequelize.DATE
       },
       nilai: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

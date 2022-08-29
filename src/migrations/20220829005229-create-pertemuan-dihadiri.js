@@ -4,9 +4,8 @@ module.exports = {
     await queryInterface.createTable('pertemuan_murids', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       pertemuan_id: {
         type: Sequelize.STRING
@@ -18,7 +17,7 @@ module.exports = {
         type: Sequelize.DATE
       },
       nilai_akhir: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       hadir: {
         type: Sequelize.BOOLEAN

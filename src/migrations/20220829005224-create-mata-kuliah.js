@@ -4,21 +4,17 @@ module.exports = {
     await queryInterface.createTable('mata_kuliahs', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      id: {
         type: Sequelize.STRING
       },
       nama: {
         type: Sequelize.STRING
       },
       durasi: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       dosen: {
-        type: Sequelize.ARRAY
+        type: Sequelize.ARRAY(Sequelize.STRING)
       },
       deskripsi: {
         type: Sequelize.STRING

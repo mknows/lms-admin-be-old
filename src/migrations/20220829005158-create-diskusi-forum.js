@@ -4,11 +4,7 @@ module.exports = {
     await queryInterface.createTable('diskusi_forums', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.STRING
-      },
-      id: {
         type: Sequelize.STRING
       },
       penulis_id: {

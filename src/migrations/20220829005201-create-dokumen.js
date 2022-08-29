@@ -4,11 +4,7 @@ module.exports = {
     await queryInterface.createTable('dokumens', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      id: {
         type: Sequelize.STRING
       },
       konten: {

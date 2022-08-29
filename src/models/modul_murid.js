@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     modul_id: { type: DataTypes.STRING, primaryKey:true },
     murid_id: { type: DataTypes.STRING, primaryKey:true },
     waktu_pengambilan: DataTypes.DATE,
-    nilai: DataTypes.NUMBER
+    nilai: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'modul_murid',

@@ -4,11 +4,7 @@ module.exports = {
     await queryInterface.createTable('komens', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      id: {
         type: Sequelize.STRING
       },
       df_id: {
@@ -24,7 +20,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       dosen_like: {
-        type: Sequelize.ARRAY
+        type: Sequelize.ARRAY(Sequelize.STRING)
       },
       murid_like: {
         type: Sequelize.STRING

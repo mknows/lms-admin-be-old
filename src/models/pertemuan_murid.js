@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     pertemuan_id: { type: DataTypes.STRING, primaryKey:true },
     murid_id: { type: DataTypes.STRING, primaryKey:true },
     tgl_hadir: DataTypes.DATE,
-    nilai_akhir: DataTypes.NUMBER,
+    nilai_akhir: DataTypes.INTEGER,
     hadir: DataTypes.BOOLEAN
   }, {
     sequelize,

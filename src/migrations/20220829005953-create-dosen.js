@@ -4,11 +4,7 @@ module.exports = {
     await queryInterface.createTable('dosens', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      id: {
         type: Sequelize.STRING
       },
       nama: {

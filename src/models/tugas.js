@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   tugas.init({
     id: { type: DataTypes.STRING, primaryKey:true },
     pertemuan_id: DataTypes.STRING,
-    durasi: DataTypes.NUMBER,
+    durasi: DataTypes.INTEGER,
     deskripsi: DataTypes.STRING,
     konten: DataTypes.STRING
   }, {

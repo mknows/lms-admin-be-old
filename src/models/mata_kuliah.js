@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   mata_kuliah.init({
     id: { type: DataTypes.STRING, primaryKey:true },
     nama: DataTypes.STRING,
-    durasi: DataTypes.NUMBER,
+    durasi: DataTypes.INTEGER,
     dosen: DataTypes.ARRAY(DataTypes.STRING),
     deskripsi: DataTypes.STRING
   }, {

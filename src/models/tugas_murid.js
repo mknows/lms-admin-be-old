@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     murid_id: { type: DataTypes.STRING, primaryKey:true },
     waktu_pengambilan: DataTypes.DATE,
     waktu_pengumpulan: DataTypes.DATE,
-    nilai: DataTypes.NUMBER
+    nilai: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'tugas_murid',

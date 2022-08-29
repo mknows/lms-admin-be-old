@@ -4,11 +4,7 @@ module.exports = {
     await queryInterface.createTable('murids', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      id: {
         type: Sequelize.STRING
       },
       nama: {

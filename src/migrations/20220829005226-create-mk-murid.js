@@ -4,9 +4,8 @@ module.exports = {
     await queryInterface.createTable('mk_murids', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       mk_id: {
         type: Sequelize.STRING
@@ -21,7 +20,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       nilai_akhir: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

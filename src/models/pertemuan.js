@@ -16,8 +16,8 @@ module.exports = (sequelize, DataTypes) => {
   pertemuan.init({
     id: { type: DataTypes.STRING, primaryKey:true },
     mk_id: DataTypes.STRING,
-    pertemuan_ke: DataTypes.NUMBER,
-    durasi: DataTypes.NUMBER,
+    pertemuan_ke: DataTypes.INTEGER,
+    durasi: DataTypes.INTEGER,
     is_sinkronus: DataTypes.BOOLEAN,
     tipe: DataTypes.STRING,
     deskripsi: DataTypes.STRING

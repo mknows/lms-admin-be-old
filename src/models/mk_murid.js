@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     murid_id: { type: DataTypes.STRING, primaryKey:true },
     tgl_diambil: DataTypes.DATE,
     status: DataTypes.STRING,
-    nilai_akhir: DataTypes.NUMBER
+    nilai_akhir: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'mk_murid',
