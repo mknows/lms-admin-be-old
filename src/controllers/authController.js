@@ -25,7 +25,7 @@ module.exports = {
    */
   getAllDataUser: async (req, res) => {
     try {
-      const data = await User.findAll();
+      const data = await user.findAll();
 
       res.sendJson(200, true, "sucess get all data", data);
     } catch (err) {
@@ -41,20 +41,18 @@ module.exports = {
   createUser: async (req, res) => {
     try {
       const { fullName, email, password, phone, gender } = req.body;
-
       const credential = await createUserWithEmailAndPassword(
         getClientAuth(),
         email,
         password
       );
-
       await updateProfile(credential.user, {
         displayName: titleCase(fullName).trim(),
         emailVerified: false
       });
 
       const hashPassword = bcrypt.hashSync(password, 10);
-
+    
       const created = await User.create({
         firebaseUID: credential.user.uid,
         fullName,

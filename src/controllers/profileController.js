@@ -13,7 +13,6 @@ module.exports = {
     try {
       let token = req.firebaseToken;
       let user = req.userData;
-
       if (!token || !user) return res.status(409).json({
         success: false,
         message: "Invalid authorization.",
