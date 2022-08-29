@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('kuis_diambils', {
+    await queryInterface.createTable('mata_kuliahs', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,20 +11,17 @@ module.exports = {
       id: {
         type: Sequelize.STRING
       },
-      murid_id: {
+      nama: {
         type: Sequelize.STRING
       },
-      waktu_pengambilan: {
-        type: Sequelize.DATE
+      durasi: {
+        type: Sequelize.NUMBER
       },
-      waktu_pengumpulan: {
-        type: Sequelize.DATE
+      dosen: {
+        type: Sequelize.ARRAY
       },
-      nilai: {
-        type: Sequelize.INTEGER
-      },
-      jawaban: {
-        type: Sequelize.ARRAY(Sequelize.STRING)
+      deskripsi: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -37,6 +34,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('kuis_diambils');
+    await queryInterface.dropTable('mata_kuliahs');
   }
 };

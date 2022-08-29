@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('pertemuans', {
+    await queryInterface.createTable('replies', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,22 +11,22 @@ module.exports = {
       id: {
         type: Sequelize.STRING
       },
-      mk_id: {
+      df_id: {
         type: Sequelize.STRING
       },
-      pertemuan_ke: {
-        type: Sequelize.INTEGER
-      },
-      durasi: {
-        type: Sequelize.INTEGER
-      },
-      is_sinkronus: {
-        type: Sequelize.BOOLEAN
-      },
-      tipe: {
+      reply_ke: {
         type: Sequelize.STRING
       },
-      deskripsi: {
+      penulis_id: {
+        type: Sequelize.STRING
+      },
+      konten: {
+        type: Sequelize.STRING
+      },
+      dosen_like: {
+        type: Sequelize.ARRAY
+      },
+      murid_like: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -40,6 +40,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('pertemuans');
+    await queryInterface.dropTable('replies');
   }
 };

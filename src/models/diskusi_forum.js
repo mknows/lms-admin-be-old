@@ -3,13 +3,18 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Diskusi_forum extends Model {
+  class diskusi_forum extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
     static associate(models) {
-      this.belongsTo(models.pertemuan,{as:'pertemuan',foreignKey:'pertemuan_id'})
+      // define association here
     }
   }
-  Diskusi_forum.init({
-    id: { type: DataTypes.STRING, primaryKey: true },
+  diskusi_forum.init({
+    id: { type: DataTypes.STRING, primaryKey:true },
     penulis_id: DataTypes.STRING,
     pertemuan_id: DataTypes.STRING,
     judul: DataTypes.STRING,
@@ -18,5 +23,5 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'diskusi_forum',
   });
-  return Diskusi_forum;
+  return diskusi_forum;
 };
