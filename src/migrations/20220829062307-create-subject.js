@@ -16,7 +16,7 @@ module.exports = {
       teacher: {
         type: Sequelize.ARRAY(Sequelize.STRING)
       },
-      desciption: {
+      description: {
         type: Sequelize.STRING
       },
       createdAt: {

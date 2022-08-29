@@ -10,11 +10,11 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      this.belongsToMany(models.subject, { through: models.student_subject});
     }
   }
   User.init({
-    id: {type:DataTypes.STRING,primaryKey:true},
+    firebaseUID: {type:DataTypes.STRING,primaryKey:true},
     fullName: DataTypes.STRING,
     email: DataTypes.STRING,
     gender: DataTypes.STRING,

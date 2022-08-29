@@ -1,6 +1,5 @@
-const { User,mata_kuliah} = require("../models");
-const { getAuth: getClientAuth, updateProfile } = require("firebase/auth");
-const { getAuth } = require("firebase-admin/auth");
+const { User,subject} = require("../models");
+const moment = require('moment')
 
 module.exports = {
   /**
@@ -10,7 +9,7 @@ module.exports = {
    */
   getAllMatakuliah: async (req, res) => {
     try {
-      const data = await mata_kuliah.findAll();
+      const data = await subject.findAll();
       res.sendJson(200, true, "sucess get all data", data);
     } catch (err) {
       res.sendJson(500, false, err.message, null);
@@ -25,8 +24,18 @@ module.exports = {
     try {
       let token = req.firebaseToken;
       let user = req.userData;
-      console.log(user.uid)
-      
+      const testUser= await User.findOne({
+        where: {
+          firebaseUID: user.uid
+        },
+        include: subject
+      });
+      const testSubject= await subject.findOne({
+        where: {
+          id: '5'
+        }
+      });
+      console.log(await testUser.getSubject())
       res.sendJson(200,true,"test",[token,user])
     } catch (err) {
       res.sendJson(500, false, err.message, null);
