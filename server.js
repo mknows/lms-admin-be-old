@@ -10,8 +10,6 @@ const response = require("./src/helpers/responseFormatter");
 const allRoutes = require("./src/routes/index");
 const initializeFirebase = require('./src/config/firebaseConnection');
 
-require('./src/config/firebaseConnection');
-
 const app = express();
 
 initializeFirebase();
