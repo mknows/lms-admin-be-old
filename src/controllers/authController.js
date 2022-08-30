@@ -1,6 +1,7 @@
-const { User } = require("../models");
+const { User, Nrus } = require("../models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const os = require("os");
 
 const {
   getAuth: getClientAuth,
@@ -59,6 +60,18 @@ module.exports = {
         role: "mahasiswa",
         is_verified: false,
         is_lecturer: false
+      });
+
+      console.log(req.useragent);
+
+      Nrus.create({
+        user_id: created.id,
+        ip_address: req.headers['x-real-ip'] || req.connection.remoteAddress,
+        referrer: req.headers.referer,
+        device: req.device.type,
+        platform: os.platform() || req.useragent.platform,
+        operating_system: `${req.useragent.browser} ${req.useragent.version}`,
+        source: req.useragent.source
       });
 
       const user = getClientAuth().currentUser;

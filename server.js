@@ -3,6 +3,8 @@ const express = require("express");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const device = require('express-device');
+const useragent = require('express-useragent');
 
 dotenv.config({ path: "./src/config/config.env" });
 
@@ -14,6 +16,9 @@ const app = express();
 
 initializeFirebase();
 
+app.use(device.capture());
+app.use(useragent.express());
+app.set('trust proxy', true);
 app.use(response);
 app.use(morgan("dev"));
 app.use(bodyParser.json());

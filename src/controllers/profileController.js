@@ -53,11 +53,11 @@ module.exports = {
   updateMe: async (req, res) => {
     try {
       let token = req.firebaseToken;
-      let user = req.firebaseData;
+      let user = req.userData;
 
       if (!token || !user) return res.status(409).json({
         success: false,
-        message: "Invalid authorization. #60",
+        message: "Invalid authorization.",
         data: {}
       });
 
@@ -67,7 +67,7 @@ module.exports = {
         full_name: titleCase(full_name)
       }, {
         where: {
-          firebase_uid: user.uid,
+          id: user.id
         },
         returning: true,
         plain: true
