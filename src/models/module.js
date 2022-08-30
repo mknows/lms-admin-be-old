@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     session_id: DataTypes.STRING,
     duration: DataTypes.INTEGER,
     video_id: DataTypes.STRING,
-    dokumen_id: DataTypes.STRING
+    document_id: DataTypes.STRING
   }, {
     sequelize,
     tableName: 'modules',
