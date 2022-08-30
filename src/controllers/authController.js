@@ -8,7 +8,6 @@ const {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   sendEmailVerification,
-
   createUserWithEmailAndPassword,
   updateProfile
 } = require("firebase/auth");
