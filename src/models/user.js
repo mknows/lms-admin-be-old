@@ -14,16 +14,32 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   User.init({
-    firebaseUID: DataTypes.STRING,
-    fullName: DataTypes.STRING,
+    firebase_uid: DataTypes.STRING,
+    full_name: DataTypes.STRING,
     email: DataTypes.STRING,
     password: DataTypes.STRING,
     phone: DataTypes.STRING,
+    gender: DataTypes.CHAR(1),
     role: DataTypes.STRING,
-    isVerified: DataTypes.BOOLEAN
+    is_verified: DataTypes.BOOLEAN,
+    is_lecturer: DataTypes.BOOLEAN,
+    created_at: {
+      allowNull: false,
+      type: DataTypes.DATE,
+      field: "created_at"
+    },
+    updated_at: {
+      allowNull: false,
+      type: DataTypes.DATE,
+      field: "updated_at"
+    }
   }, {
     sequelize,
-    modelName: "User"
+    modelName: "User",
+    tableName: "Users",
+    timestamps: true,
+    underscored: true,
+    underscoredAll: true
   });
 
   return User;
