@@ -33,11 +33,13 @@ exports.protection = async (req, res, next) => {
       data: {}
     });
 
-    req.firebaseToken = token;
-    req.firebaseData = user;
-    req.userData = await User.findOne({
+    const { dataValues } = await User.findOne({
       email: user.email
     });
+
+    req.firebaseToken = token;
+    req.userData = dataValues;
+    req.firebaseData = user;
 
     next();
   } catch (error) {
