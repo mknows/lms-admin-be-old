@@ -1,4 +1,6 @@
-const { User, Nrus, Daus } = require("../models");
+const { User, Nrus, Daus, User_Activity } = require("../models");
+const { Op } = require("sequelize");
+
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const os = require("os");
@@ -61,17 +63,9 @@ module.exports = {
         is_lecturer: false
       });
 
-      console.log(req.useragent);
+      insertActivity(created.dataValues.id, "Register with Email and Password");
 
-      Nrus.create({
-        user_id: created.id,
-        ip_address: req.headers['x-real-ip'] || req.connection.remoteAddress,
-        referrer: req.headers.referer,
-        device: req.device.type,
-        platform: os.platform() || req.useragent.platform,
-        operating_system: `${req.useragent.browser} ${req.useragent.version}`,
-        source: req.useragent.source
-      });
+      insertNRUs(created.dataValues.id);
 
       const user = getClientAuth().currentUser;
 
@@ -127,18 +121,9 @@ module.exports = {
         where: {
           email
         }
-      })
+      });
 
-      await Daus.create({
-        user_id: dataPostgre.id,
-        activity : "Login",
-        ip_address: req.headers['x-real-ip'] || req.connection.remoteAddress,
-        referrer: req.headers.referrer || req.headers.referer,
-        device: req.device.type,
-        platform: os.platform() || req.useragent.platform,
-        operating_system: `${req.useragent.browser} ${req.useragent.version}`,
-        source: req.useragent.source
-      })
+      insertActivity(dataPostgre.dataValues.id, "Login with Email and Password");
 
       const token = await auth.currentUser.getIdToken();
 
@@ -257,7 +242,11 @@ module.exports = {
           is_verified: false,
           is_lecturer: false
         });
-      }
+
+        insertNRUs(user.dataValues.id);
+      } else insertDAUs(user.dataValues.id);
+
+      insertActivity(user.dataValues.id, "Login with Google");
 
       delete user.dataValues['id'];
       delete user.dataValues['firebase_uid'];
@@ -330,4 +319,52 @@ function phoneNumber(number) {
     alert("message");
     return false;
   }
+}
+
+// Usage for Insert User Activity
+function insertActivity(userId, activity) {
+  User_Activity.create({
+    user_id: userId,
+    activity,
+    ip_address: req.headers['x-real-ip'] || req.connection.remoteAddress,
+    referrer: req.headers.referrer || req.headers.referer,
+    device: req.device.type,
+    platform: os.platform() || req.useragent.platform,
+    operating_system: `${req.useragent.browser} ${req.useragent.version}`,
+    source: req.useragent.source
+  });
+
+  return true;
+}
+
+// Usage for Insert Daily Active User (DAUs)
+const insertNRUs = async (userId) => {
+  Nrus.create({
+    user_id: userId
+  });
+
+  return true;
+
+}
+
+// Usage for Insert Daily Active User (DAUs)
+const insertDAUs = async (userId) => {
+  const TODAY_START = new Date().setHours(0, 0, 0, 0);
+  const NOW = new Date();
+
+  let existDaus = await Daus.findOne({
+    where: {
+      user_id: userId,
+      created_at: {
+        [Op.gt]: TODAY_START,
+        [Op.lt]: NOW
+      },
+    },
+  });
+
+  if (!existDaus) Daus.create({
+    user_id: userId
+  });
+
+  return true;
 }
