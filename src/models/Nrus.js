@@ -22,12 +22,6 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id'
       }
     },
-    ip_address: DataTypes.STRING,
-    referrer: DataTypes.STRING,
-    device: DataTypes.STRING,
-    platform: DataTypes.STRING,
-    operating_system: DataTypes.STRING,
-    source: DataTypes.STRING,
     created_at: {
       allowNull: false,
       type: DataTypes.DATE,
