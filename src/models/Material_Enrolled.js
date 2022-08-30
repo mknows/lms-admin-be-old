@@ -16,8 +16,8 @@ module.exports = (sequelize, DataTypes) => {
   Material_Enrolled.init({
     student_id: DataTypes.STRING,
     session_id: DataTypes.STRING,
-    student_id: DataTypes.STRING,
-    material_id: DataTypes.STRING,
+    subject_id: DataTypes.STRING,
+    material_id: {type:DataTypes.STRING,primaryKey:true},
     description: DataTypes.STRING,
     id_referrer: DataTypes.STRING,
     type: DataTypes.STRING,
@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     score: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'material_enrolled',
+    tableName: 'material_enrolleds',
   });
   return Material_Enrolled;
 };

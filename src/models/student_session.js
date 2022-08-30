@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     session_id: {type:DataTypes.STRING,primaryKey:true},
     student_id: {type:DataTypes.STRING,primaryKey:true},
     date_present: DataTypes.DATE,
-    final_score: DataTypes.NUMBER,
+    final_score: DataTypes.INTEGER,
     present: DataTypes.BOOLEAN
   }, {
     sequelize,
