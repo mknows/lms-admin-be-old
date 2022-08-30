@@ -17,12 +17,6 @@ module.exports = {
           key: 'id'
         }
       },
-      ip_address: Sequelize.STRING,
-      referrer: Sequelize.STRING,
-      device: Sequelize.STRING,
-      platform: Sequelize.STRING,
-      operating_system: Sequelize.STRING,
-      source: Sequelize.STRING,
       created_at: {
         allowNull: false,
         type: Sequelize.DATE
