@@ -1,4 +1,4 @@
-const { User, Nrus } = require("../models");
+const { User, Nrus, Daus } = require("../models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const os = require("os");
@@ -122,6 +122,23 @@ module.exports = {
         email,
         password
       );
+
+      const dataPostgre = await User.findOne({
+        where: {
+          email
+        }
+      })
+
+      await Daus.create({
+        user_id: dataPostgre.id,
+        activity : "Login",
+        ip_address: req.headers['x-real-ip'] || req.connection.remoteAddress,
+        referrer: req.headers.referrer || req.headers.referer,
+        device: req.device.type,
+        platform: os.platform() || req.useragent.platform,
+        operating_system: `${req.useragent.browser} ${req.useragent.version}`,
+        source: req.useragent.source
+      })
 
       const token = await auth.currentUser.getIdToken();
 
