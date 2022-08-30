@@ -63,7 +63,7 @@ module.exports = {
         is_lecturer: false
       });
 
-      insertActivity(created.dataValues.id, "Register with Email and Password");
+      insertActivity(req, created.dataValues.id, "Register with Email and Password");
 
       insertNRUs(created.dataValues.id);
 
@@ -123,7 +123,7 @@ module.exports = {
         }
       });
 
-      insertActivity(dataPostgre.dataValues.id, "Login with Email and Password");
+      insertActivity(req, dataPostgre.dataValues.id, "Login with Email and Password");
 
       const token = await auth.currentUser.getIdToken();
 
@@ -246,7 +246,7 @@ module.exports = {
         insertNRUs(user.dataValues.id);
       } else insertDAUs(user.dataValues.id);
 
-      insertActivity(user.dataValues.id, "Login with Google");
+      insertActivity(req, user.dataValues.id, "Login with Google");
 
       delete user.dataValues['id'];
       delete user.dataValues['firebase_uid'];
@@ -322,7 +322,7 @@ function phoneNumber(number) {
 }
 
 // Usage for Insert User Activity
-function insertActivity(userId, activity) {
+function insertActivity(req,userId, activity) {
   User_Activity.create({
     user_id: userId,
     activity,
