@@ -9,13 +9,8 @@ const {
   sendEmailVerification,
 
   createUserWithEmailAndPassword,
-  updateProfile,
-  sendVerificationEmail
+  updateProfile
 } = require("firebase/auth");
-
-const { getAuth: getAdminAuth } = require("firebase-admin/auth");
-
-const { JWT_SECRET_KEY } = process.env;
 
 module.exports = {
   /**
@@ -40,7 +35,7 @@ module.exports = {
    */
   createUser: async (req, res) => {
     try {
-      const { fullName, email, password, phone } = req.body;
+      const { full_name, email, password, gender } = req.body;
 
       const credential = await createUserWithEmailAndPassword(
         getClientAuth(),
@@ -49,38 +44,35 @@ module.exports = {
       );
 
       await updateProfile(credential.user, {
-        displayName: titleCase(fullName).trim(),
+        displayName: titleCase(full_name).trim(),
         emailVerified: false
       });
 
       const hashPassword = bcrypt.hashSync(password, 10);
 
       const created = await User.create({
-        firebaseUID: credential.user.uid,
-        fullName,
+        firebase_uid: credential.user.uid,
+        full_name,
         email,
         password: hashPassword,
-        isVerified: false,
-        phone,
-        role: "mahasiswa"
+        gender,
+        role: "mahasiswa",
+        is_verified: false,
+        is_lecturer: false
       });
 
       const user = getClientAuth().currentUser;
 
       await sendEmailVerification(user);
 
-      return res.sendJson(
-        201,
-        true,
-        "Register success. Please verify your email by click link at your mail inbox.",
+      return res.sendJson(201, true, "Register success. Please verify your email by click verification link at your mail inbox.",
         {
-          id: created.id,
-          fullName: created.name,
-          email: created.email,
+          full_name: created.dataValues.name,
+          email: created.dataValues.email
         }
       );
     } catch (error) {
-      console.log(error);
+      console.error(error);
       let message, errorCode = error.code || 500;
       switch (errorCode) {
         case "auth/wrong-password": {
@@ -122,7 +114,7 @@ module.exports = {
       const token = await auth.currentUser.getIdToken();
 
       return res.sendJson(200, true, `Login success. Hi ${credential.user.displayName}!`, {
-        token : `Bearer ${token}`,
+        token,
       }, {
         name: "token", value: token
       });
@@ -161,7 +153,7 @@ module.exports = {
 
       await sendPasswordResetEmail(getClientAuth(), email);
 
-      return res.sendJson(200, true, "Reset Password email has been send. Please check your mail inbox to reset your password.", {});
+      return res.sendJson(200, true, "Reset Password email has been sent. Please check your mail inbox to reset your password.", {});
     } catch (err) {
       console.error(err);
       return res.sendJson(403, false, "Something went wrong.", {});
@@ -201,8 +193,90 @@ module.exports = {
 
       return res.sendJson(200, true, "Email verification sent. Please check your email inbox.", {});
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return res.sendJson(500, false, err, null);
+    }
+  },
+
+  /**
+   * @desc      Login With Google
+   * @route     GET /api/v1/auth/google-validate
+   * @access    Public
+   */
+  googleValidate: async (req, res) => {
+    try {
+      let token = req.firebaseToken;
+      let firebaseData = req.firebaseData;
+      let user = req.userData;
+
+      if (!token || !firebaseData) return res.status(409).json({
+        success: false,
+        message: "Invalid authorization.",
+        data: {}
+      });
+
+      const { email, name, uid } = firebaseData;
+
+      if (!user) {
+        user = await User.create({
+          firebase_uid: uid,
+          full_name: name,
+          email,
+          password: "login-with-email",
+          gender: 0,
+          role: "mahasiswa",
+          is_verified: false,
+          is_lecturer: false
+        });
+      }
+
+      delete user.dataValues['id'];
+      delete user.dataValues['firebase_uid'];
+      delete user.dataValues['password'];
+
+      res.status(200).json({
+        success: true,
+        message: "Account connected.",
+        data: { ...user.dataValues }
+      });
+    } catch (error) {
+      console.error(error);
+
+      let message, errorCode = error.code || 500;
+      switch (errorCode) {
+        case "auth/id-token-expired": {
+          message = "Firebase ID token has expired.";
+          break;
+        }
+        case "auth/user-not-found": {
+          message = "Invalid combination Email address and Password.";
+          break;
+        }
+        case "auth/email-already-in-use": {
+          message = "This email already used by another account.";
+          break;
+        }
+        default:
+          message = "Something went wrong.";
+      }
+
+      return res.sendJson(403, false, message, {});
+    }
+  },
+
+  signOutUser: async (req, res) => {
+    try {
+      req.logout(function (err) {
+        if (err) { return next(err); }
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "Logout success.",
+        data: {}
+      });
+    } catch (error) {
+      console.error(error);
     }
   }
 };

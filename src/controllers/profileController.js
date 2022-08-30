@@ -22,10 +22,10 @@ module.exports = {
 
       const data = await User.findOne({
         where: {
-          firebaseUID: user.uid
+          firebase_uid: user.uid
         },
         attributes: {
-          exclude: ['id', 'firebaseUID', 'password']
+          exclude: ['id', 'firebase_uid', 'password']
         }
       });
 
@@ -53,36 +53,32 @@ module.exports = {
   updateMe: async (req, res) => {
     try {
       let token = req.firebaseToken;
-      let user = req.userData;
+      let user = req.firebaseData;
 
       if (!token || !user) return res.status(409).json({
         success: false,
-        message: "Invalid authorization.",
+        message: "Invalid authorization. #60",
         data: {}
       });
 
-      const { fullName } = req.body;
+      const { full_name } = req.body;
 
       const data = await User.update({
-        fullName: titleCase(fullName)
+        full_name: titleCase(full_name)
       }, {
         where: {
-          firebaseUID: user.uid,
+          firebase_uid: user.uid,
         },
         returning: true,
         plain: true
       });
 
-      console.log("before data => ", data[1]);
-      
       delete data[1].dataValues['id'];
-      delete data[1].dataValues['firebaseUID'];
+      delete data[1].dataValues['firebase_uid'];
       delete data[1].dataValues['password'];
 
-      console.log("after data => ", data[1]);
-
       await updateProfile(getClientAuth(), {
-        fullName: titleCase(fullName)
+        full_name: titleCase(full_name)
       });
 
       return res.status(200).json({
