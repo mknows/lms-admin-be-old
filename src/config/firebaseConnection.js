@@ -2,6 +2,8 @@ const firebaseConnection = require('firebase-admin');
 const { initializeApp } = require('firebase/app');
 const { cert } = require('firebase-admin/app');
 
+// const dbCredential = require("./firebaseAdminKampusGratis.json");
+// const webCredential = require("./firebaseWebKampusGratis.json");
 const dbCredential = require("./firebaseAdminKampusGratis.json");
 const webCredential = require("./firebaseWebKampusGratis.json");
 
