@@ -5,13 +5,14 @@ exports.validate = (method) => {
     case 'createUser': {
       return [
         body('email', 'Email address is invalid').notEmpty().trim().normalizeEmail().isEmail(),
-        body('password', 'Password should be at least 5 characters').not().isEmpty().isLength({ min: 5 }),
-        body('fullName', 'Full Name is invalid').notEmpty().trim().isAlpha('en-US', { ignore: ' ' })
+        body('password', 'Password should be at least 5 characters').notEmpty().isLength({ min: 5 }),
+        body('full_name', 'Full Name is invalid').notEmpty().trim().isAlpha('en-US', { ignore: ' ' }),
+        body('gender', 'Gender is invalid').notEmpty().trim().isIn([0, 1, 2, 9])
       ];
     }
     case 'loginUser': {
       return [
-        body('email', 'Email address is invalid').notEmpty().trim().normalizeEmail().isEmail(),
+        body('email', 'Email address is invaloid').notEmpty().trim().normalizeEmail().isEmail(),
         body('password', 'Password is required').notEmpty().trim()
       ];
     }
@@ -23,7 +24,7 @@ exports.validate = (method) => {
 
     case 'updateDataUser': {
       return [
-        body('fullName', 'Full Name is invalid').notEmpty().trim().isAlpha('en-US', { ignore: ' ' })
+        body('full_name', 'Full Name is invalid').notEmpty().trim().isAlpha('en-US', { ignore: ' ' })
       ]
     }
   }

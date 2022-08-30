@@ -1,3 +1,4 @@
+const { User } = require("../models");
 const { getAuth } = require("firebase-admin/auth");
 
 /**
@@ -33,7 +34,10 @@ exports.protection = async (req, res, next) => {
     });
 
     req.firebaseToken = token;
-    req.userData = user;
+    req.firebaseData = user;
+    req.userData = await User.findOne({
+      email: user.email
+    });
 
     next();
   } catch (error) {
