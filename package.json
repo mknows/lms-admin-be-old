@@ -15,6 +15,8 @@
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "express-device": "^0.4.2",
+    "express-useragent": "^1.0.15",
     "express-validator": "^6.14.2",
     "firebase": "^9.9.3",
     "firebase-admin": "^11.0.1",
