@@ -10,7 +10,6 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsToMany(models.subject, { through: models.student_subject});
     }
   }
   User.init({
@@ -21,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     phone: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'User',
+    tableName: 'users',
   });
   return User;
 };

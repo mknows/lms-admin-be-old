@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     is_mentor: DataTypes.BOOLEAN
   }, {
     sequelize,
-    modelName: 'teacher',
+    tableName: 'teachers',
   });
   return teacher;
 };

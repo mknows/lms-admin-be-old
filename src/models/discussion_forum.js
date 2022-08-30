@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class discussion_forum extends Model {
+  class Discussion_forum extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  discussion_forum.init({
+  Discussion_forum.init({
     id: {type:DataTypes.STRING,primaryKey:true},
     writer_id: DataTypes.STRING,
     session_id: DataTypes.STRING,
@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     content: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'discussion_forum',
+    tableName: 'discussion_forums',
   });
-  return discussion_forum;
+  return Discussion_forum;
 };

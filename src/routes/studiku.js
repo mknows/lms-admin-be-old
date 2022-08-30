@@ -1,13 +1,10 @@
 const express = require("express");
 const route = express.Router();
 
-const matakuliahController = require("../controllers/matakuliahController");
-const profileController = require("../controllers/profileController");
-const { validate, validatorMessage } = require('../middlewares/Validator');
+const studikuController = require("../controllers/studikuController");
 const { protection } = require("../middlewares/Authentication");
 
-route.get("/all", matakuliahController.getAllMatakuliah);
-route.get("/matakuliahMurid", protection, matakuliahController.getMatakuliahMurid);
-route.put("/matakuliahMurid", protection, validate('updateDataUser'), validatorMessage, profileController.updateMe);
+route.get("/allsubject", studikuController.getAllStudentSubject);
+route.get("/studentsSubject", protection, studikuController.getStudentsSubject);
 
 module.exports = route;

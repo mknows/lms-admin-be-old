@@ -3,17 +3,11 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class comment extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+  class Comment extends Model {
     static associate(models) {
-      // define association here
     }
   }
-  comment.init({
+  Comment.init({
     id: {type:DataTypes.STRING,primaryKey:true},
     df_id: DataTypes.STRING,
     reply_to: DataTypes.STRING,
@@ -23,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     student_like: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'comment',
+    tableName: 'comments',
   });
-  return comment;
+  return Comment;
 };
