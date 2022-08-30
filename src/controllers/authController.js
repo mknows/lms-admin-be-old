@@ -7,7 +7,6 @@ const {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   sendEmailVerification,
-
   createUserWithEmailAndPassword,
   updateProfile,
   sendVerificationEmail
@@ -25,7 +24,7 @@ module.exports = {
    */
   getAllDataUser: async (req, res) => {
     try {
-      const data = await user.findAll();
+      const data = await User.findAll();
 
       res.sendJson(200, true, "sucess get all data", data);
     } catch (err) {
