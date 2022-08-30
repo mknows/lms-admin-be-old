@@ -8,10 +8,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      firebaseUID: {
+      firebase_uid: {
         type: Sequelize.STRING,
       },
-      fullName: {
+      full_name: {
         type: Sequelize.STRING,
       },
       email: {
@@ -23,23 +23,29 @@ module.exports = {
       phone: {
         type: Sequelize.STRING,
       },
+      gender: {
+        type: Sequelize.CHAR(1),
+      },
       role: {
         type: Sequelize.STRING,
       },
-      isVerified: {
+      is_lecturer: {
+        type: Sequelize.BOOLEAN
+      },
+      is_verified: {
         type: Sequelize.BOOLEAN,
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.DATE
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.DATE
       },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Users");
+    // await queryInterface.dropTable("Users");
   },
 };
