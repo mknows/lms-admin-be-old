@@ -213,7 +213,6 @@ module.exports = {
           is_lecturer: false
         });
 
-        console.log("user.datavalues => ", user.dataValues);
         insertNRUs(user.dataValues.id);
       } else insertDAUs(user.id);
 
