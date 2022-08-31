@@ -27,7 +27,7 @@ module.exports = {
           exclude: ['id', 'firebaseUID', 'password']
         }
       });
-
+      
       return res.status(200).json({
         success: true,
         message: "Account connected.",
@@ -59,7 +59,7 @@ module.exports = {
         message: "Invalid authorization.",
         data: {}
       });
-
+      
       const { fullName } = req.body;
 
       const data = await User.update({

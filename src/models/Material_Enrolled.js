@@ -18,11 +18,13 @@ module.exports = (sequelize, DataTypes) => {
     session_id: DataTypes.STRING,
     subject_id: DataTypes.STRING,
     material_id: {type:DataTypes.STRING,primaryKey:true},
-    description: DataTypes.STRING,
+    df_id: DataTypes.STRING,
+    status: DataTypes.STRING,
     id_referrer: DataTypes.STRING,
     type: DataTypes.STRING,
-    answer: DataTypes.ARRAY,
-    score: DataTypes.INTEGER
+    answer: DataTypes.ARRAY(DataTypes.STRING),
+    score: DataTypes.INTEGER,
+    activity_detail: DataTypes.JSON
   }, {
     sequelize,
     tableName: 'material_enrolleds',

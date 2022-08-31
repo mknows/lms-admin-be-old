@@ -1,4 +1,5 @@
 const { getAuth } = require("firebase-admin/auth");
+const { User } = require("../models");
 
 /**
  * @desc      Middleware for user authentication
@@ -33,7 +34,10 @@ exports.protection = async (req, res, next) => {
     });
 
     req.firebaseToken = token;
-    req.userData = user;
+    req.firebaseData = user;
+    req.userData = await User.findOne({
+      email: user.email
+    });
 
     next();
   } catch (error) {

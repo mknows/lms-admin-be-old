@@ -3,6 +3,7 @@ const express = require("express");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const cors = require("cors")
 
 dotenv.config({ path: "./src/config/config.env" });
 
@@ -21,13 +22,16 @@ app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, strict: false }));
 app.use(cookieParser());
+app.use(cors())
 
 const PORT = process.env.PORT || 8080;
 
 app.use("/api/v1", allRoutes);
 
-app.listen(PORT, () => {
-  console.log(`[SERVER] NodeJS API Server running on port: ${PORT}`);
+app.listen(PORT, {
+  cors: {
+    origin: "*"
+  } 
 });
 
 app.all('*', (req, res) => {

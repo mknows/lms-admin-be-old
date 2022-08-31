@@ -14,10 +14,14 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Quiz.init({
-    id: {type:DataTypes.STRING,primaryKey:true},
+    id: {type:DataTypes.STRING,primaryKey:true,autoIncrement:true},
     session_id: DataTypes.STRING,
     duration: DataTypes.INTEGER,
-    question_id: DataTypes.STRING
+    questions: DataTypes.JSON,
+    answer: DataTypes.ARRAY(DataTypes.STRING),
+    description: DataTypes.STRING,
+    createdBy: DataTypes.STRING,
+    updatedBy: DataTypes.STRING
   }, {
     sequelize,
     tableName: 'quizzes',

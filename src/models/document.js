@@ -15,8 +15,6 @@ module.exports = (sequelize, DataTypes) => {
   }
   Document.init({
     id: {type:DataTypes.STRING,primaryKey:true},
-    subject_id : DataTypes.STRING,
-    session_id : DataTypes.STRING,
     content: DataTypes.STRING,
     description: DataTypes.STRING
   }, {

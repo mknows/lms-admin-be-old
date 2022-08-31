@@ -10,13 +10,10 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
     }
   }
   Video.init({
     id: {type:DataTypes.STRING,primaryKey:true},
-    subject_id : DataTypes.STRING,
-    session_id : DataTypes.STRING,
     url: DataTypes.STRING,
     description: DataTypes.STRING
   }, {

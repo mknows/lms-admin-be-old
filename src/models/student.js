@@ -14,14 +14,14 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsToMany(models.Subject, { 
         through: models.StudentSubject,
-        foreignKey: 'student_id',
-        otherKey: 'subject_id'
+        foreignKey: 'student_id'
       });
     }
   }
 
   Student.init({
-    firebaseUID: {type:DataTypes.STRING,primaryKey:true},
+    id: {type:DataTypes.STRING,primaryKey:true},
+    firebaseUID: DataTypes.STRING,
     fullName: DataTypes.STRING
   }, {
     sequelize,
