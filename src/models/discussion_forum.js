@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
   class Discussion_forum extends Model {
     /**
@@ -14,11 +15,16 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Discussion_forum.init({
-    id: {type:DataTypes.STRING,primaryKey:true},
-    writer_id: DataTypes.STRING,
+    id: {type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
+    author_id: DataTypes.STRING,
     session_id: DataTypes.STRING,
     title: DataTypes.STRING,
-    content: DataTypes.STRING
+    content: DataTypes.STRING,
+    teacher_like: DataTypes.ARRAY(DataTypes.STRING),
+    student_like: DataTypes.ARRAY(DataTypes.STRING)
   }, {
     sequelize,
     tableName: 'discussion_forums',
