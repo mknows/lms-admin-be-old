@@ -80,22 +80,7 @@ module.exports = {
     } catch (error) {
       console.error(error);
       let message, errorCode = error.code || 500;
-      switch (errorCode) {
-        case "auth/wrong-password": {
-          message = "Invalid combination Email address and Password.";
-          break;
-        }
-        case "auth/user-not-found": {
-          message = "Invalid combination Email address and Password.";
-          break;
-        }
-        case "auth/email-already-in-use": {
-          message = "This email already used by another account.";
-          break;
-        }
-        default:
-          message = "Something went wrong.";
-      }
+      message = getErrorFirebase(errorCode)
 
       return res.sendJson(403, false, message, {});
     }
@@ -135,22 +120,7 @@ module.exports = {
     } catch (error) {
       console.error(error);
       let message, errorCode = error.code || 500;
-      switch (errorCode) {
-        case "auth/wrong-password": {
-          message = "Invalid combination Email address and Password.";
-          break;
-        }
-        case "auth/user-not-found": {
-          message = "Invalid combination Email address and Password.";
-          break;
-        }
-        case "auth/email-already-in-use": {
-          message = "This email already used by another account.";
-          break;
-        }
-        default:
-          message = "Something went wrong.";
-      }
+      message = res.getErrorFirebase(errorCode)
 
       return res.sendJson(403, false, message, {});
     }
@@ -243,40 +213,26 @@ module.exports = {
           is_lecturer: false
         });
 
+        console.log("user.datavalues => ", user.dataValues);
         insertNRUs(user.dataValues.id);
-      } else insertDAUs(user.dataValues.id);
+      } else insertDAUs(user.id);
 
-      insertActivity(req, user.dataValues.id, "Login with Google");
+      insertActivity(req, user.id, "Login with Google");
 
-      delete user.dataValues['id'];
-      delete user.dataValues['firebase_uid'];
-      delete user.dataValues['password'];
+      delete user['id'];
+      delete user['firebase_uid'];
+      delete user['password'];
 
       res.status(200).json({
         success: true,
         message: "Account connected.",
-        data: { ...user.dataValues }
+        data: { ...user }
       });
     } catch (error) {
       console.error(error);
 
       let message, errorCode = error.code || 500;
-      switch (errorCode) {
-        case "auth/id-token-expired": {
-          message = "Firebase ID token has expired.";
-          break;
-        }
-        case "auth/user-not-found": {
-          message = "Invalid combination Email address and Password.";
-          break;
-        }
-        case "auth/email-already-in-use": {
-          message = "This email already used by another account.";
-          break;
-        }
-        default:
-          message = "Something went wrong.";
-      }
+      message = res.getErrorFirebase(errorCode)
 
       return res.sendJson(403, false, message, {});
     }
