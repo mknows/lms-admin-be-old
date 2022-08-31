@@ -22,7 +22,6 @@ module.exports = (sequelize, DataTypes) => {
     status: DataTypes.STRING,
     id_referrer: DataTypes.STRING,
     type: DataTypes.STRING,
-    answer: DataTypes.ARRAY(DataTypes.STRING),
     score: DataTypes.INTEGER,
     activity_detail: DataTypes.JSON
   }, {

@@ -68,7 +68,7 @@ module.exports = {
 	},
 	/**
 	 * @desc      Get Matakuliah murid
-	 * @route     GET /api/v1/studiku/getQuizDesc
+	 * @route     GET /api/v1/studiku/getModule
 	 * @access    Private
 	 */
 	getQuizDesc: async (req,res) => {
@@ -89,7 +89,7 @@ module.exports = {
 	},
 	/**
 	 * @desc      Get Matakuliah murid
-	 * @route     GET /api/v1/studiku/makeQuiz
+	 * @route     GET /api/v1/studiku/getQuizDesc
 	 * @access    Private
 	 */
 	makeQuiz: async (req,res) => {
@@ -103,6 +103,50 @@ module.exports = {
 			answer:answer
 		})
 			res.sendJson(200,true,"Success", quizzDesc)
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
+	/**
+	 * @desc      Get Matakuliah murid
+	 * @route     GET /api/v1/studiku/takeQuiz/:id
+	 * @access    Private
+	 */
+	 takeQuiz: async (req,res) => {
+		try {
+			const quiz_id = req.params.id
+			const {material_id,session_id,subject_id} = req.body
+			const user_id = req.userData.dataValues.id;
+			const quizQuestions = await Quiz.findOne({
+				where:{
+					id: quiz_id
+				},
+				attributes:[
+					'duration','questions','description'
+				]
+			})
+			const checkIfCurrentlyTaking = await Quiz.findOne({
+				where:{
+					student_id:user_id,
+					session_id:session_id,
+					material_id:material_id,
+					subject_id:subject_id,
+					id_referrer:quiz_id,	
+				},
+				attributes:[
+					'description'
+				]
+			})
+			console.log(checkIfCurrentlyTaking.length)
+			const studentTakingQuiz = await Material_Enrolled.create({
+				student_id:user_id,
+				session_id:session_id,
+				material_id:material_id,
+				subject_id:subject_id,
+				id_referrer:quiz_id,	
+				type:"quiz"	
+			})
+			res.sendJson(200,true,"Success", quizQuestions)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}
@@ -134,14 +178,17 @@ module.exports = {
 			}
 		}
 		const score = (correct / quizAns.length) * 100
+		const quizResultDetail = {
+
+		}
 		try {
 			const result = await Material_Enrolled.create({
 			student_id:user_id,
 			session_id:session_id,
 			material_id:"1",
-			duration:duration,
 			status:"wow",
-			answer:answer,
+			id_referrer:quiz_id,
+			type:"quiz",
 			score:score,
 		})
 			res.sendJson(200,true,"Success", result)

@@ -18,10 +18,9 @@ module.exports = {
         message: "Invalid authorization.",
         data: {}
       });
-
       const data = await User.findOne({
         where: {
-          firebaseUID: user.uid
+          firebaseUID: user.firebaseUID
         },
         attributes: {
           exclude: ['id', 'firebaseUID', 'password']
