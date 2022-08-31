@@ -5,19 +5,25 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
-      writer_id: {
-        type: Sequelize.STRING
+      author_id: {
+        type: Sequelize.UUID
       },
       session_id: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       title: {
         type: Sequelize.STRING
       },
       content: {
         type: Sequelize.STRING
+      },
+      teacher_like: {
+        type: Sequelize.ARRAY(Sequelize.UUID)
+      },
+      student_like: {
+        type: Sequelize.ARRAY(Sequelize.UUID)
       },
       createdAt: {
         allowNull: false,

@@ -4,15 +4,14 @@ module.exports = {
     await queryInterface.createTable('student_subjects', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID
       },
       subject_id: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       student_id: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       date_taken: {
         type: Sequelize.DATE

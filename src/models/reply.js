@@ -22,11 +22,11 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue:sequelize.literal('gen_random_uuid()')
     },
     df_id: DataTypes.UUID,
-    reply_to: DataTypes.UUID,
-    author_id: DataTypes.STRING,
+    comment_id: DataTypes.UUID,
+    author_id: DataTypes.UUID,
     content: DataTypes.STRING,
-    teacher_like: DataTypes.ARRAY(DataTypes.STRING),
-    student_like: DataTypes.ARRAY(DataTypes.STRING)
+    teacher_like: DataTypes.ARRAY(DataTypes.UUID),
+    student_like: DataTypes.ARRAY(DataTypes.UUID)
   }, {
     sequelize,
     tableName: 'replies',

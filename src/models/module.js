@@ -19,11 +19,15 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Module.init({
-    id: {type:DataTypes.STRING,primaryKey:true},
-    session_id: DataTypes.STRING,
+    id: {
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
+    session_id: DataTypes.UUID,
     duration: DataTypes.INTEGER,
-    video_id: DataTypes.STRING,
-    document_id: DataTypes.STRING
+    video_id: DataTypes.UUID,
+    document_id: DataTypes.UUID
   }, {
     sequelize,
     tableName: 'modules',

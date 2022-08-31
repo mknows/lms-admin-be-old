@@ -17,10 +17,16 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Subject.init({
-    id: {type:DataTypes.STRING,primaryKey:true},
+    id: {
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
     name: DataTypes.STRING,
-    duration: DataTypes.INTEGER,
-    teacher: DataTypes.ARRAY(DataTypes.STRING),
+    number_of_sessions: DataTypes.INTEGER,
+    program: DataTypes.STRING,
+    level: DataTypes.STRING,
+    lecturer: DataTypes.ARRAY(DataTypes.STRING),
     description: DataTypes.STRING
   }, {
     sequelize,

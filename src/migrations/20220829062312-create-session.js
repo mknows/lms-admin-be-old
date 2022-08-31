@@ -5,10 +5,10 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       subject_id: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       session_no: {
         type: Sequelize.INTEGER

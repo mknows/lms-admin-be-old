@@ -5,12 +5,12 @@ module.exports = {
       major_id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       student_id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       status: {
         type: Sequelize.STRING

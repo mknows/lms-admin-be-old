@@ -14,12 +14,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Material.init({
-    id: {type:DataTypes.STRING,primaryKey:true},
-    session_id: DataTypes.STRING,
-    subject_id: DataTypes.STRING,
+    id: {type:DataTypes.UUID,primaryKey:true},
+    session_id: DataTypes.UUID,
+    subject_id: DataTypes.UUID,
     description: DataTypes.STRING,
     type: DataTypes.STRING,
-    id_referrer: DataTypes.STRING
+    id_referrer: DataTypes.UUID
   }, {
     sequelize,
     tableName: 'materials',

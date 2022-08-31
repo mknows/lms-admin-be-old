@@ -14,8 +14,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Quiz.init({
-    id: {type:DataTypes.STRING,primaryKey:true,autoIncrement:true},
-    session_id: DataTypes.STRING,
+    id: {
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
+    session_id: DataTypes.UUID,
     duration: DataTypes.INTEGER,
     questions: DataTypes.JSON,
     answer: DataTypes.ARRAY(DataTypes.STRING),

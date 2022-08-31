@@ -5,13 +5,16 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       content: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
+      },
+      file:{
+        type: Sequelize.BLOB
       },
       description: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       createdAt: {
         allowNull: false,

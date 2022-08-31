@@ -2,10 +2,13 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('students', {
-      firebaseUID: {
+      id:{
+        type: Sequelize.UUID,
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+      },
+      firebaseUID: {
+        type: Sequelize.UUID
       },
       fullName: {
         type: Sequelize.STRING

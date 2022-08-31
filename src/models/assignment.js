@@ -14,11 +14,16 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Assignment.init({
-    id: {type:DataTypes.STRING,primaryKey:true},
-    session_id: DataTypes.STRING,
+    id: {
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
+    session_id: DataTypes.UUID,
     duration: DataTypes.INTEGER,
-    description: DataTypes.STRING,
-    content: DataTypes.STRING
+    description: DataTypes.TEXT,
+    content: DataTypes.TEXT,
+    document_id: DataTypes.UUID
   }, {
     sequelize,
     tableName: 'assignments',

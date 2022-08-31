@@ -13,8 +13,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   User.init({
-    id:{type:DataTypes.INTEGER,primaryKey:true,autoIncrement: true},
-    firebaseUID: DataTypes.STRING,
+    id:{type:DataTypes.UUID,primaryKey:true},
+    firebaseUID: DataTypes.UUID,
     fullName: DataTypes.STRING,
     email: DataTypes.STRING,
     gender: DataTypes.STRING,

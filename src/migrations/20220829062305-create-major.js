@@ -5,13 +5,13 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       name: {
         type: Sequelize.STRING
       },
-      subjects: {
-        type: Sequelize.ARRAY(Sequelize.STRING)
+      subjects_id: {
+        type: Sequelize.ARRAY(Sequelize.UUID)
       },
       createdAt: {
         allowNull: false,

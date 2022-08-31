@@ -1,11 +1,14 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('teachers', {
+    await queryInterface.createTable('lecturers', {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.UUID
+      },
+      firebaseUID: {
+        type: Sequelize.UUID
       },
       name: {
         type: Sequelize.STRING
@@ -35,6 +38,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('teachers');
+    await queryInterface.dropTable('lecturers');
   }
 };

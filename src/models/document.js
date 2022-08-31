@@ -14,9 +14,14 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Document.init({
-    id: {type:DataTypes.STRING,primaryKey:true},
-    content: DataTypes.STRING,
-    description: DataTypes.STRING
+    id: {
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
+    content: DataTypes.TEXT,
+    file: DataTypes.BLOB,
+    description: DataTypes.TEXT
   }, {
     sequelize,
     tableName: 'documents',

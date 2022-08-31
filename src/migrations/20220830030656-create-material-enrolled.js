@@ -4,27 +4,26 @@ module.exports = {
     await queryInterface.createTable('material_enrolleds', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID
       },
       student_id: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       session_id: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       student_id: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       material_id: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       description: {
         type: Sequelize.STRING
       },
       id_referrer: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       type: {
         type: Sequelize.STRING

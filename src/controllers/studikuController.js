@@ -68,7 +68,7 @@ module.exports = {
 	},
 	/**
 	 * @desc      Get Matakuliah murid
-	 * @route     GET /api/v1/studiku/getModule
+	 * @route     GET /api/v1/studiku/getQuizDesc
 	 * @access    Private
 	 */
 	getQuizDesc: async (req,res) => {
@@ -89,7 +89,7 @@ module.exports = {
 	},
 	/**
 	 * @desc      Get Matakuliah murid
-	 * @route     GET /api/v1/studiku/getQuizDesc
+	 * @route     GET /api/v1/studiku/makeQuiz
 	 * @access    Private
 	 */
 	makeQuiz: async (req,res) => {
@@ -115,17 +115,18 @@ module.exports = {
 	 takeQuiz: async (req,res) => {
 		try {
 			const quiz_id = req.params.id
-			const {material_id,session_id,subject_id} = req.body
-			const user_id = req.userData.dataValues.id;
+			const {material_id,subject_id} = req.body
+			const user_id = req.userData.id;
 			const quizQuestions = await Quiz.findOne({
 				where:{
 					id: quiz_id
 				},
 				attributes:[
-					'duration','questions','description'
+					'duration','questions','description','session_id'
 				]
 			})
-			const checkIfCurrentlyTaking = await Quiz.findOne({
+			const session_id = quizQuestions.dataValues.session_id
+			const checkIfCurrentlyTaking = await Material_Enrolled.findOne({
 				where:{
 					student_id:user_id,
 					session_id:session_id,
@@ -134,18 +135,19 @@ module.exports = {
 					id_referrer:quiz_id,	
 				},
 				attributes:[
-					'description'
+					'id'
 				]
 			})
-			console.log(checkIfCurrentlyTaking.length)
-			const studentTakingQuiz = await Material_Enrolled.create({
-				student_id:user_id,
-				session_id:session_id,
-				material_id:material_id,
-				subject_id:subject_id,
-				id_referrer:quiz_id,	
-				type:"quiz"	
-			})
+			if(checkIfCurrentlyTaking==null){
+				const studentTakingQuiz = await Material_Enrolled.create({
+					student_id:user_id,
+					session_id:session_id,
+					material_id:material_id,
+					subject_id:subject_id,
+					id_referrer:quiz_id,	
+					type:"quiz"	
+				})	
+			}
 			res.sendJson(200,true,"Success", quizQuestions)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
@@ -153,25 +155,26 @@ module.exports = {
 	},
 	/**
 	 * @desc      Get Matakuliah murid
-	 * @route     GET /api/v1/studiku/makeQuiz
+	 * @route     GET /api/v1/studiku/postQuizAnswer
 	 * @access    Private
 	 */
 	 postQuizAnswer: async (req,res) => {
-		const {answer,quiz_id} = req.body
+		const {answer,quiz_id,subject_id,duration_taken} = req.body
 		const userAnswer = answer
-		const user_id = req.userData.dataValues.id;
+		const user_id = req.userData.id
+		const kkm = 70
+		let status
 		let correct=0
 		const quiz = await Quiz.findAll({
 			where: {
 				id: quiz_id
 			},
 			attributes:[
-				'answer','session_id', 'duration'
+				'answer','session_id'
 			]
 		})
 		const quizAns = quiz[0].dataValues.answer
 		const session_id = quiz[0].dataValues.session_id
-		const duration = quiz[0].dataValues.duration
 		for(var i = 0, l = quizAns.length ; i<l;i++ ){
 			if(userAnswer[i]===quizAns[i]){
 				correct++
@@ -179,19 +182,77 @@ module.exports = {
 		}
 		const score = (correct / quizAns.length) * 100
 		const quizResultDetail = {
-
+			"date_submit":moment().format('MMMM Do YYYY, h:mm:ss a'),
+			"number_of_questions": quizAns.length,
+			"correct_answers":correct,
+			"duration_taken":duration_taken
+		}
+		if(score>=kkm){
+			status = "Passed"
+		}
+		if(score<kkm){
+			status = "Failed"
+		}
+		if(score>100 || score<0){
+			status = "Invalid"
 		}
 		try {
-			const result = await Material_Enrolled.create({
-			student_id:user_id,
+			const result = await Material_Enrolled.update({
+				score:score,
+				status:status,
+				activity_detail:quizResultDetail
+			},{
+				where:{
+					student_id:user_id,
+					subject_id:subject_id,
+					id_referrer:quiz_id,
+					session_id:session_id
+				}
+			}
+		)	
+			res.sendJson(200,true,"Success", null)
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
+	/**
+	 * @desc      Get Matakuliah murid
+	 * @route     GET /api/v1/studiku/getAssignment/:id
+	 * @access    Private
+	 */
+	 getAssignment: async (req,res) => {
+		const {session_id,duration,description,questions,answer} = req.body
+		const assignmentID = req.params.id
+		try {
+			const quizzDesc = await Quiz.create({
 			session_id:session_id,
-			material_id:"1",
-			status:"wow",
-			id_referrer:quiz_id,
-			type:"quiz",
-			score:score,
+			duration:duration,
+			description:description,
+			questions:questions,
+			answer:answer
 		})
-			res.sendJson(200,true,"Success", result)
+			res.sendJson(200,true,"Success", quizzDesc)
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
+	/**
+	 * @desc      Get Matakuliah murid
+	 * @route     GET /api/v1/studiku/postAssignment
+	 * @access    Private
+	 */
+	postAssignment: async (req,res) => {
+		const {session_id,duration,description,questions,answer} = req.body
+		const assignmentID = req.params.id
+		try {
+			const quizzDesc = await Quiz.create({
+			session_id:session_id,
+			duration:duration,
+			description:description,
+			questions:questions,
+			answer:answer
+		})
+			res.sendJson(200,true,"Success", quizzDesc)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}

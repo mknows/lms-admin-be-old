@@ -1,29 +1,30 @@
 'use strict';
+
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('replies', {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       df_id: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
-      reply_to: {
-        type: Sequelize.STRING
+      comment_id: {
+        type: Sequelize.UUID
       },
-      writer_id: {
-        type: Sequelize.STRING
+      author_id: {
+        type: Sequelize.UUID
       },
       content: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       teacher_like: {
-        type: Sequelize.ARRAY(Sequelize.STRING)
+        type: Sequelize.ARRAY(Sequelize.UUID)
       },
       student_like: {
-        type: Sequelize.STRING
+        type: Sequelize.ARRAY(Sequelize.UUID)
       },
       createdAt: {
         allowNull: false,

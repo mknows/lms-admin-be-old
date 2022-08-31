@@ -14,11 +14,15 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Material_Enrolled.init({
+    id: {
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
     student_id: DataTypes.STRING,
     session_id: DataTypes.STRING,
     subject_id: DataTypes.STRING,
     material_id: {type:DataTypes.STRING,primaryKey:true},
-    df_id: DataTypes.STRING,
     status: DataTypes.STRING,
     id_referrer: DataTypes.STRING,
     type: DataTypes.STRING,

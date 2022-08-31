@@ -13,9 +13,21 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Video.init({
-    id: {type:DataTypes.STRING,primaryKey:true},
+    id: {
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
     url: DataTypes.STRING,
-    description: DataTypes.STRING
+    description: DataTypes.TEXT,
+    updatedBy: {
+      type:DataTypes.STRING,
+      defaultValue:"NULL"
+    },
+    createdBy: {
+      type:DataTypes.STRING,
+      defaultValue:"NULL"
+    },
   }, {
     sequelize,
     tableName: 'videos',

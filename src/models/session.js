@@ -14,7 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Session.init({
-    id: {type:DataTypes.STRING,primaryKey:true},
+    id: {
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
     subject_id: DataTypes.STRING,
     session_no: DataTypes.NUMBER,
     duration: DataTypes.INTEGER,

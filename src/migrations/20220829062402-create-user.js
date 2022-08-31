@@ -5,10 +5,10 @@ module.exports = {
       firebaseUID: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       id: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       fullName: {
         type: Sequelize.STRING

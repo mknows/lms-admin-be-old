@@ -14,8 +14,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   StudentSubject.init({
-    subject_id: {type:DataTypes.STRING,primaryKey:true},
-    student_id: {type:DataTypes.STRING,primaryKey:true},
+    subject_id: {type:DataTypes.UUID,primaryKey:true},
+    student_id: {type:DataTypes.UUID,primaryKey:true},
     date_taken: DataTypes.DATE,
     status: DataTypes.STRING,
     final_score: DataTypes.INTEGER

@@ -5,19 +5,22 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       session_id: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       duration: {
         type: Sequelize.INTEGER
       },
       description: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       content: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
+      },
+      document_id: {
+        type: Sequelize.UUID
       },
       createdAt: {
         allowNull: false,

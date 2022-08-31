@@ -5,19 +5,16 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       session_id: {
-        type: Sequelize.STRING
-      },
-      duration: {
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID
       },
       video_id: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       dokumen_id: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       createdAt: {
         allowNull: false,

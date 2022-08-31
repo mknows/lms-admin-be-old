@@ -9,7 +9,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Comment.init({
-    id: {type:DataTypes.UUID,
+    id: {
+      type:DataTypes.UUID,
       primaryKey:true,
       defaultValue:sequelize.literal('gen_random_uuid()')
     },

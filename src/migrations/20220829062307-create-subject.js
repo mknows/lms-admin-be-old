@@ -5,16 +5,22 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       name: {
         type: Sequelize.STRING
       },
-      duration: {
+      number_of_sessions: {
         type: Sequelize.INTEGER
       },
-      teacher: {
-        type: Sequelize.ARRAY(Sequelize.STRING)
+      program:{
+        type: Sequelize.STRING
+      },
+      level:{
+        type: Sequelize.STRING
+      },
+      lecturer: {
+        type: Sequelize.ARRAY(Sequelize.UUID)
       },
       description: {
         type: Sequelize.STRING

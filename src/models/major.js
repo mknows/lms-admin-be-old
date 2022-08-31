@@ -14,9 +14,13 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Major.init({
-    id: {type:DataTypes.STRING,primaryKey:true},
+    id: {
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
     name: DataTypes.STRING,
-    subjects: DataTypes.ARRAY(DataTypes.STRING)
+    subjects: DataTypes.ARRAY(DataTypes.UUID)
   }, {
     sequelize,
     tableName: 'majors',

@@ -5,16 +5,13 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
       df_id: {
-        type: Sequelize.STRING
+        type: Sequelize.UUID
       },
-      reply_to: {
-        type: Sequelize.STRING
-      },
-      penulis_id: {
-        type: Sequelize.STRING
+      author_id: {
+        type: Sequelize.UUID
       },
       content: {
         type: Sequelize.STRING
@@ -23,7 +20,7 @@ module.exports = {
         type: Sequelize.ARRAY(Sequelize.STRING)
       },
       student_like: {
-        type: Sequelize.STRING
+        type: Sequelize.ARRAY(Sequelize.STRING)
       },
       createdAt: {
         allowNull: false,

@@ -15,16 +15,17 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Discussion_forum.init({
-    id: {type:DataTypes.UUID,
+    id: {
+      type:DataTypes.UUID,
       primaryKey:true,
       defaultValue:sequelize.literal('gen_random_uuid()')
     },
-    author_id: DataTypes.STRING,
-    session_id: DataTypes.STRING,
+    author_id: DataTypes.UUID,
+    session_id: DataTypes.UUID,
     title: DataTypes.STRING,
     content: DataTypes.STRING,
-    teacher_like: DataTypes.ARRAY(DataTypes.STRING),
-    student_like: DataTypes.ARRAY(DataTypes.STRING)
+    teacher_like: DataTypes.ARRAY(DataTypes.UUID),
+    student_like: DataTypes.ARRAY(DataTypes.UUID)
   }, {
     sequelize,
     tableName: 'discussion_forums',
