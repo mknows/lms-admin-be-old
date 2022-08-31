@@ -9,6 +9,7 @@ const useragent = require('express-useragent');
 dotenv.config({ path: "./src/config/config.env" });
 
 const response = require("./src/helpers/responseFormatter");
+const errResponseFirebase = require("./src/helpers/responseErrorFirebase")
 const allRoutes = require("./src/routes/index");
 const initializeFirebase = require('./src/config/firebaseConnection');
 
@@ -20,6 +21,7 @@ app.use(device.capture());
 app.use(useragent.express());
 app.set('trust proxy', true);
 app.use(response);
+app.use(errResponseFirebase);
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, strict: false }));
