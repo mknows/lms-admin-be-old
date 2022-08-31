@@ -26,11 +26,11 @@ module.exports = {
       },
       updatedBy:{
         allowNull:true,
-        type:Sequelize.DATE
+        type: Sequelize.STRING
       },
       createdBy: {
         allowNull: true,
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   },
