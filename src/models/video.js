@@ -21,12 +21,10 @@ module.exports = (sequelize, DataTypes) => {
     url: DataTypes.STRING,
     description: DataTypes.TEXT,
     updatedBy: {
-      type:DataTypes.STRING,
-      defaultValue:"NULL"
+      type:DataTypes.STRING
     },
     createdBy: {
-      type:DataTypes.STRING,
-      defaultValue:"NULL"
+      type:DataTypes.STRING
     },
   }, {
     sequelize,

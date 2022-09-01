@@ -21,9 +21,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     session_id: DataTypes.UUID,
     duration: DataTypes.INTEGER,
+    description: DataTypes.TEXT,
     questions: DataTypes.JSON,
     answer: DataTypes.ARRAY(DataTypes.STRING),
-    description: DataTypes.STRING,
     createdBy: DataTypes.STRING,
     updatedBy: DataTypes.STRING
   }, {

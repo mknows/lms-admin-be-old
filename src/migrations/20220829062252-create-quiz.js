@@ -16,8 +16,11 @@ module.exports = {
       description:{
         type: Sequelize.TEXT
       },
-      question_id: {
-        type: Sequelize.UUID
+      questions: {
+        type: Sequelize.JSON
+      },
+      answer: {
+        type: Sequelize.ARRAY(Sequelize.STRING)
       },
       createdAt: {
         allowNull: false,

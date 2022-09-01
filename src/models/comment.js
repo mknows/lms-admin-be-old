@@ -15,7 +15,6 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue:sequelize.literal('gen_random_uuid()')
     },
     df_id: DataTypes.UUID,
-    reply_to: DataTypes.UUID,
     author_id: DataTypes.STRING,
     content: DataTypes.STRING,
     teacher_like: DataTypes.ARRAY(DataTypes.STRING),

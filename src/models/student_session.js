@@ -14,13 +14,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   StudentSession.init({
-    id: {
-      type:DataTypes.UUID,
-      primaryKey:true,
-      defaultValue:sequelize.literal('gen_random_uuid()')
-    },
-    session_id: DataTypes.UUID,
-    student_id: DataTypes.UUID,
+    session_id: {type:DataTypes.UUID,primaryKey:true},
+    student_id: {type:DataTypes.UUID,primaryKey:true},
     date_present: DataTypes.DATE,
     final_score: DataTypes.INTEGER,
     present: DataTypes.BOOLEAN

@@ -10,6 +10,9 @@ module.exports = {
       firebaseUID: {
         type: Sequelize.UUID
       },
+      program:{
+        type: Sequelize.STRING
+      },
       fullName: {
         type: Sequelize.STRING
       },

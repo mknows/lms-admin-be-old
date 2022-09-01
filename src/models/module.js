@@ -25,7 +25,6 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue:sequelize.literal('gen_random_uuid()')
     },
     session_id: DataTypes.UUID,
-    duration: DataTypes.INTEGER,
     video_id: DataTypes.UUID,
     document_id: DataTypes.UUID
   }, {

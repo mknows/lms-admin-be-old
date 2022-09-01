@@ -22,6 +22,9 @@ module.exports = {
       description: {
         type: Sequelize.STRING
       },
+      status: {
+        type: Sequelize.STRING
+      },
       id_referrer: {
         type: Sequelize.UUID
       },
@@ -30,6 +33,9 @@ module.exports = {
       },
       score: {
         type: Sequelize.INTEGER
+      },
+      activity_detail:{
+        type: Sequelize.JSON
       },
       createdAt: {
         allowNull: false,
