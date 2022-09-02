@@ -8,7 +8,7 @@ module.exports = {
         type: Sequelize.UUID
       },
       firebaseUID: {
-        type: Sequelize.UUID
+        type: Sequelize.STRING
       },
       name: {
         type: Sequelize.STRING

@@ -38,7 +38,6 @@ module.exports = {
   createUser: async (req, res) => {
     try {
       const { full_name, email, password, gender } = req.body;
-
       const credential = await createUserWithEmailAndPassword(
         getClientAuth(),
         email,
@@ -80,7 +79,7 @@ module.exports = {
     } catch (error) {
       console.error(error);
       let message, errorCode = error.code || 500;
-      message = getErrorFirebase(errorCode)
+      message = res.getErrorFirebase(errorCode)
 
       return res.sendJson(403, false, message, {});
     }
@@ -93,7 +92,7 @@ module.exports = {
    */
   loginUser: async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { email, password   } = req.body;
 
       const auth = getClientAuth();
       const credential = await signInWithEmailAndPassword(
@@ -277,15 +276,15 @@ function phoneNumber(number) {
 }
 
 // Usage for Insert User Activity
-function insertActivity(req,userId, activity) {
+function insertActivity(req,userId,activity) {
   User_Activity.create({
     user_id: userId,
     activity,
     ip_address: req.headers['x-real-ip'] || req.connection.remoteAddress,
     referrer: req.headers.referrer || req.headers.referer,
-    device: req.device.type,
+    device: req.device?.type || "unknown",
     platform: os.platform() || req.useragent.platform,
-    operating_system: `${req.useragent.browser} ${req.useragent.version}`,
+    operating_system: `${req.useragent?.browser} ${req.useragent.version}`,
     source: req.useragent.source
   });
 

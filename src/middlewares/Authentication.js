@@ -41,7 +41,8 @@ exports.protection = async (req, res, next) => {
       }
     });
     req.userData = dataValues;
-
+    req.firebaseData = user;
+    req.firebaseToken = token
     next();
   } catch (error) {
     console.error(error);

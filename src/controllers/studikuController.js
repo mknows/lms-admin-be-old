@@ -1,4 +1,5 @@
-const {Student, Subject, Material_Enrolled,Module,Video,Document,Quiz} = require('../models')
+const {Student, Subject, Material_Enrolled,Module,Video,Document,Quiz,Student_Subject
+} = require('../models')
 const moment = require('moment')
 
 module.exports = {
@@ -253,6 +254,36 @@ module.exports = {
 			answer:answer
 		})
 			res.sendJson(200,true,"Success", quizzDesc)
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
+	
+	/**
+	 * @desc      Get Matakuliah murid
+	 * @route     POST /api/v1/studiku/takeSubject
+	 * @access    Private
+	 */
+	 takeSubject: async (req,res) => {
+		const user_id = req.userData.id
+		const {subject_id} = req.body
+		try {
+			const subjectTaken = await Student_Subject.findOne({
+				where:{
+					student_id:user_id,
+					subject_id
+				}
+			})
+			if(subjectTaken===null){
+				const result = await Student_Subject.create({
+					session_id:session_id,
+					duration:duration,
+					description:description,
+					questions:questions,
+					answer:answer
+				})
+			}
+			res.sendJson(200,true,"Success", subjectTaken)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}

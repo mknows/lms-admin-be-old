@@ -13,8 +13,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   User.init({
-    id:{type:DataTypes.UUID,primaryKey:true},
-    firebase_uid: DataTypes.UUID,
+    id: {
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
+    firebase_uid: DataTypes.STRING,
     full_name: DataTypes.STRING,
     email: DataTypes.STRING,
     gender: DataTypes.STRING,

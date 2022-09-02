@@ -6,7 +6,7 @@ exports.validate = (method) => {
       return [
         body('email', 'Email address is invalid').notEmpty().trim().normalizeEmail().isEmail(),
         body('password', 'Password should be at least 5 characters').not().isEmpty().isLength({ min: 5 }),
-        body('fullName', 'Full Name is invalid').notEmpty().trim(),
+        body('full_name', 'Full Name is invalid').notEmpty().trim(),
         body('gender', 'Please insert your gender').notEmpty().trim()
       ];
     }

@@ -8,7 +8,7 @@ module.exports = {
         primaryKey: true,
       },
       firebaseUID: {
-        type: Sequelize.UUID
+        type: Sequelize.STRING
       },
       program:{
         type: Sequelize.STRING

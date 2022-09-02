@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Lecturer.init({
     id: {type:DataTypes.UUID,primaryKey:true},
-    firebaseUID: DataTypes.UUID,
+    firebaseUID: DataTypes.STRING,
     name: DataTypes.STRING,
     is_lecturer: DataTypes.BOOLEAN,
     is_mentor: DataTypes.BOOLEAN
