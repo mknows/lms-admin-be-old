@@ -89,7 +89,7 @@ module.exports = {
             const comment_id = req.params.comment_id
 			const data = await Reply.findAll({
                 where: {
-                    reply_to: comment_id
+                    comment_id: comment_id
                 }
             })
 			res.sendJson(
@@ -174,7 +174,7 @@ module.exports = {
             const df_id = the_comment[0].dataValues.df_id
 			const data = await Reply.create({
                 df_id:df_id,
-                reply_to:comment_id,
+                comment_id:comment_id,
                 content:content,
                 author_id:user_id,
                
