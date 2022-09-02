@@ -20,7 +20,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       final_score: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       createdAt: {
         allowNull: false,

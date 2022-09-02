@@ -14,8 +14,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   StudentMajor.init({
-    major_id: {type:DataTypes.UUID,primaryKey:true},
-    student_id: {type:DataTypes.UUID,primaryKey:true},
+    id:{type:DataTypes.UUID,primaryKey:true},
+    major_id: DataTypes.UUID,
+    student_id: DataTypes.UUID,
     status: DataTypes.STRING
   }, {
     sequelize,

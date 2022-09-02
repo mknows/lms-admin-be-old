@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class StudentSubject extends Model {
+  class Daus extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,16 +13,15 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  StudentSubject.init({
-    id:{type:DataTypes.UUID,primaryKey:true},
-    subject_id: DataTypes.UUID,
-    student_id: DataTypes.UUID,
-    date_taken: DataTypes.DATE,
-    status: DataTypes.STRING,
-    final_score: DataTypes.FLOAT
+  Daus.init({
+    id: {
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
   }, {
     sequelize,
-    tableName: 'student_subjects',
+    modelName: 'daily_active_users',
   });
-  return StudentSubject;
+  return Daus;
 };

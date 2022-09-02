@@ -14,10 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   StudentSession.init({
-    session_id: {type:DataTypes.UUID,primaryKey:true},
-    student_id: {type:DataTypes.UUID,primaryKey:true},
+    id:{type:DataTypes.UUID,primaryKey:true},
+    subject_id: DataTypes.UUID,
+    session_id: DataTypes.UUID,
     date_present: DataTypes.DATE,
-    final_score: DataTypes.INTEGER,
+    final_score: DataTypes.FLOAT,
     present: DataTypes.BOOLEAN
   }, {
     sequelize,

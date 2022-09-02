@@ -1,26 +1,11 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('daily_active_users', {
       id: {
         type: Sequelize.UUID,
         allowNull: false,
         primaryKey: true,
-      },
-      firebase_uid: {
-        type: Sequelize.UUID
-      },
-      full_name: {
-        type: Sequelize.STRING
-      },
-      email: {
-        type: Sequelize.STRING
-      },
-      gender: {
-        type: Sequelize.STRING
-      },
-      phone: {
-        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -33,6 +18,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable('daily_active_users');
   }
 };
