@@ -20,7 +20,7 @@ module.exports = {
                 number_of_sessions:number_of_sessions,
                 program: program,
                 level: level,
-                lecture: lecturer,
+                lecturer: lecturer,
                 description: description
             })
 			res.sendJson(
@@ -49,7 +49,7 @@ module.exports = {
 			const data = await Session.create({
                 subject_id: subject_id,
                 session_no: session_no,
-                duration: session_no,
+                duration: duration,
                 is_sync: is_sync,
                 type: type,
                 description: description
