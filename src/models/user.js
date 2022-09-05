@@ -25,7 +25,6 @@ module.exports = (sequelize, DataTypes) => {
     phone: DataTypes.STRING,
     image: DataTypes.STRING,
     address: DataTypes.STRING,
-    major_id: DataTypes.ARRAY(DataTypes.STRING)
   }, {
     sequelize,
     tableName: 'users',

@@ -25,9 +25,9 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey:true,
       defaultValue:sequelize.literal('gen_random_uuid()')
     },
-    firebaseUID: DataTypes.STRING,
-    full_name: DataTypes.STRING,
-    major_id: DataTypes.ARRAY(DataTypes.STRING)
+    user_id: DataTypes.UUID,
+    major_id: DataTypes.ARRAY(DataTypes.STRING),
+    approved_By: DataTypes.STRING,
   }, {
     sequelize,
     tableName: 'students',

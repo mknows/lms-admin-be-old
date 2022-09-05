@@ -25,6 +25,9 @@ module.exports = {
       lecturer: {
         type: Sequelize.ARRAY(Sequelize.UUID)
       },
+      degree:{
+        type: Sequelize.STRING
+      },
       description: {
         type: Sequelize.STRING
       },
