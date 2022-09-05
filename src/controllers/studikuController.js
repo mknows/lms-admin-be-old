@@ -294,7 +294,6 @@ module.exports = {
 
 				subjectTaken.push(sub)
 				ongoing_credit += sub.credit
-				console.log(`\n ${ongoing_credit} \n`)
 
 				if (subjectTakenLog[i].subject_id === subject_id) {
 					already_taken = true;
@@ -302,7 +301,6 @@ module.exports = {
 			}
 			 
 			const thresh = ongoing_credit + the_subject.credit;
-			console.log(`\n ${thresh} \n`)
 
 			if(!already_taken){
 				res.sendJson(200,true,"subject already taken", subjectTaken)
