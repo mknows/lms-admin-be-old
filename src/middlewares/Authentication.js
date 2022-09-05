@@ -23,7 +23,7 @@ exports.protection = async (req, res, next) => {
     message: "Invalid authorization.",
     data: {}
   });
-
+  
   try {
     const user = await getAuth().verifyIdToken(token)
     if (!user) return res.status(409).json({
@@ -32,17 +32,15 @@ exports.protection = async (req, res, next) => {
       data: {}
     });
 
-    req.firebaseToken = token;
-    req.firebaseData = user;
-
     let { dataValues }= await User.findOne({
       where:{
         email:user.email
       }
     });
+    
     req.userData = dataValues;
     req.firebaseData = user;
-    req.firebaseToken = token
+    req.firebaseToken = token;
     next();
   } catch (error) {
     console.error(error);

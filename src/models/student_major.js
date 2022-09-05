@@ -14,7 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   StudentMajor.init({
-    id:{type:DataTypes.UUID,primaryKey:true},
+    id: {
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
     major_id: DataTypes.UUID,
     student_id: DataTypes.UUID,
     status: DataTypes.STRING

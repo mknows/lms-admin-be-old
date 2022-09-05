@@ -19,6 +19,9 @@ module.exports = {
       level:{
         type: Sequelize.STRING
       },
+      credits:{
+        type: Sequelize.INTEGER
+      },
       lecturer: {
         type: Sequelize.ARRAY(Sequelize.UUID)
       },
