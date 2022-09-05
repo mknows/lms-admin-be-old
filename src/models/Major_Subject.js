@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class StudentSession extends Model {
+  class MajorSubject extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,20 +13,17 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  StudentSession.init({
+  MajorSubject.init({
     id: {
       type:DataTypes.UUID,
       primaryKey:true,
       defaultValue:sequelize.literal('gen_random_uuid()')
     },
-    subject_id: DataTypes.UUID,
-    session_id: DataTypes.UUID,
-    date_present: DataTypes.DATE,
-    final_score: DataTypes.FLOAT,
-    present: DataTypes.BOOLEAN
+    major_id: DataTypes.UUID,
+    subject_id: DataTypes.UUID
   }, {
     sequelize,
-    tableName: 'student_sessions',
+    tableName: 'major_subjects',
   });
-  return StudentSession;
+  return MajorSubject;
 };

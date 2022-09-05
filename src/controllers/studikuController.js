@@ -82,7 +82,7 @@ module.exports = {
 			attributes:[
 				'session_id','description'
 			]
-		})
+			})
 			res.sendJson(200,true,"Success", quizzDesc)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
@@ -260,7 +260,7 @@ module.exports = {
 	},
 	/**
 	 * @desc      Get Matakuliah murid
-	 * @route     GET /api/v1/studiku/takeSubject
+	 * @route     GET /api/v1/studiku/getSubject
 	 * @access    Private
 	 */
 	getSubjectForStudent: async (req,res) => {
@@ -275,15 +275,28 @@ module.exports = {
 				]
 			})
 			const major_id = usersMajor.dataValues.major_id[0]
-			const majorSubject = await Major.findAll({
+
+			const majorSubject = await Major.findOne({
 				where:{
 					id: major_id
 				},
 				attributes:[
 					"subjects_id"
 				]
+			})	
+			const subject_id = majorSubject.dataValues.subjects_id
+			
+			const subjectTaken = await StudentSubject.findAll({
+				where:{
+					subject_id:subject_id,
+					student_id:user_id
+				},
+				attributes:[
+					"subject_id"
+				]
 			})
-			const subject_id = majorSubject[0].dataValues.subjects_id[0]
+			console.log(subjectTaken)
+
 			const subjectDetail = await Subject.findAll({
 				where:{
 					id: subject_id
