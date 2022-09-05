@@ -1,4 +1,4 @@
-const {Student, Subject, Material_Enrolled,Module,Video,Document,Quiz,Student_Subject
+const {Student, Subject, Material_Enrolled,Module,Video,Document,Quiz,StudentSubject
 } = require('../models')
 const moment = require('moment')
 
@@ -267,23 +267,55 @@ module.exports = {
 	 takeSubject: async (req,res) => {
 		const user_id = req.userData.id
 		const {subject_id} = req.body
+		const stat = "CURRENTLY TAKING"
 		try {
-			const subjectTaken = await Student_Subject.findOne({
-				where:{
-					student_id:user_id,
-					subject_id
+			const credit_thresh = 24;
+			let already_taken = false;
+			const the_subject = await Subject.findOne({
+				where: {
+					id:subject_id
 				}
 			})
-			if(subjectTaken===null){
-				const result = await Student_Subject.create({
-					session_id:session_id,
-					duration:duration,
-					description:description,
-					questions:questions,
-					answer:answer
+
+			const subjectTakenLog = await StudentSubject.findAll({
+				where:{
+					student_id:user_id,
+					status: stat
+				}
+			})
+			const subjectTaken = []
+			let ongoing_credit = 0
+			for (let i =0; i< subjectTakenLog.length; i++) {
+				const sub = await Subject.findOne({
+					where: {
+						id: subjectTakenLog[i].subject_id
+					}
 				})
+
+				subjectTaken.push(sub)
+				ongoing_credit += sub.credit
+				console.log(`\n ${ongoing_credit} \n`)
+
+				if (subjectTakenLog[i].subject_id === subject_id) {
+					already_taken = true;
+				}
 			}
-			res.sendJson(200,true,"Success", subjectTaken)
+			 
+			const thresh = ongoing_credit + the_subject.credit;
+			console.log(`\n ${thresh} \n`)
+
+			if(!already_taken && (thresh < credit_thresh)){
+				const result = await StudentSubject.create({
+					subject_id:subject_id,
+					student_id:user_id,
+					date_taken: moment().format(),
+					status: stat
+				})
+				res.sendJson(200,true,"Success", subjectTaken)
+			} else {
+				res.sendJson(200,true,"either too many credits or youve already taken it", subjectTaken)
+			}
+			
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}

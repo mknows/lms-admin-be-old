@@ -14,10 +14,15 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   StudentSubject.init({
-    id:{type:DataTypes.UUID,primaryKey:true},
+    id:{
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
     subject_id: DataTypes.UUID,
     student_id: DataTypes.UUID,
     date_taken: DataTypes.DATE,
+    date_finished: DataTypes.DATE,
     status: DataTypes.STRING,
     final_score: DataTypes.FLOAT
   }, {

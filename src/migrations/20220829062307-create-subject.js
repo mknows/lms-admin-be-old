@@ -25,6 +25,9 @@ module.exports = {
       description: {
         type: Sequelize.STRING
       },
+      credit: {
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

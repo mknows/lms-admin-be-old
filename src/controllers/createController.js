@@ -13,7 +13,8 @@ module.exports = {
             program, 
             level, 
             lecturer, 
-            description} = req.body
+            description,
+			credit} = req.body
 		try {
 			const data = await Subject.create({
                 name: name,
@@ -21,7 +22,8 @@ module.exports = {
                 program: program,
                 level: level,
                 lecturer: lecturer,
-                description: description
+                description: description,
+				credit: credit
             })
 			res.sendJson(
 				200, 

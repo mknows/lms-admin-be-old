@@ -1,4 +1,7 @@
 'use strict';
+
+const { sequelize } = require("../models");
+
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('student_subjects', {
@@ -14,6 +17,9 @@ module.exports = {
         type: Sequelize.UUID
       },
       date_taken: {
+        type: Sequelize.DATE
+      },
+      date_finished: {
         type: Sequelize.DATE
       },
       status: {

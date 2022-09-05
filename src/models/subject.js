@@ -27,7 +27,8 @@ module.exports = (sequelize, DataTypes) => {
     program: DataTypes.STRING,
     level: DataTypes.STRING,
     lecturer: DataTypes.ARRAY(DataTypes.UUID),
-    description: DataTypes.STRING
+    description: DataTypes.STRING,
+    credit: DataTypes.INTEGER
   }, {
     sequelize,
     tableName: 'subjects',
