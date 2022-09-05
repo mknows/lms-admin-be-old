@@ -13,8 +13,12 @@ module.exports = {
       program:{
         type: Sequelize.STRING
       },
-      fullName: {
+      full_name: {
         type: Sequelize.STRING
+      },
+      major_id:{
+        allowNull: false,
+        type: Sequelize.ARRAY(Sequelize.STRING)
       },
       createdAt: {
         allowNull: false,

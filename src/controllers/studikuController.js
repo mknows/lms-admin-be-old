@@ -1,4 +1,4 @@
-const {Student, Subject, Material_Enrolled,Module,Video,Document,Quiz,Student_Subject
+const {Student, Subject, Material_Enrolled,Module,Video,Document,Quiz,Student_Subject,Major
 } = require('../models')
 const moment = require('moment')
 
@@ -258,7 +258,45 @@ module.exports = {
 			res.sendJson(500, false, err.message, null);
 		}
 	},
-	
+	/**
+	 * @desc      Get Matakuliah murid
+	 * @route     GET /api/v1/studiku/takeSubject
+	 * @access    Private
+	 */
+	getSubjectForStudent: async (req,res) => {
+		const user_id = req.userData.id
+		try {
+			const usersMajor = await Student.findOne({
+				where:{
+					id:user_id
+				},
+				attributes:[
+					"major_id"
+				]
+			})
+			const major_id = usersMajor.dataValues.major_id[0]
+			const majorSubject = await Major.findAll({
+				where:{
+					id: major_id
+				},
+				attributes:[
+					"subjects_id"
+				]
+			})
+			const subject_id = majorSubject[0].dataValues.subjects_id[0]
+			const subjectDetail = await Subject.findAll({
+				where:{
+					id: subject_id
+				},
+				attributes:[
+					"name","description"
+				]
+			})
+			res.sendJson(200,true,"Success", subjectDetail)
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
 	/**
 	 * @desc      Get Matakuliah murid
 	 * @route     POST /api/v1/studiku/takeSubject
@@ -267,6 +305,7 @@ module.exports = {
 	 takeSubject: async (req,res) => {
 		const user_id = req.userData.id
 		const {subject_id} = req.body
+		let result
 		try {
 			const subjectTaken = await Student_Subject.findOne({
 				where:{
@@ -275,15 +314,15 @@ module.exports = {
 				}
 			})
 			if(subjectTaken===null){
-				const result = await Student_Subject.create({
-					session_id:session_id,
-					duration:duration,
-					description:description,
-					questions:questions,
-					answer:answer
+				result = await Student_Subject.create({
+					subject_id:subject_id,
+					student_id:user_id
 				})
 			}
-			res.sendJson(200,true,"Success", subjectTaken)
+			if(subjectTaken!==null){
+				result = "subject taken"
+			}
+			res.sendJson(200,true,"Success", result)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}
