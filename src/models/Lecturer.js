@@ -14,11 +14,15 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Lecturer.init({
-    id: {type:DataTypes.UUID,primaryKey:true},
-    firebaseUID: DataTypes.STRING,
-    full_name: DataTypes.STRING,
+    id: {
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
+    user_id:DataTypes.STRING,
     is_lecturer: DataTypes.BOOLEAN,
-    is_mentor: DataTypes.BOOLEAN
+    is_mentor: DataTypes.BOOLEAN,
+    approvedBy: DataTypes.STRING
   }, {
     sequelize,
     tableName: 'lecturers',

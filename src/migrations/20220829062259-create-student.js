@@ -7,13 +7,7 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
       },
-      firebaseUID: {
-        type: Sequelize.STRING
-      },
-      program:{
-        type: Sequelize.STRING
-      },
-      full_name: {
+      user_id: {
         type: Sequelize.STRING
       },
       major_id:{
@@ -28,12 +22,8 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updatedBy:{
+      approvedBy:{
         allowNull:true,
-        type: Sequelize.STRING
-      },
-      createdBy: {
-        allowNull: true,
         type: Sequelize.STRING
       }
     });

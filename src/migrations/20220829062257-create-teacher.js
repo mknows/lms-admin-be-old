@@ -7,12 +7,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.UUID
       },
-      firebaseUID: {
-        type: Sequelize.STRING
-      },
-      full_name: {
-        type: Sequelize.STRING
-      },
       is_lecturer: {
         type: Sequelize.BOOLEAN
       },
@@ -27,12 +21,8 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updatedBy:{
+      approvedBy:{
         allowNull:true,
-        type: Sequelize.STRING
-      },
-      createdBy: {
-        allowNull: true,
         type: Sequelize.STRING
       }
     });
