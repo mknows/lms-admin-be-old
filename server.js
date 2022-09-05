@@ -10,6 +10,7 @@ const useragent = require("express-useragent");
 dotenv.config({ path: "./src/config/config.env" });
 
 const errResponseFirebase = require("./src/helpers/responseErrorFirebase")
+const checkExistence = require("./src/helpers/checkExistence")
 const response = require("./src/helpers/responseFormatter");
 const allRoutes = require("./src/routes/index");
 const initializeFirebase = require('./src/config/firebaseConnection');
@@ -31,6 +32,7 @@ app.use(bodyParser.urlencoded({ extended: true, strict: false }));
 app.use(cookieParser());
 app.use(cors())
 app.use(errResponseFirebase);
+app.use(checkExistence)
 
 const PORT = process.env.PORT || 8080;
 
