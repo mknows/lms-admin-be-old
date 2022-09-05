@@ -274,38 +274,16 @@ module.exports = {
 					"major_id"
 				]
 			})
-			const major_id = usersMajor.dataValues.major_id[0]
-
-			const majorSubject = await Major.findOne({
+			console.log(usersMajor.dataValues.major_id)
+			const major_id = usersMajor.dataValues.major_id
+			const majorSubject = await Major.findAll({
 				where:{
-					id: major_id
+					id:major_id
 				},
-				attributes:[
-					"subjects_id"
-				]
-			})	
-			const subject_id = majorSubject.dataValues.subjects_id
-			
-			const subjectTaken = await StudentSubject.findAll({
-				where:{
-					subject_id:subject_id,
-					student_id:user_id
-				},
-				attributes:[
-					"subject_id"
-				]
+				include: Subject
 			})
-			console.log(subjectTaken)
-
-			const subjectDetail = await Subject.findAll({
-				where:{
-					id: subject_id
-				},
-				attributes:[
-					"name","description"
-				]
-			})
-			res.sendJson(200,true,"Success", subjectDetail)
+			console.log(majorSubject)
+			res.sendJson(200,true,"Success", usersMajor)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}
