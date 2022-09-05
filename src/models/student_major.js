@@ -20,8 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue:sequelize.literal('gen_random_uuid()')
     },
     major_id: DataTypes.UUID,
-    student_id: DataTypes.UUID,
-    status: DataTypes.STRING
+    student_id: DataTypes.UUID
   }, {
     sequelize,
     tableName: 'student_majors',
