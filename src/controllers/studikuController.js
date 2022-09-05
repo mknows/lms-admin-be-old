@@ -304,16 +304,21 @@ module.exports = {
 			const thresh = ongoing_credit + the_subject.credit;
 			console.log(`\n ${thresh} \n`)
 
-			if(!already_taken && (thresh < credit_thresh)){
+			if(!already_taken){
+				res.sendJson(200,true,"subject already taken", subjectTaken)
+			} 
+			else if(thresh < credit_thresh){
+				res.sendJson(200,true,"not enough credit", subjectTaken)
+			}
+			else {
 				const result = await StudentSubject.create({
-					subject_id:subject_id,
-					student_id:user_id,
-					date_taken: moment().format(),
-					status: stat
-				})
-				res.sendJson(200,true,"Success", subjectTaken)
-			} else {
-				res.sendJson(200,true,"either too many credits or youve already taken it", subjectTaken)
+				subject_id:subject_id,
+				student_id:user_id,
+				date_taken: moment().format(),
+				status: stat
+			})
+			subjectTaken.push(result)
+			res.sendJson(200,true,"Success", subjectTaken)
 			}
 			
 		} catch (err) {
