@@ -4,7 +4,8 @@ module.exports = (req, res, next) => {
     res.checkExistence = async (id,role) => {
         switch (role) {
             case "user": {
-              message = checkUser(id);
+              message = await checkUser(id);
+              console.log(message)
               break;
             }
             case "lecturer": {

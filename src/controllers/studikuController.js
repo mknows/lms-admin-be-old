@@ -315,6 +315,20 @@ module.exports = {
 			res.sendJson(500, false, err.message, null);
 		}
 	},
+	/**
+	 * @desc      Get Matakuliah murid
+	 * @route     POST /api/v1/studiku/takeSubject
+	 * @access    Private
+	 */
+	 test: async (req,res) => {
+		const user_id = req.userData.id
+		try {
+			const result = await res.checkExistence(user_id,"user")
+			res.sendJson(200,true,"Success", result)
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
 };
 
 function getID(id){
