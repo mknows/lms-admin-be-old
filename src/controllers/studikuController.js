@@ -1,4 +1,4 @@
-const {Student, Subject, Material_Enrolled,Module,Video,Document,Quiz,StudentSubject
+const {Student, Subject, Material_Enrolled,Module,Video,Document,Quiz,StudentSubject,Major,
 } = require('../models')
 const moment = require('moment')
 
@@ -292,74 +292,27 @@ module.exports = {
 	 takeSubject: async (req,res) => {
 		const user_id = req.userData.id
 		const {subject_id} = req.body
-		const stat = "CURRENTLY TAKING"
+		let result
 		try {
-			const credit_thresh = 24;
-			let already_taken = false;
-			const the_subject = await Subject.findOne({
-				where: {
-					id:subject_id
-				}
-			})
-
-			const subjectTakenLog = await StudentSubject.findAll({
+			const subjectTaken = await Student_Subject.findOne({
 				where:{
 					student_id:user_id,
-					status: stat
+					subject_id
 				}
 			})
-			const subjectTaken = []
-			let ongoing_credit = 0
-			for (let i =0; i< subjectTakenLog.length; i++) {
-				const sub = await Subject.findOne({
-					where: {
-						id: subjectTakenLog[i].subject_id
-					}
+
+			if(subjectTaken===null){
+				result = await Student_Subject.create({
+					subject_id:subject_id,
+					student_id:user_id
 				})
-
-				subjectTaken.push(sub)
-				ongoing_credit += sub.credit
-
-				if (subjectTakenLog[i].subject_id === subject_id) {
-					already_taken = true;
-				}
 			}
-			 
-			const thresh = ongoing_credit + the_subject.credit;
-
-			if(!already_taken){
-				res.sendJson(200,true,"subject already taken", subjectTaken)
-			} 
-			else if(thresh < credit_thresh){
-				res.sendJson(200,true,"not enough credit", subjectTaken)
+			if(subjectTaken!==null){
+				result = "subject taken"
 			}
-			else {
-				const result = await StudentSubject.create({
-				subject_id:subject_id,
-				student_id:user_id,
-				date_taken: moment().format(),
-				status: stat
-			})
-			subjectTaken.push(result)
-			res.sendJson(200,true,"Success", subjectTaken)
-			}
-			
+			res.sendJson(200,true,"Success", result)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
-		}
-	},
-	/**
-	 * @desc      Get Matakuliah murid
-	 * @route     POST /api/v1/studiku/takeSubject
-	 * @access    Private
-	 */
-	 test: async (req,res) => {	
-		const user_id = "N3cJRTfTWMSkSeOzlX0Mrgdy5xN2"
-		try {
-			const message = await res.checkExistence(user_id,"user")
-			res.sendJson(200, true, "Nice", message);
-		} catch (err) {
-			res.sendJson(500, false, err.message, message);
 		}
 	},
 };

@@ -12,7 +12,6 @@ route.post("/takeQuiz/:id", protection, studikuController.takeQuiz)
 route.post("/postQuizAnswer", protection, studikuController.postQuizAnswer)
 route.post("/takeSubject", protection, studikuController.takeSubject)
 route.get("/getSubjectForStudent", protection, studikuController.getSubjectForStudent)
-route.post("/test",protection,studikuController.test)
 
 
 module.exports = route;
