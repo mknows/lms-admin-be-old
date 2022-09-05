@@ -23,30 +23,10 @@ module.exports = {
 	},
 	/**
 	 * @desc      Get Matakuliah murid
-	 * @route     GET /api/v1/studiku/studentsSubject
-	 * @access    Private
-	 */
-	getStudentsSubject: async (req,res) => {
-		try {
-			let userID = req.userData.dataValues.id;
-			console.log(userID)
-			const studentsSubject = await Student.findAll({
-				where: {
-					id: userID
-				},
-				include: Subject
-			})	
-			res.sendJson(200,true,"Success", studentsSubject)
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
-	/**
-	 * @desc      Get Matakuliah murid
 	 * @route     GET /api/v1/studiku/getModule/:id
 	 * @access    Private
 	 */
-	 getModule: async (req,res) => {
+	getModule: async (req,res) => {
 		try {
 			const moduleID = req.params.id
 			const moduleData = await Module.findAll({
@@ -274,16 +254,32 @@ module.exports = {
 					"major_id"
 				]
 			})
-			console.log(usersMajor.dataValues.major_id)
-			const major_id = usersMajor.dataValues.major_id
-			const majorSubject = await Major.findAll({
+			const major_id = await usersMajor.dataValues.major_id
+
+			const majorSubject = await Major.findOne({
 				where:{
-					id:major_id
+					id:major_id	
+				},
+				include: Subject,
+				attributes:[
+					"id"
+				]
+			})
+			const majorSubjects = await majorSubject.getSubjects()
+			const majorSubjectID = getID(majorSubjects)
+			
+			const studentsSubject = await Student.findOne({
+				where:{
+					id: user_id
 				},
 				include: Subject
 			})
-			console.log(majorSubject)
-			res.sendJson(200,true,"Success", usersMajor)
+			const studentSubject = await studentsSubject.getSubjects()	
+			const studentSubjectID = getID(studentSubject)
+
+			const result = recommendation(studentSubjectID,majorSubjectID)
+			
+			res.sendJson(200,true,"Success", result)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}
@@ -353,3 +349,16 @@ module.exports = {
 		}
 	},
 };
+
+function getID(id){
+	const idReturn = []
+	for(let i=0 ; i<id.length; i++){
+		idReturn.push(id[i].dataValues.id)
+	}
+	return idReturn
+}
+
+function recommendation(studentSubjectID,majorSubjectID){
+	return majorSubjectID.filter(element=>!studentSubjectID.includes(element))
+}
+

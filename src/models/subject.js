@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
         through: models.StudentSubject,
         foreignKey: 'subject_id'
       });
+      this.belongsToMany(models.Major, { 
+        through: models.MajorSubject,
+        foreignKey: 'subject_id'
+      });
     }
   }
   Subject.init({
