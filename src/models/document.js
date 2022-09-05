@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue:sequelize.literal('gen_random_uuid()')
     },
     content: DataTypes.TEXT,
-    file: DataTypes.BLOB,
+    file: DataTypes.STRING,
     description: DataTypes.TEXT
   }, {
     sequelize,

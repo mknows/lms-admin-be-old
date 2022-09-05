@@ -22,7 +22,10 @@ module.exports = (sequelize, DataTypes) => {
     full_name: DataTypes.STRING,
     email: DataTypes.STRING,
     gender: DataTypes.STRING,
-    phone: DataTypes.STRING
+    phone: DataTypes.STRING,
+    image: DataTypes.STRING,
+    address: DataTypes.STRING,
+    major_id: DataTypes.ARRAY(DataTypes.STRING)
   }, {
     sequelize,
     tableName: 'users',

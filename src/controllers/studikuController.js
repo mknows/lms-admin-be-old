@@ -258,7 +258,45 @@ module.exports = {
 			res.sendJson(500, false, err.message, null);
 		}
 	},
-	
+	/**
+	 * @desc      Get Matakuliah murid
+	 * @route     GET /api/v1/studiku/takeSubject
+	 * @access    Private
+	 */
+	getSubjectForStudent: async (req,res) => {
+		const user_id = req.userData.id
+		try {
+			const usersMajor = await Student.findOne({
+				where:{
+					id:user_id
+				},
+				attributes:[
+					"major_id"
+				]
+			})
+			const major_id = usersMajor.dataValues.major_id[0]
+			const majorSubject = await Major.findAll({
+				where:{
+					id: major_id
+				},
+				attributes:[
+					"subjects_id"
+				]
+			})
+			const subject_id = majorSubject[0].dataValues.subjects_id[0]
+			const subjectDetail = await Subject.findAll({
+				where:{
+					id: subject_id
+				},
+				attributes:[
+					"name","description"
+				]
+			})
+			res.sendJson(200,true,"Success", subjectDetail)
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
 	/**
 	 * @desc      Get Matakuliah murid
 	 * @route     POST /api/v1/studiku/takeSubject

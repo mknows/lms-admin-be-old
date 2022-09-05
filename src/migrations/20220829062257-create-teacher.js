@@ -10,7 +10,7 @@ module.exports = {
       firebaseUID: {
         type: Sequelize.STRING
       },
-      name: {
+      full_name: {
         type: Sequelize.STRING
       },
       is_lecturer: {
