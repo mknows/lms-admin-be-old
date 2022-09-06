@@ -14,6 +14,14 @@ module.exports = (req, res, next) => {
           message = "This email already used by another account.";
           break;
         }
+        case "auth/argument-error": {
+          message = "token failed!";
+          break;
+        }
+        case "auth/user-token-expired": {
+          message = "expired!";
+          break;
+        }
         default:
           message = "Something went wrong.";
       }

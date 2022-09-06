@@ -9,7 +9,7 @@ module.exports = {
     database: "postgres",
     host: "localhost",
     dialect: "postgres",
-    port: "postgres"
+    port: 5433
   },
   test: {
     username: DB_USERNAME,

@@ -31,8 +31,10 @@ exports.protection = async (req, res, next) => {
       message: "Invalid authorization.",
       data: {}
     });
+    console.log("user Auth =>", user);
+    console.log("user Auth token =>", token);
 
-    let { dataValues }= await User.findOne({
+    let { dataValues } = await User.findOne({
       where:{
         email:user.email
       }
@@ -44,10 +46,9 @@ exports.protection = async (req, res, next) => {
     next();
   } catch (error) {
     console.error(error);
-    return res.status(403).json({
-      success: false,
-      message: "Something went wrong.",
-      data: {}
-    });
+    let message, errorCode = error.code || 500
+    message = res.getErrorFirebase(errorCode)
+
+    return res.sendJson(403, false, message, {})
   }
 }

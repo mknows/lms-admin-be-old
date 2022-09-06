@@ -20,7 +20,7 @@ module.exports = {
       });
       const data = await User.findOne({
         where: {
-          firebaseUID: user.firebaseUID
+          firebase_uid: user.firebase_uid
         },
         attributes: {
           exclude: ['id', 'firebaseUID', 'password']
