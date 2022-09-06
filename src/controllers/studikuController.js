@@ -292,9 +292,18 @@ module.exports = {
 	 takeSubject: async (req,res) => {
 		const user_id = req.userData.id
 		const {subject_id} = req.body
-		let result
+		const stat = "CURRENTLY TAKING"
+		const credit_thresh = 24;
 		try {
-			const subjectTaken = await Student_Subject.findOne({
+			
+			let already_taken = false;
+			const the_subject = await Subject.findOne({
+				where: {
+					id:subject_id
+				}
+			})
+
+			const subjectTakenLog = await StudentSubject.findAll({
 				where:{
 					student_id:user_id,
 					subject_id
