@@ -183,7 +183,7 @@ module.exports = {
 
   /**
    * @desc      Login With Google
-   * @route     GET /api/v1/auth/google-validate
+   * @route     POST /api/v1/auth/google-validate
    * @access    Public
    */
   googleValidate: async (req, res) => {

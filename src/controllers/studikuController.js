@@ -293,9 +293,8 @@ module.exports = {
 		const user_id = req.userData.id
 		const {subject_id} = req.body
 		const stat = "CURRENTLY TAKING"
-		const credit_thresh = 24;
 		try {
-			
+			const credit_thresh = 24;
 			let already_taken = false;
 			const the_subject = await Subject.findOne({
 				where: {
@@ -306,27 +305,52 @@ module.exports = {
 			const subjectTakenLog = await StudentSubject.findAll({
 				where:{
 					student_id:user_id,
-					subject_id
+					status: stat
 				}
 			})
-
-			if(subjectTaken===null){
-				result = await Student_Subject.create({
-					subject_id:subject_id,
-					student_id:user_id
+			const subjectTaken = []
+			let ongoing_credit = 0
+			for (let i =0; i< subjectTakenLog.length; i++) {
+				const sub = await Subject.findOne({
+					where: {
+						id: subjectTakenLog[i].subject_id
+					}
 				})
+
+				subjectTaken.push(sub)
+				ongoing_credit += sub.credit
+
+				if (subjectTakenLog[i].subject_id === subject_id) {
+					already_taken = true;
+				}
 			}
-			if(subjectTaken!==null){
-				result = "subject taken"
+			 
+			const thresh = ongoing_credit + the_subject.credit;
+
+			if(!already_taken){
+				res.sendJson(200,true,"subject already taken", subjectTaken)
+			} 
+			else if(thresh < credit_thresh){
+				res.sendJson(200,true,"not enough credit", subjectTaken)
 			}
-			res.sendJson(200,true,"Success", result)
+			else {
+				const result = await StudentSubject.create({
+				subject_id:subject_id,
+				student_id:user_id,
+				date_taken: moment().format(),
+				status: stat
+			})
+			subjectTaken.push(result)
+			res.sendJson(200,true,"Success", subjectTaken)
+			}
+			
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}
 	},
 	/**
 	 * @desc      Get Matakuliah murid
-	 * @route     POST /api/v1/studiku/takeSubject
+	 * @route     POST /api/v1/studiku/test
 	 * @access    Private
 	 */
 	 test: async (req,res) => {
