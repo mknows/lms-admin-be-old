@@ -1,4 +1,4 @@
-const {Student, Subject, Material_Enrolled,Module,Video,Document,Quiz,StudentSubject,Major,
+const {Student, Subject, Material_Enrolled,Module,Video,Document,Quiz,StudentSubject,Major,Session
 } = require('../models')
 const moment = require('moment')
 const {Op} = require("sequelize")
@@ -56,7 +56,7 @@ module.exports = {
 	 getAllSessionInSubject: async (req, res) => {
 		try {
 			const sub_id =  req.params.sub_id
-			const data = await Subject.findAll({
+			const data = await Session.findAll({
 				where : {
 					subject_id: sub_id
 				}

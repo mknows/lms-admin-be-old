@@ -6,7 +6,7 @@ const { protection } = require("../middlewares/Authentication");
 
 route.get("/allsubject", studikuController.getAllSubject);
 route.get("/getModule/:id", protection, studikuController.getModule)
-route.get("/getQuizzDesc/:id", protection, studikuController.getQuizDesc)
+route.get("/getQuizDesc/:id", protection, studikuController.getQuizDesc)
 route.get("/getSubjectForStudent", protection, studikuController.getSubjectForStudent)
 route.get("/session/:sub_id", protection, studikuController.getAllSessionInSubject)
 
