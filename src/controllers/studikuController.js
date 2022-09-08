@@ -118,7 +118,7 @@ module.exports = {
 				answer:answer
 				})
 
-			const make_material = await Material.create({
+			await Material.create({
 				session_id:session_id,
 				duration:duration,
 				description:description,
