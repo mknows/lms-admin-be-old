@@ -24,7 +24,7 @@ exports.validate = (method) => {
 
     case 'updateDataUser': {
       return [
-        body('fullName', 'Full Name is invalid').notEmpty().trim().isAlpha('en-US', { ignore: ' ' })
+        body('full_name', 'Full Name is invalid').notEmpty().trim().isAlpha('en-US', { ignore: ' ' })
       ]
     }
   }
