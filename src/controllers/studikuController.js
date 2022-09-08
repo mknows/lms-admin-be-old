@@ -1,10 +1,11 @@
 const {Student, Subject, Material_Enrolled,Module,Video,Document,Quiz,StudentSubject,Major,
 } = require('../models')
 const moment = require('moment')
+const {Op} = require("sequelize")
 
 module.exports = {
 	/**
-	 * @desc      Get All Matakuliah
+	 * @desc      Get All subject
 	 * @route     GET /api/v1/studiku/allSubject
 	 * @access    Public
 	 */
@@ -22,7 +23,7 @@ module.exports = {
 		}
 	},
 	/**
-	 * @desc      Get Matakuliah murid
+	 * @desc      Get Module
 	 * @route     GET /api/v1/studiku/getModule/:id
 	 * @access    Private
 	 */
@@ -48,7 +49,30 @@ module.exports = {
 		}
 	},
 	/**
-	 * @desc      Get Matakuliah murid
+	 * @desc      Get All Session in Subject
+	 * @route     GET /api/v1/studiku/session/:sub_id
+	 * @access    Public
+	 */
+	 getAllSessionInSubject: async (req, res) => {
+		try {
+			const sub_id =  req.params.sub_id
+			const data = await Subject.findAll({
+				where : {
+					subject_id: sub_id
+				}
+			});
+			res.sendJson(
+				200, 
+				true, 
+				"sucess get all data", 
+				data
+			);
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
+	/**
+	 * @desc      Get quiz
 	 * @route     GET /api/v1/studiku/getQuizDesc
 	 * @access    Private
 	 */
@@ -69,8 +93,8 @@ module.exports = {
 		}
 	},
 	/**
-	 * @desc      Get Matakuliah murid
-	 * @route     GET /api/v1/studiku/makeQuiz
+	 * @desc      buat quiz
+	 * @route     POST /api/v1/studiku/makeQuiz
 	 * @access    Private
 	 */
 	makeQuiz: async (req,res) => {
@@ -89,8 +113,8 @@ module.exports = {
 		}
 	},
 	/**
-	 * @desc      Get Matakuliah murid
-	 * @route     GET /api/v1/studiku/takeQuiz/:id
+	 * @desc      take quiz
+	 * @route     POST /api/v1/studiku/takeQuiz/:id
 	 * @access    Private
 	 */
 	 takeQuiz: async (req,res) => {
@@ -135,8 +159,8 @@ module.exports = {
 		}
 	},
 	/**
-	 * @desc      Get Matakuliah murid
-	 * @route     GET /api/v1/studiku/postQuizAnswer
+	 * @desc      submit quiz
+	 * @route     POST /api/v1/studiku/postQuizAnswer
 	 * @access    Private
 	 */
 	 postQuizAnswer: async (req,res) => {
@@ -197,177 +221,87 @@ module.exports = {
 		}
 	},
 	/**
-	 * @desc      Get Matakuliah murid
-	 * @route     GET /api/v1/studiku/getAssignment/:id
-	 * @access    Private
-	 */
-	 getAssignment: async (req,res) => {
-		const {session_id,duration,description,questions,answer} = req.body
-		const assignmentID = req.params.id
-		try {
-			const quizzDesc = await Quiz.create({
-			session_id:session_id,
-			duration:duration,
-			description:description,
-			questions:questions,
-			answer:answer
-		})
-			res.sendJson(200,true,"Success", quizzDesc)
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
-	/**
-	 * @desc      Get Matakuliah murid
-	 * @route     GET /api/v1/studiku/postAssignment
-	 * @access    Private
-	 */
-	postAssignment: async (req,res) => {
-		const {session_id,duration,description,questions,answer} = req.body
-		const assignmentID = req.params.id
-		try {
-			const quizzDesc = await Quiz.create({
-			session_id:session_id,
-			duration:duration,
-			description:description,
-			questions:questions,
-			answer:answer
-		})
-			res.sendJson(200,true,"Success", quizzDesc)
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
-	/**
-	 * @desc      Get Matakuliah murid
+	 * @desc      Get subjects of student
 	 * @route     GET /api/v1/studiku/getSubject
 	 * @access    Private
 	 */
 	getSubjectForStudent: async (req,res) => {
 		const user_id = req.userData.id
 		try {
-			const usersMajor = await Student.findOne({
+			const subjectTaken = await Student.findAll({
 				where:{
 					id:user_id
 				},
-				attributes:[
-					"major_id"
-				]
+				include: [Major,Subject]
 			})
-			const major_id = await usersMajor.dataValues.major_id
-
-			const majorSubject = await Major.findOne({
-				where:{
-					id:major_id	
-				},
-				include: Subject,
-				attributes:[
-					"id"
-				]
-			})
-			const majorSubjects = await majorSubject.getSubjects()
-			const majorSubjectID = getID(majorSubjects)
+			const subjectTakenID = await getID(subjectTaken)
 			
-			const studentsSubject = await Student.findOne({
-				where:{
-					id: user_id
-				},
+			const majorSubject = await Major.findAll({
 				include: Subject
 			})
-			const studentSubject = await studentsSubject.getSubjects()	
-			const studentSubjectID = getID(studentSubject)
-
-			const result = recommendation(studentSubjectID,majorSubjectID)
+			const majorSubjectID = await getID(majorSubject)
 			
-			res.sendJson(200,true,"Success", result)
+			const result = recommendation(subjectTakenID,majorSubjectID)
+
+			res.sendJson(200,true,"Success", result )
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}
 	},
 	/**
-	 * @desc      Get Matakuliah murid .
+	 * @desc      enroll in a subject
 	 * @route     POST /api/v1/studiku/takeSubject
 	 * @access    Private
 	 */
 	 takeSubject: async (req,res) => {
-		const user_id = req.userData.id
-		const {subject_id} = req.body
-		const stat = "CURRENTLY TAKING"
+		const {subject_id,student_id} = req.body
+		const credit_thresh = 24;
 		try {
-			const credit_thresh = 24;
-			let already_taken = false;
-			const the_subject = await Subject.findOne({
+			const checkIfSubjectTaken = await StudentSubject.findOne({
 				where: {
-					id:subject_id
-				}
+					subject_id:subject_id,
+					student_id:student_id
+				},
+				attributes:[
+					"id"
+				],
+				include: Subject
 			})
-
-			const subjectTakenLog = await StudentSubject.findAll({
-				where:{
-					student_id:user_id,
-					status: stat
-				}
+			const checkCredit = await StudentSubject.findAll({
+				where: {
+					student_id:student_id,
+					[Op.or]:[
+						{status:"ONGOING"},
+						{status:"PENDING"},
+					]
+				},
+				include: Subject
 			})
-			const subjectTaken = []
-			let ongoing_credit = 0
-			for (let i =0; i< subjectTakenLog.length; i++) {
-				const sub = await Subject.findOne({
-					where: {
-						id: subjectTakenLog[i].subject_id
-					}
+			const credit = await creditTotal(checkCredit)
+			if(credit<credit_thresh && checkIfSubjectTaken===null){
+				await StudentSubject.create({
+					subject_id:subject_id,
+					student_id:student_id
 				})
-
-				subjectTaken.push(sub)
-				ongoing_credit += sub.credit
-
-				if (subjectTakenLog[i].subject_id === subject_id) {
-					already_taken = true;
-				}
+				res.sendJson(200,true,"Enrolled",)
 			}
-			 
-			const thresh = ongoing_credit + the_subject.credit;
-
-			if(!already_taken){
-				res.sendJson(200,true,"subject already taken", subjectTaken)
-			} 
-			else if(thresh < credit_thresh){
-				res.sendJson(200,true,"not enough credit", subjectTaken)
+			if(credit>credit_thresh){
+				res.sendJson(400,false,"Exceeded maximum credit",null)
 			}
-			else {
-				const result = await StudentSubject.create({
-				subject_id:subject_id,
-				student_id:user_id,
-				date_taken: moment().format(),
-				status: stat
-			})
-			subjectTaken.push(result)
-			res.sendJson(200,true,"Success", subjectTaken)
+			if(checkIfSubjectTaken!==null){
+				res.sendJson(400,false,"Subject already taken",null)
 			}
-			
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
-	/**
-	 * @desc      Get Matakuliah murid
-	 * @route     POST /api/v1/studiku/test
-	 * @access    Private
-	 */
-	 test: async (req,res) => {
-		const user_id = req.userData.id
-		try {
-			const result = await res.checkExistence(user_id,"user")
-			res.sendJson(200,true,"Success", result)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}
 	},
 };
 
-function getID(id){
+async function getID(subjectTaken){
 	const idReturn = []
-	for(let i=0 ; i<id.length; i++){
-		idReturn.push(id[i].dataValues.id)
+	const subjectTakenParsed = JSON.parse(JSON.stringify(subjectTaken))[0].Subjects
+	for(let i=0 ; i<test.length; i++){
+		idReturn.push(test[i].id)
 	}
 	return idReturn
 }
@@ -376,3 +310,11 @@ function recommendation(studentSubjectID,majorSubjectID){
 	return majorSubjectID.filter(element=>!studentSubjectID.includes(element))
 }
 
+async function creditTotal(checkCredit){
+	let credit = 0 
+	console.log(checkCredit)
+	for(let i=0;i<checkCredit.length;i++){
+		credit += checkCredit[i].dataValues.Subject.credits
+	}
+	return credit
+}
