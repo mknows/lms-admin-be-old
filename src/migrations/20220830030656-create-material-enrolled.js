@@ -19,6 +19,9 @@ module.exports = {
       material_id: {
         type: Sequelize.UUID
       },
+      subject_id: {
+        type: Sequelize.UUID
+      },
       description: {
         type: Sequelize.STRING
       },
