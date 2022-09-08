@@ -125,7 +125,7 @@ module.exports = {
 				type: "QUIZ",
 				id_referrer: quizzDesc.id,
 				})
-			res.sendJson(200,true,"Success", quizzDesc, make_material)
+			res.sendJson(200,true,"Success", quizzDesc)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}
