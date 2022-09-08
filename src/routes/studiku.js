@@ -8,6 +8,7 @@ route.get("/allsubject", studikuController.getAllSubject);
 route.get("/getModule/:id", protection, studikuController.getModule)
 route.get("/getQuizzDesc/:id", protection, studikuController.getQuizDesc)
 route.get("/getSubjectForStudent", protection, studikuController.getSubjectForStudent)
+route.get("/session/:sub_id", protection, studikuController.getAllSessionInSubject)
 
 route.post("/makeQuiz", protection, studikuController.makeQuiz)
 route.post("/takeQuiz/:id", protection, studikuController.takeQuiz)
