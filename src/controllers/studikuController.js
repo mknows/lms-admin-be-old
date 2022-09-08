@@ -285,7 +285,7 @@ module.exports = {
 		}
 	},
 	/**
-	 * @desc      Get Matakuliah murid
+	 * @desc      Get Matakuliah murid .
 	 * @route     POST /api/v1/studiku/takeSubject
 	 * @access    Private
 	 */
