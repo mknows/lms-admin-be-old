@@ -14,7 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Material.init({
-    id: {type:DataTypes.UUID,primaryKey:true},
+    id: {
+      type:DataTypes.UUID,
+      primaryKey:true,
+      defaultValue:sequelize.literal('gen_random_uuid()')
+    },
     session_id: DataTypes.UUID,
     subject_id: DataTypes.UUID,
     description: DataTypes.STRING,

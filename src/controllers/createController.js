@@ -28,7 +28,7 @@ module.exports = {
 			res.sendJson(
 				200, 
 				true, 
-				"sucess get all discussion forums", 
+				"sucess make subject", 
 				data
 			);
 		} catch (err) {
@@ -59,7 +59,7 @@ module.exports = {
 			res.sendJson(
 				200, 
 				true, 
-				"sucess get all discussion forums", 
+				"sucess make session", 
 				data
 			);
 		} catch (err) {
