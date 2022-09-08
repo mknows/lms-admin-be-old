@@ -31,8 +31,6 @@ exports.protection = async (req, res, next) => {
       message: "Invalid authorization.",
       data: {}
     });
-    console.log("user Auth =>", user);
-    console.log("user Auth token =>", token);
 
     let { dataValues } = await User.findOne({
       where:{
