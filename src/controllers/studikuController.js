@@ -1,4 +1,14 @@
-const {Student, Subject, Material_Enrolled,Module,Video,Document,Quiz,StudentSubject,Major,Session
+const {Student, 
+	Subject, 
+	Material_Enrolled,
+	Module,
+	Video,
+	Document,
+	Quiz,
+	StudentSubject,
+	Major,
+	Session, 
+	Material
 } = require('../models')
 const moment = require('moment')
 const {Op} = require("sequelize")
@@ -101,13 +111,21 @@ module.exports = {
 		const {session_id,duration,description,questions,answer} = req.body	
 		try {
 			const quizzDesc = await Quiz.create({
-			session_id:session_id,
-			duration:duration,
-			description:description,
-			questions:questions,
-			answer:answer
-		})
-			res.sendJson(200,true,"Success", quizzDesc)
+				session_id:session_id,
+				duration:duration,
+				description:description,
+				questions:questions,
+				answer:answer
+				})
+
+			const make_material = await Material.create({
+				session_id:session_id,
+				duration:duration,
+				description:description,
+				type: "QUIZ",
+				id_referrer: quizzDesc.id,
+				})
+			res.sendJson(200,true,"Success", quizzDesc, make_material)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}
