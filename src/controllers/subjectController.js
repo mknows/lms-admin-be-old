@@ -177,7 +177,7 @@ module.exports = {
 				}
 			}
 
-			if(enrolled === false && credit >= credit_thresh){
+			if(enrolled === false && credit <= credit_thresh){
 				await StudentSubject.create({
 					subject_id:subject_id,
 					student_id:student_id,
@@ -190,6 +190,9 @@ module.exports = {
 			}
 			else if(enrolled){
 				res.sendJson(400,false,"Subject already taken",null)
+			} 
+			else {
+				res.sendJson(400,false,"something went wrong",null)
 			}
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
