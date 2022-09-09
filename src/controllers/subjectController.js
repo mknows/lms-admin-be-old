@@ -154,7 +154,10 @@ module.exports = {
 			const subjectsEnrolled = await StudentSubject.findAll({
 				where: {
 					student_id:student_id,
-					status:'PENDING'
+					[Op.or]: [
+						{status: 'PENDING'},
+						{status: 'ONGOING'}
+					]
 				}
 			})
 			console.log(subjectsEnrolled);
@@ -168,19 +171,28 @@ module.exports = {
 			// const credit = await creditTaken(subjectsEnrolled, sub);
 
 			let enrolled = false;
+			let credit = 0;
 			for (let i = 0; i<subjectsEnrolled.length; i++) {
+				
+				const subber = await Subject.findOne({
+					where: {
+						id: subjectTakenLog[i].subject_id
+					}
+				})
+				credit += subber.credit;
+
 				if (subjectsEnrolled[i].subject_id === subject_id) {
 					enrolled = true;
 				}
 			}
 
-			if(enrolled === false){
+			if(enrolled === false && credit >= credit_thresh){
 				await StudentSubject.create({
 					subject_id:subject_id,
 					student_id:student_id,
                     status:'PENDING'
 				})
-				res.sendJson(200,true,"Enrolled test")
+				res.sendJson(200,true,"Enrolled test", credit)
 			}
 			else if(credit>credit_thresh){
 				res.sendJson(400,false,"Exceeded maximum credit",null)
