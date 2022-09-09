@@ -9,5 +9,7 @@ route.get("/video/:id", protection, moduleController.getVideo);
 route.get("/document/:id", protection, moduleController.getDocument);
 
 route.post("/create", protection, moduleController.postModule);
+route.post("/createvideo", protection, moduleController.postVideo);
+route.post("/createdocument", protection, moduleController.postDocument);
 
 module.exports = route;

@@ -92,4 +92,50 @@ module.exports = {
 			res.sendJson(500, false, err.message, null);
 		}
 	},
+	/**
+	 * @desc      post make video
+	 * @route     POST /api/v1/module/createvideo
+	 * @access    Private
+	 */
+	 postVideo: async (req,res) => {
+		const {
+            url,
+            description
+        } = req.body
+
+		try {
+			const mod = await Assignment.create({
+                url: url,
+				description: description
+            })
+
+			res.sendJson(200,true,"Success", moduleData)
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
+	/**
+	 * @desc      post make video
+	 * @route     POST /api/v1/module/createdocument
+	 * @access    Private
+	 */
+	 postDocument: async (req,res) => {
+		const {
+            content,
+            file,
+            description
+        } = req.body
+
+		try {
+			const mod = await Assignment.create({
+                content: content,
+				file: file,
+				description: description
+            })
+
+			res.sendJson(200,true,"Success", moduleData)
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
 };
