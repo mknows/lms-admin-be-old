@@ -84,7 +84,7 @@ module.exports = {
             await Material.create({
 				session_id:session_id,
 				type: "MODULE",
-				id_referrer: mod.id,
+				id_referrer: modcr.id,
 				})
 
 			res.sendJson(200,true,"Success", modcr)
