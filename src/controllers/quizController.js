@@ -1,7 +1,8 @@
 const {
 	Material_Enrolled,
 	Quiz,
-	Material
+	Material,
+	Session
 } = require('../models')
 const moment = require('moment')
 const {Op} = require("sequelize")
@@ -65,7 +66,6 @@ module.exports = {
 	 takeQuiz: async (req,res) => {
 		try {
 			const quiz_id = req.params.id
-			const {material_id,subject_id} = req.body
 			const user_id = req.userData.id;
 			const quizQuestions = await Quiz.findOne({
 				where:{
@@ -76,12 +76,22 @@ module.exports = {
 				]
 			})
 			const session_id = quizQuestions.dataValues.session_id
+			const material = await Material.findOne({
+				where: {
+					id_referrer: quiz_id
+				}
+			})
+			const session = await Session.findOne({
+				where: {
+					id: session_id
+				}
+			})
 			const checkIfCurrentlyTaking = await Material_Enrolled.findOne({
 				where:{
 					student_id:user_id,
 					session_id:session_id,
-					material_id:material_id,
-					subject_id:subject_id,
+					material_id:material.id,
+					subject_id:session.subject_id,
 					id_referrer:quiz_id,	
 				},
 				attributes:[
