@@ -154,19 +154,14 @@ module.exports = {
 			const subjectsEnrolled = await StudentSubject.findAll({
 				where: {
 					student_id:student_id,
-					[Op.or]:[
-						{status:'ONGOING'},
-						{status:'PENDING'},
-					]
+					status:'PENDING'
 				}
 			})
+			console.log(subjectsEnrolled);
 			const sub = await Subject.findOne({
 				where: {
 					id: subject_id
-				},
-				attributes: [
-					'id'
-				]
+				}
 			});
 
 			// const hasEnrolled = await alreadyEnrolled(subjectsEnrolled, sub);
@@ -174,13 +169,12 @@ module.exports = {
 
 			let enrolled = false;
 			for (let i = 0; i<subjectsEnrolled.length; i++) {
-				console.log(subjectsEnrolled[i].subject_id)
-				if (sub === subjectsEnrolled[i].subject_id) {
+				if (subjectsEnrolled[i].subject_id === subject_id) {
 					enrolled = true;
 				}
 			}
 
-			if(!enrolled){
+			if(enrolled === false){
 				await StudentSubject.create({
 					subject_id:subject_id,
 					student_id:student_id,
