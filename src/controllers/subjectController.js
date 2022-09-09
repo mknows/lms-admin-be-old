@@ -197,7 +197,7 @@ module.exports = {
 			else if(credit>credit_thresh){
 				res.sendJson(400,false,"Exceeded maximum credit",null)
 			}
-			else if(hasEnrolled){
+			else if(enrolled){
 				res.sendJson(400,false,"Subject already taken",null)
 			}
 		} catch (err) {
