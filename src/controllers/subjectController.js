@@ -173,9 +173,9 @@ module.exports = {
 			// const credit = await creditTaken(subjectsEnrolled, sub);
 
 			let enrolled = false;
-			for (let i = 0; i<subjectTaken.length; i++) {
-				console.log(subjectTaken[i])
-				if (sub === subjectTaken[i]) {
+			for (let i = 0; i<subjectsEnrolled.length; i++) {
+				console.log(subjectsEnrolled[i])
+				if (sub === subjectsEnrolled[i]) {
 					enrolled = true;
 				}
 			}
