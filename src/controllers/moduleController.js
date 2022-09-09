@@ -71,7 +71,7 @@ module.exports = {
 		const {
             session_id,
             video_id,
-            document_id
+            dokumen_id
         } = req.body
 
 		try {
