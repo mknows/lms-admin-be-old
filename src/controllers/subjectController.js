@@ -171,6 +171,14 @@ module.exports = {
 			let enrolled = false;
 			let credit = 0;
 			for (let i = 0; i<subjectsEnrolled.length; i++) {
+				const current_subject = await Subject.findOne({
+					where: {
+						id: subjectsEnrolled[i].subject_id
+					}
+				})
+				if (current_subject !== null) {
+					credit += current_subject.credit
+				}
 
 				if (subjectsEnrolled[i].subject_id === subject_id) {
 					enrolled = true;
@@ -186,10 +194,10 @@ module.exports = {
 				res.sendJson(200,true,"Enrolled test", credit)
 			}
 			else if(credit>credit_thresh){
-				res.sendJson(400,false,"Exceeded maximum credit",null)
+				res.sendJson(400,false,"Exceeded maximum credit",credit)
 			}
 			else if(enrolled){
-				res.sendJson(400,false,"Subject already taken",null)
+				res.sendJson(400,false,"Subject already taken",subject_id)
 			} 
 			else {
 				res.sendJson(400,false,"something went wrong",null)
