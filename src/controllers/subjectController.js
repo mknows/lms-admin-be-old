@@ -154,10 +154,8 @@ module.exports = {
 			const subjectsEnrolled = await StudentSubject.findAll({
 				where: {
 					student_id:student_id,
-					[Op.or]: [
-						{status: 'PENDING'},
-						{status: 'ONGOING'}
-					]
+					// status: {[Op.or]: ['PENDING', 'ONGOING']}
+					status:'PENDING'
 				}
 			})
 			console.log(subjectsEnrolled);
