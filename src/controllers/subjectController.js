@@ -158,24 +158,24 @@ module.exports = {
 						{status:'ONGOING'},
 						{status:'PENDING'},
 					]
-				},
-				attributes: [
-					'subject_id'
-				]
+				}
 			})
 			const sub = await Subject.findOne({
 				where: {
 					id: subject_id
-				}
-			}).id;
+				},
+				attributes: [
+					'id'
+				]
+			});
 
 			// const hasEnrolled = await alreadyEnrolled(subjectsEnrolled, sub);
 			// const credit = await creditTaken(subjectsEnrolled, sub);
 
 			let enrolled = false;
 			for (let i = 0; i<subjectsEnrolled.length; i++) {
-				console.log(subjectsEnrolled[i])
-				if (sub === subjectsEnrolled[i]) {
+				console.log(subjectsEnrolled[i].subject_id)
+				if (sub === subjectsEnrolled[i].subject_id) {
 					enrolled = true;
 				}
 			}
