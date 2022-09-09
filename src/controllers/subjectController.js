@@ -158,7 +158,7 @@ module.exports = {
 					status:'PENDING'
 				}
 			})
-			console.log(subjectsEnrolled);
+			
 			const sub = await Subject.findOne({
 				where: {
 					id: subject_id
@@ -174,7 +174,7 @@ module.exports = {
 				
 				const subber = await Subject.findOne({
 					where: {
-						id: subjectTakenLog[i].subject_id
+						id: subjectsEnrolled[i].subject_id
 					}
 				})
 				credit += subber.credit;
