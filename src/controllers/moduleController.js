@@ -1,14 +1,8 @@
-const {Student, 
-	Subject, 
-	Material_Enrolled,
+const {
 	Module,
 	Video,
 	Document,
-	Quiz,
-	StudentSubject,
-	Major,
-	Session, 
-	Material
+    Material
 } = require('../models')
 const moment = require('moment')
 const {Op} = require("sequelize")
@@ -22,20 +16,12 @@ module.exports = {
 	getModule: async (req,res) => {
 		try {
 			const moduleID = req.params.id
-			const moduleData = await Module.findAll({
-			where: {
-				id: moduleID
-			},
-			include: [
-				{
-					model:Document
-				},
-				{
-					model:Video
-				}
-			]
-		})
-			res.sendJson(200,true,"Success", moduleData)
+			const mod = await Module.findOne({
+                where: {
+                    id: moduleID
+                }
+            })
+			res.sendJson(200,true,"Success", mod)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}
@@ -59,7 +45,7 @@ module.exports = {
 		}
 	},
     /**
-	 * @desc      Get dokument
+	 * @desc      Get document
 	 * @route     GET /api/v1/module/document/:id
 	 * @access    Private
 	 */
@@ -72,6 +58,36 @@ module.exports = {
                 }
             })
 			res.sendJson(200,true,"Success", doc)
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
+    /**
+	 * @desc      post make module
+	 * @route     POST /api/v1/module/create
+	 * @access    Private
+	 */
+	postModule: async (req,res) => {
+		const {
+            session_id,
+            video_id,
+            document_id
+        } = req.body
+
+		try {
+			const mod = await Assignment.create({
+                session_id: session_id,
+                video_id:video_id,
+                document_id: document_id
+            })
+
+            await Material.create({
+				session_id:session_id,
+				type: "MODULE",
+				id_referrer: mod.id,
+				})
+
+			res.sendJson(200,true,"Success", moduleData)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}

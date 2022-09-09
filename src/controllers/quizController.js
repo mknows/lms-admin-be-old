@@ -51,6 +51,7 @@ module.exports = {
 				type: "QUIZ",
 				id_referrer: quizzDesc.id,
 				})
+				
 			res.sendJson(200,true,"Success", quizzDesc)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
@@ -88,13 +89,13 @@ module.exports = {
 				]
 			})
 			if(checkIfCurrentlyTaking==null){
-				const studentTakingQuiz = await Material_Enrolled.create({
+				await Material_Enrolled.create({
 					student_id:user_id,
 					session_id:session_id,
 					material_id:material_id,
 					subject_id:subject_id,
 					id_referrer:quiz_id,	
-					type:"quiz"	
+					type:"QUIZ"	
 				})	
 			}
 			res.sendJson(200,true,"Success", quizQuestions)

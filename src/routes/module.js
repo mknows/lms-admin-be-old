@@ -8,4 +8,6 @@ route.get("/get/:id", protection, moduleController.getModule);
 route.get("/video/:id", protection, moduleController.getVideo);
 route.get("/document/:id", protection, moduleController.getDocument);
 
+route.post("/create", protection, moduleController.postModule);
+
 module.exports = route;
