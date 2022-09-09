@@ -141,6 +141,55 @@ module.exports = {
 			res.sendJson(500, false, err.message, null);
 		}
 	},
+	//=====================================================================================
+	/**
+	 * @desc      enroll in a subject
+	 * @route     POST /api/v1/subject/enroll
+	 * @access    Private
+	 */
+	 takeSubject2: async (req,res) => {
+		const {subject_id,student_id} = req.body
+		const credit_thresh = 24;
+		try {
+			const subjectsEnrolled = await StudentSubject.findAll({
+				where: {
+					student_id:student_id,
+					[Op.or]:[
+						{status:"ONGOING"},
+						{status:"PENDING"},
+					]
+				},
+				attributes: [
+					'id'
+				]
+			})
+			const sub = await Subject.findOne({
+				where: {
+					id: subject_id
+				}
+			})
+
+			const credit = await creditTaken(subjectsEnrolled, sub);
+			const hasEnrolled = await alreadyEnrolled(subjectsEnrolled, sub);
+
+			if(credit<=credit_thresh && !hasEnrolled){
+				await StudentSubject.create({
+					subject_id:subject_id,
+					student_id:student_id,
+                    status:"PENDING"
+				})
+				res.sendJson(200,true,"Enrolled",)
+			}
+			else if(credit>credit_thresh){
+				res.sendJson(400,false,"Exceeded maximum credit",null)
+			}
+			else if(hasEnrolled){
+				res.sendJson(400,false,"Subject already taken",null)
+			}
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
 };
 
 async function getID(subjectTaken){
@@ -156,11 +205,30 @@ function recommendation(studentSubjectID,majorSubjectID){
 	return majorSubjectID.filter(element=>!studentSubjectID.includes(element))
 }
 
-async function creditTotal(checkCredit){
+async function creditTaken(subjectTaken, sub){
 	let credit = 0 
-	console.log(checkCredit)
-	for(let i=0;i<checkCredit.length;i++){
-		credit += checkCredit[i].dataValues.Subject.credit
+	for(let i=0;i<subjectTaken.length;i++){
+		const subb = await Subject.findOne({
+			where: {
+				id: subjectTaken[i]
+			}
+		})
+		credit += subb.credit
 	}
+
+	if (sub !== "NONE") {
+		credit += sub.credit
+	}
+
 	return credit
+}
+
+async function alreadyEnrolled(subjectTaken, sub){
+	let enrolled = false;
+	for (let i = 0; i<subjectTaken.length; i++) {
+		if (sub.id === subjectTaken[i]) {
+			enrolled = true;
+		}
+	}
+	return enrolled
 }

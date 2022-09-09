@@ -5,7 +5,7 @@ const subjectController = require("../controllers/subjectController");
 const { protection } = require("../middlewares/Authentication");
 
 route.post("/create", protection, subjectController.postSubject);
-route.post("/enroll", protection, subjectController.takeSubject);
+route.post("/enroll", protection, subjectController.takeSubject2);
 
 route.get("/getall", protection, subjectController.getAllSubject);
 route.get("/forstudent", protection, subjectController.getSubjectForStudent);
