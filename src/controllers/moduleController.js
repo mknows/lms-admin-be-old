@@ -75,7 +75,7 @@ module.exports = {
         } = req.body
 
 		try {
-			const mod = await Assignment.create({
+			const mod = await Module.create({
                 session_id: session_id,
                 video_id:video_id,
                 document_id: document_id
@@ -104,7 +104,7 @@ module.exports = {
         } = req.body
 
 		try {
-			const mod = await Assignment.create({
+			const mod = await Video.create({
                 url: url,
 				description: description
             })
@@ -127,7 +127,7 @@ module.exports = {
         } = req.body
 
 		try {
-			const mod = await Assignment.create({
+			const mod = await Document.create({
                 content: content,
 				file: file,
 				description: description
