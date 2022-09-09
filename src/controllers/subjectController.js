@@ -169,10 +169,18 @@ module.exports = {
 				}
 			}).id;
 
-			const hasEnrolled = await alreadyEnrolled(subjectsEnrolled, sub);
+			// const hasEnrolled = await alreadyEnrolled(subjectsEnrolled, sub);
 			// const credit = await creditTaken(subjectsEnrolled, sub);
 
-			if(!hasEnrolled){
+			let enrolled = false;
+			for (let i = 0; i<subjectTaken.length; i++) {
+				console.log(subjectTaken[i])
+				if (sub === subjectTaken[i]) {
+					enrolled = true;
+				}
+			}
+
+			if(!enrolled){
 				await StudentSubject.create({
 					subject_id:subject_id,
 					student_id:student_id,
