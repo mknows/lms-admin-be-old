@@ -167,10 +167,10 @@ module.exports = {
 				where: {
 					id: subject_id
 				}
-			})
+			}).id;
 
-			const credit = await creditTaken(subjectsEnrolled, sub);
 			const hasEnrolled = await alreadyEnrolled(subjectsEnrolled, sub);
+			const credit = await creditTaken(subjectsEnrolled, sub);
 
 			if(credit<=credit_thresh && !hasEnrolled){
 				await StudentSubject.create({
@@ -178,7 +178,7 @@ module.exports = {
 					student_id:student_id,
                     status:'PENDING'
 				})
-				res.sendJson(200,true,"Enrolled",)
+				res.sendJson(200,true,"Enrolled", credit)
 			}
 			else if(credit>credit_thresh){
 				res.sendJson(400,false,"Exceeded maximum credit",null)
@@ -217,7 +217,7 @@ async function creditTaken(subjectTaken, sub){
 	}
 
 	if (sub !== "NONE") {
-		credit += sub.credit
+		credit += sub
 	}
 
 	return credit
@@ -227,7 +227,7 @@ async function alreadyEnrolled(subjectTaken, sub){
 	let enrolled = false;
 	for (let i = 0; i<subjectTaken.length; i++) {
 		console.log(subjectTaken[i])
-		if (sub.id === subjectTaken[i]) {
+		if (sub === subjectTaken[i]) {
 			enrolled = true;
 		}
 	}
