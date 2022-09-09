@@ -71,14 +71,14 @@ module.exports = {
 		const {
             session_id,
             video_id,
-            dokumen_id
+            document_id
         } = req.body
 
 		try {
 			const modcr = await Module.create({
                 session_id: session_id,
                 video_id:video_id,
-                dokumen_id: dokumen_id
+                document_id: document_id
             })
 
             await Material.create({

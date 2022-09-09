@@ -13,7 +13,7 @@ module.exports = {
       video_id: {
         type: Sequelize.UUID
       },
-      dokumen_id: {
+      document_id: {
         type: Sequelize.UUID
       },
       createdAt: {
