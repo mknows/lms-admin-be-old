@@ -178,7 +178,7 @@ module.exports = {
 					student_id:student_id,
                     status:'PENDING'
 				})
-				res.sendJson(200,true,"Enrolled", credit)
+				res.sendJson(200,true,"Enrolled test", credit)
 			}
 			else if(credit>credit_thresh){
 				res.sendJson(400,false,"Exceeded maximum credit",null)
