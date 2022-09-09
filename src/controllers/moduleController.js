@@ -78,7 +78,7 @@ module.exports = {
 			const modcr = await Module.create({
                 session_id: session_id,
                 video_id:video_id,
-                document_id: document_id
+                dokumen_id: document_id
             })
 
             await Material.create({
