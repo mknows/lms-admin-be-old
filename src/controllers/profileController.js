@@ -1,7 +1,8 @@
 const { User } = require("../models");
-
 const { getAuth: getClientAuth, updateProfile } = require("firebase/auth");
-const { getAuth } = require("firebase-admin/auth");
+
+const ErrorResponse = require("../utils/errorResponse");
+const asyncHandler = require("express-async-handler");
 
 module.exports = {
   /**
@@ -9,7 +10,7 @@ module.exports = {
    * @route     GET /api/v1/profile/me
    * @access    Private
    */
-  getMe: async (req, res) => {
+  getMe: asyncHandler(async (req, res) => {
     try {
       let token = req.firebaseToken;
       let user = req.userData;
@@ -36,21 +37,17 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-
-      return res.status(403).json({
-        success: false,
-        message: "Something went wrong.",
-        data: {}
-      });
+      let message = res.getErrorFirebase(error.code);
+      return res.sendJson(403, false, message, {});
     }
-  },
+  }),
 
   /**
    * @desc      Update User Login Data (Profile)
    * @route     PUT /api/v1/profile/me
    * @access    Private
    */
-  updateMe: async (req, res) => {
+  updateMe: asyncHandler(async (req, res) => {
     try {
       let token = req.firebaseToken;
       let user = req.userData;
@@ -61,10 +58,11 @@ module.exports = {
         data: {}
       });
 
-      const { full_name } = req.body;
+      const { full_name, gender } = req.body;
 
       const data = await User.update({
-        full_name: titleCase(full_name)
+        full_name: titleCase(full_name),
+        gender
       }, {
         where: {
           id: user.id
@@ -88,14 +86,10 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-
-      return res.status(403).json({
-        success: false,
-        message: "Something went wrong.",
-        data: {}
-      });
+      let message = res.getErrorFirebase(error.code);
+      return res.sendJson(403, false, message, {});
     }
-  }
+  })
 }
 
 // Usage for Capitalize Each Word
@@ -115,7 +109,6 @@ function phoneNumber(number) {
     return true;
   }
   else {
-    alert("message");
     return false;
   }
 }

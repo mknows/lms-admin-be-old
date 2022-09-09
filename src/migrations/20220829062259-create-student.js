@@ -1,16 +1,20 @@
+
 'use strict';
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Daily_Active_Users', {
+    await queryInterface.createTable('Students', {
       id: {
+        type: Sequelize.UUID,
         allowNull: false,
-        primaryKey: true,
-        type: Sequelize.UUID
+        primaryKey: true
       },
       user_id: {
-        allowNull: false,
         type: Sequelize.UUID
+      },
+      major_id: {
+        allowNull: false,
+        type: Sequelize.ARRAY(Sequelize.UUID)
       },
       created_at: {
         allowNull: false,
@@ -19,11 +23,10 @@ module.exports = {
       updated_at: {
         allowNull: false,
         type: Sequelize.DATE
-      }
+      },
     });
   },
-
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Daily_Active_Users');
+    await queryInterface.dropTable('Students');
   }
 };

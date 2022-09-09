@@ -2,15 +2,14 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Daily_Active_Users', {
+    await queryInterface.createTable('Majors', {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID
       },
-      user_id: {
-        allowNull: false,
-        type: Sequelize.UUID
+      name: {
+        type: Sequelize.STRING
       },
       created_at: {
         allowNull: false,
@@ -22,8 +21,7 @@ module.exports = {
       }
     });
   },
-
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Daily_Active_Users');
+    await queryInterface.dropTable('Majors');
   }
 };

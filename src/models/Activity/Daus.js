@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const { Model } = require('sequelize');
 
 /**
  * @desc      Daily Activity Users (DAUs)
@@ -14,28 +14,29 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   Daus.init({
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: sequelize.literal('gen_random_uuid()')
+    },
     user_id: {
       allowNull: false,
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Users',
-        key: 'id'
-      }
+      type: DataTypes.UUID
     },
     created_at: {
       allowNull: false,
       type: DataTypes.DATE,
-      field: "created_at"
+      field: 'created_at'
     },
     updated_at: {
       allowNull: false,
       type: DataTypes.DATE,
-      field: "updated_at"
+      field: 'updated_at'
     }
   }, {
     sequelize,
-    modelName: "Daus",
-    tableName: "Daily_Active_Users",
+    modelName: 'Daus',
+    tableName: 'Daily_Active_Users',
     timestamps: true,
     underscored: true,
     underscoredAll: true

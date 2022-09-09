@@ -1,7 +1,12 @@
 module.exports = (req, res, next) => {
   res.getErrorFirebase = (errorCode) => {
     let message;
+
     switch (errorCode) {
+      case "auth/id-token-expired": {
+        message = "Invalid authorization.";
+        break;
+      }
       case "auth/wrong-password": {
         message = "Invalid combination Email address and Password.";
         break;

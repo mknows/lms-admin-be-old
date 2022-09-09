@@ -1,12 +1,11 @@
-"use strict";
+'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Users", {
+    await queryInterface.createTable('Users', {
       id: {
+        type: Sequelize.UUID,
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
       },
       firebase_uid: {
         type: Sequelize.STRING,
@@ -17,23 +16,14 @@ module.exports = {
       email: {
         type: Sequelize.STRING,
       },
-      password: {
-        type: Sequelize.STRING,
+      gender: {
+        type: Sequelize.CHAR(1),
       },
       phone: {
         type: Sequelize.STRING,
       },
-      gender: {
-        type: Sequelize.CHAR(1),
-      },
-      role: {
+      display_picture: {
         type: Sequelize.STRING,
-      },
-      is_lecturer: {
-        type: Sequelize.BOOLEAN
-      },
-      is_verified: {
-        type: Sequelize.BOOLEAN,
       },
       created_at: {
         allowNull: false,
@@ -46,6 +36,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    // await queryInterface.dropTable("Users");
+    await queryInterface.dropTable('Users');
   },
 };

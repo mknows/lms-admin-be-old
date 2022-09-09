@@ -1,24 +1,25 @@
 'use strict';
-
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Users_Activities', {
+    await queryInterface.createTable('Lecturers', {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID
       },
       user_id: {
-        allowNull: false,
         type: Sequelize.UUID
       },
-      activity: Sequelize.STRING,
-      ip_address: Sequelize.STRING,
-      referrer: Sequelize.STRING,
-      device: Sequelize.STRING,
-      platform: Sequelize.STRING,
-      operating_system: Sequelize.STRING,
-      source: Sequelize.STRING,
+      is_lecturer: {
+        type: Sequelize.BOOLEAN
+      },
+      is_mentor: {
+        type: Sequelize.BOOLEAN
+      },
+      approved_by: {
+        allowNull: true,
+        type: Sequelize.UUID
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE
@@ -26,11 +27,10 @@ module.exports = {
       updated_at: {
         allowNull: false,
         type: Sequelize.DATE
-      }
+      },
     });
   },
-
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users_Activities');
+    await queryInterface.dropTable('Lecturers');
   }
 };

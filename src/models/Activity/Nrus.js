@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const { Model } = require('sequelize');
 
 /**
  * @desc      New Register Users (NRUs)
@@ -14,28 +14,27 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   Nrus.init({
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: sequelize.literal('gen_random_uuid()')
+    },
     user_id: {
       allowNull: false,
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Users',
-        key: 'id'
-      }
+      type: DataTypes.UUID
     },
     created_at: {
       allowNull: false,
-      type: DataTypes.DATE,
-      field: "created_at"
+      type: DataTypes.DATE
     },
     updated_at: {
       allowNull: false,
-      type: DataTypes.DATE,
-      field: "updated_at"
+      type: DataTypes.DATE
     }
   }, {
     sequelize,
-    modelName: "Nrus",
-    tableName: "New_Register_Users",
+    modelName: 'Nrus',
+    tableName: 'New_Register_Users',
     timestamps: true,
     underscored: true,
     underscoredAll: true

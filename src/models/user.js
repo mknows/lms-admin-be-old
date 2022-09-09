@@ -9,29 +9,31 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      this.hasMany(models.Administration, {
+        foreignKey: 'id'
+      })
     }
   }
 
   User.init({
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: sequelize.literal('gen_random_uuid()')
+    },
     firebase_uid: DataTypes.STRING,
     full_name: DataTypes.STRING,
     email: DataTypes.STRING,
-    password: DataTypes.STRING,
-    phone: DataTypes.STRING,
     gender: DataTypes.CHAR(1),
-    role: DataTypes.STRING,
-    is_verified: DataTypes.BOOLEAN,
-    is_lecturer: DataTypes.BOOLEAN,
+    phone: DataTypes.STRING,
+    display_picture: DataTypes.STRING,
     created_at: {
       allowNull: false,
-      type: DataTypes.DATE,
-      field: "created_at"
+      type: DataTypes.DATE
     },
     updated_at: {
       allowNull: false,
-      type: DataTypes.DATE,
-      field: "updated_at"
+      type: DataTypes.DATE
     }
   }, {
     sequelize,

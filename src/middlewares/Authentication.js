@@ -1,12 +1,14 @@
-const { User } = require("../models");
+const { User, Lecturer } = require("../models");
 const { getAuth } = require("firebase-admin/auth");
+const ErrorResponse = require("../utils/errorResponse");
+const asyncHandler = require("express-async-handler");
 
 /**
  * @desc      Middleware for user authentication
  * @route     -
  * @access    Private
  */
-exports.protection = async (req, res, next) => {
+exports.protection = asyncHandler(async (req, res, next) => {
   let token;
 
   if (
@@ -18,36 +20,52 @@ exports.protection = async (req, res, next) => {
     token = req.cookies.token;
   }
 
-  if (!token || token == undefined) return res.status(409).json({
-    success: false,
-    message: "Invalid authorization.",
-    data: {}
-  });
+  if (!token || token == undefined) return next(new ErrorResponse("Invalid authorization.", 409));
 
   try {
     const user = await getAuth().verifyIdToken(token);
 
-    if (!user) return res.status(409).json({
-      success: false,
-      message: "Invalid authorization.",
-      data: {}
-    });
+    if (!user) return next(new ErrorResponse(`Invalid authorization.`, 409));
 
     const { dataValues } = await User.findOne({
-      email: user.email
+      where: { firebase_uid: user.uid }
     });
 
     req.firebaseToken = token;
-    req.userData = dataValues;
     req.firebaseData = user;
+    req.userData = dataValues;
 
     next();
   } catch (error) {
-    console.error(error);
-    return res.status(403).json({
-      success: false,
-      message: "Something went wrong.",
-      data: {}
-    });
+    next(new ErrorResponse(error, 401));
+    // let message = res.getErrorFirebase(error.code);
+    // return res.status(403).json({
+    //   success: false,
+    //   message,
+    //   data: {}
+    // });
   }
-}
+});
+
+exports.authorize = (...roles) => {
+  return asyncHandler(async (req, res, next) => {
+    const currentUserRole = await Promise.all([
+      User.findOne({ where: { id: req.userData.id } }),
+      Lecturer.findOne({ where: { id: req.userData.id } }),
+      // Student.findOne({ where: { id: req.userData.id } })
+    ]).then(values => {
+      let userRoles = [];
+
+      if (values[0] !== null) userRoles.push("user");
+      if (values[1] !== null) userRoles.push("lecturer");
+
+      return userRoles;
+    });
+
+    if (!roles.includes(...currentUserRole)) return next(
+      new ErrorResponse(`Not authorized to access this route`, 401)
+    );
+
+    next();
+  });
+};

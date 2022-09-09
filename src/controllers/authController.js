@@ -1,5 +1,7 @@
 const { User, Nrus, Daus, User_Activity } = require("../models");
 const { Op } = require("sequelize");
+const ErrorResponse = require("../utils/errorResponse");
+const asyncHandler = require("express-async-handler");
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -16,242 +18,174 @@ const {
 
 module.exports = {
   /**
-   * @desc      Get All Data User
-   * @route     GET /api/v1/auth/user
-   * @access    Public
-   */
-  getAllDataUser: async (req, res) => {
-    try {
-      const data = await User.findAll();
-
-      res.sendJson(200, true, "sucess get all data", data);
-    } catch (err) {
-      res.sendJson(500, false, err.message, null);
-    }
-  },
-
-  /**
    * @desc      Register Account
    * @route     POST /api/v1/auth/register
    * @access    Public
    */
-  createUser: async (req, res) => {
-    try {
-      const { full_name, email, password, gender } = req.body;
+  createUser: asyncHandler(async (req, res) => {
+    const { full_name, email, password, gender } = req.body;
 
-      const credential = await createUserWithEmailAndPassword(
-        getClientAuth(),
-        email,
-        password
-      );
+    const credential = await createUserWithEmailAndPassword(
+      getClientAuth(),
+      email,
+      password
+    );
 
-      await updateProfile(credential.user, {
-        displayName: titleCase(full_name).trim(),
-        emailVerified: false
-      });
+    await updateProfile(credential.user, {
+      displayName: titleCase(full_name).trim(),
+      emailVerified: false
+    });
 
-      const hashPassword = bcrypt.hashSync(password, 10);
+    // const hashPassword = bcrypt.hashSync(password, 10);
 
-      const created = await User.create({
-        firebase_uid: credential.user.uid,
-        full_name,
-        email,
-        password: hashPassword,
-        gender,
-        role: "mahasiswa",
-        is_verified: false,
-        is_lecturer: false
-      });
+    const created = await User.create({
+      firebase_uid: credential.user.uid,
+      full_name,
+      email,
+      gender,
+    });
 
-      insertActivity(req, created.dataValues.id, "Register with Email and Password");
+    await insertLogActivity(req, created.dataValues.id, "Register with Email and Password");
 
-      insertNRUs(created.dataValues.id);
+    insertLog("new-register-user", created.dataValues.id);
 
-      const user = getClientAuth().currentUser;
+    const user = getClientAuth().currentUser;
 
-      await sendEmailVerification(user);
+    await sendEmailVerification(user);
 
-      return res.sendJson(201, true, "Register success. Please verify your email by click verification link at your mail inbox.",
-        {
-          full_name: created.dataValues.name,
-          email: created.dataValues.email
-        }
-      );
-    } catch (error) {
-      console.error(error);
-      let message, errorCode = error.code || 500;
-      message = getErrorFirebase(errorCode)
-
-      return res.sendJson(403, false, message, {});
-    }
-  },
+    return res.sendJson(201, true, "Register success. Please verify your email by click verification link at your mail inbox.", {
+      full_name: created.dataValues.name,
+      email: created.dataValues.email
+    });
+  }),
 
   /**
    * @desc      Login Account Using Email and Password
    * @route     POST /api/v1/auth/login
    * @access    Public
    */
-  loginUser: async (req, res) => {
-    try {
-      const { email, password } = req.body;
+  loginUser: asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
 
-      const auth = getClientAuth();
-      const credential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+    const auth = getClientAuth();
+    const credential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
 
-      const dataPostgre = await User.findOne({
-        where: {
-          email
-        }
-      });
+    const dataPostgre = await User.findOne({
+      where: { email }
+    });
 
-      insertActivity(req, dataPostgre.dataValues.id, "Login with Email and Password");
+    await insertLogActivity(req, dataPostgre.dataValues.id, "Login with Email and Password");
 
-      const token = await auth.currentUser.getIdToken();
+    const token = await auth.currentUser.getIdToken();
 
-      return res.sendJson(200, true, `Login success. Hi ${credential.user.displayName}!`, {
-        token,
-      }, {
-        name: "token", value: token
-      });
-    } catch (error) {
-      console.error(error);
-      let message, errorCode = error.code || 500;
-      message = res.getErrorFirebase(errorCode)
-
-      return res.sendJson(403, false, message, {});
-    }
-  },
+    return res.sendJson(200, true, `Login success. Hi ${credential.user.displayName}!`, { token }, {
+      name: "token", value: token
+    });
+  }),
 
   /**
    * @desc      request forgot password user, send email link to user
    * @route     POST /api/v1/auth/forget-password
    * @access    Public
    */
-  requestResetPassword: async (req, res) => {
-    try {
-      const { email } = req.body;
+  requestResetPassword: asyncHandler(async (req, res) => {
+    const { email } = req.body;
 
-      await sendPasswordResetEmail(getClientAuth(), email);
+    await sendPasswordResetEmail(getClientAuth(), email);
 
-      return res.sendJson(200, true, "Reset Password email has been sent. Please check your mail inbox to reset your password.", {});
-    } catch (err) {
-      console.error(err);
-      return res.sendJson(403, false, "Something went wrong.", {});
-    }
-  },
+    return res.sendJson(200, true, "Reset Password email has been sent. Please check your mail inbox to reset your password.", {});
+  }),
 
   /**
    * @desc      request verify email, send email link to user
    * @route     POST /api/v1/auth/verify-email
    * @access    Public
    */
-  requestVerificationEmail: async (req, res) => {
-    try {
-      let token = req.firebaseToken;
+  requestVerificationEmail: asyncHandler(async (req, res) => {
+    let token = req.firebaseToken;
 
-      if (!token) return res.status(409).json({
-        success: false,
-        message: "Invalid authorization.",
-        data: {}
-      });
+    if (!token) return res.status(409).json({
+      success: false,
+      message: "Invalid authorization.",
+      data: {}
+    });
 
-      const user = getClientAuth().currentUser;
+    const user = getClientAuth().currentUser;
 
-      if (!user) return res.status(409).json({
-        success: false,
-        message: "Invalid authorization.",
-        data: {}
-      });
+    if (!user) return res.status(409).json({
+      success: false,
+      message: "Invalid authorization.",
+      data: {}
+    });
 
-      if (user.emailVerified) return res.status(400).json({
-        success: false,
-        message: "This email already verified.",
-        data: {}
-      });
+    if (user.emailVerified) return res.status(400).json({
+      success: false,
+      message: "This email already verified.",
+      data: {}
+    });
 
-      await sendEmailVerification(user);
+    await sendEmailVerification(user);
 
-      return res.sendJson(200, true, "Email verification sent. Please check your email inbox.", {});
-    } catch (err) {
-      console.error(err);
-      return res.sendJson(500, false, err, null);
-    }
-  },
+    return res.sendJson(200, true, "Email verification sent. Please check your email inbox.", {});
+  }),
 
   /**
    * @desc      Login With Google
-   * @route     GET /api/v1/auth/google-validate
+   * @route     POST /api/v1/auth/google-validate
    * @access    Public
    */
-  googleValidate: async (req, res) => {
-    try {
-      let token = req.firebaseToken;
-      let firebaseData = req.firebaseData;
-      let user = req.userData;
+  googleValidate: asyncHandler(async (req, res) => {
+    let token = req.firebaseToken;
+    let firebaseData = req.firebaseData;
+    let user = req.userData;
 
-      if (!token || !firebaseData) return res.status(409).json({
-        success: false,
-        message: "Invalid authorization.",
-        data: {}
+    if (!token || !firebaseData) return res.status(409).json({
+      success: false,
+      message: "Invalid authorization.",
+      data: {}
+    });
+
+    const { email, name, uid } = firebaseData;
+
+    if (!user) {
+      user = await User.create({
+        firebase_uid: uid,
+        full_name: name,
+        email,
+        gender: 0
       });
 
-      const { email, name, uid } = firebaseData;
+      insertLog("daily-active-user", user.dataValues.id);
+    } else insertLog("daily-active-user", user.id);
 
-      if (!user) {
-        user = await User.create({
-          firebase_uid: uid,
-          full_name: name,
-          email,
-          password: "login-with-email",
-          gender: 0,
-          role: "mahasiswa",
-          is_verified: false,
-          is_lecturer: false
-        });
+    insertLogActivity(req, user.id, "Login with Google");
 
-        insertNRUs(user.dataValues.id);
-      } else insertDAUs(user.id);
+    delete user['id'];
+    delete user['firebase_uid'];
+    delete user['password'];
 
-      insertActivity(req, user.id, "Login with Google");
+    res.status(200).json({
+      success: true,
+      message: "Account connected.",
+      data: { ...user }
+    });
+  }),
 
-      delete user['id'];
-      delete user['firebase_uid'];
-      delete user['password'];
+  signOutUser: asyncHandler(async (req, res) => {
+    req.logout(function (err) {
+      if (err) { return next(err); }
+    });
 
-      res.status(200).json({
-        success: true,
-        message: "Account connected.",
-        data: { ...user }
-      });
-    } catch (error) {
-      console.error(error);
-
-      let message, errorCode = error.code || 500;
-      message = res.getErrorFirebase(errorCode)
-
-      return res.sendJson(403, false, message, {});
-    }
-  },
-
-  signOutUser: async (req, res) => {
-    try {
-      req.logout(function (err) {
-        if (err) { return next(err); }
-      });
-
-      res.status(200).json({
-        success: true,
-        message: "Logout success.",
-        data: {}
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+    res.status(200).json({
+      success: true,
+      message: "Logout success.",
+      data: {}
+    });
+  })
 };
 
 // Usage for Capitalize Each Word
@@ -276,9 +210,9 @@ function phoneNumber(number) {
   }
 }
 
-// Usage for Insert User Activity
-function insertActivity(req,userId, activity) {
-  User_Activity.create({
+// Usage for Insert Log Activity
+const insertLogActivity = asyncHandler(async (req, userId, activity) => {
+  await User_Activity.create({
     user_id: userId,
     activity,
     ip_address: req.headers['x-real-ip'] || req.connection.remoteAddress,
@@ -290,36 +224,39 @@ function insertActivity(req,userId, activity) {
   });
 
   return true;
-}
+});
 
-// Usage for Insert Daily Active User (DAUs)
-const insertNRUs = async (userId) => {
-  Nrus.create({
-    user_id: userId
-  });
+// Usage for Insert Log
+const insertLog = asyncHandler(async (type, userId) => {
+  switch (type) {
+    case "new-register-user":
+      await Nrus.create({
+        user_id: userId
+      });
+
+      break;
+    case "daily-active-user":
+      const TODAY_START = new Date().setHours(0, 0, 0, 0);
+      const NOW = new Date();
+
+      let existDaus = await Daus.findOne({
+        where: {
+          user_id: userId,
+          created_at: {
+            [Op.gt]: TODAY_START,
+            [Op.lt]: NOW
+          },
+        },
+      });
+
+      if (!existDaus) await Daus.create({
+        user_id: userId
+      });
+
+      break;
+    default:
+      break;
+  }
 
   return true;
-
-}
-
-// Usage for Insert Daily Active User (DAUs)
-const insertDAUs = async (userId) => {
-  const TODAY_START = new Date().setHours(0, 0, 0, 0);
-  const NOW = new Date();
-
-  let existDaus = await Daus.findOne({
-    where: {
-      user_id: userId,
-      created_at: {
-        [Op.gt]: TODAY_START,
-        [Op.lt]: NOW
-      },
-    },
-  });
-
-  if (!existDaus) Daus.create({
-    user_id: userId
-  });
-
-  return true;
-}
+});
