@@ -148,14 +148,18 @@ module.exports = {
 	 * @access    Private
 	 */
 	 takeSubject2: async (req,res) => {
-		const {subject_id,student_id} = req.body
+		const {subject_id} = req.body
+		const student_id = req.userData.id
 		const credit_thresh = 24;
 		try {
 			const subjectsEnrolled = await StudentSubject.findAll({
 				where: {
 					student_id:student_id,
 					// status: {[Op.or]: ['PENDING', 'ONGOING']}
-					status:'PENDING'
+					[Op.or]:[
+						{status:"ONGOING"},
+						{status:"PENDING"},
+					]
 				}
 			})
 			
@@ -192,10 +196,7 @@ module.exports = {
 				await StudentSubject.create({
 					subject_id:subject_id,
 					student_id:student_id,
-                    [Op.or]: [
-						{ status: 'PENDING' },
-						{ status: 'ONGOING' }
-					]	
+                    status: 'PENDING'
 				})
 				res.sendJson(200,true,"Enrolled test", credit)
 			}
