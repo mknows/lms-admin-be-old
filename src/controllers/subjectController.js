@@ -192,9 +192,10 @@ module.exports = {
 				await StudentSubject.create({
 					subject_id:subject_id,
 					student_id:student_id,
-                    status:{
-						[Op.or]: ["PENDING", "ONGOING"]
-					  }
+                    [Op.or]: [
+						{ status: 'PENDING' },
+						{ status: 'ONGOING' }
+					]	
 				})
 				res.sendJson(200,true,"Enrolled test", credit)
 			}
