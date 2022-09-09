@@ -155,12 +155,12 @@ module.exports = {
 				where: {
 					student_id:student_id,
 					[Op.or]:[
-						{status:"ONGOING"},
-						{status:"PENDING"},
+						{status:'ONGOING'},
+						{status:'PENDING'},
 					]
 				},
 				attributes: [
-					'id'
+					'subject_id'
 				]
 			})
 			const sub = await Subject.findOne({
@@ -176,7 +176,7 @@ module.exports = {
 				await StudentSubject.create({
 					subject_id:subject_id,
 					student_id:student_id,
-                    status:"PENDING"
+                    status:'PENDING'
 				})
 				res.sendJson(200,true,"Enrolled",)
 			}
@@ -226,6 +226,7 @@ async function creditTaken(subjectTaken, sub){
 async function alreadyEnrolled(subjectTaken, sub){
 	let enrolled = false;
 	for (let i = 0; i<subjectTaken.length; i++) {
+		console.log(subjectTaken[i])
 		if (sub.id === subjectTaken[i]) {
 			enrolled = true;
 		}
