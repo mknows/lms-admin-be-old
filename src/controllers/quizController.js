@@ -102,8 +102,8 @@ module.exports = {
 				await Material_Enrolled.create({
 					student_id:user_id,
 					session_id:session_id,
-					material_id:material_id,
-					subject_id:subject_id,
+					material_id:material.id,
+					subject_id:session.subject_id,
 					id_referrer:quiz_id,	
 					type:"QUIZ"	
 				})	
