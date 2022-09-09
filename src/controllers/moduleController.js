@@ -75,7 +75,7 @@ module.exports = {
         } = req.body
 
 		try {
-			const mod = await Module.create({
+			const modcr = await Module.create({
                 session_id: session_id,
                 video_id:video_id,
                 document_id: document_id
@@ -87,7 +87,7 @@ module.exports = {
 				id_referrer: mod.id,
 				})
 
-			res.sendJson(200,true,"Success", moduleData)
+			res.sendJson(200,true,"Success", modcr)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}
@@ -104,12 +104,12 @@ module.exports = {
         } = req.body
 
 		try {
-			const mod = await Video.create({
+			const vidcr = await Video.create({
                 url: url,
 				description: description
             })
 
-			res.sendJson(200,true,"Success", moduleData)
+			res.sendJson(200,true,"Success", vidcr)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}
@@ -127,13 +127,13 @@ module.exports = {
         } = req.body
 
 		try {
-			const mod = await Document.create({
+			const doccr = await Document.create({
                 content: content,
 				file: file,
 				description: description
             })
 
-			res.sendJson(200,true,"Success", moduleData)
+			res.sendJson(200,true,"Success", doccr)
 		} catch (err) {
 			res.sendJson(500, false, err.message, null);
 		}
