@@ -192,15 +192,17 @@ module.exports = {
 				await StudentSubject.create({
 					subject_id:subject_id,
 					student_id:student_id,
-                    status:'PENDING'
+                    status:{
+						[Op.or]: ["PENDING", "ONGOING"]
+					  }
 				})
 				res.sendJson(200,true,"Enrolled test", credit)
 			}
 			else if(credit>credit_thresh){
-				res.sendJson(400,false,"Exceeded maximum credit",credit)
+				res.sendJson(400,false,"Exceeded maximum credit",{credit: credit})
 			}
 			else if(enrolled){
-				res.sendJson(400,false,"Subject already taken",subject_id)
+				res.sendJson(400,false,"Subject already taken",{enrolled_in: subject_id})
 			} 
 			else {
 				res.sendJson(400,false,"something went wrong",null)
