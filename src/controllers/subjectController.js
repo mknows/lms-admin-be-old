@@ -170,15 +170,15 @@ module.exports = {
 			}).id;
 
 			const hasEnrolled = await alreadyEnrolled(subjectsEnrolled, sub);
-			const credit = await creditTaken(subjectsEnrolled, sub);
+			// const credit = await creditTaken(subjectsEnrolled, sub);
 
-			if(credit<=credit_thresh && !hasEnrolled){
+			if(!hasEnrolled){
 				await StudentSubject.create({
 					subject_id:subject_id,
 					student_id:student_id,
                     status:'PENDING'
 				})
-				res.sendJson(200,true,"Enrolled test", credit)
+				res.sendJson(200,true,"Enrolled test")
 			}
 			else if(credit>credit_thresh){
 				res.sendJson(400,false,"Exceeded maximum credit",null)
