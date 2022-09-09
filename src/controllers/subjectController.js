@@ -171,13 +171,6 @@ module.exports = {
 			let enrolled = false;
 			let credit = 0;
 			for (let i = 0; i<subjectsEnrolled.length; i++) {
-				
-				const subber = await Subject.findOne({
-					where: {
-						id: subjectsEnrolled[i].subject_id
-					}
-				})
-				credit += subber.credit;
 
 				if (subjectsEnrolled[i].subject_id === subject_id) {
 					enrolled = true;
