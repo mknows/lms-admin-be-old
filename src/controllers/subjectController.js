@@ -107,7 +107,7 @@ module.exports = {
 				],
 				include: Subject
 			})
-			const checkCredit = await StudentSubject.findAll({
+			const subjectsEnrolled = await StudentSubject.findAll({
 				where: {
 					student_id:student_id,
 					[Op.or]:[
@@ -117,8 +117,13 @@ module.exports = {
 				},
 				include: Subject
 			})
-			const credit = await creditTotal(checkCredit)
-			if(credit<credit_thresh && checkIfSubjectTaken===null){
+			const sub = await Subject.findOne({
+				where: {
+					id: subject_id
+				}
+			})
+			const credit = await creditTotal(subjectsEnrolled) + sub.dataValues.Subject.credit
+			if(credit<=credit_thresh && checkIfSubjectTaken===null){
 				await StudentSubject.create({
 					subject_id:subject_id,
 					student_id:student_id,
@@ -155,7 +160,7 @@ async function creditTotal(checkCredit){
 	let credit = 0 
 	console.log(checkCredit)
 	for(let i=0;i<checkCredit.length;i++){
-		credit += checkCredit[i].dataValues.Subject.credits
+		credit += checkCredit[i].dataValues.Subject.credit
 	}
 	return credit
 }
