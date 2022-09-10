@@ -26,6 +26,6 @@ route.use("/session", sessionRoute);
 route.use("/forum",forumRoute);
 route.use("/quiz", quizRoute);
 route.use("/module", moduleRoute);
-route.use("/asignment", assignmentRoute);
+route.use("/assignment", assignmentRoute);
 
 module.exports = route;
