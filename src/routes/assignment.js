@@ -6,6 +6,6 @@ const { protection } = require("../middlewares/Authentication");
 
 route.get("/get/:id", protection, assignmentController.getAssignment);
 
-route.get("/create", protection, assignmentController.postAssignment);
+route.post("/create", protection, assignmentController.postAssignment);
 
 module.exports = route;
