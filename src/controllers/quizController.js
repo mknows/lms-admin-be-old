@@ -119,13 +119,13 @@ module.exports = {
 	 * @access    Private
 	 */
 	 postQuizAnswer: async (req,res) => {
-		const {answer,quiz_id,subject_id,duration_taken} = req.body
+		const {answer,quiz_id,duration_taken} = req.body
 		const userAnswer = answer
 		const user_id = req.userData.id
 		const kkm = 70
 		let status
 		let correct=0
-		const quiz = await Quiz.findAll({
+		const quiz = await Quiz.findOne({
 			where: {
 				id: quiz_id
 			},
@@ -133,8 +133,16 @@ module.exports = {
 				'answer','session_id'
 			]
 		})
-		const quizAns = quiz[0].dataValues.answer
-		const session_id = quiz[0].dataValues.session_id
+
+		const quizAns = quiz.answer
+		const session_id = quiz.session_id
+
+		const quiz_session = await Session.findOne({
+			where: {
+				id: session_id
+			}
+		})
+
 		for(var i = 0, l = quizAns.length ; i<l;i++ ){
 			if(userAnswer[i]===quizAns[i]){
 				correct++
@@ -164,7 +172,7 @@ module.exports = {
 			},{
 				where:{
 					student_id:user_id,
-					subject_id:subject_id,
+					subject_id:quiz_session.subject_id,
 					id_referrer:quiz_id,
 					session_id:session_id
 				}
