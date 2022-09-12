@@ -4,11 +4,12 @@ const { DB_USERNAME, DB_PASSWORD, DB_NAME, DB_PORT, DB_HOST, DB_DIALECT } =
 
 module.exports = {
   development: {
-    username: DB_USERNAME,
-    password: DB_PASSWORD,
-    database: DB_NAME,
-    host: DB_HOST,
-    dialect: DB_DIALECT,
+    username: "postgres",
+    password: "postgres",
+    database: "postgres",
+    host: "localhost",
+    dialect: "postgres",
+    port:5433
   },
   test: {
     username: DB_USERNAME,
