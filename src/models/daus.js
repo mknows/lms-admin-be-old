@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		{
 			sequelize,
-			modelName: "daily_active_users",
+			tableName: "daily_active_users",
 		}
 	);
 	return Daus;
