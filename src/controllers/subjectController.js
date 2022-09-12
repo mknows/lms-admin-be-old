@@ -88,66 +88,13 @@ module.exports = {
 			res.sendJson(500, false, err.message, null);
 		}
 	},
+	// TODO: STILL VERY NAIVE, WILL BE REFACTORED LATER
 	/**
 	 * @desc      enroll in a subject
 	 * @route     POST /api/v1/subject/enroll
 	 * @access    Private
 	 */
 	 takeSubject: async (req,res) => {
-		const {subject_id,student_id} = req.body
-		const credit_thresh = 24;
-		try {
-			const checkIfSubjectTaken = await StudentSubject.findOne({
-				where: {
-					subject_id:subject_id,
-					student_id:student_id
-				},
-				attributes:[
-					"id"
-				],
-				include: Subject
-			})
-			const subjectsEnrolled = await StudentSubject.findAll({
-				where: {
-					student_id:student_id,
-					[Op.or]:[
-						{status:"ONGOING"},
-						{status:"PENDING"},
-					]
-				},
-				include: Subject
-			})
-			const sub = await Subject.findOne({
-				where: {
-					id: subject_id
-				}
-			})
-			const credit = await creditTotal(subjectsEnrolled) + sub.dataValues.Subject.credit
-			if(credit<=credit_thresh && checkIfSubjectTaken===null){
-				await StudentSubject.create({
-					subject_id:subject_id,
-					student_id:student_id,
-                    status:"PENDING"
-				})
-				res.sendJson(200,true,"Enrolled",)
-			}
-			if(credit>credit_thresh){
-				res.sendJson(400,false,"Exceeded maximum credit",null)
-			}
-			if(checkIfSubjectTaken!==null){
-				res.sendJson(400,false,"Subject already taken",null)
-			}
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
-	//=====================================================================================
-	/**
-	 * @desc      enroll in a subject
-	 * @route     POST /api/v1/subject/enroll
-	 * @access    Private
-	 */
-	 takeSubject2: async (req,res) => {
 		const {subject_id} = req.body
 		const student_id = req.userData.id
 		const credit_thresh = 24;
