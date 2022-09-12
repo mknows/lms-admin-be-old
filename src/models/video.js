@@ -26,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
 		{
 			sequelize,
 			tableName: "videos",
+			timestamps: true,
+			underscored: true,
+			underscoredAll: true,
 		}
 	);
 	return Video;

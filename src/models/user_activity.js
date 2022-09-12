@@ -33,6 +33,9 @@ module.exports = (sequelize, DataTypes) => {
 		{
 			sequelize,
 			tableName: "user_activities",
+			timestamps: true,
+			underscored: true,
+			underscoredAll: true,
 		}
 	);
 	return User_Activity;

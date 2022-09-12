@@ -28,6 +28,9 @@ module.exports = (sequelize, DataTypes) => {
 		{
 			sequelize,
 			tableName: "major_subjects",
+			timestamps: true,
+			underscored: true,
+			underscoredAll: true,
 		}
 	);
 	return MajorSubject;
