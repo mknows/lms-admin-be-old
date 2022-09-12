@@ -78,7 +78,7 @@ module.exports = {
 				true,
 				"Register success. Please verify your email by click verification link at your mail inbox.",
 				{
-					full_name: created.dataValues.name,
+					full_name: created.dataValues.full_name,
 					email: created.dataValues.email,
 				}
 			);

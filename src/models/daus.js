@@ -18,6 +18,24 @@ module.exports = (sequelize, DataTypes) => {
 				primaryKey: true,
 				defaultValue: sequelize.literal("gen_random_uuid()"),
 			},
+			user_id: {
+				allowNull: false,
+				type: DataTypes.INTEGER,
+				references: {
+					model: "Users",
+					key: "id",
+				},
+			},
+			created_at: {
+				allowNull: false,
+				type: DataTypes.DATE,
+				field: "created_at",
+			},
+			updated_at: {
+				allowNull: false,
+				type: DataTypes.DATE,
+				field: "updated_at",
+			},
 		},
 		{
 			sequelize,

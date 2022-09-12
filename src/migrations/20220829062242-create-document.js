@@ -16,21 +16,21 @@ module.exports = {
 			description: {
 				type: Sequelize.TEXT,
 			},
-			createdAt: {
+			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
 			},
-			updatedAt: {
+			updated_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
 			},
-			updatedBy: {
+			updated_by: {
 				allowNull: true,
-				type: Sequelize.STRING,
+				type: Sequelize.UUID,
 			},
-			createdBy: {
+			created_by: {
 				allowNull: true,
-				type: Sequelize.STRING,
+				type: Sequelize.UUID,
 			},
 		});
 	},

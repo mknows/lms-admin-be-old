@@ -15,8 +15,18 @@ module.exports = (sequelize, DataTypes) => {
 			df_id: DataTypes.UUID,
 			author_id: DataTypes.STRING,
 			content: DataTypes.STRING,
-			teacher_like: DataTypes.ARRAY(DataTypes.STRING),
-			student_like: DataTypes.ARRAY(DataTypes.STRING),
+			teacher_like: {
+				type: DataTypes.ARRAY(DataTypes.STRING),
+				defaultValue: [],
+			},
+			student_like: {
+				type: DataTypes.ARRAY(DataTypes.STRING),
+				defaultValue: [],
+			},
+			created_at: DataTypes.DATE,
+			updated_at: DataTypes.DATE,
+			created_by: DataTypes.UUID,
+			updated_by: DataTypes.UUID,
 		},
 		{
 			sequelize,

@@ -25,6 +25,10 @@ module.exports = (sequelize, DataTypes) => {
 			platform: DataTypes.STRING,
 			operating_system: DataTypes.STRING,
 			source: DataTypes.STRING,
+			created_at: DataTypes.DATE,
+			updated_at: DataTypes.DATE,
+			created_by: DataTypes.UUID,
+			updated_by: DataTypes.UUID,
 		},
 		{
 			sequelize,

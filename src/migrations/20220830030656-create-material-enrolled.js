@@ -13,9 +13,6 @@ module.exports = {
 			session_id: {
 				type: Sequelize.UUID,
 			},
-			student_id: {
-				type: Sequelize.UUID,
-			},
 			material_id: {
 				type: Sequelize.UUID,
 			},
@@ -40,13 +37,21 @@ module.exports = {
 			activity_detail: {
 				type: Sequelize.JSON,
 			},
-			createdAt: {
+			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
 			},
-			updatedAt: {
+			updated_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
+			},
+			updated_by: {
+				allowNull: true,
+				type: Sequelize.UUID,
+			},
+			created_by: {
+				allowNull: true,
+				type: Sequelize.UUID,
 			},
 		});
 	},

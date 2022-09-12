@@ -22,13 +22,21 @@ module.exports = {
 			id_referrer: {
 				type: Sequelize.UUID,
 			},
-			createdAt: {
+			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
 			},
-			updatedAt: {
+			updated_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
+			},
+			updated_by: {
+				allowNull: true,
+				type: Sequelize.UUID,
+			},
+			created_by: {
+				allowNull: true,
+				type: Sequelize.UUID,
 			},
 		});
 	},

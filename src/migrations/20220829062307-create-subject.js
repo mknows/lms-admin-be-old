@@ -13,7 +13,7 @@ module.exports = {
 			number_of_sessions: {
 				type: Sequelize.INTEGER,
 			},
-			program: {
+			degree: {
 				type: Sequelize.STRING,
 			},
 			level: {
@@ -22,30 +22,27 @@ module.exports = {
 			lecturer: {
 				type: Sequelize.ARRAY(Sequelize.UUID),
 			},
-			degree: {
-				type: Sequelize.STRING,
-			},
 			description: {
 				type: Sequelize.STRING,
 			},
 			credit: {
 				type: Sequelize.INTEGER,
 			},
-			createdAt: {
+			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
 			},
-			updatedAt: {
+			updated_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
 			},
-			updatedBy: {
+			updated_by: {
 				allowNull: true,
-				type: Sequelize.STRING,
+				type: Sequelize.UUID,
 			},
-			createdBy: {
+			created_by: {
 				allowNull: true,
-				type: Sequelize.STRING,
+				type: Sequelize.UUID,
 			},
 		});
 	},

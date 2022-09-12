@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
 			description: DataTypes.STRING,
 			type: DataTypes.STRING,
 			id_referrer: DataTypes.UUID,
+			created_at: DataTypes.DATE,
+			updated_at: DataTypes.DATE,
+			created_by: DataTypes.UUID,
+			updated_by: DataTypes.UUID,
 		},
 		{
 			sequelize,

@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
 			date_finished: DataTypes.DATE,
 			status: DataTypes.STRING,
 			final_score: DataTypes.FLOAT,
+			created_at: DataTypes.DATE,
+			updated_at: DataTypes.DATE,
+			created_by: DataTypes.UUID,
+			updated_by: DataTypes.UUID,
 		},
 		{
 			sequelize,

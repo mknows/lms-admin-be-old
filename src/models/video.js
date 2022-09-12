@@ -18,12 +18,10 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			url: DataTypes.STRING,
 			description: DataTypes.TEXT,
-			updatedBy: {
-				type: DataTypes.STRING,
-			},
-			createdBy: {
-				type: DataTypes.STRING,
-			},
+			created_at: DataTypes.DATE,
+			updated_at: DataTypes.DATE,
+			created_by: DataTypes.UUID,
+			updated_by: DataTypes.UUID,
 		},
 		{
 			sequelize,

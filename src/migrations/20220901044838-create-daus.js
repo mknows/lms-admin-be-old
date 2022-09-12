@@ -7,13 +7,25 @@ module.exports = {
 				allowNull: false,
 				primaryKey: true,
 			},
-			createdAt: {
+			user_id: {
+				allowNull: false,
+				type: Sequelize.UUID,
+			},
+			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
 			},
-			updatedAt: {
+			updated_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
+			},
+			updated_by: {
+				allowNull: true,
+				type: Sequelize.STRING,
+			},
+			created_by: {
+				allowNull: true,
+				type: Sequelize.STRING,
 			},
 		});
 	},

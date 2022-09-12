@@ -23,8 +23,10 @@ module.exports = (sequelize, DataTypes) => {
 			description: DataTypes.TEXT,
 			questions: DataTypes.JSON,
 			answer: DataTypes.ARRAY(DataTypes.STRING),
-			createdBy: DataTypes.STRING,
-			updatedBy: DataTypes.STRING,
+			created_at: DataTypes.DATE,
+			updated_at: DataTypes.DATE,
+			created_by: DataTypes.UUID,
+			updated_by: DataTypes.UUID,
 		},
 		{
 			sequelize,

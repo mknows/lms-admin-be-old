@@ -21,7 +21,11 @@ module.exports = (sequelize, DataTypes) => {
 			user_id: DataTypes.STRING,
 			is_lecturer: DataTypes.BOOLEAN,
 			is_mentor: DataTypes.BOOLEAN,
-			approvedBy: DataTypes.STRING,
+			approvedBy: DataTypes.UUID,
+			created_at: DataTypes.DATE,
+			updated_at: DataTypes.DATE,
+			created_by: DataTypes.UUID,
+			updated_by: DataTypes.UUID,
 		},
 		{
 			sequelize,

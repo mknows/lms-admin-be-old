@@ -13,8 +13,16 @@ module.exports = (sequelize, DataTypes) => {
 	}
 	Admin.init(
 		{
-			id: { type: DataTypes.STRING, primaryKey: true },
+			id: {
+				type: DataTypes.STRING,
+				primaryKey: true,
+				defaultValue: sequelize.literal("gen_random_uuid()"),
+			},
 			name: DataTypes.STRING,
+			created_at: DataTypes.DATE,
+			updated_at: DataTypes.DATE,
+			created_by: DataTypes.UUID,
+			updated_by: DataTypes.UUID,
 		},
 		{
 			sequelize,

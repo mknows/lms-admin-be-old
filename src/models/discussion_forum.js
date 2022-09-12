@@ -23,8 +23,18 @@ module.exports = (sequelize, DataTypes) => {
 			session_id: DataTypes.UUID,
 			title: DataTypes.STRING,
 			content: DataTypes.STRING,
-			teacher_like: DataTypes.ARRAY(DataTypes.UUID),
-			student_like: DataTypes.ARRAY(DataTypes.UUID),
+			teacher_like: {
+				type: DataTypes.ARRAY(DataTypes.STRING),
+				defaultValue: [],
+			},
+			student_like: {
+				type: DataTypes.ARRAY(DataTypes.STRING),
+				defaultValue: [],
+			},
+			created_at: DataTypes.DATE,
+			updated_at: DataTypes.DATE,
+			created_by: DataTypes.UUID,
+			updated_by: DataTypes.UUID,
 		},
 		{
 			sequelize,

@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
 			session_id: DataTypes.UUID,
 			video_id: DataTypes.UUID,
 			document_id: DataTypes.UUID,
+			created_at: DataTypes.DATE,
+			updated_at: DataTypes.DATE,
+			created_by: DataTypes.UUID,
+			updated_by: DataTypes.UUID,
 		},
 		{
 			sequelize,

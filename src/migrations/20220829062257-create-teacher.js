@@ -1,4 +1,7 @@
 "use strict";
+
+const { DataTypes } = require("sequelize/types");
+
 module.exports = {
 	async up(queryInterface, Sequelize) {
 		await queryInterface.createTable("lecturers", {
@@ -7,23 +10,33 @@ module.exports = {
 				primaryKey: true,
 				type: Sequelize.UUID,
 			},
+			user_id: {
+				type: Sequelize.STRING,
+			},
 			is_lecturer: {
 				type: Sequelize.BOOLEAN,
 			},
 			is_mentor: {
 				type: Sequelize.BOOLEAN,
 			},
-			createdAt: {
+			approved_by: {
+				type: Sequelize.UUID,
+			},
+			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
 			},
-			updatedAt: {
+			updated_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
 			},
-			approvedBy: {
+			updated_by: {
 				allowNull: true,
-				type: Sequelize.STRING,
+				type: Sequelize.UUID,
+			},
+			created_by: {
+				allowNull: true,
+				type: Sequelize.UUID,
 			},
 		});
 	},
