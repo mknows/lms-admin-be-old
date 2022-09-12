@@ -39,17 +39,17 @@ const PORT = process.env.PORT || 8080;
 app.use("/api/v1", allRoutes);
 
 app.listen(
-  PORT,
-  {
-    cors: {
-      origin: "*",
-    },
-  },
-  console.log(`Running in port ${PORT}`)
+	PORT,
+	{
+		cors: {
+			origin: "*",
+		},
+	},
+	console.log(`Running in port ${PORT}`)
 );
 
 app.all("*", (req, res) => {
-  return res
-    .status(404)
-    .json({ success: false, message: "Page not found.", data: {} });
+	return res
+		.status(404)
+		.json({ success: false, message: "Page not found.", data: {} });
 });

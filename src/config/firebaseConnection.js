@@ -6,13 +6,13 @@ const dbCredential = require("./firebaseAdminKampusGratis.json");
 const webCredential = require("./firebaseWebKampusGratis.json");
 
 const initializeFirebase = async () => {
-  firebaseConnection.initializeApp({
-    credential: cert(dbCredential),
-    databaseURL:
-      "https://kampus-gratis2-default-rtdb.asia-southeast1.firebasedatabase.app",
-  });
+	firebaseConnection.initializeApp({
+		credential: cert(dbCredential),
+		databaseURL:
+			"https://kampus-gratis2-default-rtdb.asia-southeast1.firebasedatabase.app",
+	});
 
-  initializeApp(webCredential);
+	initializeApp(webCredential);
 };
 
 module.exports = initializeFirebase;

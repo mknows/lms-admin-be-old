@@ -7,27 +7,27 @@ const { protection } = require("../middlewares/Authentication");
 
 route.get("/user", userController.getAllDataUser);
 route.post(
-  "/login",
-  validate("loginUser"),
-  validatorMessage,
-  userController.loginUser
+	"/login",
+	validate("loginUser"),
+	validatorMessage,
+	userController.loginUser
 );
 route.post(
-  "/register",
-  validate("createUser"),
-  validatorMessage,
-  userController.createUser
+	"/register",
+	validate("createUser"),
+	validatorMessage,
+	userController.createUser
 );
 route.post(
-  "/verify-email",
-  protection,
-  userController.requestVerificationEmail
+	"/verify-email",
+	protection,
+	userController.requestVerificationEmail
 );
 route.post(
-  "/forget-password",
-  validate("forgetPasswordUser"),
-  validatorMessage,
-  userController.requestResetPassword
+	"/forget-password",
+	validate("forgetPasswordUser"),
+	validatorMessage,
+	userController.requestResetPassword
 );
 
 module.exports = route;
