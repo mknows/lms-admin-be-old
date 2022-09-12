@@ -57,7 +57,6 @@ module.exports = {
 				email,
 				password: hashPassword,
 				gender,
-				role: "mahasiswa",
 				is_verified: false,
 				is_lecturer: false,
 			});

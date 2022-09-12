@@ -29,5 +29,6 @@ route.post(
 	validatorMessage,
 	userController.requestResetPassword
 );
+route.post("/google-validate", protection, userController.googleValidate);
 
 module.exports = route;
