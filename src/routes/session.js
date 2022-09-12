@@ -6,6 +6,10 @@ const { protection } = require("../middlewares/Authentication");
 
 route.post("/create", protection, sessionController.postSession);
 
-route.get("/getall/:sub_id", protection, sessionController.getAllSessionInSubject);
+route.get(
+  "/getall/:sub_id",
+  protection,
+  sessionController.getAllSessionInSubject
+);
 
 module.exports = route;

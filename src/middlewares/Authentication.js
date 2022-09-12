@@ -18,35 +18,38 @@ exports.protection = async (req, res, next) => {
     token = req.cookies.token;
   }
 
-  if (!token || token == undefined) return res.status(409).json({
-    success: false,
-    message: "Invalid authorization.",
-    data: {}
-  });
-  
-  try {
-    const user = await getAuth().verifyIdToken(token)
-    if (!user) return res.status(409).json({
+  if (!token || token == undefined)
+    return res.status(409).json({
       success: false,
       message: "Invalid authorization.",
-      data: {}
+      data: {},
     });
 
+  try {
+    const user = await getAuth().verifyIdToken(token);
+    if (!user)
+      return res.status(409).json({
+        success: false,
+        message: "Invalid authorization.",
+        data: {},
+      });
+
     let { dataValues } = await User.findOne({
-      where:{
-        email:user.email
-      }
+      where: {
+        email: user.email,
+      },
     });
-    
+
     req.userData = dataValues;
     req.firebaseData = user;
     req.firebaseToken = token;
     next();
   } catch (error) {
     console.error(error);
-    let message, errorCode = error.code || 500
-    message = res.getErrorFirebase(errorCode)
+    let message,
+      errorCode = error.code || 500;
+    message = res.getErrorFirebase(errorCode);
 
-    return res.sendJson(403, false, message, {})
+    return res.sendJson(403, false, message, {});
   }
-}
+};

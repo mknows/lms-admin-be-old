@@ -1,8 +1,6 @@
-'use strict';
+"use strict";
 
-const {
-  Model
-} = require('sequelize');
+const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
   class Student extends Model {
@@ -12,26 +10,29 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsToMany(models.Subject, { 
+      this.belongsToMany(models.Subject, {
         through: models.StudentSubject,
-        foreignKey: 'student_id'
+        foreignKey: "student_id",
       });
     }
   }
 
-  Student.init({
-    id: {
-      type:DataTypes.UUID,
-      primaryKey:true,
-      defaultValue:sequelize.literal('gen_random_uuid()')
+  Student.init(
+    {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: sequelize.literal("gen_random_uuid()"),
+      },
+      user_id: DataTypes.UUID,
+      major_id: DataTypes.ARRAY(DataTypes.STRING),
+      approved_By: DataTypes.STRING,
     },
-    user_id: DataTypes.UUID,
-    major_id: DataTypes.ARRAY(DataTypes.STRING),
-    approved_By: DataTypes.STRING,
-  }, {
-    sequelize,
-    tableName: 'students',
-  });
+    {
+      sequelize,
+      tableName: "students",
+    }
+  );
 
   return Student;
 };

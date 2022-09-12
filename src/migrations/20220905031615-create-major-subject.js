@@ -1,29 +1,29 @@
-'use strict';
+"use strict";
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('major_subjects', {
+    await queryInterface.createTable("major_subjects", {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUID
+        type: Sequelize.UUID,
       },
       major_id: {
-        type: Sequelize.UUID
+        type: Sequelize.UUID,
       },
       subject_id: {
-        type: Sequelize.UUID
+        type: Sequelize.UUID,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('major_subjects');
-  }
+    await queryInterface.dropTable("major_subjects");
+  },
 };

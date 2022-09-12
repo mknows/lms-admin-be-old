@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Module extends Model {
     /**
@@ -11,25 +9,28 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.hasMany(models.Video, {
-        foreignKey:'id'
+        foreignKey: "id",
       });
       this.hasMany(models.Document, {
-        foreignKey:'id'
+        foreignKey: "id",
       });
     }
   }
-  Module.init({
-    id: {
-      type:DataTypes.UUID,
-      primaryKey:true,
-      defaultValue:sequelize.literal('gen_random_uuid()')
+  Module.init(
+    {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: sequelize.literal("gen_random_uuid()"),
+      },
+      session_id: DataTypes.UUID,
+      video_id: DataTypes.UUID,
+      document_id: DataTypes.UUID,
     },
-    session_id: DataTypes.UUID,
-    video_id: DataTypes.UUID,
-    document_id: DataTypes.UUID
-  }, {
-    sequelize,
-    tableName: 'modules',
-  });
+    {
+      sequelize,
+      tableName: "modules",
+    }
+  );
   return Module;
 };

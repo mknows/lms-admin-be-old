@@ -1,46 +1,46 @@
-'use strict';
+"use strict";
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('quizzes', {
+    await queryInterface.createTable("quizzes", {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUID
+        type: Sequelize.UUID,
       },
       session_id: {
-        type: Sequelize.UUID
+        type: Sequelize.UUID,
       },
       duration: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
-      description:{
-        type: Sequelize.TEXT
+      description: {
+        type: Sequelize.TEXT,
       },
       questions: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
       },
       answer: {
-        type: Sequelize.ARRAY(Sequelize.STRING)
+        type: Sequelize.ARRAY(Sequelize.STRING),
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
-      updatedBy:{
-        allowNull:true,
-        type:Sequelize.STRING
+      updatedBy: {
+        allowNull: true,
+        type: Sequelize.STRING,
       },
       createdBy: {
         allowNull: true,
-        type: Sequelize.STRING
-      }
+        type: Sequelize.STRING,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('quizzes');
-  }
+    await queryInterface.dropTable("quizzes");
+  },
 };

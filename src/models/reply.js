@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
   class Reply extends Model {
@@ -15,22 +13,25 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
 
-  Reply.init({
-    id: {
-      type:DataTypes.UUID,
-      primaryKey:true,
-      defaultValue:sequelize.literal('gen_random_uuid()')
+  Reply.init(
+    {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: sequelize.literal("gen_random_uuid()"),
+      },
+      df_id: DataTypes.UUID,
+      comment_id: DataTypes.UUID,
+      author_id: DataTypes.UUID,
+      content: DataTypes.STRING,
+      teacher_like: DataTypes.ARRAY(DataTypes.UUID),
+      student_like: DataTypes.ARRAY(DataTypes.UUID),
     },
-    df_id: DataTypes.UUID,
-    comment_id: DataTypes.UUID,
-    author_id: DataTypes.UUID,
-    content: DataTypes.STRING,
-    teacher_like: DataTypes.ARRAY(DataTypes.UUID),
-    student_like: DataTypes.ARRAY(DataTypes.UUID)
-  }, {
-    sequelize,
-    tableName: 'replies',
-  });
+    {
+      sequelize,
+      tableName: "replies",
+    }
+  );
 
   return Reply;
 };

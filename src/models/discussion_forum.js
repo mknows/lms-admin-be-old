@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
   class Discussion_forum extends Model {
@@ -14,21 +12,24 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Discussion_forum.init({
-    id: {
-      type:DataTypes.UUID,
-      primaryKey:true,
-      defaultValue:sequelize.literal('gen_random_uuid()')
+  Discussion_forum.init(
+    {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: sequelize.literal("gen_random_uuid()"),
+      },
+      author_id: DataTypes.UUID,
+      session_id: DataTypes.UUID,
+      title: DataTypes.STRING,
+      content: DataTypes.STRING,
+      teacher_like: DataTypes.ARRAY(DataTypes.UUID),
+      student_like: DataTypes.ARRAY(DataTypes.UUID),
     },
-    author_id: DataTypes.UUID,
-    session_id: DataTypes.UUID,
-    title: DataTypes.STRING,
-    content: DataTypes.STRING,
-    teacher_like: DataTypes.ARRAY(DataTypes.UUID),
-    student_like: DataTypes.ARRAY(DataTypes.UUID)
-  }, {
-    sequelize,
-    tableName: 'discussion_forums',
-  });
+    {
+      sequelize,
+      tableName: "discussion_forums",
+    }
+  );
   return Discussion_forum;
 };

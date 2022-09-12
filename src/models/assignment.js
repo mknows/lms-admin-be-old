@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Assignment extends Model {
     /**
@@ -13,20 +11,23 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Assignment.init({
-    id: {
-      type:DataTypes.UUID,
-      primaryKey:true,
-      defaultValue:sequelize.literal('gen_random_uuid()')
+  Assignment.init(
+    {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: sequelize.literal("gen_random_uuid()"),
+      },
+      session_id: DataTypes.UUID,
+      duration: DataTypes.INTEGER,
+      description: DataTypes.TEXT,
+      content: DataTypes.TEXT,
+      document_id: DataTypes.UUID,
     },
-    session_id: DataTypes.UUID,
-    duration: DataTypes.INTEGER,
-    description: DataTypes.TEXT,
-    content: DataTypes.TEXT,
-    document_id: DataTypes.UUID
-  }, {
-    sequelize,
-    tableName: 'assignments',
-  });
+    {
+      sequelize,
+      tableName: "assignments",
+    }
+  );
   return Assignment;
 };

@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Document extends Model {
     /**
@@ -13,18 +11,21 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Document.init({
-    id: {
-      type:DataTypes.UUID,
-      primaryKey:true,
-      defaultValue:sequelize.literal('gen_random_uuid()')
+  Document.init(
+    {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: sequelize.literal("gen_random_uuid()"),
+      },
+      content: DataTypes.TEXT,
+      file: DataTypes.STRING,
+      description: DataTypes.TEXT,
     },
-    content: DataTypes.TEXT,
-    file: DataTypes.STRING,
-    description: DataTypes.TEXT
-  }, {
-    sequelize,
-    tableName: 'documents',
-  });
+    {
+      sequelize,
+      tableName: "documents",
+    }
+  );
   return Document;
 };

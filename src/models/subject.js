@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Subject extends Model {
     /**
@@ -10,32 +8,35 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsToMany(models.Student, { 
+      this.belongsToMany(models.Student, {
         through: models.StudentSubject,
-        foreignKey: 'subject_id'
+        foreignKey: "subject_id",
       });
-      this.belongsToMany(models.Major, { 
+      this.belongsToMany(models.Major, {
         through: models.MajorSubject,
-        foreignKey: 'subject_id'
+        foreignKey: "subject_id",
       });
     }
   }
-  Subject.init({
-    id: {
-      type:DataTypes.UUID,
-      primaryKey:true,
-      defaultValue:sequelize.literal('gen_random_uuid()')
+  Subject.init(
+    {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: sequelize.literal("gen_random_uuid()"),
+      },
+      name: DataTypes.STRING,
+      number_of_sessions: DataTypes.INTEGER,
+      degree: DataTypes.STRING,
+      level: DataTypes.STRING,
+      lecturer: DataTypes.ARRAY(DataTypes.UUID),
+      description: DataTypes.STRING,
+      credit: DataTypes.INTEGER,
     },
-    name: DataTypes.STRING,
-    number_of_sessions: DataTypes.INTEGER,
-    degree: DataTypes.STRING,
-    level: DataTypes.STRING,
-    lecturer: DataTypes.ARRAY(DataTypes.UUID),
-    description: DataTypes.STRING,
-    credit: DataTypes.INTEGER,
-  }, {
-    sequelize,
-    tableName: 'subjects',
-  });
+    {
+      sequelize,
+      tableName: "subjects",
+    }
+  );
   return Subject;
 };

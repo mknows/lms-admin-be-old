@@ -65,7 +65,11 @@ module.exports = {
 
       const data = await User.update(
         {
-          full_name, gender, phone, image, address,
+          full_name,
+          gender,
+          phone,
+          image,
+          address,
         },
         {
           where: {

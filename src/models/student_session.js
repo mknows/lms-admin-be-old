@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class StudentSession extends Model {
     /**
@@ -13,20 +11,23 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  StudentSession.init({
-    id: {
-      type:DataTypes.UUID,
-      primaryKey:true,
-      defaultValue:sequelize.literal('gen_random_uuid()')
+  StudentSession.init(
+    {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: sequelize.literal("gen_random_uuid()"),
+      },
+      subject_id: DataTypes.UUID,
+      session_id: DataTypes.UUID,
+      date_present: DataTypes.DATE,
+      final_score: DataTypes.FLOAT,
+      present: DataTypes.BOOLEAN,
     },
-    subject_id: DataTypes.UUID,
-    session_id: DataTypes.UUID,
-    date_present: DataTypes.DATE,
-    final_score: DataTypes.FLOAT,
-    present: DataTypes.BOOLEAN
-  }, {
-    sequelize,
-    tableName: 'student_sessions',
-  });
+    {
+      sequelize,
+      tableName: "student_sessions",
+    }
+  );
   return StudentSession;
 };

@@ -1,55 +1,55 @@
-'use strict';
+"use strict";
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('subjects', {
+    await queryInterface.createTable("subjects", {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUID
+        type: Sequelize.UUID,
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       number_of_sessions: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
-      program:{
-        type: Sequelize.STRING
+      program: {
+        type: Sequelize.STRING,
       },
-      level:{
-        type: Sequelize.STRING
+      level: {
+        type: Sequelize.STRING,
       },
       lecturer: {
-        type: Sequelize.ARRAY(Sequelize.UUID)
+        type: Sequelize.ARRAY(Sequelize.UUID),
       },
-      degree:{
-        type: Sequelize.STRING
+      degree: {
+        type: Sequelize.STRING,
       },
       description: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       credit: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
-      updatedBy:{
-        allowNull:true,
-        type: Sequelize.STRING
+      updatedBy: {
+        allowNull: true,
+        type: Sequelize.STRING,
       },
       createdBy: {
         allowNull: true,
-        type: Sequelize.STRING
-      }
+        type: Sequelize.STRING,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('subjects');
-  }
+    await queryInterface.dropTable("subjects");
+  },
 };

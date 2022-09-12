@@ -1,24 +1,25 @@
 module.exports = (req, res, next) => {
   res.sendJson = (statusCode, status, message, data, cookie) => {
-    if (cookie) return res
-      .status(statusCode)
-      .cookie(cookie.name, cookie.value, {
-        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
-        httpOnly: true
-      })
-      .json({
-        status,
-        message,
-        data
-      });
+    if (cookie)
+      return res
+        .status(statusCode)
+        .cookie(cookie.name, cookie.value, {
+          expires: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+          ),
+          httpOnly: true,
+        })
+        .json({
+          status,
+          message,
+          data,
+        });
 
-    return res
-      .status(statusCode)
-      .json({
-        status,
-        message,
-        data
-      });
+    return res.status(statusCode).json({
+      status,
+      message,
+      data,
+    });
   };
 
   res.sendDataCreated = (message, data) => {

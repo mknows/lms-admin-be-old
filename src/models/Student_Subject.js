@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class StudentSubject extends Model {
     /**
@@ -11,25 +9,28 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.Subject, {
-        foreignKey: 'subject_id'
+        foreignKey: "subject_id",
       });
     }
   }
-  StudentSubject.init({
-    id: {
-      type:DataTypes.UUID,
-      primaryKey:true,
-      defaultValue:sequelize.literal('gen_random_uuid()')
+  StudentSubject.init(
+    {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: sequelize.literal("gen_random_uuid()"),
+      },
+      subject_id: DataTypes.UUID,
+      student_id: DataTypes.UUID,
+      date_taken: DataTypes.DATE,
+      date_finished: DataTypes.DATE,
+      status: DataTypes.STRING,
+      final_score: DataTypes.FLOAT,
     },
-    subject_id: DataTypes.UUID,
-    student_id: DataTypes.UUID,
-    date_taken: DataTypes.DATE,
-    date_finished: DataTypes.DATE,
-    status: DataTypes.STRING,
-    final_score: DataTypes.FLOAT
-  }, {
-    sequelize,
-    tableName: 'student_subjects',
-  });
+    {
+      sequelize,
+      tableName: "student_subjects",
+    }
+  );
   return StudentSubject;
 };
