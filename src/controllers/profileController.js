@@ -1,109 +1,88 @@
 const { User } = require("../models");
-
 const { getAuth: getClientAuth, updateProfile } = require("firebase/auth");
-const { getAuth } = require("firebase-admin/auth");
+
+const ErrorResponse = require("../utils/errorResponse");
+const asyncHandler = require("express-async-handler");
 
 module.exports = {
-	/**
-	 * @desc      Get User Login Data (Profile)
-	 * @route     GET /api/v1/profile/me
-	 * @access    Private
-	 */
-	getMe: async (req, res) => {
-		try {
-			let token = req.firebaseToken;
-			let user = req.userData;
-			if (!token || !user)
-				return res.status(409).json({
-					success: false,
-					message: "Invalid authorization.",
-					data: {},
-				});
-			const data = await User.findOne({
-				where: {
-					firebase_uid: user.firebase_uid,
-				},
-				attributes: {
-					exclude: ["id", "firebaseUID", "password"],
-				},
-			});
+  /**
+   * @desc      Get User Login Data (Profile)
+   * @route     GET /api/v1/profile/me
+   * @access    Private
+   */
+  getMe: asyncHandler(async (req, res) => {
+    try {
+      let token = req.firebaseToken;
+      let user = req.userData;
 
 			delete data["firebase_uid"];
 
-			return res.status(200).json({
-				success: true,
-				message: "Account connected.",
-				data: { ...data.dataValues },
-			});
-		} catch (error) {
-			console.error(error);
+      const data = await User.findOne({
+        where: {
+          firebase_uid: user.uid
+        },
+        attributes: {
+          exclude: ['id', 'firebase_uid', 'password']
+        }
+      });
 
-			return res.status(403).json({
-				success: false,
-				message: "Something went wrong.",
-				data: {},
-			});
-		}
-	},
+      return res.status(200).json({
+        success: true,
+        message: "Account connected.",
+        data: { ...data.dataValues }
+      });
+    } catch (error) {
+      console.error(error);
+      let message = res.getErrorFirebase(error.code);
+      return res.sendJson(403, false, message, {});
+    }
+  }),
 
-	/**
-	 * @desc      Update User Login Data (Profile)
-	 * @route     PUT /api/v1/profile/me
-	 * @access    Private
-	 */
-	updateMe: async (req, res) => {
-		try {
-			let token = req.firebaseToken;
-			let user = req.userData;
-
-			if (!token || !user)
-				return res.status(409).json({
-					success: false,
-					message: "Invalid authorization.",
-					data: {},
-				});
+  /**
+   * @desc      Update User Login Data (Profile)
+   * @route     PUT /api/v1/profile/me
+   * @access    Private
+   */
+  updateMe: asyncHandler(async (req, res) => {
+    try {
+      let token = req.firebaseToken;
+      let user = req.userData;
 
 			const { full_name, gender, phone, image, address } = req.body;
 
-			const data = await User.update(
-				{
-					full_name,
-					gender,
-					phone,
-					image,
-					address,
-				},
-				{
-					where: {
-						firebase_uid: user.firebase_uid,
-					},
-					returning: true,
-					plain: true,
-				}
-			);
+      const { full_name, gender } = req.body;
 
-			delete data[1].dataValues["id"];
-			delete data[1].dataValues["firebaseUID"];
-			delete data[1].dataValues["password"];
+      const data = await User.update({
+        full_name: titleCase(full_name),
+        gender
+      }, {
+        where: {
+          id: user.id
+        },
+        returning: true,
+        plain: true
+      });
 
-			await updateProfile(getClientAuth(), {
-				fullName: full_name,
-			});
+      delete data[1].dataValues['id'];
+      delete data[1].dataValues['firebase_uid'];
+      delete data[1].dataValues['password'];
 
-			return res.sendJson(200, true, "Account connected.", {
-				data: { ...data[1].dataValues },
-			});
-		} catch (error) {
-			console.error(error);
+      await updateProfile(getClientAuth(), {
+        full_name: titleCase(full_name)
+      });
 
-			return res.status(403).json({
-				success: false,
-				message: "Something went wrong.",
-				data: {},
-			});
-		}
-	},
-};
+      return res.status(200).json({
+        success: true,
+        message: "Account connected.",
+        data: { ...data[1].dataValues }
+      });
+    } catch (error) {
+      console.error(error);
+      let message = res.getErrorFirebase(error.code);
+      return res.sendJson(403, false, message, {});
+    }
+  })
+}
 
 // Usage for Capitalize Each Word
 function titleCase(str) {
@@ -118,11 +97,11 @@ function titleCase(str) {
 
 // Usage for Phone Number Validator (Firebase) (Example: +62 822 xxxx xxxx)
 function phoneNumber(number) {
-	var validationPhone = /^\+?([0-9]{2})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/;
-	if (number.value.match(validationPhone)) {
-		return true;
-	} else {
-		alert("message");
-		return false;
-	}
+  var validationPhone = /^\+?([0-9]{2})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/;
+  if (number.value.match(validationPhone)) {
+    return true;
+  }
+  else {
+    return false;
+  }
 }

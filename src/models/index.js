@@ -8,6 +8,7 @@ const env = process.env.NODE_ENV || "development";
 const config = require(__dirname + "/../config/config.js")[env];
 
 const databases = {};
+const files = [];
 
 let sequelize;
 
@@ -21,6 +22,7 @@ else
 		config
 	);
 
+<<<<<<< HEAD
 fs.readdirSync(__dirname)
 	.filter((file) => {
 		return (
@@ -35,6 +37,39 @@ fs.readdirSync(__dirname)
 
 		databases[model.name] = model;
 	});
+=======
+const sortDir = (mainDirectory) => {
+  const folders = [];
+  const CheckFile = filePath => (fs.statSync(filePath).isFile());
+  const sortPath = (directory) => {
+    fs
+      .readdirSync(directory)
+      .filter(file => (file.indexOf(".") !== 0) && (file !== "index.js"))
+      .forEach((res) => {
+        const filePath = path.join(directory, res);
+        if (CheckFile(filePath)) files.push(filePath);
+        else folders.push(filePath);
+      });
+  };
+
+  folders.push(mainDirectory);
+
+  let i = 0;
+
+  do {
+    sortPath(folders[i]);
+    i += 1;
+  } while (i < folders.length);
+};
+
+sortDir(__dirname);
+
+files
+  .forEach((file) => {
+    const model = require(file)(sequelize, Sequelize.DataTypes);
+    databases[model.name] = model;
+  });
+>>>>>>> c1b84daa499c7d54751af28c96dbc561eaef452d
 
 Object.keys(databases).forEach((tableName) => {
 	if (databases[tableName].associate) {

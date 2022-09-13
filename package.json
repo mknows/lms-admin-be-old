@@ -17,6 +17,10 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+<<<<<<< HEAD
+=======
+    "express-async-handler": "^1.2.0",
+>>>>>>> c1b84daa499c7d54751af28c96dbc561eaef452d
     "express-device": "^0.4.2",
     "express-useragent": "^1.0.15",
     "express-validator": "^6.14.2",
@@ -25,11 +29,16 @@
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.4",
     "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.7.8",
     "nodemon": "^2.0.19",
     "path": "^0.12.7",
     "pg": "^8.7.3",
     "sequelize": "^6.21.4",
+<<<<<<< HEAD
     "sequelize-cli": "^6.4.1"
+=======
+    "uuid": "^9.0.0"
+>>>>>>> c1b84daa499c7d54751af28c96dbc561eaef452d
   }
 }

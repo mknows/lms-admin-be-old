@@ -6,6 +6,6 @@ const { validate, validatorMessage } = require("../middlewares/Validator");
 const { protection } = require("../middlewares/Authentication");
 
 route.get("/me", protection, profileController.getMe);
-route.put("/me", protection, validatorMessage, profileController.updateMe);
+route.put("/me", protection, validate("updateDataUser"), validatorMessage, profileController.updateMe);
 
 module.exports = route;
