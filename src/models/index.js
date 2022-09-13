@@ -22,22 +22,6 @@ else
 		config
 	);
 
-<<<<<<< HEAD
-fs.readdirSync(__dirname)
-	.filter((file) => {
-		return (
-			file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js"
-		);
-	})
-	.forEach((file) => {
-		const model = require(path.join(__dirname, file))(
-			sequelize,
-			Sequelize.DataTypes
-		);
-
-		databases[model.name] = model;
-	});
-=======
 const sortDir = (mainDirectory) => {
   const folders = [];
   const CheckFile = filePath => (fs.statSync(filePath).isFile());
@@ -69,7 +53,6 @@ files
     const model = require(file)(sequelize, Sequelize.DataTypes);
     databases[model.name] = model;
   });
->>>>>>> c1b84daa499c7d54751af28c96dbc561eaef452d
 
 Object.keys(databases).forEach((tableName) => {
 	if (databases[tableName].associate) {
