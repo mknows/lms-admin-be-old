@@ -23,10 +23,10 @@ module.exports = (sequelize, DataTypes) => {
 			phone: DataTypes.STRING,
 			image: DataTypes.STRING,
 			address: DataTypes.STRING,
-			created_at: DataTypes.DATE,
-			updated_at: DataTypes.DATE,
 			created_by: DataTypes.UUID,
 			updated_by: DataTypes.UUID,
+			created_at: DataTypes.DATE,
+			updated_at: DataTypes.DATE,
 		},
 		{
 			sequelize,
@@ -34,6 +34,8 @@ module.exports = (sequelize, DataTypes) => {
 			timestamps: true,
 			underscored: true,
 			underscoredAll: true,
+			createdAt: false,
+  			updatedAt: false,
 		}
 	);
 	return User;
