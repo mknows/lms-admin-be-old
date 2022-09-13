@@ -15,11 +15,12 @@ module.exports = {
 			let token = req.firebaseToken;
 			let user = req.userData;
 
-			delete data["firebase_uid"];
+			console.log(token, user);
+			// delete user["firebase_uid"];
 
 			const data = await User.findOne({
 				where: {
-					firebase_uid: user.uid,
+					firebase_uid: user.firebase_uid,
 				},
 				attributes: {
 					exclude: ["id", "firebase_uid", "password"],

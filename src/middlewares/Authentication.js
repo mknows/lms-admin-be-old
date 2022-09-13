@@ -21,30 +21,31 @@ exports.protection = asyncHandler(async (req, res, next) => {
 	}
 
 	if (!token || token == undefined)
-		return next(new ErrorResponse("Invalid authorization.", 409));
+		return res.status(409).json({
+			success: false,
+			message: "Invalid authorization.",
+			data: {},
+		});
 
 	try {
 		const user = await getAuth().verifyIdToken(token);
 
+		console.log(user);
 		if (!user) return next(new ErrorResponse(`Invalid authorization.`, 409));
 
-		const { dataValues } = await User.findOne({
+		const userData = await User.findOne({
 			where: { firebase_uid: user.uid },
 		});
 
 		req.firebaseToken = token;
 		req.firebaseData = user;
-		req.userData = dataValues;
+
+		if (userData) req.userData = userData.dataValues;
+		console.log(req.userData);
 
 		next();
 	} catch (error) {
 		next(new ErrorResponse(error, 401));
-		// let message = res.getErrorFirebase(error.code);
-		// return res.status(403).json({
-		//   success: false,
-		//   message,
-		//   data: {}
-		// });
 	}
 });
 
