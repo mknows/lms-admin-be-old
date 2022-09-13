@@ -4,12 +4,12 @@ const route = express.Router();
 const { validate, validatorMessage } = require("../middlewares/Validator");
 const adminController = require("../controllers/adminController");
 
-route.get("/user", adminController.getAllDataAdmin);
+route.get("/user", adminController.getAllAdmin);
 route.post(
 	"/register",
 	validate("createUser"),
 	validatorMessage,
-	adminController.createDataAdmin
+	adminController.createAdmin
 );
 
 module.exports = route;

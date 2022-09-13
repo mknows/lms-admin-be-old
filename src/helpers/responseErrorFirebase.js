@@ -1,8 +1,12 @@
 module.exports = (req, res, next) => {
-<<<<<<< HEAD
 	res.getErrorFirebase = (errorCode) => {
 		let message;
+
 		switch (errorCode) {
+			case "auth/id-token-expired": {
+				message = "Invalid authorization.";
+				break;
+			}
 			case "auth/wrong-password": {
 				message = "Invalid combination Email address and Password.";
 				break;
@@ -15,18 +19,6 @@ module.exports = (req, res, next) => {
 				message = "This email already used by another account.";
 				break;
 			}
-			case "auth/argument-error": {
-				message = "token failed!";
-				break;
-			}
-			case "auth/user-token-expired": {
-				message = "expired!";
-				break;
-			}
-			case "auth/network-request-failed": {
-				message = "request fb failed!";
-				break;
-			}
 			default:
 				message = "Something went wrong.";
 		}
@@ -35,34 +27,4 @@ module.exports = (req, res, next) => {
 	};
 
 	next();
-=======
-  res.getErrorFirebase = (errorCode) => {
-    let message;
-
-    switch (errorCode) {
-      case "auth/id-token-expired": {
-        message = "Invalid authorization.";
-        break;
-      }
-      case "auth/wrong-password": {
-        message = "Invalid combination Email address and Password.";
-        break;
-      }
-      case "auth/user-not-found": {
-        message = "Invalid combination Email address and Password.";
-        break;
-      }
-      case "auth/email-already-in-use": {
-        message = "This email already used by another account.";
-        break;
-      }
-      default:
-        message = "Something went wrong.";
-    }
-
-    return message;
-  };
-
-  next();
->>>>>>> c1b84daa499c7d54751af28c96dbc561eaef452d
 };
