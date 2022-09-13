@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
 			underscored: true,
 			underscoredAll: true,
 			createdAt: false,
-  			updatedAt: false,
+			updatedAt: false,
 		}
 	);
 	return User;

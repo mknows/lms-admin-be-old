@@ -21,10 +21,20 @@ module.exports = (sequelize, DataTypes) => {
       title: DataTypes.STRING,
       image: DataTypes.STRING,
       description: DataTypes.STRING,
+      created_by: DataTypes.UUID,
+      updated_by: DataTypes.UUID,
+      created_at: DataTypes.DATE,
+      updated_at: DataTypes.DATE,
     },
     {
       sequelize,
       modelName: "Article",
+      tableName: "Articles",
+      timestamps: true,
+      underscored: true,
+      underscoredAll: true,
+      createdAt: false,
+      updatedAt: false,
     }
   );
   return Article;

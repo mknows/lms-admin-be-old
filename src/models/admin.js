@@ -30,6 +30,8 @@ module.exports = (sequelize, DataTypes) => {
 			timestamps: true,
 			underscored: true,
 			underscoredAll: true,
+			createdAt: false,
+      		updatedAt: false,
 		}
 	);
 	return Admin;
