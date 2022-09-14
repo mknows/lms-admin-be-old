@@ -1,14 +1,16 @@
 const { Student, Subject, StudentSubject, Major } = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
+const asyncHandler = require("express-async-handler");
+const ErrorResponse = require("../utils/errorResponse");
 
 module.exports = {
 	/**
-	 * @desc      Get All Forums
-	 * @route     GET /api/v1/subject/create
+	 * @desc      create subjects
+	 * @route     POST /api/v1/subject/create
 	 * @access    Public
 	 */
-	postSubject: async (req, res) => {
+	postSubject: asyncHandler(async (req, res) => {
 		const {
 			name,
 			number_of_sessions,
@@ -17,22 +19,35 @@ module.exports = {
 			lecturer,
 			description,
 			credit,
+			degree,
 		} = req.body;
-		try {
-			const data = await Subject.create({
-				name: name,
-				number_of_sessions: number_of_sessions,
-				program: program,
-				level: level,
-				lecturer: lecturer,
-				description: description,
-				credit: credit,
-			});
-			res.sendJson(200, true, "sucess make subject", data);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
+		if (
+			!name ||
+			!number_of_sessions ||
+			!program ||
+			!level ||
+			!lecturer ||
+			!description ||
+			!credit ||
+			!degree
+		) {
+			return next(new ErrorResponse("Some fields are missing.", 400));
 		}
-	},
+		if (!lecturer instanceof Array) {
+			return next(new ErrorResponse("Invalid lecturer.", 400));
+		}
+		const data = await Subject.create({
+			name: name,
+			number_of_sessions: number_of_sessions,
+			program: program,
+			level: level,
+			lecturer: lecturer,
+			description: description,
+			credit: credit,
+			degree: degree,
+		});
+		return res.sendJson(200, true, "sucess make subject", data);
+	}),
 	/**
 	 * @desc      Get All subject
 	 * @route     GET /api/v1/subject/getall
@@ -46,7 +61,104 @@ module.exports = {
 			res.sendJson(500, false, err.message, null);
 		}
 	},
+	/**
+	 * @desc      Edit Study by ID (Edit data Materi)
+	 * @route     PUT /api/v1/subject/edit/:subjectId
+	 * @access    Private (Admin)
+	 */
+	editSubject: asyncHandler(async (req, res) => {
+		const { subjectId } = req.params;
+		const {
+			name,
+			number_of_sessions,
+			program,
+			level,
+			lecturer,
+			description,
+			credit,
+			degree,
+		} = req.body;
 
+		if (
+			!name ||
+			!number_of_sessions ||
+			!program ||
+			!level ||
+			!lecturer ||
+			!description ||
+			!credit ||
+			!degree
+		) {
+			return next(new ErrorResponse("Some fields are missing.", 400));
+		}
+		if (!lecturer instanceof Array) {
+			return next(new ErrorResponse("Invalid lecturer.", 400));
+		}
+		const study = await Subject.findOne({
+			where: { id: subjectId },
+		});
+
+		if (!study) {
+			return res.status(404).json({
+				success: false,
+				message: "Invalid subject_id.",
+				data: {},
+			});
+		}
+
+		const data = await Subject.update(
+			{
+				name,
+				description,
+				number_of_sessions,
+				lecturer_id,
+				created_by,
+			},
+			{
+				where: { id: subjectId },
+				returning: true,
+				plain: true,
+			}
+		);
+
+		return res.status(200).json({
+			success: true,
+			message: `Edit Subject with ID ${subjectId} successfully.`,
+			data: { ...data[1].dataValues },
+		});
+	}),
+	/**
+	 * @desc      Delete Study by ID (Hapus data Materi)
+	 * @route     DELETE /api/v1/subject/delete/:subjectId
+	 * @access    Private (Admin)
+	 */
+	removeSubject: asyncHandler(async (req, res, next) => {
+		const { subjectId } = req.params;
+
+		let data = await Subject.findOne({
+			where: { id: subjectId },
+		});
+
+		if (!data) {
+			return res.status(404).json({
+				success: false,
+				message: "Invalid subject_id.",
+				data: {},
+			});
+		}
+
+		Subject.destroy({
+			where: { id: subjectId },
+		});
+
+		return res.status(200).json({
+			success: true,
+			message: `Delete Subject with ID ${subjectId} successfully.`,
+			data: {},
+		});
+	}),
+
+	// Student Specific
 	/**
 	 * @desc      Get subjects of student
 	 * @route     GET /api/v1/subject/forstudent
@@ -155,33 +267,4 @@ function recommendation(studentSubjectID, majorSubjectID) {
 	return majorSubjectID.filter(
 		(element) => !studentSubjectID.includes(element)
 	);
-}
-
-async function creditTaken(subjectTaken, sub) {
-	let credit = 0;
-	for (let i = 0; i < subjectTaken.length; i++) {
-		const subb = await Subject.findOne({
-			where: {
-				id: subjectTaken[i],
-			},
-		});
-		credit += subb.credit;
-	}
-
-	if (sub !== "NONE") {
-		credit += sub;
-	}
-
-	return credit;
-}
-
-async function alreadyEnrolled(subjectTaken, sub) {
-	let enrolled = false;
-	for (let i = 0; i < subjectTaken.length; i++) {
-		console.log(subjectTaken[i]);
-		if (sub === subjectTaken[i]) {
-			enrolled = true;
-		}
-	}
-	return enrolled;
 }

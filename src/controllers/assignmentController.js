@@ -5,7 +5,7 @@ const { Op } = require("sequelize");
 module.exports = {
 	/**
 	 * @desc      Get Assignment
-	 * @route     GET /api/v1/assignment/get/:id
+	 * @route     GET /api/v1/assignment/:id
 	 * @access    Private
 	 */
 	getAssignment: async (req, res) => {

@@ -4,6 +4,7 @@ const route = express.Router();
 const sessionController = require("../controllers/sessionController");
 const { protection } = require("../middlewares/Authentication");
 
+route.get("/", protection, sessionController.getAllSessions);
 route.post("/create", protection, sessionController.postSession);
 
 route.get(

@@ -4,8 +4,47 @@ const { Op } = require("sequelize");
 
 module.exports = {
 	/**
+	 * @desc      Get all Module
+	 * @route     GET /api/v1/module/
+	 * @access    Private
+	 */
+	getAllModule: async (req, res) => {
+		try {
+			const data = await Module.findAll();
+			res.sendJson(200, true, "Success", data);
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
+	/**
+	 * @desc      Get all video
+	 * @route     GET /api/v1/module/video
+	 * @access    Private
+	 */
+	getAllVideo: async (req, res) => {
+		try {
+			const data = await Video.findAll();
+			res.sendJson(200, true, "Success", data);
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
+	/**
+	 * @desc      Get all documents
+	 * @route     GET /api/v1/module/document
+	 * @access    Private
+	 */
+	getAllDocument: async (req, res) => {
+		try {
+			const data = await Document.findAll();
+			res.sendJson(200, true, "Success", data);
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
+	/**
 	 * @desc      Get Module
-	 * @route     GET /api/v1/module/get/:id
+	 * @route     GET /api/v1/module/:id
 	 * @access    Private
 	 */
 	getModule: async (req, res) => {

@@ -26,6 +26,19 @@ module.exports = {
 		}
 	},
 	/**
+	 * @desc      Get All Session
+	 * @route     GET /api/v1/session/
+	 * @access    Public
+	 */
+	getAllSessions: async (req, res) => {
+		try {
+			const data = await Session.findAll();
+			res.sendJson(200, true, "success get all sessions", data);
+		} catch (err) {
+			res.sendJson(500, err.message, null);
+		}
+	},
+	/**
 	 * @desc      Get All Session in Subject
 	 * @route     GET /api/v1/session/getall/:sub_id
 	 * @access    Public
