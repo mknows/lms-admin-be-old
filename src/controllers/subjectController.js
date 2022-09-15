@@ -201,35 +201,36 @@ module.exports = {
 			const subjectsEnrolled = await StudentSubject.findAll({
 				where: {
 					student_id: student_id,
-					// status: {[Op.or]: ['PENDING', 'ONGOING']}
 					[Op.or]: [{ status: "ONGOING" }, { status: "PENDING" }],
 				},
 			});
 
 			const sub = await Subject.findOne({ where: { id: subject_id } });
 
-			// const hasEnrolled = await alreadyEnrolled(subjectsEnrolled, sub);
-			// const credit = await creditTaken(subjectsEnrolled, sub);
-
-			let enrolled = false;
 			let credit = 0;
-			for (let i = 0; i < subjectsEnrolled.length; i++) {
-				const current_subject = await Subject.findOne({
-					where: {
-						id: subjectsEnrolled[i].subject_id,
-					},
-				});
-				if (current_subject !== null) {
-					credit += current_subject.credit;
-				}
+			let enrolled = false;
 
-				if (subjectsEnrolled[i].subject_id === subject_id) {
-					enrolled = true;
-				}
+			// for (let i = 0; i < subjectsEnrolled.length; i++) {
+			// 	const current_subject = await Subject.findOne({
+			// 		where: {
+			// 			id: subjectsEnrolled[i].subject_id,
+			// 		},
+			// 	});
+			// 	if (current_subject !== null) {
+			// 		credit += current_subject.credit;
+			// 	}
+			// }
+
+			if (subjectsEnrolled !== null) {
+				credit = await totalCredit(subjectsEnrolled);
+				enrolled = await isEnrolled(subjectsEnrolled, sub.id);
 			}
+
 			if (sub !== null) {
 				credit += sub.credit;
 			}
+			console.log(credit);
+			console.log(enrolled);
 
 			if (enrolled === false && credit <= credit_thresh) {
 				await StudentSubject.create({
@@ -267,4 +268,28 @@ function recommendation(studentSubjectID, majorSubjectID) {
 	return majorSubjectID.filter(
 		(element) => !studentSubjectID.includes(element)
 	);
+}
+
+async function totalCredit(subIdlist) {
+	let credit = 0;
+	for (let i = 0; i < subIdlist.length; i++) {
+		const current_subject = await Subject.findOne({
+			where: {
+				id: subIdlist[i].subject_id,
+			},
+		});
+		if (current_subject !== null) {
+			credit += current_subject.credit;
+		}
+	}
+	return credit;
+}
+
+async function isEnrolled(subIdlist, subId) {
+	for (let i = 0; i < subIdlist.length; i++) {
+		if (subIdlist[i].subject_id === subId) {
+			return true;
+		}
+	}
+	return false;
 }

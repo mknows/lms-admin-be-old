@@ -14,13 +14,12 @@ const assignmentRoute = require("./assignment");
 const articleRoute = require("./article");
 
 //punya ryo
-const administrationRoute = require("./My-Study/Administration");
-route.use("/my-study/administrations", administrationRoute);
+const administrationRoute = require("./Administration");
+route.use("/administrations", administrationRoute);
 
 route.use("/auth", userRoute);
 route.use("/profile", profileRoute);
 route.use("/admin", adminRoute);
-
 
 route.use("/subject", subjectRoute);
 route.use("/session", sessionRoute);

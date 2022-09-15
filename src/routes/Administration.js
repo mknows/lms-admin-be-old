@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const route = express.Router();
 
-const administrationController = require("../../controllers/My-Study/User/AdministrationController");
+const administrationController = require("../controllers/administrationController");
 const { protection, authorize } = require("../middlewares/Authentication");
 
 const getExtension = (filename) => {
