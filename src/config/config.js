@@ -18,6 +18,13 @@ module.exports = {
 		host: DB_HOST,
 		dialect: DB_DIALECT,
 	},
+	testing_kg:{
+		username: "postgres",
+		password: "belajar",
+		database: "testing_kg",
+		host: "localhost",
+		dialect: "postgres",
+	},
 	production: {
 		username: DB_USERNAME,
 		password: DB_PASSWORD,

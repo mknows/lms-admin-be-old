@@ -56,11 +56,11 @@ module.exports = {
 			const uuid = req.params.uuid;
 
 			if (req.file) {
-        const findFile = await Article.findOne({
-          where:{
-            id: uuid
-          }
-        })
+        		const findFile = await Article.findOne({
+          		where:{
+            		id: uuid
+          		}
+        	})
 
         fs.unlinkSync("./public/images/"+findFile.image)
 
@@ -102,4 +102,37 @@ module.exports = {
 			return res.sendJson(403, false, error, {});
 		}
 	},
+
+	/**
+	 * @desc      Delete data article
+	 * @route     DELETE /api/v1/article/delete/:id
+	 * @access    Private
+	 */
+	delete:async(req,res)=>{
+		try {
+			const id = req.params.id;
+			
+			const findArticle = await Article.findOne({
+				where:{
+					id
+				}
+			})
+
+			if(findArticle == null){
+				return res.sendJson(400, false, "article not found")
+			}
+			
+			fs.unlinkSync("./public/images/" + findArticle.image)
+			await Article.destroy({
+				where:{
+					id
+				}
+			})
+
+			return res.sendJson(200, true, "success delete article")
+		} catch (error) {
+			console.log(error);
+			return res.sendJson(403, false, error, {});
+		}
+	}
 };
