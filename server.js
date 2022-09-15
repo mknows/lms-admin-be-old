@@ -7,6 +7,8 @@ const device = require("express-device");
 const useragent = require("express-useragent");
 const path = require("path");
 const fs = require('fs')
+const cors = require("cors");
+
 
 dotenv.config({ path: "./src/config/config.env" });
 
@@ -37,6 +39,7 @@ app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, strict: false }));
 app.use(cookieParser());
+app.use(cors());
 
 const PORT = process.env.PORT || 8080;
 
