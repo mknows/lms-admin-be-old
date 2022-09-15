@@ -52,6 +52,7 @@ route.get("/me", protection, authorize("user"), profileController.getMe);
 route.put(
 	"/me",
 	protection,
+    upload.single('image'),
 	authorize("user"),
 	validate("updateDataUser"),
 	validatorMessage,
