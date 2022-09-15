@@ -48,13 +48,7 @@ const profileController = require("../controllers/profileController");
 const { validate, validatorMessage } = require("../middlewares/Validator");
 const { protection, authorize } = require("../middlewares/Authentication");
 
-route.get(
-	"/me",
-	protection,
-	authorize(),
-	authorize("user"),
-	profileController.getMe
-);
+route.get("/me", protection, authorize("user"), profileController.getMe);
 route.put(
 	"/me",
 	protection,
