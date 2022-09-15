@@ -54,20 +54,32 @@ exports.authorize = (...roles) => {
 		const currentUserRole = await Promise.all([
 			User.findOne({ where: { id: req.userData.id } }),
 			Lecturer.findOne({ where: { id: req.userData.id } }),
-			// Student.findOne({ where: { id: req.userData.id } })
+			Student.findOne({ where: { id: req.userData.id } }),
 		]).then((values) => {
 			let userRoles = [];
 
 			if (values[0] !== null) userRoles.push("user");
 			if (values[1] !== null) userRoles.push("lecturer");
+			if (values[2] !== null) userRoles.push("student");
 
 			return userRoles;
 		});
 
-		if (!roles.includes(...currentUserRole))
+		if (!roles.includes(...currentUserRole)) {
 			return next(
 				new ErrorResponse(`Not authorized to access this route`, 401)
 			);
+		}
+
+		let role = "not registered";
+		if (currentUserRole.includes("lecturer")) {
+			role = "lecturer";
+		} else if (currentUserRole.includes("student")) {
+			role = "student";
+		} else if (currentUserRole.includes("user")) {
+			role = "guest";
+		}
+		req.role = role;
 
 		next();
 	});

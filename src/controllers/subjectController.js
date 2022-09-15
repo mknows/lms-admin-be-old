@@ -68,7 +68,7 @@ module.exports = {
 	 */
 	editSubject: asyncHandler(async (req, res) => {
 		const { subjectId } = req.params;
-		const {
+		let {
 			name,
 			number_of_sessions,
 			program,
@@ -79,21 +79,6 @@ module.exports = {
 			degree,
 		} = req.body;
 
-		if (
-			!name ||
-			!number_of_sessions ||
-			!program ||
-			!level ||
-			!lecturer ||
-			!description ||
-			!credit ||
-			!degree
-		) {
-			return next(new ErrorResponse("Some fields are missing.", 400));
-		}
-		if (!lecturer instanceof Array) {
-			return next(new ErrorResponse("Invalid lecturer.", 400));
-		}
 		const study = await Subject.findOne({
 			where: { id: subjectId },
 		});
@@ -106,13 +91,41 @@ module.exports = {
 			});
 		}
 
+		if (name === null) {
+			name = study.name;
+		}
+		if (number_of_sessions == null) {
+			number_of_sessions = study.number_of_sessions;
+		}
+		if (program === null) {
+			program = study.program;
+		}
+		if (level === null) {
+			program = study.level;
+		}
+		if (lecturer === null) {
+			program = study.lecturer;
+		}
+		if (description === null) {
+			program = study.description;
+		}
+		if (credit === null) {
+			program = study.credit;
+		}
+		if (degree === null) {
+			program = study.degree;
+		}
+
 		const data = await Subject.update(
 			{
 				name,
-				description,
 				number_of_sessions,
-				lecturer_id,
-				created_by,
+				program,
+				level,
+				lecturer,
+				description,
+				credit,
+				degree,
 			},
 			{
 				where: { id: subjectId },
