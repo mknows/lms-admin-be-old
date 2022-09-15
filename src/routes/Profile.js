@@ -52,13 +52,13 @@ route.get(
 	"/me",
 	protection,
 	authorize(),
-	authorize("lecturer", "student", "user"),
+	authorize("user"),
 	profileController.getMe
 );
 route.put(
 	"/me",
 	protection,
-	authorize("lecturer", "student", "user"),
+	authorize("user"),
 	validate("updateDataUser"),
 	validatorMessage,
 	profileController.updateMe
