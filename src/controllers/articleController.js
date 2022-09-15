@@ -41,27 +41,40 @@ module.exports = {
       if (req.file) {
         const findFile = await Article.findOne({
           where: {
-            uuid,
+            id: uuid,
           },
         });
 
-        fs.unlinkSync(findFile.image);
+        await Article.update(
+          {
+            image:
+              Date.now() + "-" + req.file.originalname.split(" ").join("-"),
+          },
+          {
+            where: {
+              id: uuid,
+            },
+          }
+        );
       }
 
       const updated = await Article.update(
         {
           title,
           description,
-          image: Date.now() + "-" + req.file.originalname.split(" ").join("-"),
         },
         {
           where: {
-            uuid,
+            id: uuid,
           },
         }
       );
 
-      return res.sendJson(200, true, "succes update user", updated);
+      if (updated != 1) {
+        return res.sendJson();
+      }
+
+      return res.sendJson(204, true, "succes update user", {});
     } catch (error) {
       console.log(error);
       return res.sendJson(403, false, error, {});
