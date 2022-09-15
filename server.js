@@ -19,7 +19,8 @@ const app = express();
 
 initializeFirebase();
 
-app.use("/file", express.static(path.join(__dirname, "public/documents")));
+app.use("/file/documents", express.static(path.join(__dirname, "public/documents")));
+app.use("/file/images", express.static(path.join(__dirname, "public/images")));
 app.use(device.capture());
 app.use(useragent.express());
 app.set("trust proxy", true);
