@@ -231,8 +231,6 @@ module.exports = {
 			if (sub !== null) {
 				credit += sub.credit;
 			}
-			console.log(credit);
-			console.log(enrolled);
 
 			if (enrolled === false && credit <= credit_thresh) {
 				await StudentSubject.create({
