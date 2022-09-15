@@ -48,7 +48,6 @@ module.exports = {
     try {
       let token = req.firebaseToken;
       let user = req.userData;
-      console.log("req.file => ", req.file);
 
       const { full_name, gender, phone, address } = req.body;
 
