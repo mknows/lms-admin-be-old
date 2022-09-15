@@ -4,6 +4,19 @@ const { Op } = require("sequelize");
 
 module.exports = {
 	/**
+	 * @desc      Get all Assignment
+	 * @route     GET /api/v1/assignment/
+	 * @access    Private
+	 */
+	getAllAssignment: async (req, res) => {
+		try {
+			const assign = await Assignment.findAll();
+			res.sendJson(200, true, "Success", assign);
+		} catch (err) {
+			res.sendJson(500, false, err.message, null);
+		}
+	},
+	/**
 	 * @desc      Get Assignment
 	 * @route     GET /api/v1/assignment/:id
 	 * @access    Private

@@ -223,17 +223,6 @@ module.exports = {
 			let credit = 0;
 			let enrolled = false;
 
-			// for (let i = 0; i < subjectsEnrolled.length; i++) {
-			// 	const current_subject = await Subject.findOne({
-			// 		where: {
-			// 			id: subjectsEnrolled[i].subject_id,
-			// 		},
-			// 	});
-			// 	if (current_subject !== null) {
-			// 		credit += current_subject.credit;
-			// 	}
-			// }
-
 			if (subjectsEnrolled !== null) {
 				credit = await totalCredit(subjectsEnrolled);
 				enrolled = await isEnrolled(subjectsEnrolled, sub.id);
