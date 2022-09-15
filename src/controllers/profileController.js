@@ -77,7 +77,7 @@ module.exports = {
 
 			return res.status(200).json({
 				success: true,
-				message: "Profile Updated",
+				message: "Profile updated",
 				data: { ...data[1].dataValues },
 			});
 		} catch (error) {
