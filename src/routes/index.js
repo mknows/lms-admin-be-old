@@ -12,6 +12,7 @@ const quizRoute = require("./quiz");
 const moduleRoute = require("./module");
 const assignmentRoute = require("./assignment");
 const articleRoute = require("./article");
+const majorRoute = require("./major");
 
 //punya ryo
 const administrationRoute = require("./Administration");
@@ -28,5 +29,6 @@ route.use("/quiz", quizRoute);
 route.use("/module", moduleRoute);
 route.use("/assignment", assignmentRoute);
 route.use("/article", articleRoute);
+route.use("/major", majorRoute);
 
 module.exports = route;
