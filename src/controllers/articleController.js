@@ -56,6 +56,14 @@ module.exports = {
 			const uuid = req.params.uuid;
 
 			if (req.file) {
+        const findFile = await Article.findOne({
+          where:{
+            id: uuid
+          }
+        })
+
+        fs.unlinkSync("./public/images/"+findFile.image)
+
 				await Article.update(
 					{
 						image: req.file.filename,
