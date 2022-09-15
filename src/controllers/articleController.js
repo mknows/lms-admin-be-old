@@ -2,9 +2,16 @@ const { Article } = require("../models");
 const fs = require("fs");
 
 module.exports = {
+	/**
+	 * @desc      Get All data Article
+	 * @route     GET /api/v1/article/index
+	 * @access    Private
+	 */
 	index: async (req, res) => {
 		try {
 			const data = await Article.findAll();
+			console.log(data);
+
 			return res.sendJson(200, true, "success get all data", data);
 		} catch (error) {
 			console.log(error);
@@ -12,6 +19,11 @@ module.exports = {
 		}
 	},
 
+	/**
+	 * @desc      Create a new data article
+	 * @route     POST /api/v1/article/create
+	 * @access    Private
+	 */
 	create: async (req, res) => {
 		try {
 			const { title, description } = req.body;
@@ -19,7 +31,7 @@ module.exports = {
 			const created = await Article.create({
 				title,
 				description,
-				image: Date.now() + "-" + req.file.originalname.split(" ").join("-"),
+				image: req.file.filename,
 			});
 
 			return res.sendJson(201, true, "success create new article", {
@@ -33,35 +45,50 @@ module.exports = {
 		}
 	},
 
+	/**
+	 * @desc      Update data article
+	 * @route     PUT /api/v1/article/update
+	 * @access    Private
+	 */
 	update: async (req, res) => {
 		try {
 			const { title, description } = req.body;
 			const uuid = req.params.uuid;
 
 			if (req.file) {
-				const findFile = await Article.findOne({
-					where: {
-						uuid,
+				await Article.update(
+					{
+						image: req.file.filename,
 					},
-				});
-
-				fs.unlinkSync(findFile.image);
+					{
+						where: {
+							id: uuid,
+						},
+					}
+				);
 			}
 
 			const updated = await Article.update(
 				{
 					title,
 					description,
-					image: Date.now() + "-" + req.file.originalname.split(" ").join("-"),
 				},
 				{
 					where: {
-						uuid,
+						id: uuid,
 					},
 				}
 			);
 
-			return res.sendJson(200, true, "succes update user", updated);
+			if (updated == 0) {
+				return res.sendJson(
+					204,
+					false,
+					"can't update because there no have value article",
+					{}
+				);
+			}
+			return res.sendJson(200, true, "succes update article", {});
 		} catch (error) {
 			console.log(error);
 			return res.sendJson(403, false, error, {});

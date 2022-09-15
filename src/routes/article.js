@@ -35,5 +35,6 @@ const upload = multer({
 
 route.get("/index", articleController.index);
 route.post("/create", upload.single("image"), articleController.create);
+route.put("/update/:uuid", upload.single("image"), articleController.update);
 
 module.exports = route;

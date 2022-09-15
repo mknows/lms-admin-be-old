@@ -49,7 +49,20 @@ module.exports = {
 			let token = req.firebaseToken;
 			let user = req.userData;
 
-			const { full_name, gender, phone, image, address } = req.body;
+			const { full_name, gender, phone, address } = req.body;
+
+			if (req.file) {
+				await User.update(
+					{
+						image: req.file.filename,
+					},
+					{
+						where: {
+							id: user.id,
+						},
+					}
+				);
+			}
 
 			const data = await User.update(
 				{
@@ -77,7 +90,7 @@ module.exports = {
 
 			return res.status(200).json({
 				success: true,
-				message: "Profile updated",
+				message: "Profile updated.",
 				data: { ...data[1].dataValues },
 			});
 		} catch (error) {
