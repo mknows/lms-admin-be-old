@@ -26,7 +26,6 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			user_id: DataTypes.UUID,
 			major_id: DataTypes.ARRAY(DataTypes.STRING),
-			approved_By: DataTypes.UUID,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
 			created_by: DataTypes.UUID,

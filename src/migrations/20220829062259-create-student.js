@@ -30,10 +30,6 @@ module.exports = {
 				allowNull: true,
 				type: Sequelize.UUID,
 			},
-			approvedBy: {
-				allowNull: true,
-				type: Sequelize.UUID,
-			},
 		});
 	},
 	async down(queryInterface, Sequelize) {
