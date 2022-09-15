@@ -1,4 +1,4 @@
-const { User, Lecturer } = require("../models");
+const { User, Lecturer, Student } = require("../models");
 const { getAuth } = require("firebase-admin/auth");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("express-async-handler");
