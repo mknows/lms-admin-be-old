@@ -62,6 +62,7 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: false,
 				type: DataTypes.DATE,
 			},
+			deleted_at: DataTypes.DATE,
 		},
 		{
 			sequelize,

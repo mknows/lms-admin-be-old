@@ -36,14 +36,14 @@ module.exports = {
 			emailVerified: false,
 		});
 
-		// const hashPassword = bcrypt.hashSync(password, 10);
-
 		const created = await User.create({
 			firebase_uid: credential.user.uid,
 			full_name,
 			email,
 			gender,
 		});
+
+		await defaultUsernameFromEmail(created);
 
 		await insertLogActivity(
 			req,
@@ -189,6 +189,8 @@ module.exports = {
 				gender: 0,
 			});
 
+			await defaultUsernameFromEmail(created);
+
 			insertLog("daily-active-user", user.dataValues.id);
 		} else insertLog("daily-active-user", user.id);
 
@@ -293,3 +295,11 @@ const insertLog = asyncHandler(async (type, userId) => {
 
 	return true;
 });
+
+async function defaultUsernameFromEmail(user) {
+	let username = user.email.split("@")[0].split(".").join("");
+	const added_id = user.id.split("-")[1];
+	username = username.concat(added_id);
+	user.username = username;
+	await user.save();
+}

@@ -14,6 +14,9 @@ module.exports = {
 			full_name: {
 				type: Sequelize.STRING,
 			},
+			username: {
+				type: Sequelize.STRING,
+			},
 			email: {
 				type: Sequelize.STRING,
 			},
@@ -35,6 +38,10 @@ module.exports = {
 			},
 			updated_at: {
 				allowNull: false,
+				type: Sequelize.DATE,
+			},
+			deleted_at: {
+				allowNull: true,
 				type: Sequelize.DATE,
 			},
 			updated_by: {

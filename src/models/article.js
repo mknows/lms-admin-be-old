@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
 			updated_by: DataTypes.UUID,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
+			deleted_at: DataTypes.DATE,
 		},
 		{
 			sequelize,

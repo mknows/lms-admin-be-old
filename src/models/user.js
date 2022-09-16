@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			firebase_uid: DataTypes.STRING,
 			full_name: DataTypes.STRING,
+			username: DataTypes.STRING,
 			email: DataTypes.STRING,
 			gender: DataTypes.STRING,
 			phone: DataTypes.STRING,
@@ -27,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
 			updated_by: DataTypes.UUID,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
+			deleted_at: DataTypes.DATE,
 		},
 		{
 			sequelize,
