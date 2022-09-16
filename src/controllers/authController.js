@@ -191,21 +191,23 @@ module.exports = {
 				gender: 0,
 			});
 
-			await defaultUsernameFromEmail(user.dataValues.id);
+			user = user.dataValues;
 
-			insertLog("daily-active-user", user.dataValues.id);
-		} else insertLog("daily-active-user", user.dataValues.id);
+			await defaultUsernameFromEmail(user.id);
 
-		insertLogActivity(req, user.dataValues.id, "Login with Google");
+			insertLog("daily-active-user", user.id);
+		} else insertLog("daily-active-user", user.id);
 
-		delete user.dataValues["id"];
-		delete user.dataValues["firebase_uid"];
-		delete user.dataValues["password"];
+		insertLogActivity(req, user.id, "Login with Google");
+
+		delete user["id"];
+		delete user["firebase_uid"];
+		delete user["password"];
 
 		res.status(200).json({
 			success: true,
 			message: "Account connected.",
-			data: { ...user.dataValues },
+			data: { ...user },
 		});
 	}),
 

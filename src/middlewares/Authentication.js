@@ -30,7 +30,6 @@ exports.protection = asyncHandler(async (req, res, next) => {
 	try {
 		const user = await getAuth().verifyIdToken(token);
 
-		console.log(user);
 		if (!user) return next(new ErrorResponse(`Invalid authorization.`, 409));
 
 		const userData = await User.findOne({
@@ -41,7 +40,6 @@ exports.protection = asyncHandler(async (req, res, next) => {
 		req.firebaseData = user;
 
 		if (userData) req.userData = userData.dataValues;
-		console.log(req.userData);
 
 		next();
 	} catch (error) {
