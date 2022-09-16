@@ -45,7 +45,7 @@ module.exports = {
 			gender,
 		});
 
-		await defaultUsernameFromEmail(created.id);
+		await defaultUsernameFromEmail(created);
 
 		await insertLogActivity(
 			req,
@@ -193,7 +193,7 @@ module.exports = {
 
 			user = user.dataValues;
 
-			await defaultUsernameFromEmail(user.id);
+			await defaultUsernameFromEmail(user);
 
 			insertLog("daily-active-user", user.id);
 		} else insertLog("daily-active-user", user.id);
@@ -304,12 +304,13 @@ const deleteAllUser = asyncHandler(async (req, res) => {
 	return await nukeUsers;
 });
 
-async function defaultUsernameFromEmail(userId) {
+async function defaultUsernameFromEmail(user) {
+	let userId = user.id;
 	let username = user.email.split("@")[0].split(".").join("");
 	const added_id = user.id.split("-")[1];
 	username = username.concat(added_id);
 
-	const user = await User.update(
+	const current_user = await User.update(
 		{
 			username,
 		},
@@ -319,7 +320,7 @@ async function defaultUsernameFromEmail(userId) {
 			},
 		}
 	);
-	return user;
+	return current_user;
 }
 
 async function nukeUsers() {
