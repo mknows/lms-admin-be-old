@@ -30,7 +30,7 @@ module.exports = {
 			return res.status(200).json({
 				success: true,
 				message: "Account connected.",
-				data: { ...data.dataValues },
+				data: { ...data.dataValues, role: req.role },
 			});
 		} catch (error) {
 			console.error(error);
