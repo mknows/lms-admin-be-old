@@ -39,11 +39,6 @@ module.exports = (sequelize, DataTypes) => {
 		{
 			sequelize,
 			tableName: "discussion_forums",
-			timestamps: true,
-			underscored: true,
-			underscoredAll: true,
-			createdAt: "created_at",
-			updatedAt: "updated_at",
 		}
 	);
 	return Discussion_forum;

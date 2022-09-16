@@ -23,7 +23,7 @@ module.exports = {
 			phone: {
 				type: Sequelize.STRING,
 			},
-			image: {
+			display_picture: {
 				type: Sequelize.STRING,
 			},
 			address: {

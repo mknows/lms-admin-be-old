@@ -40,11 +40,6 @@ module.exports = (sequelize, DataTypes) => {
 		{
 			sequelize,
 			tableName: "daily_active_users",
-			timestamps: true,
-			underscored: true,
-			underscoredAll: true,
-			createdAt: "created_at",
-			updatedAt: "updated_at",
 		}
 	);
 	return Daus;

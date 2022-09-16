@@ -10,6 +10,15 @@ module.exports = {
 		host: "localhost",
 		dialect: "postgres",
 		port: 5433,
+		define: {
+			paranoid: true,
+			timestamps: true,
+			underscored: true,
+			underscoredAll: true,
+			createdAt: "created_at",
+			updatedAt: "updated_at",
+			deletedAt: "deleted_at",
+		},
 	},
 	test: {
 		username: DB_USERNAME,
@@ -17,6 +26,15 @@ module.exports = {
 		database: DB_NAME,
 		host: DB_HOST,
 		dialect: DB_DIALECT,
+		define: {
+			paranoid: true,
+			timestamps: true,
+			underscored: true,
+			underscoredAll: true,
+			createdAt: "created_at",
+			updatedAt: "updated_at",
+			deletedAt: "deleted_at",
+		},
 	},
 	testing_kg:{
 		username: "postgres",
@@ -31,5 +49,14 @@ module.exports = {
 		database: DB_NAME,
 		host: DB_HOST,
 		dialect: DB_DIALECT,
+		define: {
+			paranoid: true,
+			timestamps: true,
+			underscored: true,
+			underscoredAll: true,
+			createdAt: "created_at",
+			updatedAt: "updated_at",
+			deletedAt: "deleted_at",
+		},
 	},
 };

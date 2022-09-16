@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
 			email: DataTypes.STRING,
 			gender: DataTypes.STRING,
 			phone: DataTypes.STRING,
-			image: DataTypes.STRING,
+			display_picture: DataTypes.STRING,
 			address: DataTypes.STRING,
 			created_by: DataTypes.UUID,
 			updated_by: DataTypes.UUID,
@@ -31,11 +31,6 @@ module.exports = (sequelize, DataTypes) => {
 		{
 			sequelize,
 			tableName: "users",
-			timestamps: true,
-			underscored: true,
-			underscoredAll: true,
-			createdAt: "created_at",
-			updatedAt: "updated_at",
 		}
 	);
 	return User;
