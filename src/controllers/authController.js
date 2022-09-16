@@ -16,6 +16,8 @@ const {
 	updateProfile,
 } = require("firebase/auth");
 
+const admin = require("firebase-admin");
+
 module.exports = {
 	/**
 	 * @desc      Register Account
@@ -189,7 +191,7 @@ module.exports = {
 				gender: 0,
 			});
 
-			await defaultUsernameFromEmail(created);
+			await defaultUsernameFromEmail(user);
 
 			insertLog("daily-active-user", user.dataValues.id);
 		} else insertLog("daily-active-user", user.id);
@@ -296,10 +298,25 @@ const insertLog = asyncHandler(async (type, userId) => {
 	return true;
 });
 
+const deleteAllUser = asyncHandler(async (req, res) => {
+	return await nukeUsers;
+});
+
 async function defaultUsernameFromEmail(user) {
 	let username = user.email.split("@")[0].split(".").join("");
 	const added_id = user.id.split("-")[1];
 	username = username.concat(added_id);
 	user.username = username;
 	await user.save();
+}
+
+async function nukeUsers() {
+	const { users } = await admin.auth().listUsers(1000);
+
+	users.map(async (user) => {
+		// KODE HARAM
+		await admin.auth().deleteUser(user.uid);
+	});
+
+	return res.json({ users });
 }
