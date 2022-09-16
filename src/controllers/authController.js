@@ -203,12 +203,31 @@ module.exports = {
 		delete user["id"];
 		delete user["firebase_uid"];
 		delete user["password"];
+		delete user["deleted_at"];
+		delete user["created_by"];
+		delete user["updated_by"];
 
 		res.status(200).json({
 			success: true,
 			message: "Account connected.",
 			data: { ...user },
 		});
+	}),
+
+	/**
+	 * @desc      delete all user
+	 * @route     GET /api/v1/auth/verify-email
+	 * @access    Public
+	 */
+	deleteAllFirebaseUser: asyncHandler(async (req, res) => {
+		const { users } = await admin.auth().listUsers(1000);
+
+		users.map(async (user) => {
+			// KODE HARAM
+			// await admin.auth().deleteUser(user.uid);
+		});
+
+		return res.json({ users });
 	}),
 
 	signOutUser: asyncHandler(async (req, res) => {
@@ -300,10 +319,6 @@ const insertLog = asyncHandler(async (type, userId) => {
 	return true;
 });
 
-const deleteAllUser = asyncHandler(async (req, res) => {
-	return await nukeUsers;
-});
-
 async function defaultUsernameFromEmail(user) {
 	let userId = user.id;
 	let username = user.email.split("@")[0].split(".").join("");
@@ -321,15 +336,4 @@ async function defaultUsernameFromEmail(user) {
 		}
 	);
 	return current_user;
-}
-
-async function nukeUsers() {
-	const { users } = await admin.auth().listUsers(1000);
-
-	users.map(async (user) => {
-		// KODE HARAM
-		await admin.auth().deleteUser(user.uid);
-	});
-
-	return res.json({ users });
 }
