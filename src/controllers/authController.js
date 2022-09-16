@@ -81,6 +81,11 @@ module.exports = {
 		const auth = getClientAuth();
 		const credential = await signInWithEmailAndPassword(auth, email, password);
 
+		// NOTE: check email verified in firebase
+		if(credential.user.emailVerified == false){
+			return res.sendJson(401, false, "sorry, please verified your email address")
+		}
+
 		const dataPostgre = await User.findOne({
 			where: { email },
 		});
