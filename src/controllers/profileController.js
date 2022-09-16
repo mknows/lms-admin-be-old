@@ -54,7 +54,7 @@ module.exports = {
 			if (req.file) {
 				await User.update(
 					{
-						image: req.file.filename,
+						display_picture: req.file.filename,
 					},
 					{
 						where: {

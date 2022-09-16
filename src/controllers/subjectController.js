@@ -14,7 +14,6 @@ module.exports = {
 		const {
 			name,
 			number_of_sessions,
-			program,
 			level,
 			lecturer,
 			description,
@@ -24,7 +23,6 @@ module.exports = {
 		if (
 			!name ||
 			!number_of_sessions ||
-			!program ||
 			!level ||
 			!lecturer ||
 			!description ||
@@ -39,7 +37,6 @@ module.exports = {
 		const data = await Subject.create({
 			name: name,
 			number_of_sessions: number_of_sessions,
-			program: program,
 			level: level,
 			lecturer: lecturer,
 			description: description,
@@ -71,7 +68,6 @@ module.exports = {
 		let {
 			name,
 			number_of_sessions,
-			program,
 			level,
 			lecturer,
 			description,
@@ -97,30 +93,26 @@ module.exports = {
 		if (number_of_sessions == null) {
 			number_of_sessions = study.number_of_sessions;
 		}
-		if (program === null) {
-			program = study.program;
-		}
 		if (level === null) {
-			program = study.level;
+			level = study.level;
 		}
 		if (lecturer === null) {
-			program = study.lecturer;
+			lecturer = study.lecturer;
 		}
 		if (description === null) {
-			program = study.description;
+			description = study.description;
 		}
 		if (credit === null) {
-			program = study.credit;
+			credit = study.credit;
 		}
 		if (degree === null) {
-			program = study.degree;
+			degree = study.degree;
 		}
 
 		const data = await Subject.update(
 			{
 				name,
 				number_of_sessions,
-				program,
 				level,
 				lecturer,
 				description,
