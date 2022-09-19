@@ -14,4 +14,5 @@ route.get(
 );
 route.put("/edit/:sessionId", protection, sessionController.updateSession);
 route.delete("/delete/:sessionId", protection, sessionController.removeSession);
-route.module.exports = route;
+
+module.exports = route;
