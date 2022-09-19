@@ -4,13 +4,14 @@ const route = express.Router();
 const sessionController = require("../controllers/sessionController");
 const { protection } = require("../middlewares/Authentication");
 
+route.post("/create", protection, sessionController.createSession);
 route.get("/", protection, sessionController.getAllSessions);
-route.post("/create", protection, sessionController.postSession);
-
+route.get("/:sessionId", protection, sessionController.getSession);
 route.get(
-	"/getall/:sub_id",
+	"/getfromsub/:subjectId",
 	protection,
 	sessionController.getAllSessionInSubject
 );
-
-module.exports = route;
+route.put("/edit/:sessionId", protection, sessionController.updateSession);
+route.delete("/delete/:sessionId", protection, sessionController.removeSession);
+route.module.exports = route;

@@ -1,147 +1,371 @@
 const { Student, Discussion_forum, Comment, Reply } = require("../models");
 const moment = require("moment");
+const { Op } = require("sequelize");
+const asyncHandler = require("express-async-handler");
+const ErrorResponse = require("../utils/errorResponse");
 
 module.exports = {
 	/**
 	 * @desc      Get All Forums
-	 * @route     GET /api/v1/forum/getAllDisccussionForum
+	 * @route     GET /api/v1/forum/discussionforum/
 	 * @access    Public
 	 */
-	getAllDiscussionForum: async (req, res) => {
-		try {
-			const data = await Discussion_forum.findAll();
-			res.sendJson(200, true, "sucess get all discussion forums", data);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
+	getAllDiscussionForum: asyncHandler(async (req, res) => {
+		const data = await Discussion_forum.findAll();
+		return res.sendJson(200, true, "sucess get all discussion forums", data);
+	}),
 	/**
 	 * @desc      Get All Forums
-	 * @route     GET /api/v1/forum/getAllComment
+	 * @route     GET /api/v1/forum/comment
 	 * @access    Public
 	 */
-	getAllComment: async (req, res) => {
-		try {
-			const data = await Comment.findAll();
-			res.sendJson(200, true, "sucess get all comments", data);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
+	getAllComment: asyncHandler(async (req, res) => {
+		const data = await Comment.findAll();
+		return res.sendJson(200, true, "sucess get all comments", data);
+	}),
 	/**
 	 * @desc      Get All Forums
-	 * @route     GET /api/v1/forum/getAllReply
+	 * @route     GET /api/v1/forum/reply
 	 * @access    Public
 	 */
-	getAllReply: async (req, res) => {
-		try {
-			const data = await Reply.findAll();
-			res.sendJson(200, true, "sucess get all replies", data);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
+	getAllReply: asyncHandler(async (req, res) => {
+		const data = await Reply.findAll();
+		return res.sendJson(200, true, "sucess get all replies", data);
+	}),
 	/**
 	 * @desc      Get All Forums
-	 * @route     GET /api/v1/forum/getCommentOnDF/:df_id
+	 * @route     GET /api/v1/forum/commentondf/:df_id
 	 * @access    Public
 	 */
-	getCommentOnDF: async (req, res) => {
-		try {
-			const dfid = req.params.df_id;
-			const data = await Comment.findAll({
-				where: {
-					df_id: dfid,
-				},
-			});
-			res.sendJson(200, true, "sucess get comment in a df", data);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
+	getCommentOnDF: asyncHandler(async (req, res) => {
+		const { dfId } = req.params;
+		const data = await Comment.findAll({
+			where: {
+				df_id: dfId,
+			},
+		});
+		return res.sendJson(200, true, "sucess get comment in a df", data);
+	}),
 	/**
 	 * @desc      Get All Forums
-	 * @route     GET /api/v1/forum/getReplyOfComment/:comment_id
+	 * @route     GET /api/v1/forum/replyoncomment/:comment_id
 	 * @access    Public
 	 */
-	getReplyOnComment: async (req, res) => {
-		try {
-			const comment_id = req.params.comment_id;
-			const data = await Reply.findAll({
-				where: {
-					comment_id: comment_id,
-				},
-			});
-			res.sendJson(200, true, "sucess get reply on a comment", data);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
+	getReplyOnComment: asyncHandler(async (req, res) => {
+		const { commentId } = req.params;
+		const data = await Reply.findAll({
+			where: {
+				comment_id: commentId,
+			},
+		});
+		return res.sendJson(200, true, "sucess get reply on a comment", data);
+	}),
 	/**
 	 * @desc      Get All Forums
-	 * @route     GET /api/v1/forum/makeDiscussionForum/
+	 * @route     GET /api/v1/forum/discussionforum/create
 	 * @access    Public
 	 */
-	postDiscussionForum: async (req, res) => {
+	createDiscussionForum: asyncHandler(async (req, res) => {
 		const { content, title, session_id } = req.body;
-		console.log(req.userData);
 		const user_id = req.userData.id;
-		try {
-			const data = await Discussion_forum.create({
-				session_id: session_id,
-				content: content,
-				title: title,
-				author_id: user_id,
-			});
-			res.sendJson(200, true, "sucess post discussion forum", data);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
+
+		const data = await Discussion_forum.create({
+			session_id: session_id,
+			content: content,
+			title: title,
+			author_id: user_id,
+		});
+		return res.sendJson(200, true, "sucess post discussion forum", data);
+	}),
 	/**
 	 * @desc      Get All Forums
-	 * @route     GET /api/v1/forum/makeComment/
+	 * @route     GET /api/v1/forum/comment/create
 	 * @access    Public
 	 */
-	postComment: async (req, res) => {
+	createComment: asyncHandler(async (req, res) => {
 		const { content, df_id } = req.body;
 		const user_id = req.userData.id;
-		try {
-			const data = await Comment.create({
-				df_id: df_id,
-				content: content,
-				author_id: user_id,
-			});
-			res.sendJson(200, true, "sucess post comment", data);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
+
+		const data = await Comment.create({
+			df_id: df_id,
+			content: content,
+			author_id: user_id,
+		});
+		return res.sendJson(200, true, "sucess post comment", data);
+	}),
 	/**
 	 * @desc      Get All Forums
-	 * @route     GET /api/v1/forum/makeReply/
+	 * @route     GET /api/v1/forum/reply/create
 	 * @access    Public
 	 */
-	postReply: async (req, res) => {
+	createReply: asyncHandler(async (req, res) => {
 		const { content, comment_id } = req.body;
 		const user_id = req.userData.id;
-		try {
-			const the_comment = await Comment.findAll({
-				where: {
-					id: comment_id,
-				},
-				attributes: ["df_id"],
+
+		const the_comment = await Comment.findAll({
+			where: {
+				id: comment_id,
+			},
+			attributes: ["df_id"],
+		});
+		const df_id = the_comment[0].dataValues.df_id;
+		const data = await Reply.create({
+			df_id: df_id,
+			comment_id: comment_id,
+			content: content,
+			author_id: user_id,
+		});
+		return res.sendJson(200, true, "sucess post reply", data);
+	}),
+
+	/**
+	 * @desc      update discussion Forums
+	 * @route     GET /api/v1/forum/discussionforum/edit/:dfId
+	 * @access    Public
+	 */
+	updateDiscussionForum: asyncHandler(async (req, res) => {
+		const { dfId } = req.params;
+		let { content, title, session_id } = req.body;
+		const user_id = req.userData.id;
+
+		let data = await Discussion_forum.findOne({
+			where: {
+				id: dfId,
+			},
+		});
+
+		if (!data) {
+			return res.status(404).json({
+				success: false,
+				message: "Invalid df id.",
+				data: {},
 			});
-			const df_id = the_comment[0].dataValues.df_id;
-			const data = await Reply.create({
-				df_id: df_id,
-				comment_id: comment_id,
-				content: content,
-				author_id: user_id,
-			});
-			res.sendJson(200, true, "sucess post reply", data);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
 		}
-	},
+
+		if (user_id !== data.author_id) {
+			return res.status(404).json({
+				success: false,
+				message: "updater is not author",
+				data: {},
+			});
+		}
+		if (content === null) {
+			content = data.content;
+		}
+		if (title === null) {
+			title = data.title;
+		}
+		if (session_id === null) {
+			session_id = data.session_id;
+		}
+
+		data = await Discussion_forum.update(
+			{
+				content,
+				title,
+				session_id,
+			},
+			{
+				where: { id: dfId },
+				returning: true,
+			}
+		);
+
+		return res.status(200).json({
+			success: true,
+			message: `Edit Discussion Forum with ID ${dfId} successfully.`,
+			data: { ...data[1].dataValues },
+		});
+	}),
+
+	/**
+	 * @desc      update comments
+	 * @route     GET /api/v1/forum/comment/edit/:commentId
+	 * @access    Public
+	 */
+	updateComment: asyncHandler(async (req, res) => {
+		const { commentId } = req.params;
+		let { content } = req.body;
+		const user_id = req.userData.id;
+
+		let data = await Comment.findOne({
+			where: {
+				id: commentId,
+			},
+		});
+
+		if (!data) {
+			return res.status(404).json({
+				success: false,
+				message: "Invalid comment id.",
+				data: {},
+			});
+		}
+
+		if (user_id !== data.author_id) {
+			return res.status(404).json({
+				success: false,
+				message: "updater is not author",
+				data: {},
+			});
+		}
+		if (content === null) {
+			content = data.content;
+		}
+
+		data = await Discussion_forum.update(
+			{
+				content,
+			},
+			{
+				where: { id: commentId },
+				returning: true,
+			}
+		);
+
+		return res.status(200).json({
+			success: true,
+			message: `Edit comment with ID ${commentId} successfully.`,
+			data: { ...data[1].dataValues },
+		});
+	}),
+
+	/**
+	 * @desc      update discussion Forums
+	 * @route     GET /api/v1/forum/reply/edit/:replyId
+	 * @access    Public
+	 */
+	updateReply: asyncHandler(async (req, res) => {
+		const { replyId } = req.params;
+		let { content } = req.body;
+		const user_id = req.userData.id;
+
+		let data = await Reply.findOne({
+			where: {
+				id: replyId,
+			},
+		});
+
+		if (!data) {
+			return res.status(404).json({
+				success: false,
+				message: "Invalid reply id.",
+				data: {},
+			});
+		}
+
+		if (user_id !== data.author_id) {
+			return res.status(404).json({
+				success: false,
+				message: "updater is not author",
+				data: {},
+			});
+		}
+		if (content === null) {
+			content = data.content;
+		}
+
+		data = await Reply.update(
+			{
+				content,
+			},
+			{
+				where: { id: replyId },
+				returning: true,
+			}
+		);
+
+		return res.status(200).json({
+			success: true,
+			message: `Edit Discussion Forum with ID ${replyId} successfully.`,
+			data: { ...data[1].dataValues },
+		});
+	}),
+	/**
+	 * @desc      delete df
+	 * @route     DELETE /api/v1/forum/discussionforum/delete/:dfId
+	 * @access    Private
+	 */
+	deleteDiscussionForum: asyncHandler(async (req, res) => {
+		const { dfId } = req.params;
+		let data = await Discussion_forum.findOne({
+			where: {
+				id: dfId,
+			},
+		});
+
+		if (!data) {
+			return res.status(404).json({
+				success: false,
+				message: "Invalid df id.",
+				data: {},
+			});
+		}
+
+		Discussion_forum.destroy({
+			where: {
+				id: dfId,
+			},
+		});
+
+		return res.sendJson(200, true, "Success", {});
+	}),
+	/**
+	 * @desc      delete comment
+	 * @route     DELETE /api/v1/forum/comment/delete/:commentId
+	 * @access    Private
+	 */
+	deleteComment: asyncHandler(async (req, res) => {
+		const { commentId } = req.params;
+		let data = await Comment.findOne({
+			where: {
+				id: commentId,
+			},
+		});
+
+		if (!data) {
+			return res.status(404).json({
+				success: false,
+				message: "Invalid comment id.",
+				data: {},
+			});
+		}
+
+		Comment.destroy({
+			where: {
+				id: commentId,
+			},
+		});
+
+		return res.sendJson(200, true, "Success", {});
+	}),
+	/**
+	 * @desc      delete reply
+	 * @route     DELETE /api/v1/forum/reply/delete/:replyId
+	 * @access    Private
+	 */
+	deleteReply: asyncHandler(async (req, res) => {
+		const { replyId } = req.params;
+		let data = await Reply.findOne({
+			where: {
+				id: replyId,
+			},
+		});
+
+		if (!data) {
+			return res.status(404).json({
+				success: false,
+				message: "Invalid reply id.",
+				data: {},
+			});
+		}
+
+		Reply.destroy({
+			where: {
+				id: replyId,
+			},
+		});
+
+		return res.sendJson(200, true, "Success", {});
+	}),
 };

@@ -5,7 +5,7 @@ const majorController = require("../controllers/majorController");
 const { protection } = require("../middlewares/Authentication");
 
 route.get("/", protection, majorController.getAllMajors);
-route.get("/:id", protection, majorController.getMajor);
+route.get("/:majorId", protection, majorController.getMajor);
 
 route.post("/create", protection, majorController.postMajor);
 route.put("/edit/:majorId", protection, majorController.editMajor);

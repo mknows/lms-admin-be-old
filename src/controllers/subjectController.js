@@ -3,6 +3,7 @@ const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
+const { as } = require("pg-promise");
 
 module.exports = {
 	/**
@@ -10,7 +11,7 @@ module.exports = {
 	 * @route     POST /api/v1/subject/create
 	 * @access    Public
 	 */
-	postSubject: asyncHandler(async (req, res) => {
+	createSubject: asyncHandler(async (req, res) => {
 		const {
 			name,
 			number_of_sessions,
@@ -47,19 +48,29 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Get All subject
-	 * @route     GET /api/v1/subject/getall
+	 * @route     GET /api/v1/subject/
 	 * @access    Public
 	 */
-	getAllSubject: async (req, res) => {
-		try {
-			const data = await Subject.findAll();
-			res.sendJson(200, true, "sucess get all data", data);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
+	getAllSubject: asyncHandler(async (req, res) => {
+		const data = await Subject.findAll();
+		return res.sendJson(200, true, "sucess get all data", data);
+	}),
 	/**
-	 * @desc      Edit Study by ID (Edit data Materi)
+	 * @desc      Get subject
+	 * @route     GET /api/v1/subject/:subjectId
+	 * @access    Public
+	 */
+	getSubject: asyncHandler(async (req, res) => {
+		const { subjectId } = req.body;
+		const data = await Subject.findOne({
+			where: {
+				id: subjectId,
+			},
+		});
+		return res.sendJson(200, true, "sucess get subject", data);
+	}),
+	/**
+	 * @desc      Edit Subject
 	 * @route     PUT /api/v1/subject/edit/:subjectId
 	 * @access    Private (Admin)
 	 */
@@ -133,7 +144,7 @@ module.exports = {
 		});
 	}),
 	/**
-	 * @desc      Delete Study by ID (Hapus data Materi)
+	 * @desc      Delete Subject
 	 * @route     DELETE /api/v1/subject/delete/:subjectId
 	 * @access    Private (Admin)
 	 */
@@ -169,81 +180,74 @@ module.exports = {
 	 * @route     GET /api/v1/subject/forstudent
 	 * @access    Private
 	 */
-	getSubjectForStudent: async (req, res) => {
+	getSubjectForStudent: asyncHandler(async (req, res) => {
 		const user_id = req.userData.id;
-		try {
-			const subjectTaken = await Student.findAll({
-				where: {
-					id: user_id,
-				},
-				include: [Major, Subject],
-			});
-			const subjectTakenID = await getID(subjectTaken);
 
-			const majorSubject = await Major.findAll({
-				include: Subject,
-			});
-			const majorSubjectID = await getID(majorSubject);
+		const subjectTaken = await Student.findAll({
+			where: {
+				id: user_id,
+			},
+			include: [Major, Subject],
+		});
+		const subjectTakenID = await getID(subjectTaken);
 
-			const result = recommendation(subjectTakenID, majorSubjectID);
+		const majorSubject = await Major.findAll({
+			include: Subject,
+		});
+		const majorSubjectID = await getID(majorSubject);
 
-			res.sendJson(200, true, "Success", result);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
-	// TODO: STILL VERY NAIVE, WILL BE REFACTORED LATER
+		const result = recommendation(subjectTakenID, majorSubjectID);
+
+		return res.sendJson(200, true, "Success", result);
+	}),
 	/**
 	 * @desc      enroll in a subject
 	 * @route     POST /api/v1/subject/enroll
 	 * @access    Private
 	 */
-	takeSubject: async (req, res) => {
+	takeSubject: asyncHandler(async (req, res) => {
 		const { subject_id } = req.body;
 		const student_id = req.userData.id;
 		const credit_thresh = 24;
-		try {
-			const subjectsEnrolled = await StudentSubject.findAll({
-				where: {
-					student_id: student_id,
-					[Op.or]: [{ status: "ONGOING" }, { status: "PENDING" }],
-				},
-			});
+		const subjectsEnrolled = await StudentSubject.findAll({
+			where: {
+				student_id: student_id,
+				[Op.or]: [{ status: "ONGOING" }, { status: "PENDING" }],
+			},
+		});
 
-			const sub = await Subject.findOne({ where: { id: subject_id } });
+		const sub = await Subject.findOne({ where: { id: subject_id } });
 
-			let credit = 0;
-			let enrolled = false;
+		let credit = 0;
+		let enrolled = false;
 
-			if (subjectsEnrolled !== null) {
-				credit = await totalCredit(subjectsEnrolled);
-				enrolled = await isEnrolled(subjectsEnrolled, sub.id);
-			}
-
-			if (sub !== null) {
-				credit += sub.credit;
-			}
-
-			if (enrolled === false && credit <= credit_thresh) {
-				await StudentSubject.create({
-					subject_id: subject_id,
-					student_id: student_id,
-					status: "PENDING",
-				});
-				res.sendJson(200, true, "Enrolled test", credit);
-			} else if (credit > credit_thresh) {
-				res.sendJson(400, false, "Exceeded maximum credit", { credit: credit });
-			} else if (enrolled) {
-				res.sendJson(400, false, "Subject already taken", {
-					enrolled_in: subject_id,
-				});
-			} else {
-				res.sendJson(400, false, "something went wrong", null);
-			}
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
+		if (subjectsEnrolled !== null) {
+			credit = await totalCredit(subjectsEnrolled);
+			enrolled = await isEnrolled(subjectsEnrolled, sub.id);
 		}
-	},
+
+		if (sub !== null) {
+			credit += sub.credit;
+		}
+
+		if (enrolled === false && credit <= credit_thresh) {
+			await StudentSubject.create({
+				subject_id: subject_id,
+				student_id: student_id,
+				status: "PENDING",
+			});
+			res.sendJson(200, true, "Enrolled test", credit);
+		} else if (credit > credit_thresh) {
+			return res.sendJson(400, false, "Exceeded maximum credit", {
+				credit: credit,
+			});
+		} else if (enrolled) {
+			return res.sendJson(400, false, "Subject already taken", {
+				enrolled_in: subject_id,
+			});
+		}
+		return res.sendJson(400, false, "something went wrong", null);
+	}),
 };
 
 async function getID(subjectTaken) {

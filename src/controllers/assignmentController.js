@@ -6,43 +6,62 @@ const ErrorResponse = require("../utils/errorResponse");
 
 module.exports = {
 	/**
+	 * @desc      POST create Assignment
+	 * @route     GET /api/v1/assignment/create
+	 * @access    Private
+	 */
+	createAssignment: asyncHandler(async (req, res) => {
+		const { session_id, duration, description, content, document_id } =
+			req.body;
+
+		const assign = await Assignment.create({
+			session_id: session_id,
+			duration: duration,
+			description: description,
+			content: content,
+			document_id: document_id,
+		});
+
+		await Material.create({
+			session_id: session_id,
+			duration: duration,
+			description: description,
+			type: "ASSIGNMENT",
+			id_referrer: assign.id,
+		});
+
+		return res.sendJson(200, true, "Success", assign);
+	}),
+	/**
 	 * @desc      Get all Assignment
 	 * @route     GET /api/v1/assignment/
 	 * @access    Private
 	 */
-	getAllAssignment: async (req, res) => {
-		try {
-			const assign = await Assignment.findAll();
-			res.sendJson(200, true, "Success", assign);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
+	getAllAssignment: asyncHandler(async (req, res) => {
+		const assign = await Assignment.findAll();
+		res.sendJson(200, true, "Success", assign);
+	}),
 	/**
 	 * @desc      Get Assignment
-	 * @route     GET /api/v1/assignment/:id
+	 * @route     GET /api/v1/assignment/:assignmentId
 	 * @access    Private
 	 */
-	getAssignment: async (req, res) => {
-		try {
-			const assignmentID = req.params.id;
-			const assign = await Assignment.findAll({
-				where: {
-					id: assignmentID,
-				},
-			});
-			res.sendJson(200, true, "Success", assign);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
+	getAssignment: asyncHandler(async (req, res) => {
+		const { assignmentID } = req.params;
+		const assign = await Assignment.findAll({
+			where: {
+				id: assignmentID,
+			},
+		});
+		res.sendJson(200, true, "Success", assign);
+	}),
 	/**
 	 * @desc      update Assignment
-	 * @route     put /api/v1/assignment/:id
+	 * @route     put /api/v1/assignment/:assignmentId
 	 * @access    Private
 	 */
 	updateAssignment: asyncHandler(async (req, res) => {
-		const assignmentID = req.params.id;
+		const { assignmentID } = req.params;
 		let { session_id, duration, description, content, document_id } = req.body;
 		const exist = await Assignment.findOne({
 			where: {
@@ -92,34 +111,33 @@ module.exports = {
 		return res.sendJson(200, true, "Success", { ...assign[1].dataValues });
 	}),
 	/**
-	 * @desc      POST create Assignment
-	 * @route     GET /api/v1/assignment/create
-	 * @access    Private
+	 * @desc      Delete assignment
+	 * @route     DELETE /api/v1/assignment/delete/:assignmentId
+	 * @access    Private (Admin)
 	 */
-	postAssignment: async (req, res) => {
-		const { session_id, duration, description, content, document_id } =
-			req.body;
+	removeAssignment: asyncHandler(async (req, res, next) => {
+		const { assignmentID } = req.params;
 
-		try {
-			const assign = await Assignment.create({
-				session_id: session_id,
-				duration: duration,
-				description: description,
-				content: content,
-				document_id: document_id,
+		let data = await Assignment.findOne({
+			where: { id: assignmentID },
+		});
+
+		if (!data) {
+			return res.status(404).json({
+				success: false,
+				message: "Invalid assignment id.",
+				data: {},
 			});
-
-			await Material.create({
-				session_id: session_id,
-				duration: duration,
-				description: description,
-				type: "ASSIGNMENT",
-				id_referrer: assign.id,
-			});
-
-			res.sendJson(200, true, "Success", assign);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
 		}
-	},
+
+		Assignment.destroy({
+			where: { id: assignmentID },
+		});
+
+		return res.status(200).json({
+			success: true,
+			message: `Delete Assignment with ID ${assignmentID} successfully.`,
+			data: {},
+		});
+	}),
 };

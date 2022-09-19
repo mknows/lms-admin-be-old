@@ -1,113 +1,191 @@
 const { Material_Enrolled, Quiz, Material, Session } = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
+const asyncHandler = require("express-async-handler");
+const ErrorResponse = require("../utils/errorResponse");
 
 module.exports = {
+	/**
+	 * @desc      create quiz
+	 * @route     POST /api/v1/quiz/create
+	 * @access    Private
+	 */
+	createQuiz: asyncHandler(async (req, res) => {
+		const { session_id, duration, description, questions, answer } = req.body;
+
+		const quizzDesc = await Quiz.create({
+			session_id: session_id,
+			duration: duration,
+			description: description,
+			questions: questions,
+			answer: answer,
+		});
+
+		await Material.create({
+			session_id: session_id,
+			duration: duration,
+			description: description,
+			type: "QUIZ",
+			id_referrer: quizzDesc.id,
+		});
+
+		return res.sendJson(200, true, "Success", quizzDesc);
+	}),
 	/**
 	 * @desc      Get quiz
 	 * @route     GET /api/v1/quiz/desc
 	 * @access    Private
 	 */
-	getQuizDesc: async (req, res) => {
-		try {
-			const quizzID = req.params.id;
-			const quizzDesc = await Quiz.findAll({
-				where: {
-					id: quizzID,
-				},
-				attributes: ["session_id", "description"],
-			});
-			res.sendJson(200, true, "Success", quizzDesc);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
+	getQuizDesc: asyncHandler(async (req, res) => {
+		const quizzID = req.params.id;
+		const quizzDesc = await Quiz.findAll({
+			where: {
+				id: quizzID,
+			},
+			attributes: ["session_id", "description"],
+		});
+		return res.sendJson(200, true, "Success", quizzDesc);
+	}),
 	/**
-	 * @desc      buat quiz
-	 * @route     POST /api/v1/quiz/create
+	 * @desc      update quiz
+	 * @route     PUT /api/v1/quiz/:quizId
 	 * @access    Private
 	 */
-	makeQuiz: async (req, res) => {
-		const { session_id, duration, description, questions, answer } = req.body;
-		try {
-			const quizzDesc = await Quiz.create({
-				session_id: session_id,
-				duration: duration,
-				description: description,
-				questions: questions,
-				answer: answer,
-			});
+	updateQuiz: asyncHandler(async (req, res) => {
+		const { quizId } = req.params;
+		let { session_id, duration, description, questions, answer } = req.body;
 
-			await Material.create({
-				session_id: session_id,
-				duration: duration,
-				description: description,
-				type: "QUIZ",
-				id_referrer: quizzDesc.id,
-			});
+		const exist = await Quiz.findOne({
+			where: {
+				quizId,
+			},
+		});
 
-			res.sendJson(200, true, "Success", quizzDesc);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
+		if (!exist) {
+			return res.status(404).json({
+				success: false,
+				message: "Invalid quiz id.",
+				data: {},
+			});
 		}
-	},
+
+		if (session_id === null) {
+			session_id = exist.session_id;
+		}
+		if (duration === null) {
+			duration = exist.duration;
+		}
+		if (description === null) {
+			description = exist.description;
+		}
+		if (questions === null) {
+			questions = exist.questions;
+		}
+		if (answer === null) {
+			answer = exist.answer;
+		}
+
+		const quiz = await Quiz.update(
+			{
+				session_id,
+				duration,
+				description,
+				questions,
+				answer,
+			},
+			{
+				where: {
+					id: quizId,
+				},
+				returning: true,
+			}
+		);
+		return res.sendJson(200, true, "Success", { ...quiz[1].dataValues });
+	}),
+
+	/**
+	 * @desc      Delete quiz
+	 * @route     DELETE /api/v1/quiz/delete/:quizId
+	 * @access    Private (Admin)
+	 */
+	removeQuiz: asyncHandler(async (req, res, next) => {
+		const { quizId } = req.params;
+
+		const exist = await Quiz.findOne({
+			where: { id: quizId },
+		});
+
+		if (!exist) {
+			return res.status(404).json({
+				success: false,
+				message: "Invalid quiz id.",
+				data: {},
+			});
+		}
+
+		Quiz.destroy({
+			where: { id: quizId },
+		});
+
+		return res.status(200).json({
+			success: true,
+			message: `Delete quiz with ID ${quizId} successfully.`,
+			data: {},
+		});
+	}),
 	/**
 	 * @desc      take quiz
 	 * @route     POST /api/v1/quiz/take/:id
 	 * @access    Private
 	 */
-	takeQuiz: async (req, res) => {
-		try {
-			const quiz_id = req.params.id;
-			const user_id = req.userData.id;
-			const quizQuestions = await Quiz.findOne({
-				where: {
-					id: quiz_id,
-				},
-				attributes: ["duration", "questions", "description", "session_id"],
+	takeQuiz: asyncHandler(async (req, res) => {
+		const quiz_id = req.params.id;
+		const user_id = req.userData.id;
+		const quizQuestions = await Quiz.findOne({
+			where: {
+				id: quiz_id,
+			},
+			attributes: ["duration", "questions", "description", "session_id"],
+		});
+		const session_id = quizQuestions.dataValues.session_id;
+		const material = await Material.findOne({
+			where: {
+				id_referrer: quiz_id,
+			},
+		});
+		const session = await Session.findOne({
+			where: {
+				id: session_id,
+			},
+		});
+		const checkIfCurrentlyTaking = await Material_Enrolled.findOne({
+			where: {
+				student_id: user_id,
+				session_id: session_id,
+				material_id: material.id,
+				subject_id: session.subject_id,
+				id_referrer: quiz_id,
+			},
+			attributes: ["id"],
+		});
+		if (checkIfCurrentlyTaking == null) {
+			await Material_Enrolled.create({
+				student_id: user_id,
+				session_id: session_id,
+				material_id: material.id,
+				subject_id: session.subject_id,
+				id_referrer: quiz_id,
+				type: "QUIZ",
 			});
-			const session_id = quizQuestions.dataValues.session_id;
-			const material = await Material.findOne({
-				where: {
-					id_referrer: quiz_id,
-				},
-			});
-			const session = await Session.findOne({
-				where: {
-					id: session_id,
-				},
-			});
-			const checkIfCurrentlyTaking = await Material_Enrolled.findOne({
-				where: {
-					student_id: user_id,
-					session_id: session_id,
-					material_id: material.id,
-					subject_id: session.subject_id,
-					id_referrer: quiz_id,
-				},
-				attributes: ["id"],
-			});
-			if (checkIfCurrentlyTaking == null) {
-				await Material_Enrolled.create({
-					student_id: user_id,
-					session_id: session_id,
-					material_id: material.id,
-					subject_id: session.subject_id,
-					id_referrer: quiz_id,
-					type: "QUIZ",
-				});
-			}
-			res.sendJson(200, true, "Success", quizQuestions);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
 		}
-	},
+		return res.sendJson(200, true, "Success", quizQuestions);
+	}),
 	/**
 	 * @desc      submit quiz
 	 * @route     POST /api/v1/quiz/submit
 	 * @access    Private
 	 */
-	postQuizAnswer: async (req, res) => {
+	postQuizAnswer: asyncHandler(async (req, res) => {
 		const { answer, quiz_id, duration_taken } = req.body;
 		const userAnswer = answer;
 		const user_id = req.userData.id;
@@ -151,25 +229,22 @@ module.exports = {
 		if (score > 100 || score < 0) {
 			status = "Invalid";
 		}
-		try {
-			const result = await Material_Enrolled.update(
-				{
-					score: score,
-					status: status,
-					activity_detail: quizResultDetail,
+
+		const result = await Material_Enrolled.update(
+			{
+				score: score,
+				status: status,
+				activity_detail: quizResultDetail,
+			},
+			{
+				where: {
+					student_id: user_id,
+					subject_id: quiz_session.subject_id,
+					id_referrer: quiz_id,
+					session_id: session_id,
 				},
-				{
-					where: {
-						student_id: user_id,
-						subject_id: quiz_session.subject_id,
-						id_referrer: quiz_id,
-						session_id: session_id,
-					},
-				}
-			);
-			res.sendJson(200, true, "Success", null);
-		} catch (err) {
-			res.sendJson(500, false, err.message, null);
-		}
-	},
+			}
+		);
+		return res.sendJson(200, true, "Success", null);
+	}),
 };

@@ -5,26 +5,50 @@ const forumController = require("../controllers/forumController");
 const { protection } = require("../middlewares/Authentication");
 
 route.get(
-	"/getAllDisccussionForum",
+	"/discussionforum",
 	protection,
 	forumController.getAllDiscussionForum
 );
-route.get("/getAllComment", protection, forumController.getAllComment);
-route.get("/getAllReply", protection, forumController.getAllReply);
+route.get("/comment", protection, forumController.getAllComment);
+route.get("/reply", protection, forumController.getAllReply);
 
-route.get("/getCommentOnDF/:df_id", protection, forumController.getCommentOnDF);
+route.get("/commentondf/:dfId", protection, forumController.getCommentOnDF);
 route.get(
-	"/getReplyOfComment/:comment_id",
+	"/replyoncomment/:commentId",
 	protection,
 	forumController.getReplyOnComment
 );
 
 route.post(
-	"/makeDiscussionForum/",
+	"/discussionforum/create",
 	protection,
-	forumController.postDiscussionForum
+	forumController.createDiscussionForum
 );
-route.post("/makeComment/", protection, forumController.postComment);
-route.post("/makeReply/", protection, forumController.postReply);
+route.post("/comment/create", protection, forumController.createComment);
+route.post("/reply/create", protection, forumController.createReply);
+
+route.put(
+	"/discussionforum/edit/:dfId",
+	protection,
+	forumController.updateDiscussionForum
+);
+route.put(
+	"/comment/edit/:commentiD",
+	protection,
+	forumController.updateComment
+);
+route.put("/reply/edit/:replyId", protection, forumController.updateReply);
+
+route.delete(
+	"/discussionforum/delete/:dfId",
+	protection,
+	forumController.deleteDiscussionForum
+);
+route.delete(
+	"/comment/delete/:commentId",
+	protection,
+	forumController.deleteComment
+);
+route.delete("/reply/delete/:replyId", protection, forumController.deleteReply);
 
 module.exports = route;

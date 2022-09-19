@@ -91,7 +91,7 @@ module.exports = {
 			return res.status(200).json({
 				success: true,
 				message: "Profile updated.",
-				data: { ...data[1].dataValues },
+				data: { ...data[1].dataValues, role: req.role },
 			});
 		} catch (error) {
 			console.error(error);
