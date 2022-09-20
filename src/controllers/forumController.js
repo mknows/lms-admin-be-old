@@ -15,6 +15,18 @@ module.exports = {
 		return res.sendJson(200, true, "sucess get all discussion forums", data);
 	}),
 	/**
+	 * @desc      Get All Forums in session
+	 * @route     GET /api/v1/forum/discussionforum/session/:sessionId
+	 * @access    Public
+	 */
+	getAllDiscussionForumInSession: asyncHandler(async (req, res) => {
+		const { sessionId } = req.params;
+		const data = await Discussion_forum.findAll({
+			where: sessionId,
+		});
+		return res.sendJson(200, true, "sucess get all df in session", data);
+	}),
+	/**
 	 * @desc      Get All Forums
 	 * @route     GET /api/v1/forum/comment
 	 * @access    Public

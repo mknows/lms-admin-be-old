@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
 			duration: DataTypes.INTEGER,
 			description: DataTypes.TEXT,
 			content: DataTypes.TEXT,
-			document_id: DataTypes.UUID,
+			document_id: { type: DataTypes.ARRAY(DataTypes.UUID), defaultValue: [] },
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
 			deleted_at: DataTypes.DATE,

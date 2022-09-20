@@ -11,10 +11,10 @@ module.exports = {
 				type: Sequelize.UUID,
 			},
 			video_id: {
-				type: Sequelize.UUID,
+				type: Sequelize.ARRAY(Sequelize.UUID),
 			},
 			document_id: {
-				type: Sequelize.UUID,
+				type: Sequelize.ARRAY(Sequelize.UUID),
 			},
 			created_at: {
 				allowNull: false,

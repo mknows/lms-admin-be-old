@@ -86,18 +86,52 @@ module.exports = {
 		return res.sendJson(200, true, "Success", data);
 	}),
 	/**
+	 * @desc      Get Modules in sessino
+	 * @route     GET /api/v1/module/session/:sessionId
+	 * @access    Private
+	 */
+	getModuleInSession: asyncHandler(async (req, res) => {
+		const { sessionId } = req.params;
+		const mods = await Module.findAll({
+			where: {
+				session_id: sessionId,
+			},
+		});
+		return res.sendJson(200, true, "Success", mods);
+	}),
+	/**
 	 * @desc      Get Module
 	 * @route     GET /api/v1/module/:id
 	 * @access    Private
 	 */
 	getModule: asyncHandler(async (req, res) => {
-		const moduleID = req.params.id;
+		const moduleId = req.params.id;
 		const mod = await Module.findOne({
 			where: {
-				id: moduleID,
+				id: moduleId,
 			},
 		});
-		return res.sendJson(200, true, "Success", mod);
+
+		const vids = await Video.findAll({
+			where: {
+				id: {
+					[Op.in]: mod.video_id,
+				},
+			},
+		});
+
+		const docs = await Document.findAll({
+			where: {
+				id: {
+					[Op.in]: mod.document_id,
+				},
+			},
+		});
+		return res.sendJson(200, true, "Success", {
+			module: mod,
+			videos: vids,
+			documents: docs,
+		});
 	}),
 	/**
 	 * @desc      Get video
@@ -353,5 +387,31 @@ module.exports = {
 		});
 
 		res.sendJson(200, true, "Success", {});
+	}),
+	/**
+	 * @desc      post make module
+	 * @route     POST /api/v1/module/enroll
+	 * @access    Private
+	 */
+	takeModule: asyncHandler(async (req, res) => {
+		const student_id = req.userData.id;
+		const { moduleId } = req.body;
+
+		const material = await Material.findOne({
+			where: {
+				id_referrer: moduleId,
+			},
+		});
+
+		const enrolldata = await Material_Enrolled.create({
+			session_id: material.session_id,
+			student_id: student_id,
+			material_id: material.id,
+			subject_id: material.subject_id,
+			id_referrer: moduleId,
+			status: "ONGOING",
+			type: material.type,
+		});
+		return res.sendJson(200, true, "Success", enrolldata);
 	}),
 };

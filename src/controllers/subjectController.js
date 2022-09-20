@@ -69,6 +69,21 @@ module.exports = {
 		return res.sendJson(200, true, "sucess get subject", data);
 	}),
 	/**
+	 * @desc      Get enrolled subject
+	 * @route     GET /api/v1/subject/enrolledsubjects
+	 * @access    Public
+	 */
+	getEnrolledSubject: asyncHandler(async (req, res) => {
+		const student_id = req.userData.id;
+		const subjectsEnrolled = await StudentSubject.findAll({
+			where: {
+				student_id: student_id,
+				status: "ONGOING",
+			},
+		});
+		return res.sendJson(200, true, "sucess get subject", subjectsEnrolled);
+	}),
+	/**
 	 * @desc      Edit Subject
 	 * @route     PUT /api/v1/subject/edit/:subjectId
 	 * @access    Private (Admin)

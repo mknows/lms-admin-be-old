@@ -9,6 +9,12 @@ route.get(
 	protection,
 	forumController.getAllDiscussionForum
 );
+
+route.get(
+	"/discussionforum/session/:sessionId",
+	protection,
+	forumController.getAllDiscussionForumInSession
+);
 route.get("/comment", protection, forumController.getAllComment);
 route.get("/reply", protection, forumController.getAllReply);
 

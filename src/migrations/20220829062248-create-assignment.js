@@ -20,7 +20,7 @@ module.exports = {
 				type: Sequelize.TEXT,
 			},
 			document_id: {
-				type: Sequelize.UUID,
+				type: Sequelize.ARRAY(Sequelize.UUID),
 			},
 			created_at: {
 				allowNull: false,

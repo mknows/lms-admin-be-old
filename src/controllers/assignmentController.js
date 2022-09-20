@@ -42,13 +42,27 @@ module.exports = {
 		res.sendJson(200, true, "Success", assign);
 	}),
 	/**
+	 * @desc      Get Assignment in session
+	 * @route     GET /api/v1/assignment/session/:sessionId
+	 * @access    Private
+	 */
+	getAssignmentInSession: asyncHandler(async (req, res) => {
+		const { sessionId } = req.params;
+		const assign = await Assignment.findAll({
+			where: {
+				session_id: sessionId,
+			},
+		});
+		res.sendJson(200, true, "Success", assign);
+	}),
+	/**
 	 * @desc      Get Assignment
 	 * @route     GET /api/v1/assignment/:assignmentId
 	 * @access    Private
 	 */
 	getAssignment: asyncHandler(async (req, res) => {
 		const { assignmentID } = req.params;
-		const assign = await Assignment.findAll({
+		const assign = await Assignment.findOne({
 			where: {
 				id: assignmentID,
 			},

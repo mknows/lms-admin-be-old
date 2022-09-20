@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
 			this.hasMany(models.Document, {
 				foreignKey: "id",
 			});
+			// this.belongsTo(models.Session);
 		}
 	}
 	Module.init(
@@ -24,8 +25,8 @@ module.exports = (sequelize, DataTypes) => {
 				defaultValue: sequelize.literal("gen_random_uuid()"),
 			},
 			session_id: DataTypes.UUID,
-			video_id: DataTypes.UUID,
-			document_id: DataTypes.UUID,
+			video_id: { type: DataTypes.ARRAY(DataTypes.UUID), defaultValue: [] },
+			document_id: { type: DataTypes.ARRAY(DataTypes.UUID), defaultValue: [] },
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
 			deleted_at: DataTypes.DATE,

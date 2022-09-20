@@ -37,7 +37,7 @@ module.exports = {
 	 * @access    Private
 	 */
 	getQuizDesc: asyncHandler(async (req, res) => {
-		const quizzID = req.params.id;
+		const { quizId } = req.params;
 		const quizzDesc = await Quiz.findAll({
 			where: {
 				id: quizzID,
@@ -139,7 +139,7 @@ module.exports = {
 	 * @access    Private
 	 */
 	takeQuiz: asyncHandler(async (req, res) => {
-		const quiz_id = req.params.id;
+		const { quizId } = req.params;
 		const user_id = req.userData.id;
 		const quizQuestions = await Quiz.findOne({
 			where: {
