@@ -20,6 +20,38 @@ module.exports = {
 			deletedAt: "deleted_at",
 		},
 	},
+	nonmsib: {
+		username: "kgizfusz",
+		password: "6tc1FhcLvdmibwYhjzZsshQrtAHTSf1X",
+		database: "kgizfusz",
+		host: "rosie.db.elephantsql.com",
+		dialect: "postgres",
+		define: {
+			paranoid: true,
+			timestamps: true,
+			underscored: true,
+			underscoredAll: true,
+			createdAt: "created_at",
+			updatedAt: "updated_at",
+			deletedAt: "deleted_at",
+		},
+	},
+	testing_kg: {
+		username: "postgres",
+		password: "belajar",
+		database: "testing_kg",
+		host: "localhost",
+		dialect: "postgres",
+		define: {
+			paranoid: true,
+			timestamps: true,
+			underscored: true,
+			underscoredAll: true,
+			createdAt: "created_at",
+			updatedAt: "updated_at",
+			deletedAt: "deleted_at",
+		},
+	},
 	test: {
 		username: DB_USERNAME,
 		password: DB_PASSWORD,
@@ -36,13 +68,7 @@ module.exports = {
 			deletedAt: "deleted_at",
 		},
 	},
-	testing_kg:{
-		username: "postgres",
-		password: "belajar",
-		database: "testing_kg",
-		host: "localhost",
-		dialect: "postgres",
-	},
+
 	production: {
 		username: DB_USERNAME,
 		password: DB_PASSWORD,
