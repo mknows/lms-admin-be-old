@@ -33,7 +33,7 @@ route.put(
 	forumController.updateDiscussionForum
 );
 route.put(
-	"/comment/edit/:commentiD",
+	"/comment/edit/:commentId",
 	protection,
 	forumController.updateComment
 );

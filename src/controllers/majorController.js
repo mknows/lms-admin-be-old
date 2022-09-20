@@ -92,7 +92,7 @@ module.exports = {
 
 	/**
 	 * @desc      Delete Major (Hapus Major)
-	 * @route     DELETE /api/v1/my-study/majors/remove-major/:majorId
+	 * @route     DELETE /api/v1/majors/delete/:majorId
 	 * @access    Private
 	 */
 	removeMajor: asyncHandler(async (req, res) => {

@@ -34,7 +34,7 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Get All Forums
-	 * @route     GET /api/v1/forum/commentondf/:df_id
+	 * @route     GET /api/v1/forum/commentondf/:dfId
 	 * @access    Public
 	 */
 	getCommentOnDF: asyncHandler(async (req, res) => {
@@ -44,7 +44,7 @@ module.exports = {
 				df_id: dfId,
 			},
 		});
-		return res.sendJson(200, true, "sucess get comment in a df", data);
+		return res.sendJson(200, true, "success get comment in a df", data);
 	}),
 	/**
 	 * @desc      Get All Forums

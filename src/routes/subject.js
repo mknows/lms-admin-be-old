@@ -7,8 +7,8 @@ const { protection } = require("../middlewares/Authentication");
 route.post("/create", protection, subjectController.createSubject);
 
 route.get("/", protection, subjectController.getAllSubject);
-route.get("/forstudent", protection, subjectController.getSubjectForStudent);
-route.delete("/:subjectId", protection, subjectController.getSubject);
+route.get("/forstudent", protection, subjectController.getSubjectForStudent); //get enrolled subjects
+route.get("/:subjectId", protection, subjectController.getSubject);
 
 route.put("/edit/:subjectId", protection, subjectController.editSubject);
 

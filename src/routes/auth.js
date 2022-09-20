@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 const userController = require("../controllers/authController");
 const { validate, validatorMessage } = require("../middlewares/Validator");
-const { protection } = require("../middlewares/Authentication");
+const { protection, authorize } = require("../middlewares/Authentication");
 
 route.post(
 	"/login",
@@ -32,6 +32,11 @@ route.post(
 route.post("/google-validate", protection, userController.googleValidate);
 route.get("/logout", userController.signOutUser);
 
-route.get("/nukeusers", userController.deleteAllFirebaseUser);
+route.get(
+	"/nukeusers",
+	protection,
+	authorize("admin"),
+	userController.deleteAllFirebaseUser
+);
 
 module.exports = route;
