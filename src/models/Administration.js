@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
 			father_name: DataTypes.STRING,
 			mother_name: DataTypes.STRING,
 			father_occupation: DataTypes.STRING,
-			mother_oocupation: DataTypes.STRING,
+			mother_occupation: DataTypes.STRING,
 			job: DataTypes.STRING,
 			income: DataTypes.STRING,
 			father_income: DataTypes.STRING,
