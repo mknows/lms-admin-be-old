@@ -82,8 +82,12 @@ module.exports = {
 		const credential = await signInWithEmailAndPassword(auth, email, password);
 
 		// NOTE: check email verified in firebase
-		if(credential.user.emailVerified == false){
-			return res.sendJson(401, false, "sorry, please verified your email address")
+		if (credential.user.emailVerified == false) {
+			return res.sendJson(
+				401,
+				false,
+				"sorry, please verify your email address"
+			);
 		}
 
 		const dataPostgre = await User.findOne({
@@ -229,7 +233,7 @@ module.exports = {
 
 		users.map(async (user) => {
 			// KODE HARAM
-			// await admin.auth().deleteUser(user.uid);
+			await admin.auth().deleteUser(user.uid);
 		});
 
 		return res.json({ users });
