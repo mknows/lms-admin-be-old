@@ -10,6 +10,7 @@ const initializeFirebase = async () => {
 		credential: cert(dbCredential),
 		databaseURL:
 			"https://kampus-gratis2-default-rtdb.asia-southeast1.firebasedatabase.app",
+			storageBucket: "gs://kampus-gratis2.appspot.com"
 	});
 
 	initializeApp(webCredential);

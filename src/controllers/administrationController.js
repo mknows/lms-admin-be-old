@@ -1,7 +1,14 @@
 const asyncHandler = require("express-async-handler");
 const { Administration, User } = require("../models");
 const ErrorResponse = require("../utils/errorResponse");
-const fs = require("fs");
+const {
+	getStorage,
+	ref,
+	getDownloadURL,
+	deleteObject,
+} = require("firebase/storage");
+const admin = require("firebase-admin");
+const { v4: uuidv4 } = require("uuid");
 
 module.exports = {
 	/**
@@ -158,22 +165,6 @@ module.exports = {
 		const { administrationId } = req.body;
 
 		if (!administrationId) {
-			const files = req.files;
-
-			Object.values(files).forEach((file) => {
-				fs.unlink("./public/documents/" + `${file[0].filename}`, (err) => {
-					if (err) {
-						console.log(
-							`failed to delete local image: ${file[0].fieldname}` + err
-						);
-					} else {
-						console.log(
-							`successfully deleted local image ${file[0].fieldname}`
-						);
-					}
-				});
-			});
-
 			return res.sendJson(400, false, "no administration ID", {});
 		}
 
@@ -186,16 +177,83 @@ module.exports = {
 			return res.sendJson(400, false, "invalid administration ID", {});
 		}
 
+		const integrityFactFile =
+			uuidv4() +
+			"-" +
+			req.files.integrity_fact[0].originalname.split(" ").join("-");
+		const integrityFactBuffer = req.files.integrity_fact[0].buffer;
+
+		const ninCardFile =
+			uuidv4() + "-" + req.files.nin_card[0].originalname.split(" ").join("-");
+		const ninCardBuffer = req.files.nin_card[0].buffer;
+
+		const familyCardFile =
+			uuidv4() +
+			"-" +
+			req.files.family_card[0].originalname.split(" ").join("-");
+		const familyCardBuffer = req.files.family_card[0].buffer;
+
+		const sertificateFile =
+			uuidv4() +
+			"-" +
+			req.files.sertificate[0].originalname.split(" ").join("-");
+		const sertificateBuffer = req.files.sertificate[0].buffer;
+
+		const photoFile =
+			uuidv4() + "-" + req.files.photo[0].originalname.split(" ").join("-");
+		const photoBuffer = req.files.photo[0].buffer;
+
+		const transcriptFile =
+			uuidv4() +
+			"-" +
+			req.files.transcript[0].originalname.split(" ").join("-");
+		const transcriptBuffer = req.files.transcript[0].buffer;
+
+		const recomendationLetterFile =
+			uuidv4() +
+			"-" +
+			req.files.recomendation_letter[0].originalname.split(" ").join("-");
+		const recomendationLetterBuffer = req.files.recomendation_letter[0].buffer;
+
+		const bucket = admin.storage().bucket();
+		const storage = getStorage();
+
+		bucket
+			.file(`documents/${integrityFactFile}`)
+			.createWriteStream()
+			.end(integrityFactBuffer);
+		bucket
+			.file(`documents/${ninCardFile}`)
+			.createWriteStream()
+			.end(ninCardBuffer);
+		bucket
+			.file(`documents/${familyCardFile}`)
+			.createWriteStream()
+			.end(familyCardBuffer);
+		bucket
+			.file(`documents/${sertificateFile}`)
+			.createWriteStream()
+			.end(sertificateBuffer);
+		bucket.file(`documents/${photoFile}`).createWriteStream().end(photoBuffer);
+		bucket
+			.file(`documents/${transcriptFile}`)
+			.createWriteStream()
+			.end(transcriptBuffer);
+		bucket
+			.file(`documents/${recomendationLetterFile}`)
+			.createWriteStream()
+			.end(recomendationLetterBuffer);
+
 		data = await Administration.update(
 			{
 				// file
-				integrity_fact: req.files.integrity_fact[0].filename,
-				nin_card: req.files.nin_card[0].filename,
-				family_card: req.files.family_card[0].filename,
-				sertificate: req.files.sertificate[0].filename,
-				photo: req.files.photo[0].filename,
-				transcript: req.files.transcript[0].filename,
-				recomendation_letter: req.files.recomendation_letter[0].filename,
+				integrity_fact: `documents/${integrityFactFile}`,
+				nin_card: `documents/${ninCardFile}`,
+				family_card: `documents/${familyCardFile}`,
+				sertificate: `documents/${sertificateFile}`,
+				photo: `documents/${photoFile}`,
+				transcript: `documents/${transcriptFile}`,
+				recomendation_letter: `documents/${recomendationLetterFile}`,
 
 				is_approved: "waiting",
 				approved_by: null,
@@ -315,22 +373,75 @@ module.exports = {
 		) {
 			const files = req.files;
 
-			Object.values(files).forEach((file) => {
-				fs.unlink("./public/documents/" + `${file[0].filename}`, (err) => {
-					if (err) {
-						console.log(
-							`failed to delete local image: ${file[0].fieldname}` + err
-						);
-					} else {
-						console.log(
-							`successfully deleted local image ${file[0].fieldname}`
-						);
-					}
-				});
-			});
-
 			return res.sendJson(400, false, "Some fields is missing.", {});
 		}
+
+		const integrityFactFile =
+			uuidv4() +
+			"-" +
+			req.files.integrity_fact[0].originalname.split(" ").join("-");
+		const integrityFactBuffer = req.files.integrity_fact[0].buffer;
+
+		const ninCardFile =
+			uuidv4() + "-" + req.files.nin_card[0].originalname.split(" ").join("-");
+		const ninCardBuffer = req.files.nin_card[0].buffer;
+
+		const familyCardFile =
+			uuidv4() +
+			"-" +
+			req.files.family_card[0].originalname.split(" ").join("-");
+		const familyCardBuffer = req.files.family_card[0].buffer;
+
+		const sertificateFile =
+			uuidv4() +
+			"-" +
+			req.files.sertificate[0].originalname.split(" ").join("-");
+		const sertificateBuffer = req.files.sertificate[0].buffer;
+
+		const photoFile =
+			uuidv4() + "-" + req.files.photo[0].originalname.split(" ").join("-");
+		const photoBuffer = req.files.photo[0].buffer;
+
+		const transcriptFile =
+			uuidv4() +
+			"-" +
+			req.files.transcript[0].originalname.split(" ").join("-");
+		const transcriptBuffer = req.files.transcript[0].buffer;
+
+		const recomendationLetterFile =
+			uuidv4() +
+			"-" +
+			req.files.recomendation_letter[0].originalname.split(" ").join("-");
+		const recomendationLetterBuffer = req.files.recomendation_letter[0].buffer;
+
+		const bucket = admin.storage().bucket();
+		const storage = getStorage();
+
+		bucket
+			.file(`documents/${integrityFactFile}`)
+			.createWriteStream()
+			.end(integrityFactBuffer);
+		bucket
+			.file(`documents/${ninCardFile}`)
+			.createWriteStream()
+			.end(ninCardBuffer);
+		bucket
+			.file(`documents/${familyCardFile}`)
+			.createWriteStream()
+			.end(familyCardBuffer);
+		bucket
+			.file(`documents/${sertificateFile}`)
+			.createWriteStream()
+			.end(sertificateBuffer);
+		bucket.file(`documents/${photoFile}`).createWriteStream().end(photoBuffer);
+		bucket
+			.file(`documents/${transcriptFile}`)
+			.createWriteStream()
+			.end(transcriptBuffer);
+		bucket
+			.file(`documents/${recomendationLetterFile}`)
+			.createWriteStream()
+			.end(recomendationLetterBuffer);
 
 		const data = await Administration.create(
 			{
@@ -355,14 +466,13 @@ module.exports = {
 				mother_income,
 
 				// file
-				integrity_pact: req.files.integrity_fact[0].filename,
-				nin_card: req.files.nin_card[0].filename,
-				family_card: req.files.family_card[0].filename,
-				sertificate: req.files.sertificate[0].filename,
-				photo: req.files.photo[0].filename,
-				transcript: req.files.transcript[0].filename,
-				recomendation_letter: req.files.recomendation_letter[0].filename,
-
+				integrity_fact: `documents/${integrityFactFile}`,
+				nin_card: `documents/${ninCardFile}`,
+				family_card: `documents/${familyCardFile}`,
+				sertificate: `documents/${sertificateFile}`,
+				photo: `documents/${photoFile}`,
+				transcript: `documents/${transcriptFile}`,
+				recomendation_letter: `documents/${recomendationLetterFile}`,
 				is_approved: "waiting",
 				approved_by: null,
 			},
@@ -371,7 +481,7 @@ module.exports = {
 			}
 		);
 
-		data = await Administration.findOne({
+		const asdasd = await Administration.findOne({
 			where: { id: data.dataValues.id },
 			include: [
 				{
@@ -384,7 +494,78 @@ module.exports = {
 		});
 
 		return res.sendJson(201, true, "Your administration has been submited.", {
-			...data.dataValues,
+			...asdasd.dataValues,
 		});
 	}),
+
+	getFile: async (req, res, next) => {
+		const { id } = req.params;
+		const storage = getStorage();
+
+		const getFiles = await Administration.findOne({
+			where: {
+				id,
+			},
+			attributes: [
+				"integrity_fact",
+				"nin_card",
+				"family_card",
+				"sertificate",
+				"photo",
+				"transcript",
+				"recomendation_letter",
+			],
+		});
+
+		let arrFile = Object.values(getFiles.dataValues);
+
+		let linkFile = [];
+		arrFile.map((file) => {
+			getDownloadURL(ref(storage, file)).then((res) => {
+				linkFile.push(res);
+				console.log(linkFile);
+			});
+		});
+
+		return res.sendJson(200, true, "success", linkFile);
+	},
+
+	deleteAdministration: async (req, res) => {
+		try {
+			const { id } = req.params;
+			const storage = getStorage();
+
+			const getFiles = await Administration.findOne({
+				where: {
+					id,
+				},
+				attributes: [
+					"integrity_fact",
+					"nin_card",
+					"family_card",
+					"sertificate",
+					"photo",
+					"transcript",
+					"recomendation_letter",
+				],
+			});
+
+			let arrFile = Object.values(getFiles.dataValues);
+
+			arrFile.map((file) => {
+				deleteObject(ref(storage, file));
+			});
+
+			await Administration.destroy({
+				where: {
+					id,
+				},
+			});
+
+			return res.sendJson(200, true, "succes delete administration");
+		} catch (error) {
+			console.log(error);
+			res.sendJson(403, false, error);
+		}
+	},
 };

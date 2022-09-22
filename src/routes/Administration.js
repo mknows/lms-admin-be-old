@@ -12,22 +12,8 @@ const getExtension = (filename) => {
 	return i < 0 ? "" : filename.substr(i);
 };
 
-const fileStorage = multer.diskStorage({
-	destination: function (req, file, cb) {
-		cb(null, "public/documents");
-	},
-	filename: function (req, file, cb) {
-		cb(
-			null,
-			`user_${req.userData.id}_${uuidv4().split("-").join("_")}${getExtension(
-				file.originalname
-			)}`
-		);
-	},
-});
-
 const upload = multer({
-	storage: fileStorage,
+	storage: multer.memoryStorage(),
 	limits: "2mb",
 	fileFilter: (req, file, cb) => {
 		if (
@@ -98,5 +84,9 @@ route.post(
 	]),
 	administrationController.createAdministration
 );
+
+route.get("/file/:id", administrationController.getFile);
+
+route.delete("/delete/:id", administrationController.deleteAdministration);
 
 module.exports = route;
