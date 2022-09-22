@@ -22,6 +22,7 @@ module.exports = {
 			phone: Sequelize.STRING,
 			gender: Sequelize.STRING,
 			nsn: Sequelize.STRING,
+
 			father_name: Sequelize.STRING,
 			father_occupation: Sequelize.STRING,
 			father_income: Sequelize.STRING,
@@ -45,6 +46,8 @@ module.exports = {
 
 			is_approved: Sequelize.STRING,
 			approved_by: Sequelize.UUID,
+
+			degree: Sequelize.STRING,
 			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,

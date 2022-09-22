@@ -6,7 +6,7 @@ const fs = require("fs");
 module.exports = {
 	/**
 	 * @desc      Insert Administration for self data
-	 * @route     POST /api/v1/administrations/self-data
+	 * @route     POST /api/v1/administrations/biodata
 	 * @access    Private (User)
 	 */
 	selfDataAdministration: asyncHandler(async (req, res, next) => {
@@ -70,7 +70,7 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Insert Administration for familial data
-	 * @route     POST /api/v1/administrations/failial
+	 * @route     POST /api/v1/administrations/familial
 	 * @access    Private (User)
 	 */
 	familialAdministration: asyncHandler(async (req, res, next) => {
@@ -152,7 +152,7 @@ module.exports = {
 	 * @route     POST /api/v1/administrations/files
 	 * @access    Private (User)
 	 */
-	createAdministration: asyncHandler(async (req, res, next) => {
+	filesAdministration: asyncHandler(async (req, res, next) => {
 		const user = req.userData;
 
 		const { administrationId } = req.body;
@@ -186,7 +186,7 @@ module.exports = {
 			return res.sendJson(400, false, "invalid administration ID", {});
 		}
 
-		const data = await Administration.update(
+		data = await Administration.update(
 			{
 				// file
 				integrity_fact: req.files.integrity_fact[0].filename,
@@ -208,7 +208,7 @@ module.exports = {
 			}
 		);
 
-		const data = await Administration.findOne({
+		data = await Administration.findOne({
 			where: { id: data.id },
 			include: [
 				{
@@ -220,9 +220,46 @@ module.exports = {
 			},
 		});
 
-		return res.sendJson(201, true, "Your administration has been submited.", {
+		return res.sendJson(201, true, "Successfully uploaded files", {
 			...data,
 		});
+	}),
+
+	/**
+	 * @desc      pick degree
+	 * @route     POST /api/v1/administrations/degree
+	 * @access    Private (User)
+	 */
+	degreeAdministration: asyncHandler(async (req, res, next) => {
+		const user = req.userData;
+		const { administrationId, degree } = req.body;
+
+		if (!administrationId || !degree) {
+			return res.sendJson(400, false, "Some fields are missing.", {});
+		}
+
+		const data = await Administration.update(
+			{
+				// non - file
+				degree,
+
+				is_approved: "waiting",
+				approved_by: null,
+			},
+			{
+				include: User,
+				where: {
+					id: administrationId,
+				},
+			}
+		);
+
+		return res.sendJson(
+			200,
+			true,
+			"Successfully submitted administration for review",
+			data
+		);
 	}),
 
 	/**
@@ -334,7 +371,7 @@ module.exports = {
 			}
 		);
 
-		const data = await Administration.findOne({
+		data = await Administration.findOne({
 			where: { id: data.dataValues.id },
 			include: [
 				{

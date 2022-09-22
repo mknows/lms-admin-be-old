@@ -50,6 +50,40 @@ const upload = multer({
 });
 
 route.post(
+	"/biodata",
+	protection,
+	authorize("user"),
+	administrationController.selfDataAdministration
+);
+route.post(
+	"/familial",
+	protection,
+	authorize("user"),
+	administrationController.familialAdministration
+);
+route.post(
+	"/files",
+	protection,
+	authorize("user"),
+	upload.fields([
+		{ name: "integrity_fact", maxCount: 1 },
+		{ name: "nin_card", maxCount: 1 },
+		{ name: "family_card", maxCount: 1 },
+		{ name: "sertificate", maxCount: 1 },
+		{ name: "photo", maxCount: 1 },
+		{ name: "transcript", maxCount: 1 },
+		{ name: "recomendation_letter", maxCount: 1 },
+	]),
+	administrationController.createAdministration
+);
+route.post(
+	"/degree",
+	protection,
+	authorize("user"),
+	administrationController.degreeAdministration
+);
+
+route.post(
 	"/create-administration",
 	protection,
 	authorize("user"),
