@@ -46,11 +46,54 @@ module.exports = {
 			);
 		}
 
+		const ret_data = {
+			administration_id: data.id,
+			biodata: {
+				nin: nin,
+				study_program: study_program,
+				semester: semester,
+				nin_address: nin_address,
+				residence_address: residence_address,
+				birth_place: birth_place,
+				birth_date: birth_date,
+				phone: phone,
+				gender: gender,
+				nsn: nsn,
+			},
+			familial: {
+				father_name: father_name,
+				father_occupation: father_occupation,
+				father_income: father_income,
+				mother_name: mother_name,
+				mother_occupation: mother_occupation,
+				mother_income: mother_income,
+
+				occupation: occupation,
+				income: income,
+				living_partner: living_partner,
+				financier: financier,
+			},
+			files: {
+				integrity_pact: integrity_pact,
+				nin_card: nin_card,
+				family_card: family_card,
+				certificate: certificate,
+				photo: photo,
+				transcript: transcript,
+				recommendation_letter: recommendation_letter,
+			},
+			degree: {
+				degree: degree,
+				is_approved: is_approved,
+				approved_by: approved_by,
+			},
+		};
+
 		return res.sendJson(
 			200,
 			true,
 			"Successfully retrieved administration of user",
-			data
+			ret_data
 		);
 	}),
 	/**
@@ -239,7 +282,7 @@ module.exports = {
 			return res.sendJson(400, false, "invalid administration ID", {});
 		}
 
-		const integrityFactFile =
+		const integrityPactFile =
 			uuidv4() +
 			"-" +
 			req.files.integrity_pact[0].originalname.split(" ").join("-");
@@ -255,11 +298,11 @@ module.exports = {
 			req.files.family_card[0].originalname.split(" ").join("-");
 		const familyCardBuffer = req.files.family_card[0].buffer;
 
-		const sertificateFile =
+		const certificateFile =
 			uuidv4() +
 			"-" +
-			req.files.sertificate[0].originalname.split(" ").join("-");
-		const sertificateBuffer = req.files.sertificate[0].buffer;
+			req.files.certificate[0].originalname.split(" ").join("-");
+		const certificateBuffer = req.files.certificate[0].buffer;
 
 		const photoFile =
 			uuidv4() + "-" + req.files.photo[0].originalname.split(" ").join("-");
@@ -274,8 +317,8 @@ module.exports = {
 		const recomendationLetterFile =
 			uuidv4() +
 			"-" +
-			req.files.recomendation_letter[0].originalname.split(" ").join("-");
-		const recomendationLetterBuffer = req.files.recomendation_letter[0].buffer;
+			req.files.recommendation_letter[0].originalname.split(" ").join("-");
+		const recomendationLetterBuffer = req.files.recommendation_letter[0].buffer;
 
 		const bucket = admin.storage().bucket();
 		const storage = getStorage();
@@ -293,9 +336,9 @@ module.exports = {
 			.createWriteStream()
 			.end(familyCardBuffer);
 		bucket
-			.file(`documents/${sertificateFile}`)
+			.file(`documents/${certificateFile}`)
 			.createWriteStream()
-			.end(sertificateBuffer);
+			.end(certificateBuffer);
 		bucket.file(`documents/${photoFile}`).createWriteStream().end(photoBuffer);
 		bucket
 			.file(`documents/${transcriptFile}`)
@@ -314,10 +357,10 @@ module.exports = {
 				integrity_pact: `documents/${integrityFactFile}`,
 				nin_card: `documents/${ninCardFile}`,
 				family_card: `documents/${familyCardFile}`,
-				sertificate: `documents/${sertificateFile}`,
+				certificate: `documents/${certificateFile}`,
 				photo: `documents/${photoFile}`,
 				transcript: `documents/${transcriptFile}`,
-				recomendation_letter: `documents/${recomendationLetterFile}`,
+				recommendation_letter: `documents/${recomendationLetterFile}`,
 
 				is_approved: "waiting",
 				approved_by: null,
@@ -454,11 +497,11 @@ module.exports = {
 			req.files.family_card[0].originalname.split(" ").join("-");
 		const familyCardBuffer = req.files.family_card[0].buffer;
 
-		const sertificateFile =
+		const certificateFile =
 			uuidv4() +
 			"-" +
-			req.files.sertificate[0].originalname.split(" ").join("-");
-		const sertificateBuffer = req.files.sertificate[0].buffer;
+			req.files.certificate[0].originalname.split(" ").join("-");
+		const certificateBuffer = req.files.certificate[0].buffer;
 
 		const photoFile =
 			uuidv4() + "-" + req.files.photo[0].originalname.split(" ").join("-");
@@ -473,8 +516,8 @@ module.exports = {
 		const recomendationLetterFile =
 			uuidv4() +
 			"-" +
-			req.files.recomendation_letter[0].originalname.split(" ").join("-");
-		const recomendationLetterBuffer = req.files.recomendation_letter[0].buffer;
+			req.files.recommendation_letter[0].originalname.split(" ").join("-");
+		const recomendationLetterBuffer = req.files.recommendation_letter[0].buffer;
 
 		const bucket = admin.storage().bucket();
 
@@ -491,9 +534,9 @@ module.exports = {
 			.createWriteStream()
 			.end(familyCardBuffer);
 		bucket
-			.file(`documents/${sertificateFile}`)
+			.file(`documents/${certificateFile}`)
 			.createWriteStream()
-			.end(sertificateBuffer);
+			.end(certificateBuffer);
 		bucket.file(`documents/${photoFile}`).createWriteStream().end(photoBuffer);
 		bucket
 			.file(`documents/${transcriptFile}`)
@@ -530,10 +573,10 @@ module.exports = {
 				integrity_pact: `documents/${integrityFactFile}`,
 				nin_card: `documents/${ninCardFile}`,
 				family_card: `documents/${familyCardFile}`,
-				sertificate: `documents/${sertificateFile}`,
+				certificate: `documents/${certificateFile}`,
 				photo: `documents/${photoFile}`,
 				transcript: `documents/${transcriptFile}`,
-				recomendation_letter: `documents/${recomendationLetterFile}`,
+				recommendation_letter: `documents/${recomendationLetterFile}`,
 				is_approved: "waiting",
 				approved_by: null,
 			},
@@ -571,10 +614,10 @@ module.exports = {
 				"integrity_pact",
 				"nin_card",
 				"family_card",
-				"sertificate",
+				"certificate",
 				"photo",
 				"transcript",
-				"recomendation_letter",
+				"recommendation_letter",
 			],
 		});
 
@@ -604,10 +647,10 @@ module.exports = {
 					"integrity_pact",
 					"nin_card",
 					"family_card",
-					"sertificate",
+					"certificate",
 					"photo",
 					"transcript",
-					"recomendation_letter",
+					"recommendation_letter",
 				],
 			});
 
