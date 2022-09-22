@@ -75,11 +75,54 @@ module.exports = {
 			);
 		}
 
+		const ret_data = {
+			administration_id: data.id,
+			biodata: {
+				nin: nin,
+				study_program: study_program,
+				semester: semester,
+				nin_address: nin_address,
+				residence_address: residence_address,
+				birth_place: birth_place,
+				birth_date: birth_date,
+				phone: phone,
+				gender: gender,
+				nsn: nsn,
+			},
+			familial: {
+				father_name: father_name,
+				father_occupation: father_occupation,
+				father_income: father_income,
+				mother_name: mother_name,
+				mother_occupation: mother_occupation,
+				mother_income: mother_income,
+
+				occupation: occupation,
+				income: income,
+				living_partner: living_partner,
+				financier: financier,
+			},
+			files: {
+				integrity_pact: integrity_pact,
+				nin_card: nin_card,
+				family_card: family_card,
+				certificate: certificate,
+				photo: photo,
+				transcript: transcript,
+				recommendation_letter: recommendation_letter,
+			},
+			degree: {
+				degree: degree,
+				is_approved: is_approved,
+				approved_by: approved_by,
+			},
+		};
+
 		return res.sendJson(
 			200,
 			true,
 			"Successfully retrieved administration of user",
-			data
+			ret_data
 		);
 	}),
 	/**
@@ -302,12 +345,20 @@ module.exports = {
     const {
       administration_id,
 
+<<<<<<< HEAD
       father_name,
       father_occupation,
       father_income,
       mother_name,
       mother_occupation,
       mother_income,
+=======
+		const integrityPactFile =
+			uuidv4() +
+			"-" +
+			req.files.integrity_pact[0].originalname.split(" ").join("-");
+		const integrityFactBuffer = req.files.integrity_pact[0].buffer;
+>>>>>>> 5e58800 (admin get and fixed attribute typos)
 
       occupation,
       income,
@@ -330,11 +381,19 @@ module.exports = {
       return res.sendJson(400, false, "Some fields are missing.", {});
     }
 
+<<<<<<< HEAD
     let data = await Administration.findOne({
       where: {
         id: administration_id,
       },
     });
+=======
+		const certificateFile =
+			uuidv4() +
+			"-" +
+			req.files.certificate[0].originalname.split(" ").join("-");
+		const certificateBuffer = req.files.certificate[0].buffer;
+>>>>>>> 5e58800 (admin get and fixed attribute typos)
 
     if (!data) {
       return res.sendJson(400, false, "invalid administration id", {});
@@ -349,10 +408,18 @@ module.exports = {
         mother_occupation,
         mother_income,
 
+<<<<<<< HEAD
         occupation,
         income,
         living_partner,
         financier,
+=======
+		const recomendationLetterFile =
+			uuidv4() +
+			"-" +
+			req.files.recommendation_letter[0].originalname.split(" ").join("-");
+		const recomendationLetterBuffer = req.files.recommendation_letter[0].buffer;
+>>>>>>> 5e58800 (admin get and fixed attribute typos)
 
         updated_by: user.id,
       },
@@ -365,12 +432,40 @@ module.exports = {
       }
     );
 
+<<<<<<< HEAD
     data = await Administration.findOne({
       where: {
         id: administration_id,
       },
       exclude: ["user_id"],
     });
+=======
+		bucket
+			.file(`documents/${integrityFactFile}`)
+			.createWriteStream()
+			.end(integrityFactBuffer);
+		bucket
+			.file(`documents/${ninCardFile}`)
+			.createWriteStream()
+			.end(ninCardBuffer);
+		bucket
+			.file(`documents/${familyCardFile}`)
+			.createWriteStream()
+			.end(familyCardBuffer);
+		bucket
+			.file(`documents/${certificateFile}`)
+			.createWriteStream()
+			.end(certificateBuffer);
+		bucket.file(`documents/${photoFile}`).createWriteStream().end(photoBuffer);
+		bucket
+			.file(`documents/${transcriptFile}`)
+			.createWriteStream()
+			.end(transcriptBuffer);
+		bucket
+			.file(`documents/${recomendationLetterFile}`)
+			.createWriteStream()
+			.end(recomendationLetterBuffer);
+>>>>>>> 5e58800 (admin get and fixed attribute typos)
 
 <<<<<<< HEAD
     const ret_data = await sortData(data);
@@ -383,11 +478,15 @@ module.exports = {
 				integrity_pact: `documents/${integrityFactFile}`,
 				nin_card: `documents/${ninCardFile}`,
 				family_card: `documents/${familyCardFile}`,
-				sertificate: `documents/${sertificateFile}`,
+				certificate: `documents/${certificateFile}`,
 				photo: `documents/${photoFile}`,
 				transcript: `documents/${transcriptFile}`,
+<<<<<<< HEAD
 				recomendation_letter: `documents/${recomendationLetterFile}`,
 >>>>>>> b56a706 (admin get and init)
+=======
+				recommendation_letter: `documents/${recomendationLetterFile}`,
+>>>>>>> 5e58800 (admin get and fixed attribute typos)
 
     return res.sendJson(
       200,
@@ -489,9 +588,17 @@ module.exports = {
       .createWriteStream()
       .end(recommendationLetterBuffer);
 
+<<<<<<< HEAD
     data = await Administration.update(
       {
         updated_by: user.id,
+=======
+		const certificateFile =
+			uuidv4() +
+			"-" +
+			req.files.certificate[0].originalname.split(" ").join("-");
+		const certificateBuffer = req.files.certificate[0].buffer;
+>>>>>>> 5e58800 (admin get and fixed attribute typos)
 
         // file
         integrity_pact: `documents/${integrityPactFile}`,
@@ -513,15 +620,24 @@ module.exports = {
       }
     );
 
+<<<<<<< HEAD
     data = await Administration.findOne({
       where: {
         id: administration_id,
       },
       exclude: ["user_id"],
     });
+=======
+		const recomendationLetterFile =
+			uuidv4() +
+			"-" +
+			req.files.recommendation_letter[0].originalname.split(" ").join("-");
+		const recomendationLetterBuffer = req.files.recommendation_letter[0].buffer;
+>>>>>>> 5e58800 (admin get and fixed attribute typos)
 
     const ret_data = await sortData(data);
 
+<<<<<<< HEAD
     return res.sendJson(
       200,
       true,
@@ -529,6 +645,33 @@ module.exports = {
       ret_data
     );
   }),
+=======
+		bucket
+			.file(`documents/${integrityFactFile}`)
+			.createWriteStream()
+			.end(integrityFactBuffer);
+		bucket
+			.file(`documents/${ninCardFile}`)
+			.createWriteStream()
+			.end(ninCardBuffer);
+		bucket
+			.file(`documents/${familyCardFile}`)
+			.createWriteStream()
+			.end(familyCardBuffer);
+		bucket
+			.file(`documents/${certificateFile}`)
+			.createWriteStream()
+			.end(certificateBuffer);
+		bucket.file(`documents/${photoFile}`).createWriteStream().end(photoBuffer);
+		bucket
+			.file(`documents/${transcriptFile}`)
+			.createWriteStream()
+			.end(transcriptBuffer);
+		bucket
+			.file(`documents/${recomendationLetterFile}`)
+			.createWriteStream()
+			.end(recomendationLetterBuffer);
+>>>>>>> 5e58800 (admin get and fixed attribute typos)
 
   /**
    * @desc      pick degree
@@ -539,9 +682,27 @@ module.exports = {
     const user = req.userData;
     const { administration_id, degree } = req.body;
 
+<<<<<<< HEAD
     if (!administration_id || !degree) {
       return res.sendJson(400, false, "Some fields are missing.", {});
     }
+=======
+				// file
+				integrity_pact: `documents/${integrityFactFile}`,
+				nin_card: `documents/${ninCardFile}`,
+				family_card: `documents/${familyCardFile}`,
+				certificate: `documents/${certificateFile}`,
+				photo: `documents/${photoFile}`,
+				transcript: `documents/${transcriptFile}`,
+				recommendation_letter: `documents/${recomendationLetterFile}`,
+				is_approved: "waiting",
+				approved_by: null,
+			},
+			{
+				include: User,
+			}
+		);
+>>>>>>> 5e58800 (admin get and fixed attribute typos)
 
     let data = await Administration.update(
       {
@@ -566,7 +727,24 @@ module.exports = {
       exclude: ["user_id"],
     });
 
+<<<<<<< HEAD
     const ret_data = await sortData(data);
+=======
+		const getFiles = await Administration.findOne({
+			where: {
+				id,
+			},
+			attributes: [
+				"integrity_pact",
+				"nin_card",
+				"family_card",
+				"certificate",
+				"photo",
+				"transcript",
+				"recommendation_letter",
+			],
+		});
+>>>>>>> 5e58800 (admin get and fixed attribute typos)
 
     return res.sendJson(
       200,
@@ -608,6 +786,7 @@ module.exports = {
       mother_income,
     } = req.body;
 
+<<<<<<< HEAD
     if (
       !nin ||
       !study_program ||
@@ -629,6 +808,22 @@ module.exports = {
     ) {
       return res.sendJson(400, false, "Some fields is missing.", {});
     }
+=======
+			const getFiles = await Administration.findOne({
+				where: {
+					id,
+				},
+				attributes: [
+					"integrity_pact",
+					"nin_card",
+					"family_card",
+					"certificate",
+					"photo",
+					"transcript",
+					"recommendation_letter",
+				],
+			});
+>>>>>>> 5e58800 (admin get and fixed attribute typos)
 
     const integrityPactFile =
       uuidv4() +
