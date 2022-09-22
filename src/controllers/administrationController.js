@@ -314,11 +314,12 @@ module.exports = {
 			req.files.transcript[0].originalname.split(" ").join("-");
 		const transcriptBuffer = req.files.transcript[0].buffer;
 
-		const recomendationLetterFile =
+		const recommendationLetterFile =
 			uuidv4() +
 			"-" +
 			req.files.recommendation_letter[0].originalname.split(" ").join("-");
-		const recomendationLetterBuffer = req.files.recommendation_letter[0].buffer;
+		const recommendationLetterBuffer =
+			req.files.recommendation_letter[0].buffer;
 
 		const bucket = admin.storage().bucket();
 		const storage = getStorage();
@@ -345,9 +346,9 @@ module.exports = {
 			.createWriteStream()
 			.end(transcriptBuffer);
 		bucket
-			.file(`documents/${recomendationLetterFile}`)
+			.file(`documents/${recommendationLetterFile}`)
 			.createWriteStream()
-			.end(recomendationLetterBuffer);
+			.end(recommendationLetterBuffer);
 
 		data = await Administration.update(
 			{
@@ -360,7 +361,7 @@ module.exports = {
 				certificate: `documents/${certificateFile}`,
 				photo: `documents/${photoFile}`,
 				transcript: `documents/${transcriptFile}`,
-				recommendation_letter: `documents/${recomendationLetterFile}`,
+				recommendation_letter: `documents/${recommendationLetterFile}`,
 
 				is_approved: "waiting",
 				approved_by: null,
@@ -515,11 +516,12 @@ module.exports = {
 			req.files.transcript[0].originalname.split(" ").join("-");
 		const transcriptBuffer = req.files.transcript[0].buffer;
 
-		const recomendationLetterFile =
+		const recommendationLetterFile =
 			uuidv4() +
 			"-" +
 			req.files.recommendation_letter[0].originalname.split(" ").join("-");
-		const recomendationLetterBuffer = req.files.recommendation_letter[0].buffer;
+		const recommendationLetterBuffer =
+			req.files.recommendation_letter[0].buffer;
 
 		const bucket = admin.storage().bucket();
 		const storage = getStorage();
@@ -546,9 +548,9 @@ module.exports = {
 			.createWriteStream()
 			.end(transcriptBuffer);
 		bucket
-			.file(`documents/${recomendationLetterFile}`)
+			.file(`documents/${recommendationLetterFile}`)
 			.createWriteStream()
-			.end(recomendationLetterBuffer);
+			.end(recommendationLetterBuffer);
 
 		const data = await Administration.create(
 			{
@@ -579,7 +581,7 @@ module.exports = {
 				certificate: `documents/${certificateFile}`,
 				photo: `documents/${photoFile}`,
 				transcript: `documents/${transcriptFile}`,
-				recommendation_letter: `documents/${recomendationLetterFile}`,
+				recommendation_letter: `documents/${recommendationLetterFile}`,
 				is_approved: "waiting",
 				approved_by: null,
 			},
