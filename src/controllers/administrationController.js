@@ -21,79 +21,84 @@ module.exports = {
 
 		let data = await Administration.findOne({
 			where: {
-				student_id: user.id,
+				user_id: user.id,
 			},
-			include: user,
+			include: User,
 		});
 
 		if (!data) {
 			data = await Administration.create(
 				{
-					student_id: user.id,
+					user_id: user.id,
 					created_by: user.id,
 					is_approved: "waiting",
 					approved_by: null,
 				},
 				{
-					include: user,
+					include: User,
 				}
 			);
+
+			const retdat = await sortData(data);
+
 			return res.sendJson(
 				200,
 				true,
-				"Successfully created administration of user",
-				data
+				"Successfully retrieved administration of user",
+				retdat
 			);
 		}
 
-		const ret_data = {
-			administration_id: data.id,
-			biodata: {
-				nin: nin,
-				study_program: study_program,
-				semester: semester,
-				nin_address: nin_address,
-				residence_address: residence_address,
-				birth_place: birth_place,
-				birth_date: birth_date,
-				phone: phone,
-				gender: gender,
-				nsn: nsn,
-			},
-			familial: {
-				father_name: father_name,
-				father_occupation: father_occupation,
-				father_income: father_income,
-				mother_name: mother_name,
-				mother_occupation: mother_occupation,
-				mother_income: mother_income,
+		// const ret_data = {
+		// 	administration_id: data.id,
+		// 	biodata: {
+		// 		nin: data.nin,
+		// 		study_program: data.study_program,
+		// 		semester: data.semester,
+		// 		nin_address: data.nin_address,
+		// 		residence_address: data.residence_address,
+		// 		birth_place: data.birth_place,
+		// 		birth_date: data.birth_date,
+		// 		phone: data.phone,
+		// 		gender: data.gender,
+		// 		nsn: data.nsn,
+		// 	},
+		// 	familial: {
+		// 		father_name: data.father_name,
+		// 		father_occupation: data.father_occupation,
+		// 		father_income: data.father_income,
+		// 		mother_name: data.mother_name,
+		// 		mother_occupation: data.mother_occupation,
+		// 		mother_income: data.mother_income,
 
-				occupation: occupation,
-				income: income,
-				living_partner: living_partner,
-				financier: financier,
-			},
-			files: {
-				integrity_pact: integrity_pact,
-				nin_card: nin_card,
-				family_card: family_card,
-				certificate: certificate,
-				photo: photo,
-				transcript: transcript,
-				recommendation_letter: recommendation_letter,
-			},
-			degree: {
-				degree: degree,
-				is_approved: is_approved,
-				approved_by: approved_by,
-			},
-		};
+		// 		occupation: data.occupation,
+		// 		income: data.income,
+		// 		living_partner: data.living_partner,
+		// 		financier: data.financier,
+		// 	},
+		// 	files: {
+		// 		integrity_pact: data.integrity_pact,
+		// 		nin_card: data.nin_card,
+		// 		family_card: data.family_card,
+		// 		certificate: data.certificate,
+		// 		photo: data.photo,
+		// 		transcript: data.transcript,
+		// 		recommendation_letter: data.recommendation_letter,
+		// 	},
+		// 	degree: {
+		// 		degree: data.degree,
+		// 		is_approved: data.is_approved,
+		// 		approved_by: data.approved_by,
+		// 	},
+		// };
+
+		const ret_dat = await sortData(data);
 
 		return res.sendJson(
 			200,
 			true,
 			"Successfully retrieved administration of user",
-			ret_data
+			ret_dat
 		);
 	}),
 	/**
@@ -166,16 +171,22 @@ module.exports = {
 					id: administrationId,
 				},
 				include: User,
-				returning: true,
-				plain: true,
 			}
 		);
+
+		data = await Administration.findOne({
+			where: {
+				id: administrationId,
+			},
+		});
+
+		const ret_dat = await sortData(data);
 
 		return res.sendJson(
 			200,
 			true,
 			"Successfully created administration with self data",
-			data
+			ret_dat
 		);
 	}),
 	/**
@@ -247,16 +258,23 @@ module.exports = {
 				where: {
 					id: administrationId,
 					returning: true,
-					plain: true,
 				},
 			}
 		);
-
-		return res.status(200).json({
-			success: true,
-			message: `edited admin with ID ${administrationId} with familial data successfully.`,
-			data,
+		data = await Administration.findOne({
+			where: {
+				id: administrationId,
+			},
 		});
+
+		const ret_dat = await sortData(data);
+
+		return res.sendJson(
+			200,
+			true,
+			"Successfully edited administration with familial data",
+			ret_dat
+		);
 	}),
 
 	/**
@@ -386,9 +404,15 @@ module.exports = {
 			},
 		});
 
-		return res.sendJson(201, true, "Successfully uploaded files", {
-			...data,
+		data = await Administration.findOne({
+			where: {
+				id: administrationId,
+			},
 		});
+
+		const ret_dat = await sortData(data);
+
+		return res.sendJson(201, true, "Successfully uploaded files", ret_dat);
 	}),
 
 	/**
@@ -420,11 +444,13 @@ module.exports = {
 			}
 		);
 
+		const ret_dat = await sortData(data);
+
 		return res.sendJson(
 			200,
 			true,
 			"Successfully submitted administration for review",
-			data
+			ret_dat
 		);
 	}),
 
@@ -599,9 +625,12 @@ module.exports = {
 			},
 		});
 
-		return res.sendJson(201, true, "Your administration has been submited.", {
-			
-		});
+		return res.sendJson(
+			201,
+			true,
+			"Your administration has been submited.",
+			{}
+		);
 	}),
 
 	getFile: async (req, res, next) => {
@@ -675,3 +704,50 @@ module.exports = {
 		}
 	},
 };
+
+async function sortData(data) {
+	const ret_data = {
+		administration_id: data.id,
+		biodata: {
+			nin: data.nin,
+			study_program: data.study_program,
+			semester: data.semester,
+			nin_address: data.nin_address,
+			residence_address: data.residence_address,
+			birth_place: data.birth_place,
+			birth_date: data.birth_date,
+			phone: data.phone,
+			gender: data.gender,
+			nsn: data.nsn,
+		},
+		familial: {
+			father_name: data.father_name,
+			father_occupation: data.father_occupation,
+			father_income: data.father_income,
+			mother_name: data.mother_name,
+			mother_occupation: data.mother_occupation,
+			mother_income: data.mother_income,
+
+			occupation: data.occupation,
+			income: data.income,
+			living_partner: data.living_partner,
+			financier: data.financier,
+		},
+		files: {
+			integrity_pact: data.integrity_pact,
+			nin_card: data.nin_card,
+			family_card: data.family_card,
+			certificate: data.certificate,
+			photo: data.photo,
+			transcript: data.transcript,
+			recommendation_letter: data.recommendation_letter,
+		},
+		degree: {
+			degree: data.degree,
+			is_approved: data.is_approved,
+			approved_by: data.approved_by,
+		},
+	};
+
+	return ret_data;
+}

@@ -17,7 +17,7 @@ const materialEnrolledRoute = require("./materialEnrolled");
 
 //punya ryo
 const administrationRoute = require("./Administration");
-route.use("/administrations", administrationRoute);
+route.use("/administration", administrationRoute);
 
 route.use("/auth", userRoute);
 route.use("/profile", profileRoute);
