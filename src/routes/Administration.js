@@ -35,7 +35,7 @@ const upload = multer({
 	},
 });
 
-route.post(
+route.get(
 	"/getcurrentuseradmindata",
 	protection,
 	authorize("user"),
