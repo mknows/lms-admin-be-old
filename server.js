@@ -6,7 +6,6 @@ const cookieParser = require("cookie-parser");
 const device = require("express-device");
 const useragent = require("express-useragent");
 const path = require("path");
-const fs = require('fs')
 const cors = require("cors");
 
 
@@ -22,11 +21,6 @@ const app = express();
 
 initializeFirebase();
 
-const pathDoc = "./public/documents"
-const pathImg = "./public/images"
-if(!fs.existsSync(pathDoc && pathImg)){
-	fs.mkdirSync(pathDoc && pathImg, {recursive: true})
-}
 
 app.use("/file/documents", express.static(path.join(__dirname, "public/documents")));
 app.use("/file/images", express.static(path.join(__dirname, "public/images")));
