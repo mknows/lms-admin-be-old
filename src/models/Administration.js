@@ -49,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
 			financier: DataTypes.STRING,
 
 			// File
-			integrity_fact: DataTypes.STRING,
+			integrity_pact: DataTypes.STRING,
 			nin_card: DataTypes.STRING,
 			family_card: DataTypes.STRING,
 			sertificate: DataTypes.STRING,

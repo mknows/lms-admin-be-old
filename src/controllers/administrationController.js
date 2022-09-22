@@ -180,8 +180,8 @@ module.exports = {
 		const integrityFactFile =
 			uuidv4() +
 			"-" +
-			req.files.integrity_fact[0].originalname.split(" ").join("-");
-		const integrityFactBuffer = req.files.integrity_fact[0].buffer;
+			req.files.integrity_pact[0].originalname.split(" ").join("-");
+		const integrityFactBuffer = req.files.integrity_pact[0].buffer;
 
 		const ninCardFile =
 			uuidv4() + "-" + req.files.nin_card[0].originalname.split(" ").join("-");
@@ -247,7 +247,7 @@ module.exports = {
 		data = await Administration.update(
 			{
 				// file
-				integrity_fact: `documents/${integrityFactFile}`,
+				integrity_pact: `documents/${integrityFactFile}`,
 				nin_card: `documents/${ninCardFile}`,
 				family_card: `documents/${familyCardFile}`,
 				sertificate: `documents/${sertificateFile}`,
@@ -371,16 +371,14 @@ module.exports = {
 			!father_income ||
 			!mother_income
 		) {
-			const files = req.files;
-
 			return res.sendJson(400, false, "Some fields is missing.", {});
 		}
 
 		const integrityFactFile =
 			uuidv4() +
 			"-" +
-			req.files.integrity_fact[0].originalname.split(" ").join("-");
-		const integrityFactBuffer = req.files.integrity_fact[0].buffer;
+			req.files.integrity_pact[0].originalname.split(" ").join("-");
+		const integrityFactBuffer = req.files.integrity_pact[0].buffer;
 
 		const ninCardFile =
 			uuidv4() + "-" + req.files.nin_card[0].originalname.split(" ").join("-");
@@ -415,7 +413,6 @@ module.exports = {
 		const recomendationLetterBuffer = req.files.recomendation_letter[0].buffer;
 
 		const bucket = admin.storage().bucket();
-		const storage = getStorage();
 
 		bucket
 			.file(`documents/${integrityFactFile}`)
@@ -466,7 +463,7 @@ module.exports = {
 				mother_income,
 
 				// file
-				integrity_fact: `documents/${integrityFactFile}`,
+				integrity_pact: `documents/${integrityFactFile}`,
 				nin_card: `documents/${ninCardFile}`,
 				family_card: `documents/${familyCardFile}`,
 				sertificate: `documents/${sertificateFile}`,
@@ -494,7 +491,7 @@ module.exports = {
 		});
 
 		return res.sendJson(201, true, "Your administration has been submited.", {
-			...asdasd.dataValues,
+			
 		});
 	}),
 
@@ -507,7 +504,7 @@ module.exports = {
 				id,
 			},
 			attributes: [
-				"integrity_fact",
+				"integrity_pact",
 				"nin_card",
 				"family_card",
 				"sertificate",
@@ -540,7 +537,7 @@ module.exports = {
 					id,
 				},
 				attributes: [
-					"integrity_fact",
+					"integrity_pact",
 					"nin_card",
 					"family_card",
 					"sertificate",
