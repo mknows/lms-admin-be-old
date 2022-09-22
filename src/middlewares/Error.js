@@ -42,7 +42,6 @@ const errorHandler = (err, req, res, next) => {
   // Sequelize 
   // ==========================
   if (errors?.parent?.code)
-  console.log("errors.parent.code => ", errors.parent.code);
     switch (errors.parent.code) {
       case "22P02": {
         const message = "Invalid type of data.";
