@@ -36,6 +36,13 @@ const upload = multer({
 });
 
 route.post(
+	"/getcurrentuseradmindata",
+	protection,
+	authorize("user"),
+	administrationController.getCurrentUserAdminData
+);
+
+route.post(
 	"/biodata",
 	protection,
 	authorize("user"),

@@ -12,6 +12,48 @@ const { v4: uuidv4 } = require("uuid");
 
 module.exports = {
 	/**
+	 * @desc      Initiate admin data
+	 * @route     GET /api/v1/administrations/getcurrentuseradmindata
+	 * @access    Private (User)
+	 */
+	getCurrentUserAdminData: asyncHandler(async (req, res, next) => {
+		const user = req.userData;
+
+		let data = await Administration.findOne({
+			where: {
+				student_id: user.id,
+			},
+			include: user,
+		});
+
+		if (!data) {
+			data = await Administration.create(
+				{
+					student_id: user.id,
+					created_by: user.id,
+					is_approved: "waiting",
+					approved_by: null,
+				},
+				{
+					include: user,
+				}
+			);
+			return res.sendJson(
+				200,
+				true,
+				"Successfully created administration of user",
+				data
+			);
+		}
+
+		return res.sendJson(
+			200,
+			true,
+			"Successfully retrieved administration of user",
+			data
+		);
+	}),
+	/**
 	 * @desc      Insert Administration for self data
 	 * @route     POST /api/v1/administrations/biodata
 	 * @access    Private (User)
@@ -19,6 +61,8 @@ module.exports = {
 	selfDataAdministration: asyncHandler(async (req, res, next) => {
 		const user = req.userData;
 		const {
+			administrationId,
+
 			nin,
 			study_program,
 			semester,
@@ -43,13 +87,22 @@ module.exports = {
 			!gender ||
 			!nsn
 		) {
-			return res.sendJson(400, false, "Some fields is missing.", {});
+			return res.sendJson(400, false, "Some fields are missing.", {});
 		}
 
-		const data = await Administration.create(
+		let data = await Administration.findOne({
+			where: {
+				id: administrationId,
+			},
+		});
+
+		if (!data) {
+			return res.sendJson(400, false, "invalid administration Id.", {});
+		}
+
+		data = await Administration.update(
 			{
 				// non - file
-				user_id: user.id,
 				nin,
 				study_program,
 				semester,
@@ -60,11 +113,18 @@ module.exports = {
 				phone,
 				gender,
 				nsn,
+
+				updated_by: user.id,
 				is_approved: "waiting",
 				approved_by: null,
 			},
 			{
+				where: {
+					id: administrationId,
+				},
 				include: User,
+				returning: true,
+				plain: true,
 			}
 		);
 
@@ -137,6 +197,8 @@ module.exports = {
 				income,
 				living_partner,
 				financier,
+
+				updated_by: user.id,
 			},
 			{
 				where: {
@@ -246,6 +308,8 @@ module.exports = {
 
 		data = await Administration.update(
 			{
+				updated_by: user.id,
+
 				// file
 				integrity_fact: `documents/${integrityFactFile}`,
 				nin_card: `documents/${ninCardFile}`,
