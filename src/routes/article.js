@@ -4,17 +4,8 @@ const multer = require("multer");
 
 const articleController = require("../controllers/articleController");
 
-const diskStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public/images");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname.split(" ").join("-"));
-  },
-});
-
 const upload = multer({
-  storage: diskStorage,
+  storage: multer.memoryStorage(),
   fileFilter: (req, file, cb) => {
     if (
       file.mimetype == "image/png" ||
