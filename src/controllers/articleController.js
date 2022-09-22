@@ -17,7 +17,15 @@ module.exports = {
    */
   index: async (req, res) => {
     try {
-      const data = await Article.findAll();
+		const bucket = admin.storage().bucket();
+		const getFile = bucket.getFiles({prefix: "images/article/"});
+		const data = await Article.findAll();
+		const getNameFile = await Article.findAll({
+			attributes: ["image"]
+		})
+
+		console.log(getNameFile.image);
+
       if (data.length == 0) {
         return res.sendJson(
           200,
@@ -26,7 +34,7 @@ module.exports = {
         );
       }
 
-      return res.sendJson(200, true, "success get all data", data);
+      return res.sendJson(200, true, "success get all data", getNameFile);
     } catch (error) {
       console.log(error);
       return res.sendJson(403, false, error, {});
@@ -79,6 +87,8 @@ module.exports = {
     try {
       const { title, description } = req.body;
       const { uuid } = req.params;
+	  const storage = getStorage();
+	  const bucket = admin.storage().bucket();
 
       const findFile = await Article.findOne({
         where: {
@@ -88,14 +98,19 @@ module.exports = {
 
       if (req.file) {
         if (findFile == null) {
-          fs.unlinkSync("./public/images/" + req.file.filename);
           return res.sendJson(400, false, "can't find article");
         }
 
-        fs.unlinkSync("./public/images/" + findFile.image);
+		deleteObject(ref(storage, findFile.image))
+
+		const articleUpdateFile = uuidv4() + "-" + req.file.originalname.split(" ").join("-");
+		const articleUpdateBuffer = req.file.buffer;
+
+		bucket.file(`images/article/${articleUpdateFile}`).createWriteStream().end(articleUpdateBuffer)
+
         await Article.update(
           {
-            image: req.file.filename,
+            image: `images/article/${articleUpdateFile}`,
           },
           {
             where: {
@@ -142,6 +157,7 @@ module.exports = {
   delete: async (req, res) => {
     try {
       const { id } = req.params;
+	  const storage = getStorage();
 
       const findArticle = await Article.findOne({
         where: {
@@ -153,7 +169,7 @@ module.exports = {
         return res.sendJson(400, false, "article not found");
       }
 
-      fs.unlinkSync("./public/images/" + findArticle.image);
+	  deleteObject(ref(storage, findArticle.image))
       await Article.destroy({
         where: {
           id,
