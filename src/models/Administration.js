@@ -49,13 +49,13 @@ module.exports = (sequelize, DataTypes) => {
 			financier: DataTypes.STRING,
 
 			// File
-			integrity_fact: DataTypes.STRING,
+			integrity_pact: DataTypes.STRING,
 			nin_card: DataTypes.STRING,
 			family_card: DataTypes.STRING,
-			sertificate: DataTypes.STRING,
+			certificate: DataTypes.STRING,
 			photo: DataTypes.STRING,
 			transcript: DataTypes.STRING,
-			recomendation_letter: DataTypes.STRING,
+			recommendation_letter: DataTypes.STRING,
 
 			is_approved: DataTypes.STRING,
 			approved_by: DataTypes.UUID,

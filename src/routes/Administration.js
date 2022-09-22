@@ -59,13 +59,13 @@ route.post(
 	protection,
 	authorize("user"),
 	upload.fields([
-		{ name: "integrity_fact", maxCount: 1 },
+		{ name: "integrity_pact", maxCount: 1 },
 		{ name: "nin_card", maxCount: 1 },
 		{ name: "family_card", maxCount: 1 },
-		{ name: "sertificate", maxCount: 1 },
+		{ name: "certificate", maxCount: 1 },
 		{ name: "photo", maxCount: 1 },
 		{ name: "transcript", maxCount: 1 },
-		{ name: "recomendation_letter", maxCount: 1 },
+		{ name: "recommendation_letter", maxCount: 1 },
 	]),
 	administrationController.createAdministration
 );
@@ -81,13 +81,13 @@ route.post(
 	protection,
 	authorize("user"),
 	upload.fields([
-		{ name: "integrity_fact", maxCount: 1 },
+		{ name: "integrity_pact", maxCount: 1 },
 		{ name: "nin_card", maxCount: 1 },
 		{ name: "family_card", maxCount: 1 },
-		{ name: "sertificate", maxCount: 1 },
+		{ name: "certificate", maxCount: 1 },
 		{ name: "photo", maxCount: 1 },
 		{ name: "transcript", maxCount: 1 },
-		{ name: "recomendation_letter", maxCount: 1 },
+		{ name: "recommendation_letter", maxCount: 1 },
 	]),
 	administrationController.createAdministration
 );

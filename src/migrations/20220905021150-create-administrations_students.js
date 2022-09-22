@@ -39,10 +39,10 @@ module.exports = {
 			integrity_pact: Sequelize.STRING,
 			nin_card: Sequelize.STRING,
 			family_card: Sequelize.STRING,
-			sertificate: Sequelize.STRING,
+			certificate: Sequelize.STRING,
 			photo: Sequelize.STRING,
 			transcript: Sequelize.STRING,
-			recomendation_letter: Sequelize.STRING,
+			recommendation_letter: Sequelize.STRING,
 
 			is_approved: Sequelize.STRING,
 			approved_by: Sequelize.UUID,
