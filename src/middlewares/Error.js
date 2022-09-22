@@ -1,9 +1,11 @@
 const ErrorResponse = require('../utils/errorResponse');
+const Sentry = require("../helpers/sentry")
 
 const errorHandler = (err, req, res, next) => {
   let errors = { ...err };
 
   errors.message = err.message;
+  Sentry.captureException(errors.message);
 
   // Log to console for developer
   console.log(errors);
@@ -40,6 +42,7 @@ const errorHandler = (err, req, res, next) => {
   // Sequelize 
   // ==========================
   if (errors?.parent?.code)
+  console.log("errors.parent.code => ", errors.parent.code);
     switch (errors.parent.code) {
       case "22P02": {
         const message = "Invalid type of data.";
