@@ -17,14 +17,25 @@ module.exports = {
    */
   index: async (req, res) => {
     try {
-		const bucket = admin.storage().bucket();
-		const getFile = bucket.getFiles({prefix: "images/article/"});
-		const data = await Article.findAll();
-		const getNameFile = await Article.findAll({
-			attributes: ["image"]
-		})
+      const data = await Article.findAll();
+      const getNameFile = await Article.findAll({
+        attributes: ["image"],
+      });
+      const storage = getStorage();
 
-		console.log(getNameFile.image);
+      let docLink = [];
+      getNameFile.forEach((file) => {
+        docLink.push(file.dataValues.image);
+      });
+
+      let resultLink = [];
+      docLink.forEach((linkFile) => {
+        getDownloadURL(ref(storage, linkFile)).then((res) => {
+          resultLink.push(res);
+        });
+      });
+
+      console.log(resultLink);
 
       if (data.length == 0) {
         return res.sendJson(
@@ -34,7 +45,7 @@ module.exports = {
         );
       }
 
-      return res.sendJson(200, true, "success get all data", getNameFile);
+      return res.sendJson(200, true, "success get all data", docLink);
     } catch (error) {
       console.log(error);
       return res.sendJson(403, false, error, {});
@@ -87,8 +98,8 @@ module.exports = {
     try {
       const { title, description } = req.body;
       const { uuid } = req.params;
-	  const storage = getStorage();
-	  const bucket = admin.storage().bucket();
+      const storage = getStorage();
+      const bucket = admin.storage().bucket();
 
       const findFile = await Article.findOne({
         where: {
@@ -101,12 +112,16 @@ module.exports = {
           return res.sendJson(400, false, "can't find article");
         }
 
-		deleteObject(ref(storage, findFile.image))
+        deleteObject(ref(storage, findFile.image));
 
-		const articleUpdateFile = uuidv4() + "-" + req.file.originalname.split(" ").join("-");
-		const articleUpdateBuffer = req.file.buffer;
+        const articleUpdateFile =
+          uuidv4() + "-" + req.file.originalname.split(" ").join("-");
+        const articleUpdateBuffer = req.file.buffer;
 
-		bucket.file(`images/article/${articleUpdateFile}`).createWriteStream().end(articleUpdateBuffer)
+        bucket
+          .file(`images/article/${articleUpdateFile}`)
+          .createWriteStream()
+          .end(articleUpdateBuffer);
 
         await Article.update(
           {
@@ -157,7 +172,7 @@ module.exports = {
   delete: async (req, res) => {
     try {
       const { id } = req.params;
-	  const storage = getStorage();
+      const storage = getStorage();
 
       const findArticle = await Article.findOne({
         where: {
@@ -169,7 +184,7 @@ module.exports = {
         return res.sendJson(400, false, "article not found");
       }
 
-	  deleteObject(ref(storage, findArticle.image))
+      deleteObject(ref(storage, findArticle.image));
       await Article.destroy({
         where: {
           id,
