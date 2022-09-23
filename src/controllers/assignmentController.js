@@ -43,14 +43,14 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Get Assignment in session
-	 * @route     GET /api/v1/assignment/session/:sessionId
+	 * @route     GET /api/v1/assignment/session/:session_id
 	 * @access    Private
 	 */
 	getAssignmentInSession: asyncHandler(async (req, res) => {
-		const { sessionId } = req.params;
+		const { session_id } = req.params;
 		const assign = await Assignment.findAll({
 			where: {
-				session_id: sessionId,
+				session_id: session_id,
 			},
 		});
 		res.sendJson(200, true, "Success", assign);

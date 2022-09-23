@@ -6,13 +6,17 @@ const { protection } = require("../middlewares/Authentication");
 
 route.post("/create", protection, sessionController.createSession);
 route.get("/", protection, sessionController.getAllSessions);
-route.get("/:sessionId", protection, sessionController.getSession);
+route.get("/:session_id", protection, sessionController.getSession);
 route.get(
 	"/getfromsub/:subject_id",
 	protection,
 	sessionController.getAllSessionInSubject
 );
-route.put("/edit/:sessionId", protection, sessionController.updateSession);
-route.delete("/delete/:sessionId", protection, sessionController.removeSession);
+route.put("/edit/:session_id", protection, sessionController.updateSession);
+route.delete(
+	"/delete/:session_id",
+	protection,
+	sessionController.removeSession
+);
 
 module.exports = route;

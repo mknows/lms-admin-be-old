@@ -42,10 +42,10 @@ module.exports = {
 	 * @access    Public
 	 */
 	getMajor: asyncHandler(async (req, res) => {
-		const { majorId } = req.params;
+		const { major_id } = req.params;
 		const data = await Major.findOne({
 			where: {
-				id: majorId,
+				id: major_id,
 			},
 		});
 		return res.sendJson(200, true, "Search major successfully.", data);
@@ -53,15 +53,15 @@ module.exports = {
 
 	/**
 	 * @desc      Edit Major (Ubah Major)
-	 * @route     PUT /api/v1/major/edit/:majorId
+	 * @route     PUT /api/v1/major/edit/:major_id
 	 * @access    Private
 	 */
 	editMajor: asyncHandler(async (req, res) => {
-		const { majorId } = req.params;
+		const { major_id } = req.params;
 		const { major } = req.body;
 
 		let data = await Major.findOne({
-			where: { id: majorId },
+			where: { id: major_id },
 		});
 
 		if (!data) {
@@ -77,7 +77,7 @@ module.exports = {
 				name: major,
 			},
 			{
-				where: { id: majorId },
+				where: { id: major_id },
 				returning: true,
 				plain: true,
 			}
@@ -85,21 +85,21 @@ module.exports = {
 
 		return res.status(200).json({
 			success: true,
-			message: `Edit Major with ID ${majorId} successfully.`,
+			message: `Edit Major with ID ${major_id} successfully.`,
 			data: { ...data[1].dataValues },
 		});
 	}),
 
 	/**
 	 * @desc      Delete Major (Hapus Major)
-	 * @route     DELETE /api/v1/majors/delete/:majorId
+	 * @route     DELETE /api/v1/majors/delete/:major_id
 	 * @access    Private
 	 */
 	removeMajor: asyncHandler(async (req, res) => {
-		const { majorId } = req.params;
+		const { major_id } = req.params;
 
 		let data = await Major.findOne({
-			where: { id: majorId },
+			where: { id: major_id },
 		});
 
 		if (!data)
@@ -110,12 +110,12 @@ module.exports = {
 			});
 
 		Major.destroy({
-			where: { id: majorId },
+			where: { id: major_id },
 		});
 
 		return res.status(200).json({
 			success: true,
-			message: `Delete Major with ID ${majorId} successfully.`,
+			message: `Delete Major with ID ${major_id} successfully.`,
 			data: {},
 		});
 	}),

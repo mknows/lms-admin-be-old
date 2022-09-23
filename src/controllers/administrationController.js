@@ -259,6 +259,7 @@ module.exports = {
 				id: administration_id,
 			},
 		});
+
 		if (!data) {
 			return res.sendJson(400, false, "invalid administration ID", {});
 		}

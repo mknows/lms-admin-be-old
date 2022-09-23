@@ -16,13 +16,13 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Get All Forums in session
-	 * @route     GET /api/v1/forum/discussionforum/session/:sessionId
+	 * @route     GET /api/v1/forum/discussionforum/session/:session_id
 	 * @access    Public
 	 */
 	getAllDiscussionForumInSession: asyncHandler(async (req, res) => {
-		const { sessionId } = req.params;
+		const { session_id } = req.params;
 		const data = await Discussion_forum.findAll({
-			where: sessionId,
+			where: session_id,
 		});
 		return res.sendJson(200, true, "sucess get all df in session", data);
 	}),

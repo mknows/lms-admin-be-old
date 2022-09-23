@@ -33,14 +33,14 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Get quiz
-	 * @route     GET /api/v1/quiz/desc
+	 * @route     GET /api/v1/quiz/desc/:quiz_id
 	 * @access    Private
 	 */
 	getQuizDesc: asyncHandler(async (req, res) => {
-		const { quizId } = req.params;
+		const { quiz_id } = req.params;
 		const quizzDesc = await Quiz.findAll({
 			where: {
-				id: quizzID,
+				id: quiz_id,
 			},
 			attributes: ["session_id", "description"],
 		});
@@ -48,16 +48,16 @@ module.exports = {
 	}),
 	/**
 	 * @desc      update quiz
-	 * @route     PUT /api/v1/quiz/:quizId
+	 * @route     PUT /api/v1/quiz/:quiz_id
 	 * @access    Private
 	 */
 	updateQuiz: asyncHandler(async (req, res) => {
-		const { quizId } = req.params;
+		const { quiz_id } = req.params;
 		let { session_id, duration, description, questions, answer } = req.body;
 
 		const exist = await Quiz.findOne({
 			where: {
-				quizId,
+				quiz_id,
 			},
 		});
 
@@ -95,7 +95,7 @@ module.exports = {
 			},
 			{
 				where: {
-					id: quizId,
+					id: quiz_id,
 				},
 				returning: true,
 			}
@@ -105,14 +105,14 @@ module.exports = {
 
 	/**
 	 * @desc      Delete quiz
-	 * @route     DELETE /api/v1/quiz/delete/:quizId
+	 * @route     DELETE /api/v1/quiz/delete/:quiz_id
 	 * @access    Private (Admin)
 	 */
 	removeQuiz: asyncHandler(async (req, res, next) => {
-		const { quizId } = req.params;
+		const { quiz_id } = req.params;
 
 		const exist = await Quiz.findOne({
-			where: { id: quizId },
+			where: { id: quiz_id },
 		});
 
 		if (!exist) {
@@ -124,12 +124,12 @@ module.exports = {
 		}
 
 		Quiz.destroy({
-			where: { id: quizId },
+			where: { id: quiz_id },
 		});
 
 		return res.status(200).json({
 			success: true,
-			message: `Delete quiz with ID ${quizId} successfully.`,
+			message: `Delete quiz with ID ${quiz_id} successfully.`,
 			data: {},
 		});
 	}),
@@ -139,7 +139,7 @@ module.exports = {
 	 * @access    Private
 	 */
 	takeQuiz: asyncHandler(async (req, res) => {
-		const { quizId } = req.params;
+		const { quiz_id } = req.params;
 		const user_id = req.userData.id;
 		const quizQuestions = await Quiz.findOne({
 			where: {

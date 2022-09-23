@@ -11,7 +11,7 @@ route.get(
 );
 
 route.get(
-	"/discussionforum/session/:sessionId",
+	"/discussionforum/session/:session_id",
 	protection,
 	forumController.getAllDiscussionForumInSession
 );

@@ -5,10 +5,10 @@ const majorController = require("../controllers/majorController");
 const { protection } = require("../middlewares/Authentication");
 
 route.get("/", protection, majorController.getAllMajors);
-route.get("/:majorId", protection, majorController.getMajor);
+route.get("/:major_id", protection, majorController.getMajor);
 
 route.post("/create", protection, majorController.postMajor);
-route.put("/edit/:majorId", protection, majorController.editMajor);
-route.delete("/delete/:majorId", protection, majorController.removeMajor);
+route.put("/edit/:major_id", protection, majorController.editMajor);
+route.delete("/delete/:major_id", protection, majorController.removeMajor);
 
 module.exports = route;

@@ -8,7 +8,7 @@ route.post("/create", protection, assignmentController.createAssignment);
 
 route.get("/", protection, assignmentController.getAllAssignment);
 route.get(
-	"/session/:sessionId",
+	"/session/:session_id",
 	protection,
 	assignmentController.getAssignmentInSession
 );

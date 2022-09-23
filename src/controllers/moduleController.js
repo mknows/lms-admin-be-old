@@ -87,14 +87,14 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Get Modules in sessino
-	 * @route     GET /api/v1/module/session/:sessionId
+	 * @route     GET /api/v1/module/session/:session_id
 	 * @access    Private
 	 */
 	getModuleInSession: asyncHandler(async (req, res) => {
-		const { sessionId } = req.params;
+		const { session_id } = req.params;
 		const mods = await Module.findAll({
 			where: {
-				session_id: sessionId,
+				session_id: session_id,
 			},
 		});
 		return res.sendJson(200, true, "Success", mods);
@@ -105,10 +105,10 @@ module.exports = {
 	 * @access    Private
 	 */
 	getModule: asyncHandler(async (req, res) => {
-		const moduleId = req.params.id;
+		const module_id = req.params.id;
 		const mod = await Module.findOne({
 			where: {
-				id: moduleId,
+				id: module_id,
 			},
 		});
 
@@ -163,15 +163,15 @@ module.exports = {
 	}),
 	/**
 	 * @desc      edit module
-	 * @route     PUT /api/v1/module/edit/:moduleId
+	 * @route     PUT /api/v1/module/edit/:module_id
 	 * @access    Private
 	 */
 	editModule: asyncHandler(async (req, res) => {
-		const { moduleId } = req.params;
+		const { module_id } = req.params;
 		let { session_id, video_id, document_id } = req.body;
 		let data = await Module.findOne({
 			where: {
-				id: moduleId,
+				id: module_id,
 			},
 		});
 
@@ -201,7 +201,7 @@ module.exports = {
 			},
 			{
 				where: {
-					id: moduleId,
+					id: module_id,
 				},
 				returning: true,
 			}
@@ -211,15 +211,15 @@ module.exports = {
 	}),
 	/**
 	 * @desc      edit video
-	 * @route     PUT /api/v1/module/video/edit/:videoId
+	 * @route     PUT /api/v1/module/video/edit/:video_id
 	 * @access    Private
 	 */
 	editVideo: asyncHandler(async (req, res) => {
-		const { videoId } = req.params;
+		const { video_id } = req.params;
 		let { url, description } = req.body;
 		let data = await Video.findOne({
 			where: {
-				id: videoId,
+				id: video_id,
 			},
 		});
 
@@ -245,7 +245,7 @@ module.exports = {
 			},
 			{
 				where: {
-					id: videoId,
+					id: video_id,
 				},
 				returning: true,
 			}
@@ -255,7 +255,7 @@ module.exports = {
 	}),
 	/**
 	 * @desc      edit document
-	 * @route     PUT /api/v1/module/document/edit/:documentId
+	 * @route     PUT /api/v1/module/document/edit/:document_id
 	 * @access    Private
 	 */
 	editDocument: asyncHandler(async (req, res) => {
@@ -303,14 +303,14 @@ module.exports = {
 	}),
 	/**
 	 * @desc      delete module
-	 * @route     DELETE /api/v1/module/delete/:moduleId
+	 * @route     DELETE /api/v1/module/delete/:module_id
 	 * @access    Private
 	 */
 	deleteModule: asyncHandler(async (req, res) => {
-		const { moduleId } = req.params;
+		const { module_id } = req.params;
 		let data = await Module.findOne({
 			where: {
-				id: moduleId,
+				id: module_id,
 			},
 		});
 
@@ -324,7 +324,7 @@ module.exports = {
 
 		Module.destroy({
 			where: {
-				id: moduleId,
+				id: module_id,
 			},
 		});
 
@@ -332,14 +332,14 @@ module.exports = {
 	}),
 	/**
 	 * @desc      delete video
-	 * @route     DELETE /api/v1/module/video/delete/:videoId
+	 * @route     DELETE /api/v1/module/video/delete/:video_id
 	 * @access    Private
 	 */
 	deleteVideo: asyncHandler(async (req, res) => {
-		const { videoId } = req.params;
+		const { video_id } = req.params;
 		let data = await Video.findOne({
 			where: {
-				id: videoId,
+				id: video_id,
 			},
 		});
 
@@ -353,7 +353,7 @@ module.exports = {
 
 		Video.destroy({
 			where: {
-				id: videoId,
+				id: video_id,
 			},
 		});
 
@@ -361,7 +361,7 @@ module.exports = {
 	}),
 	/**
 	 * @desc      delete document
-	 * @route     DELETE /api/v1/module/document/delete/:documentId
+	 * @route     DELETE /api/v1/module/document/delete/:document_id
 	 * @access    Private
 	 */
 	deleteDocument: asyncHandler(async (req, res) => {
@@ -395,11 +395,11 @@ module.exports = {
 	 */
 	takeModule: asyncHandler(async (req, res) => {
 		const student_id = req.userData.id;
-		const { moduleId } = req.body;
+		const { module_id } = req.body;
 
 		const material = await Material.findOne({
 			where: {
-				id_referrer: moduleId,
+				id_referrer: module_id,
 			},
 		});
 
@@ -408,7 +408,7 @@ module.exports = {
 			student_id: student_id,
 			material_id: material.id,
 			subject_id: material.subject_id,
-			id_referrer: moduleId,
+			id_referrer: module_id,
 			status: "ONGOING",
 			type: material.type,
 		});
