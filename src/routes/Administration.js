@@ -67,7 +67,7 @@ route.post(
 		{ name: "transcript", maxCount: 1 },
 		{ name: "recommendation_letter", maxCount: 1 },
 	]),
-	administrationController.createAdministration
+	administrationController.filesAdministration
 );
 route.post(
 	"/degree",

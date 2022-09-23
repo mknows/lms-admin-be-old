@@ -13,7 +13,7 @@ const { v4: uuidv4 } = require("uuid");
 module.exports = {
 	/**
 	 * @desc      Initiate admin data
-	 * @route     GET /api/v1/administrations/getcurrentuseradmindata
+	 * @route     GET /api/v1/administration/getcurrentuseradmindata
 	 * @access    Private (User)
 	 */
 	getCurrentUserAdminData: asyncHandler(async (req, res, next) => {
@@ -60,7 +60,7 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Insert Administration for self data
-	 * @route     POST /api/v1/administrations/biodata
+	 * @route     POST /api/v1/administration/biodata
 	 * @access    Private (User)
 	 */
 	selfDataAdministration: asyncHandler(async (req, res, next) => {
@@ -151,7 +151,7 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Insert Administration for familial data
-	 * @route     POST /api/v1/administrations/familial
+	 * @route     POST /api/v1/administration/familial
 	 * @access    Private (User)
 	 */
 	familialAdministration: asyncHandler(async (req, res, next) => {
@@ -217,9 +217,9 @@ module.exports = {
 			{
 				where: {
 					id: administration_id,
-					returning: true,
-					plain: true,
 				},
+				returning: true,
+				plain: true,
 			}
 		);
 
@@ -242,7 +242,7 @@ module.exports = {
 
 	/**
 	 * @desc      Insert Administration files
-	 * @route     POST /api/v1/administrations/files
+	 * @route     POST /api/v1/administration/files
 	 * @access    Private (User)
 	 */
 	filesAdministration: asyncHandler(async (req, res, next) => {
@@ -267,7 +267,7 @@ module.exports = {
 			uuidv4() +
 			"-" +
 			req.files.integrity_pact[0].originalname.split(" ").join("-");
-		const integrityFactBuffer = req.files.integrity_pact[0].buffer;
+		const integrityPactBuffer = req.files.integrity_pact[0].buffer;
 
 		const ninCardFile =
 			uuidv4() + "-" + req.files.nin_card[0].originalname.split(" ").join("-");
@@ -306,9 +306,9 @@ module.exports = {
 		const storage = getStorage();
 
 		bucket
-			.file(`documents/${integrityFactFile}`)
+			.file(`documents/${integrityPactFile}`)
 			.createWriteStream()
-			.end(integrityFactBuffer);
+			.end(integrityPactBuffer);
 		bucket
 			.file(`documents/${ninCardFile}`)
 			.createWriteStream()
@@ -336,7 +336,7 @@ module.exports = {
 				updated_by: user.id,
 
 				// file
-				integrity_pact: `documents/${integrityFactFile}`,
+				integrity_pact: `documents/${integrityPactFile}`,
 				nin_card: `documents/${ninCardFile}`,
 				family_card: `documents/${familyCardFile}`,
 				certificate: `documents/${certificateFile}`,
@@ -367,7 +367,7 @@ module.exports = {
 		return res.sendJson(
 			200,
 			true,
-			"Successfully created administration with self data",
+			"Successfully created administration with files",
 			ret_data
 		);
 	}),
@@ -385,7 +385,7 @@ module.exports = {
 			return res.sendJson(400, false, "Some fields are missing.", {});
 		}
 
-		const data = await Administration.update(
+		let data = await Administration.update(
 			{
 				// non - file
 				degree,
@@ -474,11 +474,11 @@ module.exports = {
 			return res.sendJson(400, false, "Some fields is missing.", {});
 		}
 
-		const integrityFactFile =
+		const integrityPactFile =
 			uuidv4() +
 			"-" +
 			req.files.integrity_pact[0].originalname.split(" ").join("-");
-		const integrityFactBuffer = req.files.integrity_pact[0].buffer;
+		const integrityPactBuffer = req.files.integrity_pact[0].buffer;
 
 		const ninCardFile =
 			uuidv4() + "-" + req.files.nin_card[0].originalname.split(" ").join("-");
@@ -517,9 +517,9 @@ module.exports = {
 		const storage = getStorage();
 
 		bucket
-			.file(`documents/${integrityFactFile}`)
+			.file(`documents/${integrityPactFile}`)
 			.createWriteStream()
-			.end(integrityFactBuffer);
+			.end(integrityPactBuffer);
 		bucket
 			.file(`documents/${ninCardFile}`)
 			.createWriteStream()
@@ -565,7 +565,7 @@ module.exports = {
 				mother_income,
 
 				// file
-				integrity_pact: `documents/${integrityFactFile}`,
+				integrity_pact: `documents/${integrityPactFile}`,
 				nin_card: `documents/${ninCardFile}`,
 				family_card: `documents/${familyCardFile}`,
 				certificate: `documents/${certificateFile}`,
