@@ -56,14 +56,14 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Get subject
-	 * @route     GET /api/v1/subject/:subjectId
+	 * @route     GET /api/v1/subject/:subject_id
 	 * @access    Public
 	 */
 	getSubject: asyncHandler(async (req, res) => {
-		const { subjectId } = req.body;
+		const { subject_id } = req.body;
 		const data = await Subject.findOne({
 			where: {
-				id: subjectId,
+				id: subject_id,
 			},
 		});
 		return res.sendJson(200, true, "sucess get subject", data);
@@ -85,11 +85,11 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Edit Subject
-	 * @route     PUT /api/v1/subject/edit/:subjectId
+	 * @route     PUT /api/v1/subject/edit/:subject_id
 	 * @access    Private (Admin)
 	 */
 	editSubject: asyncHandler(async (req, res) => {
-		const { subjectId } = req.params;
+		const { subject_id } = req.params;
 		let {
 			name,
 			number_of_sessions,
@@ -101,7 +101,7 @@ module.exports = {
 		} = req.body;
 
 		const study = await Subject.findOne({
-			where: { id: subjectId },
+			where: { id: subject_id },
 		});
 
 		if (!study) {
@@ -145,7 +145,7 @@ module.exports = {
 				degree,
 			},
 			{
-				where: { id: subjectId },
+				where: { id: subject_id },
 				returning: true,
 				plain: true,
 			}
@@ -153,20 +153,20 @@ module.exports = {
 
 		return res.status(200).json({
 			success: true,
-			message: `Edit Subject with ID ${subjectId} successfully.`,
+			message: `Edit Subject with ID ${subject_id} successfully.`,
 			data: { ...data[1].dataValues },
 		});
 	}),
 	/**
 	 * @desc      Delete Subject
-	 * @route     DELETE /api/v1/subject/delete/:subjectId
+	 * @route     DELETE /api/v1/subject/delete/:subject_id
 	 * @access    Private (Admin)
 	 */
 	removeSubject: asyncHandler(async (req, res, next) => {
-		const { subjectId } = req.params;
+		const { subject_id } = req.params;
 
 		let data = await Subject.findOne({
-			where: { id: subjectId },
+			where: { id: subject_id },
 		});
 
 		if (!data) {
@@ -178,12 +178,12 @@ module.exports = {
 		}
 
 		Subject.destroy({
-			where: { id: subjectId },
+			where: { id: subject_id },
 		});
 
 		return res.status(200).json({
 			success: true,
-			message: `Delete Subject with ID ${subjectId} successfully.`,
+			message: `Delete Subject with ID ${subject_id} successfully.`,
 			data: {},
 		});
 	}),
@@ -208,9 +208,9 @@ module.exports = {
 		const majorSubject = await Major.findAll({
 			include: Subject,
 		});
-		const majorSubjectID = await getID(majorSubject);
+		const majorsubject_id = await getID(majorSubject);
 
-		const result = recommendation(subjectTakenID, majorSubjectID);
+		const result = recommendation(subjectTakenID, majorsubject_id);
 
 		return res.sendJson(200, true, "Success", result);
 	}),
@@ -274,9 +274,9 @@ async function getID(subjectTaken) {
 	return idReturn;
 }
 
-function recommendation(studentSubjectID, majorSubjectID) {
-	return majorSubjectID.filter(
-		(element) => !studentSubjectID.includes(element)
+function recommendation(studentsubject_id, majorsubject_id) {
+	return majorsubject_id.filter(
+		(element) => !studentsubject_id.includes(element)
 	);
 }
 

@@ -66,7 +66,7 @@ module.exports = {
 	selfDataAdministration: asyncHandler(async (req, res, next) => {
 		const user = req.userData;
 		const {
-			administrationId,
+			administration_id,
 
 			nin,
 			study_program,
@@ -97,7 +97,7 @@ module.exports = {
 
 		let data = await Administration.findOne({
 			where: {
-				id: administrationId,
+				id: administration_id,
 			},
 		});
 
@@ -125,7 +125,7 @@ module.exports = {
 			},
 			{
 				where: {
-					id: administrationId,
+					id: administration_id,
 				},
 				include: User,
 				returning: true,
@@ -135,7 +135,7 @@ module.exports = {
 
 		data = await Administration.findOne({
 			where: {
-				id: administrationId,
+				id: administration_id,
 			},
 			exclude: ["user_id"],
 		});
@@ -158,7 +158,7 @@ module.exports = {
 		const user = req.userData;
 
 		const {
-			administrationId,
+			administration_id,
 
 			father_name,
 			father_occupation,
@@ -190,7 +190,7 @@ module.exports = {
 
 		let data = await Administration.findOne({
 			where: {
-				id: administrationId,
+				id: administration_id,
 			},
 		});
 
@@ -216,7 +216,7 @@ module.exports = {
 			},
 			{
 				where: {
-					id: administrationId,
+					id: administration_id,
 					returning: true,
 					plain: true,
 				},
@@ -225,7 +225,7 @@ module.exports = {
 
 		data = await Administration.findOne({
 			where: {
-				id: administrationId,
+				id: administration_id,
 			},
 			exclude: ["user_id"],
 		});
@@ -248,15 +248,15 @@ module.exports = {
 	filesAdministration: asyncHandler(async (req, res, next) => {
 		const user = req.userData;
 
-		const { administrationId } = req.body;
+		const { administration_id } = req.body;
 
-		if (!administrationId) {
+		if (!administration_id) {
 			return res.sendJson(400, false, "no administration ID", {});
 		}
 
 		let data = await Administration.findOne({
 			where: {
-				id: administrationId,
+				id: administration_id,
 			},
 		});
 		if (!data) {
@@ -348,7 +348,7 @@ module.exports = {
 				approved_by: null,
 			},
 			{
-				where: { id: administrationId },
+				where: { id: administration_id },
 				returning: true,
 				plain: true,
 				include: User,
@@ -357,7 +357,7 @@ module.exports = {
 
 		data = await Administration.findOne({
 			where: {
-				id: administrationId,
+				id: administration_id,
 			},
 			exclude: ["user_id"],
 		});
@@ -379,9 +379,9 @@ module.exports = {
 	 */
 	degreeAdministration: asyncHandler(async (req, res, next) => {
 		const user = req.userData;
-		const { administrationId, degree } = req.body;
+		const { administration_id, degree } = req.body;
 
-		if (!administrationId || !degree) {
+		if (!administration_id || !degree) {
 			return res.sendJson(400, false, "Some fields are missing.", {});
 		}
 
@@ -396,14 +396,14 @@ module.exports = {
 			{
 				include: User,
 				where: {
-					id: administrationId,
+					id: administration_id,
 				},
 			}
 		);
 
 		data = await Administration.findOne({
 			where: {
-				id: administrationId,
+				id: administration_id,
 			},
 			exclude: ["user_id"],
 		});

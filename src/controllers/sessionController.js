@@ -35,14 +35,14 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Get All Session in Subject
-	 * @route     GET /api/v1/session/getfromsub/:subjectId
+	 * @route     GET /api/v1/session/getfromsub/:subject_id
 	 * @access    Public
 	 */
 	getAllSessionInSubject: asyncHandler(async (req, res) => {
-		const subjectId = req.params.subjectId;
+		const subject_id = req.params.subject_id;
 		const data = await Session.findAll({
 			where: {
-				subject_id: subjectId,
+				subject_id: subject_id,
 			},
 		});
 		return res.sendJson(200, true, "success get all session in sub", data);

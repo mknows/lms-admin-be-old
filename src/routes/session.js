@@ -8,7 +8,7 @@ route.post("/create", protection, sessionController.createSession);
 route.get("/", protection, sessionController.getAllSessions);
 route.get("/:sessionId", protection, sessionController.getSession);
 route.get(
-	"/getfromsub/:subjectId",
+	"/getfromsub/:subject_id",
 	protection,
 	sessionController.getAllSessionInSubject
 );

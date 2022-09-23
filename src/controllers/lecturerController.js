@@ -5,11 +5,11 @@ const ErrorResponse = require("../utils/errorResponse");
 module.exports = {
 	/**
 	 * @desc      Action to Lecturer Administration (Aksi untuk Administrasi Dosen)
-	 * @route     PUT /api/v1/my-study/administrations/:administrationId
+	 * @route     PUT /api/v1/my-study/administrations/:administration_id
 	 * @access    Private (Admin)
 	 */
 	administrationAction: asyncHandler(async (res, res, next) => {
-		const { administrationId } = req.params;
+		const { administration_id } = req.params;
 		const { action } = req.body;
 
 		if (!action) return next(new ErrorResponse("Some fields is missing.", 400));
