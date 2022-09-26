@@ -617,43 +617,12 @@ module.exports = {
     );
   }),
 
-  //   /**
-  //    * @desc      Delete data Administration
-  //    * @route     DELETE /api/v1/administrations/delete/:id
-  //    * @access    Private (User)
-  //    */
-  //   deleteAdministration: asyncHandler(async (req, res) => {
-  //     const { id } = req.params;
-  //     const storage = getStorage();
 
-  //     const getFiles = await Administration.findOne({
-  //       where: {
-  //         id,
-  //       },
-  //       attributes: [
-  //         "integrity_pact",
-  //         "nin_card",
-  //         "family_card",
-  //         "certificate",
-  //         "photo",
-  //         "transcript",
-  //         "recommendation_letter",
-  //       ],
-  //     });
-
-  //     let arrFile = Object.values(getFiles.dataValues);
-
-  //     let linkFile = [];
-  //     arrFile.map((file) => {
-  //       getDownloadURL(ref(storage, file)).then((res) => {
-  //         linkFile.push(res);
-  //         console.log(linkFile);
-  //       });
-  //     });
-
-  //     return res.sendJson(200, true, "success", linkFile);
-  //   },
-
+  /**
+   * @desc      Delete data Administration 
+   * @route     DELETE /api/v1/administrations/delete/:id
+   * @access    Private (User)
+   */
   deleteAdministration: async (req, res) => {
     try {
       const { id } = req.params;

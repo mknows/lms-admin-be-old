@@ -92,7 +92,6 @@ route.post(
   administrationController.createAdministration
 );
 
-route.get("/file/:id", administrationController.getFile);
 
 route.delete("/delete/:id", administrationController.deleteAdministration);
 
