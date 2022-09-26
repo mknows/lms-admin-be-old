@@ -31,23 +31,13 @@ const { protection, authorize } = require("../middlewares/Authentication");
 
 route.get("/me", protection, authorize("user"), profileController.getMe);
 route.put(
-<<<<<<< HEAD
-	"/me",
-	protection,
-	upload.single("display_picture"),
-	authorize("user"),
-	validate("updateDataUser"),
-	validatorMessage,
-	profileController.updateMe
-=======
   "/me",
   protection,
-  upload.single("image"),
+  upload.single("display_picture"),
   authorize("user"),
   validate("updateDataUser"),
   validatorMessage,
   profileController.updateMe
->>>>>>> 3cdb032 (fix firebase storage)
 );
 
 module.exports = route;

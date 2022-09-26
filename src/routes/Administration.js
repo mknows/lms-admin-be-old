@@ -7,6 +7,11 @@ const route = express.Router();
 const administrationController = require("../controllers/administrationController");
 const { protection, authorize } = require("../middlewares/Authentication");
 
+const getExtension = (filename) => {
+  var i = filename.lastIndexOf(".");
+  return i < 0 ? "" : filename.substr(i);
+};
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: "2mb",
@@ -30,75 +35,26 @@ const upload = multer({
   },
 });
 
-<<<<<<< HEAD
 route.get(
-	"/mine",
-=======
-route.post(
-<<<<<<< HEAD
-	"/getcurrentuseradmindata",
->>>>>>> b56a706 (admin get and init)
-	protection,
-	authorize("user"),
-	administrationController.getCurrentUserAdminData
-=======
-  "/getcurrentuseradmindata",
+  "/mine",
   protection,
   authorize("user"),
   administrationController.getCurrentUserAdminData
->>>>>>> 3cdb032 (fix firebase storage)
 );
 
-<<<<<<< HEAD
 route.put(
-=======
-route.post(
-<<<<<<< HEAD
->>>>>>> b56a706 (admin get and init)
-	"/biodata",
-	protection,
-	authorize("user"),
-	administrationController.selfDataAdministration
-);
-route.put(
-	"/familial",
-	protection,
-	authorize("user"),
-	administrationController.familialAdministration
-);
-route.put(
-	"/files",
-	protection,
-	authorize("user"),
-	upload.fields([
-		{ name: "integrity_pact", maxCount: 1 },
-		{ name: "nin_card", maxCount: 1 },
-		{ name: "family_card", maxCount: 1 },
-		{ name: "certificate", maxCount: 1 },
-		{ name: "photo", maxCount: 1 },
-		{ name: "transcript", maxCount: 1 },
-		{ name: "recommendation_letter", maxCount: 1 },
-	]),
-	administrationController.filesAdministration
-);
-route.put(
-	"/degree",
-	protection,
-	authorize("user"),
-	administrationController.degreeAdministration
-=======
   "/biodata",
   protection,
   authorize("user"),
   administrationController.selfDataAdministration
 );
-route.post(
+route.put(
   "/familial",
   protection,
   authorize("user"),
   administrationController.familialAdministration
 );
-route.post(
+route.put(
   "/files",
   protection,
   authorize("user"),
@@ -113,12 +69,11 @@ route.post(
   ]),
   administrationController.filesAdministration
 );
-route.post(
+route.put(
   "/degree",
   protection,
   authorize("user"),
   administrationController.degreeAdministration
->>>>>>> 3cdb032 (fix firebase storage)
 );
 
 route.post(
@@ -136,6 +91,8 @@ route.post(
   ]),
   administrationController.createAdministration
 );
+
+route.get("/file/:id", administrationController.getFile);
 
 route.delete("/delete/:id", administrationController.deleteAdministration);
 
