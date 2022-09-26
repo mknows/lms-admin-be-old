@@ -36,7 +36,7 @@ const upload = multer({
 });
 
 route.get(
-	"/getcurrentuseradmindata",
+	"/mine",
 	protection,
 	authorize("user"),
 	administrationController.getCurrentUserAdminData

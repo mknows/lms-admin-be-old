@@ -13,7 +13,7 @@ const { v4: uuidv4 } = require("uuid");
 module.exports = {
 	/**
 	 * @desc      Initiate admin data
-	 * @route     GET /api/v1/administration/getcurrentuseradmindata
+	 * @route     GET /api/v1/administration/mine
 	 * @access    Private (User)
 	 */
 	getCurrentUserAdminData: asyncHandler(async (req, res, next) => {
