@@ -25,6 +25,8 @@ module.exports = (sequelize, DataTypes) => {
 					key: "id",
 				},
 			},
+			// full_name: DataTypes.STRING,
+			// email: DataTypes.STRING,
 			nin: DataTypes.STRING,
 			study_program: DataTypes.STRING,
 			semester: DataTypes.STRING,

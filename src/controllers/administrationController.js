@@ -68,8 +68,8 @@ module.exports = {
 		const {
 			administration_id,
 
-			full_name,
-			email,
+			// full_name,
+			// email,
 			nin,
 			study_program,
 			semester,
@@ -110,8 +110,8 @@ module.exports = {
 		data = await Administration.update(
 			{
 				// non - file
-				full_name,
-				email,
+				// full_name,
+				// email,
 				nin,
 				study_program,
 				semester,
@@ -678,8 +678,8 @@ async function sortData(data) {
 	const ret_data = {
 		administration_id: data.id,
 		biodata: {
-			full_name: data.full_name,
-			email: data.full_name,
+			// full_name: data.full_name,
+			// email: data.full_name,
 			nin: data.nin,
 			study_program: data.study_program,
 			semester: data.semester,
@@ -713,11 +713,9 @@ async function sortData(data) {
 			transcript: data.transcript,
 			recommendation_letter: data.recommendation_letter,
 		},
-		degree: {
-			degree: data.degree,
-			is_approved: data.is_approved,
-			approved_by: data.approved_by,
-		},
+		degree: data.degree,
+		is_approved: data.is_approved,
+		approved_by: data.approved_by,
 	};
 
 	return ret_data;
