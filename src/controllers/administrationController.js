@@ -360,22 +360,36 @@ module.exports = {
         include: User,
       }
     );
+    await sleep(1000);
+    createLinkFirebaseIntegrityPact(integrityPactFile, data.id);
+    await sleep(1000);
+    createLinkFirebaseNinCard(ninCardFile, data.id);
+    await sleep(1000);
+    createLinkFirebaseFamilyCard(familyCardFile, data.id);
+    await sleep(1000);
+    createLinkFirebaseCertificate(certificateFile, data.id);
+    await sleep(1000);
+    createLinkFirebasePhoto(photoFile, data.id);
+    await sleep(1000);
+    createLinkFirebaseTranscript(transcriptFile, data.id);
+    await sleep(1000);
+    createLinkFirebaseRecommendationLetter(recommendationLetterFile, data.id);
 
     data = await Administration.findOne({
-      where: {
-        id: administration_id,
+      where: { id: data.id },
+      include: [
+        {
+          model: User,
+        },
+      ],
+      attributes: {
+        exclude: ["user_id"],
       },
-      exclude: ["user_id"],
     });
 
-    const ret_data = await sortData(data);
-
-    return res.sendJson(
-      200,
-      true,
-      "Successfully created administration with files",
-      ret_data
-    );
+    return res.sendJson(201, true, "Successfully uploaded files", {
+      ...data,
+    });
   }),
 
   /**
@@ -419,7 +433,7 @@ module.exports = {
     return res.sendJson(
       200,
       true,
-      "Successfully created administration with self data",
+      "Successfully created administration with degree",
       ret_data
     );
   }),
@@ -599,42 +613,16 @@ module.exports = {
       201,
       true,
       "Your administration has been submited.",
-      {}
+      asdasd
     );
   }),
 
-  getFile: async (req, res, next) => {
-    const { id } = req.params;
-    const storage = getStorage();
 
-    const getFiles = await Administration.findOne({
-      where: {
-        id,
-      },
-      attributes: [
-        "integrity_pact",
-        "nin_card",
-        "family_card",
-        "certificate",
-        "photo",
-        "transcript",
-        "recommendation_letter",
-      ],
-    });
-
-    let arrFile = Object.values(getFiles.dataValues);
-
-    let linkFile = [];
-    arrFile.map((file) => {
-      getDownloadURL(ref(storage, file)).then((res) => {
-        linkFile.push(res);
-        console.log(linkFile);
-      });
-    });
-
-    return res.sendJson(200, true, "success", linkFile);
-  },
-
+  /**
+   * @desc      Delete data Administration 
+   * @route     DELETE /api/v1/administrations/delete/:id
+   * @access    Private (User)
+   */
   deleteAdministration: async (req, res) => {
     try {
       const { id } = req.params;
