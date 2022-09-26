@@ -56,12 +56,22 @@ module.exports = {
     try {
       let token = req.firebaseToken;
       let user = req.userData;
+      const storage = getStorage();
 
       const { full_name, gender, phone, address } = req.body;
 
       if (req.file) {
+        const getFile = await User.findOne({
+          where: {
+            id: user.id,
+          },
+        });
+
+        if (getFile.display_picture_link != null) {
+          deleteObject(ref(storage, getFile.display_picture_link));
+        }
+
         const bucket = admin.storage().bucket();
-        const storage = getStorage();
         const displayPictureFile =
           uuidv4() + "-" + req.file.originalname.split(" ").join("-");
         const displayPictureBuffer = req.file.buffer;
