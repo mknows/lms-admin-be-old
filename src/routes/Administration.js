@@ -1,16 +1,10 @@
 const express = require("express");
-const multer = require("multer");
-const { v4: uuidv4 } = require("uuid");
-
 const route = express.Router();
+const multer = require("multer");
 
+const { validate, validatorMessage } = require("../middlewares/Validator");
 const administrationController = require("../controllers/administrationController");
 const { protection, authorize } = require("../middlewares/Authentication");
-
-const getExtension = (filename) => {
-  var i = filename.lastIndexOf(".");
-  return i < 0 ? "" : filename.substr(i);
-};
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -80,6 +74,8 @@ route.post(
   "/create-administration",
   protection,
   authorize("user"),
+  //   validate("createAdministration"),
+  //   validatorMessage,
   upload.fields([
     { name: "integrity_pact", maxCount: 1 },
     { name: "nin_card", maxCount: 1 },
@@ -91,7 +87,6 @@ route.post(
   ]),
   administrationController.createAdministration
 );
-
 
 route.delete("/delete/:id", administrationController.deleteAdministration);
 

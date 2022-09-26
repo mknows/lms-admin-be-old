@@ -22,9 +22,10 @@ exports.validate = (method) => {
 					.isIn([0, 1, 2, 9]),
 			];
 		}
+		
 		case "loginUser": {
 			return [
-				body("email", "Email address is invaloid")
+				body("email", "Email address is invalid")
 					.notEmpty()
 					.trim()
 					.normalizeEmail()
@@ -32,6 +33,7 @@ exports.validate = (method) => {
 				body("password", "Password is required").notEmpty().trim(),
 			];
 		}
+
 		case "forgetPasswordUser": {
 			return [
 				body("email", "Email address is invalid")
@@ -52,6 +54,81 @@ exports.validate = (method) => {
 					.notEmpty()
 					.trim()
 					.isIn([0, 1, 2, 9]),
+			];
+		}
+
+		case "createAdministration": {
+			return [
+				body("nin", "nin is invalid")
+					.notEmpty().trim(),
+				body("semester", "semester is invalid")
+					.notEmpty().trim(),
+				body("nsn", "nsn is invalid")
+					.notEmpty().trim(),
+				body("study_program", "study_program is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("residence_address", "residence_address is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("nin_address", "nin_address is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("phone", "phone is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("birth_place", "birth_place is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("birth_date", "birth_date is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("father_name", "father_name is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("father_occupation", "father_occupation is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("father_income", "father_income is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("mother_name", "mother_name is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("mother_occupation", "mother_occupation is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("mother_income", "mother_income is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("occupation", "occupation is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("income", "income is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("living_partner", "living_partner is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("financier", "financier is invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
 			];
 		}
 	}

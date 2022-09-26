@@ -470,28 +470,6 @@ module.exports = {
       mother_income,
     } = req.body;
 
-    if (
-      !nin ||
-      !study_program ||
-      !semester ||
-      !residence_address ||
-      !nin_address ||
-      !phone ||
-      !birth_place ||
-      !domicile ||
-      !financier ||
-      !father_name ||
-      !mother_name ||
-      !father_occupation ||
-      !mother_occupation ||
-      !job ||
-      !income ||
-      !father_income ||
-      !mother_income
-    ) {
-      return res.sendJson(400, false, "Some fields is missing.", {});
-    }
-
     const integrityPactFile =
       uuidv4() +
       "-" +
