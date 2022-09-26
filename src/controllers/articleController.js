@@ -8,6 +8,13 @@ const {
   getDownloadURL,
   deleteObject,
 } = require("firebase/storage");
+let value;
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 
 module.exports = {
   /**
@@ -18,24 +25,6 @@ module.exports = {
   index: async (req, res) => {
     try {
       const data = await Article.findAll();
-      const getNameFile = await Article.findAll({
-        attributes: ["image"],
-      });
-      const storage = getStorage();
-
-      let docLink = [];
-      getNameFile.forEach((file) => {
-        docLink.push(file.dataValues.image);
-      });
-
-      let resultLink = [];
-      docLink.forEach((linkFile) => {
-        getDownloadURL(ref(storage, linkFile)).then((res) => {
-          resultLink.push(res);
-        });
-      });
-
-      console.log(resultLink);
 
       if (data.length == 0) {
         return res.sendJson(
@@ -45,7 +34,7 @@ module.exports = {
         );
       }
 
-      return res.sendJson(200, true, "success get all data", docLink);
+      return res.sendJson(200, true, "success get all data", data);
     } catch (error) {
       console.log(error);
       return res.sendJson(403, false, error, {});
@@ -60,8 +49,8 @@ module.exports = {
   create: async (req, res) => {
     try {
       const { title, description } = req.body;
-      console.log(req.file);
       const bucket = admin.storage().bucket();
+      const storage = getStorage();
 
       const articleFile =
         uuidv4() + "-" + req.file.originalname.split(" ").join("-");
@@ -78,10 +67,26 @@ module.exports = {
         image: `images/article/${articleFile}`,
       });
 
+      getDownloadURL(ref(storage, `images/article/${file}`)).then(
+        async (linkFile) => {
+          await Article.update(
+            {
+              image_link: linkFile,
+            },
+            {
+              where: {
+                id,
+              },
+            }
+          );
+        }
+      );
+
       return res.sendJson(201, true, "success create new article", {
         title: created.title,
         description: created.description,
         image: created.image,
+        image_link: created.image_link,
       });
     } catch (error) {
       console.log(error);
@@ -197,4 +202,22 @@ module.exports = {
       return res.sendJson(403, false, error, {});
     }
   },
+};
+
+const firebaseLinkFileArticle = (file, id) => {
+  const storage = getStorage();
+  getDownloadURL(ref(storage, `images/article/${file}`)).then(
+    async (linkFile) => {
+      await Article.update(
+        {
+          image_link: linkFile,
+        },
+        {
+          where: {
+            id,
+          },
+        }
+      );
+    }
+  );
 };

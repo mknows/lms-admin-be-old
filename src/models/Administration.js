@@ -53,12 +53,19 @@ module.exports = (sequelize, DataTypes) => {
 
 			// File
 			integrity_pact: DataTypes.STRING,
+			integrity_pact_link: DataTypes.STRING,
 			nin_card: DataTypes.STRING,
+			nin_card_link: DataTypes.STRING,
 			family_card: DataTypes.STRING,
+			family_card_link: DataTypes.STRING,
 			certificate: DataTypes.STRING,
+			certificate_link: DataTypes.STRING,
 			photo: DataTypes.STRING,
+			photo_link: DataTypes.STRING,
 			transcript: DataTypes.STRING,
+			transcript_link: DataTypes.STRING,
 			recommendation_letter: DataTypes.STRING,
+			recommendation_letter_link: DataTypes.STRING,
 
 			is_approved: DataTypes.STRING,
 			approved_by: DataTypes.UUID,

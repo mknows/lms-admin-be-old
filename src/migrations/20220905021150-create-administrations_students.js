@@ -40,12 +40,19 @@ module.exports = {
 
 			// File
 			integrity_pact: Sequelize.STRING,
+			integrity_pact_link: Sequelize.STRING,
 			nin_card: Sequelize.STRING,
+			nin_card_link: Sequelize.STRING,
 			family_card: Sequelize.STRING,
+			family_card_link: Sequelize.STRING,
 			certificate: Sequelize.STRING,
+			certificate_link: Sequelize.STRING,
 			photo: Sequelize.STRING,
+			photo_link: Sequelize.STRING,
 			transcript: Sequelize.STRING,
+			transcript_link: Sequelize.STRING,
 			recommendation_letter: Sequelize.STRING,
+			recommendation_letter_link: Sequelize.STRING,
 
 			is_approved: Sequelize.STRING,
 			approved_by: Sequelize.UUID,
