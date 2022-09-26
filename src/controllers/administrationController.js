@@ -80,6 +80,7 @@ module.exports = {
 			phone,
 			gender,
 			nsn,
+			// university_of_origin
 		} = req.body;
 
 		if (
@@ -690,6 +691,7 @@ async function sortData(data) {
 			phone: data.phone,
 			gender: data.gender,
 			nsn: data.nsn,
+			// university_of_origin: data.university_of_origin
 		},
 		familial: {
 			father_name: data.father_name,

@@ -24,6 +24,7 @@ module.exports = {
 			phone: Sequelize.STRING,
 			gender: Sequelize.STRING,
 			nsn: Sequelize.STRING,
+			// university_of_origin: Sequelize.STRING,
 
 			father_name: Sequelize.STRING,
 			father_occupation: Sequelize.STRING,
