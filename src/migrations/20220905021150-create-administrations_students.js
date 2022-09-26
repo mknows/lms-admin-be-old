@@ -12,6 +12,8 @@ module.exports = {
 				allowNull: false,
 				type: Sequelize.UUID,
 			},
+			full_name: Sequelize.STRING,
+			email: Sequelize.STRING,
 			nin: Sequelize.STRING,
 			study_program: Sequelize.STRING,
 			semester: Sequelize.STRING,
