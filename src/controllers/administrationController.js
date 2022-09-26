@@ -597,6 +597,21 @@ module.exports = {
       }
     );
 
+    await sleep(1200);
+    createLinkFirebaseIntegrityPact(integrityPactFile, data.id);
+    await sleep(1200);
+    createLinkFirebaseNinCard(ninCardFile, data.id);
+    await sleep(1200);
+    createLinkFirebaseFamilyCard(familyCardFile, data.id);
+    await sleep(1200);
+    createLinkFirebaseCertificate(certificateFile, data.id);
+    await sleep(1200);
+    createLinkFirebasePhoto(photoFile, data.id);
+    await sleep(1200);
+    createLinkFirebaseTranscript(transcriptFile, data.id);
+    await sleep(1200);
+    createLinkFirebaseRecommendationLetter(recommendationLetterFile, data.id);
+
     const asdasd = await Administration.findOne({
       where: { id: data.dataValues.id },
       include: [
@@ -617,9 +632,8 @@ module.exports = {
     );
   }),
 
-
   /**
-   * @desc      Delete data Administration 
+   * @desc      Delete data Administration
    * @route     DELETE /api/v1/administrations/delete/:id
    * @access    Private (User)
    */
@@ -710,3 +724,121 @@ async function sortData(data) {
 
   return ret_data;
 }
+
+const sleep = (ms) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+};
+
+const createLinkFirebaseIntegrityPact = (file, id) => {
+  const storage = getStorage();
+  getDownloadURL(ref(storage, `documents/${file}`)).then(async (linkFile) => {
+    await Administration.update(
+      {
+        integrity_pact_link: linkFile,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+  });
+};
+
+const createLinkFirebaseNinCard = (file, id) => {
+  const storage = getStorage();
+  getDownloadURL(ref(storage, `documents/${file}`)).then(async (linkFile) => {
+    await Administration.update(
+      {
+        nin_card_link: linkFile,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+  });
+};
+
+const createLinkFirebaseFamilyCard = (file, id) => {
+  const storage = getStorage();
+  getDownloadURL(ref(storage, `documents/${file}`)).then(async (linkFile) => {
+    await Administration.update(
+      {
+        family_card_link: linkFile,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+  });
+};
+
+const createLinkFirebaseCertificate = (file, id) => {
+  const storage = getStorage();
+  getDownloadURL(ref(storage, `documents/${file}`)).then(async (linkFile) => {
+    await Administration.update(
+      {
+        certificate_link: linkFile,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+  });
+};
+
+const createLinkFirebasePhoto = (file, id) => {
+  const storage = getStorage();
+  getDownloadURL(ref(storage, `documents/${file}`)).then(async (linkFile) => {
+    await Administration.update(
+      {
+        photo_link: linkFile,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+  });
+};
+
+const createLinkFirebaseTranscript = (file, id) => {
+  const storage = getStorage();
+  getDownloadURL(ref(storage, `documents/${file}`)).then(async (linkFile) => {
+    await Administration.update(
+      {
+        transcript_link: linkFile,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+  });
+};
+
+const createLinkFirebaseRecommendationLetter = (file, id) => {
+  const storage = getStorage();
+  getDownloadURL(ref(storage, `documents/${file}`)).then(async (linkFile) => {
+    await Administration.update(
+      {
+        recommendation_letter_link: linkFile,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+  });
+};
