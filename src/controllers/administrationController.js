@@ -597,19 +597,19 @@ module.exports = {
       }
     );
 
-    await sleep(1200);
+    await sleep(1000);
     createLinkFirebaseIntegrityPact(integrityPactFile, data.id);
-    await sleep(1200);
+    await sleep(1000);
     createLinkFirebaseNinCard(ninCardFile, data.id);
-    await sleep(1200);
+    await sleep(1000);
     createLinkFirebaseFamilyCard(familyCardFile, data.id);
-    await sleep(1200);
+    await sleep(1000);
     createLinkFirebaseCertificate(certificateFile, data.id);
-    await sleep(1200);
+    await sleep(1000);
     createLinkFirebasePhoto(photoFile, data.id);
-    await sleep(1200);
+    await sleep(1000);
     createLinkFirebaseTranscript(transcriptFile, data.id);
-    await sleep(1200);
+    await sleep(1000);
     createLinkFirebaseRecommendationLetter(recommendationLetterFile, data.id);
 
     const asdasd = await Administration.findOne({
@@ -637,44 +637,49 @@ module.exports = {
    * @route     DELETE /api/v1/administrations/delete/:id
    * @access    Private (User)
    */
-  deleteAdministration: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const storage = getStorage();
+  deleteAdministration: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const storage = getStorage();
 
-      const getFiles = await Administration.findOne({
-        where: {
-          id,
-        },
-        attributes: [
-          "integrity_pact",
-          "nin_card",
-          "family_card",
-          "certificate",
-          "photo",
-          "transcript",
-          "recommendation_letter",
-        ],
-      });
+    const findAdministration = await Administration.findOne({
+      where: {
+        id,
+      },
+    });
 
-      let arrFile = Object.values(getFiles.dataValues);
-
-      arrFile.map((file) => {
-        deleteObject(ref(storage, file));
-      });
-
-      await Administration.destroy({
-        where: {
-          id,
-        },
-      });
-
-      return res.sendJson(200, true, "succes delete administration");
-    } catch (error) {
-      console.log(error);
-      res.sendJson(403, false, error);
+    if (findAdministration == null) {
+      return res.sendJson(404, false, "administration not found");
     }
-  },
+
+    const getFiles = await Administration.findOne({
+      where: {
+        id,
+      },
+      attributes: [
+        "integrity_pact",
+        "nin_card",
+        "family_card",
+        "certificate",
+        "photo",
+        "transcript",
+        "recommendation_letter",
+      ],
+    });
+
+    let arrFile = Object.values(getFiles.dataValues);
+
+    arrFile.map((file) => {
+      deleteObject(ref(storage, file));
+    });
+
+    await Administration.destroy({
+      where: {
+        id,
+      },
+    });
+
+    return res.sendJson(200, true, "succes delete administration");
+  }),
 };
 
 async function sortData(data) {

@@ -10,12 +10,6 @@ const {
 } = require("firebase/storage");
 let value;
 
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 module.exports = {
   /**
    * @desc      Get All data Article
@@ -50,7 +44,6 @@ module.exports = {
     try {
       const { title, description } = req.body;
       const bucket = admin.storage().bucket();
-      const storage = getStorage();
 
       const articleFile =
         uuidv4() + "-" + req.file.originalname.split(" ").join("-");
@@ -67,20 +60,8 @@ module.exports = {
         image: `images/article/${articleFile}`,
       });
 
-      getDownloadURL(ref(storage, `images/article/${file}`)).then(
-        async (linkFile) => {
-          await Article.update(
-            {
-              image_link: linkFile,
-            },
-            {
-              where: {
-                id,
-              },
-            }
-          );
-        }
-      );
+      await sleep(1000);
+      firebaseLinkFileArticle(articleFile, created.id);
 
       return res.sendJson(201, true, "success create new article", {
         title: created.title,
@@ -186,7 +167,7 @@ module.exports = {
       });
 
       if (findArticle == null) {
-        return res.sendJson(400, false, "article not found");
+        return res.sendJson(404, false, "article not found");
       }
 
       deleteObject(ref(storage, findArticle.image));
@@ -220,4 +201,10 @@ const firebaseLinkFileArticle = (file, id) => {
       );
     }
   );
+};
+
+const sleep = (ms) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 };
