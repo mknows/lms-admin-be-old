@@ -42,19 +42,19 @@ route.get(
 	administrationController.getCurrentUserAdminData
 );
 
-route.post(
+route.put(
 	"/biodata",
 	protection,
 	authorize("user"),
 	administrationController.selfDataAdministration
 );
-route.post(
+route.put(
 	"/familial",
 	protection,
 	authorize("user"),
 	administrationController.familialAdministration
 );
-route.post(
+route.put(
 	"/files",
 	protection,
 	authorize("user"),
@@ -69,7 +69,7 @@ route.post(
 	]),
 	administrationController.filesAdministration
 );
-route.post(
+route.put(
 	"/degree",
 	protection,
 	authorize("user"),

@@ -60,7 +60,7 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Insert Administration for self data
-	 * @route     POST /api/v1/administration/biodata
+	 * @route     PUT /api/v1/administration/biodata
 	 * @access    Private (User)
 	 */
 	selfDataAdministration: asyncHandler(async (req, res, next) => {
@@ -151,7 +151,7 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Insert Administration for familial data
-	 * @route     POST /api/v1/administration/familial
+	 * @route     PUS /api/v1/administration/familial
 	 * @access    Private (User)
 	 */
 	familialAdministration: asyncHandler(async (req, res, next) => {
@@ -242,7 +242,7 @@ module.exports = {
 
 	/**
 	 * @desc      Insert Administration files
-	 * @route     POST /api/v1/administration/files
+	 * @route     PUT /api/v1/administration/files
 	 * @access    Private (User)
 	 */
 	filesAdministration: asyncHandler(async (req, res, next) => {
@@ -375,7 +375,7 @@ module.exports = {
 
 	/**
 	 * @desc      pick degree
-	 * @route     POST /api/v1/administrations/degree
+	 * @route     PUT /api/v1/administrations/degree
 	 * @access    Private (User)
 	 */
 	degreeAdministration: asyncHandler(async (req, res, next) => {
