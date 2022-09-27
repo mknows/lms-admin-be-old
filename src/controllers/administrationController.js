@@ -362,22 +362,25 @@ module.exports = {
 			}
 		);
 		await sleep(1000);
-		createLinkFirebaseIntegrityPact(integrityPactFile, data.id);
+		createLinkFirebaseIntegrityPact(integrityPactFile, administration_id);
 		await sleep(1000);
-		createLinkFirebaseNinCard(ninCardFile, data.id);
+		createLinkFirebaseNinCard(ninCardFile, administration_id);
 		await sleep(1000);
-		createLinkFirebaseFamilyCard(familyCardFile, data.id);
+		createLinkFirebaseFamilyCard(familyCardFile, administration_id);
 		await sleep(1000);
-		createLinkFirebaseCertificate(certificateFile, data.id);
+		createLinkFirebaseCertificate(certificateFile, administration_id);
 		await sleep(1000);
-		createLinkFirebasePhoto(photoFile, data.id);
+		createLinkFirebasePhoto(photoFile, administration_id);
 		await sleep(1000);
-		createLinkFirebaseTranscript(transcriptFile, data.id);
+		createLinkFirebaseTranscript(transcriptFile, administration_id);
 		await sleep(1000);
-		createLinkFirebaseRecommendationLetter(recommendationLetterFile, data.id);
+		createLinkFirebaseRecommendationLetter(
+			recommendationLetterFile,
+			administration_id
+		);
 
 		data = await Administration.findOne({
-			where: { id: data.id },
+			where: { id: administration_id },
 			include: [
 				{
 					model: User,
