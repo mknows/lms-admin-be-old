@@ -123,6 +123,7 @@ module.exports = {
 				phone,
 				gender,
 				nsn,
+				university_of_origin,
 
 				updated_by: user.id,
 				is_approved: "waiting",
@@ -665,7 +666,7 @@ async function sortData(data) {
 		administration_id: data.id,
 		biodata: {
 			full_name: data.full_name,
-			email: data.full_name,
+			email: data.email,
 			nin: data.nin,
 			study_program: data.study_program,
 			semester: data.semester,
