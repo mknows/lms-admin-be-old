@@ -8,19 +8,19 @@ route.post("/create", protection, assignmentController.createAssignment);
 
 route.get("/", protection, assignmentController.getAllAssignment);
 route.get(
-	"/session/:sessionId",
+	"/session/:session_id",
 	protection,
 	assignmentController.getAssignmentInSession
 );
-route.get("/:assignmentId", protection, assignmentController.getAssignment);
+route.get("/:assignment_id", protection, assignmentController.getAssignment);
 
 route.put(
-	"/edit/:assignmentId",
+	"/edit/:assignment_id",
 	protection,
 	assignmentController.updateAssignment
 );
 route.delete(
-	"/delete/:assignmentId",
+	"/delete/:assignment_id",
 	protection,
 	assignmentController.removeAssignment
 );

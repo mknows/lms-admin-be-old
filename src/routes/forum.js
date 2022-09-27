@@ -11,7 +11,7 @@ route.get(
 );
 
 route.get(
-	"/discussionforum/session/:sessionId",
+	"/discussionforum/session/:session_id",
 	protection,
 	forumController.getAllDiscussionForumInSession
 );
@@ -20,7 +20,7 @@ route.get("/reply", protection, forumController.getAllReply);
 
 route.get("/commentondf/:dfId", protection, forumController.getCommentOnDF);
 route.get(
-	"/replyoncomment/:commentId",
+	"/replyoncomment/:comment_id",
 	protection,
 	forumController.getReplyOnComment
 );
@@ -39,11 +39,11 @@ route.put(
 	forumController.updateDiscussionForum
 );
 route.put(
-	"/comment/edit/:commentId",
+	"/comment/edit/:comment_id",
 	protection,
 	forumController.updateComment
 );
-route.put("/reply/edit/:replyId", protection, forumController.updateReply);
+route.put("/reply/edit/:reply_id", protection, forumController.updateReply);
 
 route.delete(
 	"/discussionforum/delete/:dfId",
@@ -51,10 +51,14 @@ route.delete(
 	forumController.deleteDiscussionForum
 );
 route.delete(
-	"/comment/delete/:commentId",
+	"/comment/delete/:comment_id",
 	protection,
 	forumController.deleteComment
 );
-route.delete("/reply/delete/:replyId", protection, forumController.deleteReply);
+route.delete(
+	"/reply/delete/:reply_id",
+	protection,
+	forumController.deleteReply
+);
 
 module.exports = route;

@@ -1,16 +1,10 @@
 const express = require("express");
-const multer = require("multer");
-const { v4: uuidv4 } = require("uuid");
-
 const route = express.Router();
+const multer = require("multer");
 
+const { validate, validatorMessage } = require("../middlewares/Validator");
 const administrationController = require("../controllers/administrationController");
 const { protection, authorize } = require("../middlewares/Authentication");
-
-const getExtension = (filename) => {
-	var i = filename.lastIndexOf(".");
-	return i < 0 ? "" : filename.substr(i);
-};
 
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -36,25 +30,25 @@ const upload = multer({
 });
 
 route.get(
-	"/getcurrentuseradmindata",
+	"/mine",
 	protection,
 	authorize("user"),
 	administrationController.getCurrentUserAdminData
 );
 
-route.post(
+route.put(
 	"/biodata",
 	protection,
 	authorize("user"),
 	administrationController.selfDataAdministration
 );
-route.post(
+route.put(
 	"/familial",
 	protection,
 	authorize("user"),
 	administrationController.familialAdministration
 );
-route.post(
+route.put(
 	"/files",
 	protection,
 	authorize("user"),
@@ -67,32 +61,32 @@ route.post(
 		{ name: "transcript", maxCount: 1 },
 		{ name: "recommendation_letter", maxCount: 1 },
 	]),
-	administrationController.createAdministration
+	administrationController.filesAdministration
 );
-route.post(
+route.put(
 	"/degree",
 	protection,
 	authorize("user"),
 	administrationController.degreeAdministration
 );
 
-route.post(
-	"/create-administration",
-	protection,
-	authorize("user"),
-	upload.fields([
-		{ name: "integrity_pact", maxCount: 1 },
-		{ name: "nin_card", maxCount: 1 },
-		{ name: "family_card", maxCount: 1 },
-		{ name: "certificate", maxCount: 1 },
-		{ name: "photo", maxCount: 1 },
-		{ name: "transcript", maxCount: 1 },
-		{ name: "recommendation_letter", maxCount: 1 },
-	]),
-	administrationController.createAdministration
-);
-
-route.get("/file/:id", administrationController.getFile);
+// route.post(
+//   "/create-administration",
+//   protection,
+//   authorize("user"),
+//   //   validate("createAdministration"),
+//   //   validatorMessage,
+//   upload.fields([
+//     { name: "integrity_pact", maxCount: 1 },
+//     { name: "nin_card", maxCount: 1 },
+//     { name: "family_card", maxCount: 1 },
+//     { name: "certificate", maxCount: 1 },
+//     { name: "photo", maxCount: 1 },
+//     { name: "transcript", maxCount: 1 },
+//     { name: "recommendation_letter", maxCount: 1 },
+//   ]),
+//   administrationController.createAdministration
+// );
 
 route.delete("/delete/:id", administrationController.deleteAdministration);
 

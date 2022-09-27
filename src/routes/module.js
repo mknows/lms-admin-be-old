@@ -12,7 +12,7 @@ route.get("/video", protection, moduleController.getAllVideo);
 route.get("/document", protection, moduleController.getAllDocument);
 
 route.get(
-	"/session/:sessionId",
+	"/session/:session_id",
 	protection,
 	moduleController.getModuleInSession
 );
@@ -21,22 +21,22 @@ route.get("/:id", protection, moduleController.getModule);
 route.get("/video/:id", protection, moduleController.getVideo);
 route.get("/document/:id", protection, moduleController.getDocument);
 
-route.put("/edit/:moduleId", protection, moduleController.editModule);
-route.put("/video/edit/:videoId", protection, moduleController.editVideo);
+route.put("/edit/:module_id", protection, moduleController.editModule);
+route.put("/video/edit/:video_id", protection, moduleController.editVideo);
 route.put(
-	"/document/edit/:documentId",
+	"/document/edit/:document_id",
 	protection,
 	moduleController.editDocument
 );
 
-route.delete("/delete/:moduleId", protection, moduleController.deleteModule);
+route.delete("/delete/:module_id", protection, moduleController.deleteModule);
 route.delete(
-	"/video/delete/:videoId",
+	"/video/delete/:video_id",
 	protection,
 	moduleController.deleteVideo
 );
 route.delete(
-	"/document/delete/:documentId",
+	"/document/delete/:document_id",
 	protection,
 	moduleController.deleteDocument
 );

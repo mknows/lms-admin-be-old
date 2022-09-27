@@ -35,45 +35,45 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Get All Session in Subject
-	 * @route     GET /api/v1/session/getfromsub/:subjectId
+	 * @route     GET /api/v1/session/getfromsub/:subject_id
 	 * @access    Public
 	 */
 	getAllSessionInSubject: asyncHandler(async (req, res) => {
-		const subjectId = req.params.subjectId;
+		const subject_id = req.params.subject_id;
 		const data = await Session.findAll({
 			where: {
-				subject_id: subjectId,
+				subject_id: subject_id,
 			},
 		});
 		return res.sendJson(200, true, "success get all session in sub", data);
 	}),
 	/**
 	 * @desc      Get Session
-	 * @route     GET /api/v1/session/:sessionId
+	 * @route     GET /api/v1/session/:session_id
 	 * @access    Public
 	 */
 	getSession: asyncHandler(async (req, res) => {
-		const { sessionId } = req.params;
+		const { session_id } = req.params;
 		const data = await Session.findOne({
 			where: {
-				id: sessionId,
+				id: session_id,
 			},
 		});
 		return res.sendJson(200, true, "success session", data);
 	}),
 	/**
 	 * @desc      update session
-	 * @route     put /api/v1/session/edit/:sessionId
+	 * @route     put /api/v1/session/edit/:session_id
 	 * @access    Private
 	 */
 	updateSession: asyncHandler(async (req, res) => {
-		const { sessionId } = req.params;
+		const { session_id } = req.params;
 		let { subject_id, session_no, duration, is_sync, type, description } =
 			req.body;
 
 		const exist = await Session.findOne({
 			where: {
-				id: sessionId,
+				id: session_id,
 			},
 		});
 
@@ -115,7 +115,7 @@ module.exports = {
 			},
 			{
 				where: {
-					id: sessionId,
+					id: session_id,
 				},
 				returning: true,
 			}
@@ -124,14 +124,14 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Delete session
-	 * @route     DELETE /api/v1/sedion/delete/:sessionId
+	 * @route     DELETE /api/v1/sedion/delete/:session_id
 	 * @access    Private (Admin)
 	 */
 	removeSession: asyncHandler(async (req, res, next) => {
-		const { sessionId } = req.params;
+		const { session_id } = req.params;
 
 		let data = await Session.findOne({
-			where: { id: sessionId },
+			where: { id: session_id },
 		});
 
 		if (!data) {
@@ -143,12 +143,12 @@ module.exports = {
 		}
 
 		Session.destroy({
-			where: { id: sessionId },
+			where: { id: session_id },
 		});
 
 		return res.status(200).json({
 			success: true,
-			message: `Delete session with ID ${sessionId} successfully.`,
+			message: `Delete session with ID ${session_id} successfully.`,
 			data: {},
 		});
 	}),

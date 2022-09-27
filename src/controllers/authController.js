@@ -94,6 +94,14 @@ module.exports = {
 			where: { email },
 		});
 
+		if (!dataPostgre) {
+			return res.sendJson(
+				401,
+				false,
+				"sorry, your account is not in the database"
+			);
+		}
+
 		await insertLogActivity(
 			req,
 			dataPostgre.dataValues.id,

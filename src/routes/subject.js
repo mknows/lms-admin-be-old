@@ -8,16 +8,20 @@ route.post("/create", protection, subjectController.createSubject);
 
 route.get("/", protection, subjectController.getAllSubject);
 route.get("/forstudent", protection, subjectController.getSubjectForStudent);
-route.get("/:subjectId", protection, subjectController.getSubject);
+route.get("/:subject_id", protection, subjectController.getSubject);
 route.get(
 	"/enrolledsubjects",
 	protection,
 	subjectController.getEnrolledSubject
 );
 
-route.put("/edit/:subjectId", protection, subjectController.editSubject);
+route.put("/edit/:subject_id", protection, subjectController.editSubject);
 
-route.delete("/delete/:subjectId", protection, subjectController.removeSubject);
+route.delete(
+	"/delete/:subject_id",
+	protection,
+	subjectController.removeSubject
+);
 
 route.post("/enroll", protection, subjectController.takeSubject);
 route.get("/forstudent", protection, subjectController.getSubjectForStudent);

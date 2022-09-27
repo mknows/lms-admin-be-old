@@ -16,13 +16,13 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Get All Forums in session
-	 * @route     GET /api/v1/forum/discussionforum/session/:sessionId
+	 * @route     GET /api/v1/forum/discussionforum/session/:session_id
 	 * @access    Public
 	 */
 	getAllDiscussionForumInSession: asyncHandler(async (req, res) => {
-		const { sessionId } = req.params;
+		const { session_id } = req.params;
 		const data = await Discussion_forum.findAll({
-			where: sessionId,
+			where: session_id,
 		});
 		return res.sendJson(200, true, "sucess get all df in session", data);
 	}),
@@ -64,10 +64,10 @@ module.exports = {
 	 * @access    Public
 	 */
 	getReplyOnComment: asyncHandler(async (req, res) => {
-		const { commentId } = req.params;
+		const { comment_id } = req.params;
 		const data = await Reply.findAll({
 			where: {
-				comment_id: commentId,
+				comment_id: comment_id,
 			},
 		});
 		return res.sendJson(200, true, "sucess get reply on a comment", data);
@@ -192,17 +192,17 @@ module.exports = {
 
 	/**
 	 * @desc      update comments
-	 * @route     GET /api/v1/forum/comment/edit/:commentId
+	 * @route     GET /api/v1/forum/comment/edit/:comment_id
 	 * @access    Public
 	 */
 	updateComment: asyncHandler(async (req, res) => {
-		const { commentId } = req.params;
+		const { comment_id } = req.params;
 		let { content } = req.body;
 		const user_id = req.userData.id;
 
 		let data = await Comment.findOne({
 			where: {
-				id: commentId,
+				id: comment_id,
 			},
 		});
 
@@ -230,31 +230,31 @@ module.exports = {
 				content,
 			},
 			{
-				where: { id: commentId },
+				where: { id: comment_id },
 				returning: true,
 			}
 		);
 
 		return res.status(200).json({
 			success: true,
-			message: `Edit comment with ID ${commentId} successfully.`,
+			message: `Edit comment with ID ${comment_id} successfully.`,
 			data: { ...data[1].dataValues },
 		});
 	}),
 
 	/**
 	 * @desc      update discussion Forums
-	 * @route     GET /api/v1/forum/reply/edit/:replyId
+	 * @route     GET /api/v1/forum/reply/edit/:reply_id
 	 * @access    Public
 	 */
 	updateReply: asyncHandler(async (req, res) => {
-		const { replyId } = req.params;
+		const { reply_id } = req.params;
 		let { content } = req.body;
 		const user_id = req.userData.id;
 
 		let data = await Reply.findOne({
 			where: {
-				id: replyId,
+				id: reply_id,
 			},
 		});
 
@@ -282,14 +282,14 @@ module.exports = {
 				content,
 			},
 			{
-				where: { id: replyId },
+				where: { id: reply_id },
 				returning: true,
 			}
 		);
 
 		return res.status(200).json({
 			success: true,
-			message: `Edit Discussion Forum with ID ${replyId} successfully.`,
+			message: `Edit Discussion Forum with ID ${reply_id} successfully.`,
 			data: { ...data[1].dataValues },
 		});
 	}),
@@ -324,14 +324,14 @@ module.exports = {
 	}),
 	/**
 	 * @desc      delete comment
-	 * @route     DELETE /api/v1/forum/comment/delete/:commentId
+	 * @route     DELETE /api/v1/forum/comment/delete/:comment_id
 	 * @access    Private
 	 */
 	deleteComment: asyncHandler(async (req, res) => {
-		const { commentId } = req.params;
+		const { comment_id } = req.params;
 		let data = await Comment.findOne({
 			where: {
-				id: commentId,
+				id: comment_id,
 			},
 		});
 
@@ -345,7 +345,7 @@ module.exports = {
 
 		Comment.destroy({
 			where: {
-				id: commentId,
+				id: comment_id,
 			},
 		});
 
@@ -353,14 +353,14 @@ module.exports = {
 	}),
 	/**
 	 * @desc      delete reply
-	 * @route     DELETE /api/v1/forum/reply/delete/:replyId
+	 * @route     DELETE /api/v1/forum/reply/delete/:reply_id
 	 * @access    Private
 	 */
 	deleteReply: asyncHandler(async (req, res) => {
-		const { replyId } = req.params;
+		const { reply_id } = req.params;
 		let data = await Reply.findOne({
 			where: {
-				id: replyId,
+				id: reply_id,
 			},
 		});
 
@@ -374,7 +374,7 @@ module.exports = {
 
 		Reply.destroy({
 			where: {
-				id: replyId,
+				id: reply_id,
 			},
 		});
 

@@ -25,6 +25,8 @@ module.exports = (sequelize, DataTypes) => {
 					key: "id",
 				},
 			},
+			full_name: DataTypes.STRING,
+			email: DataTypes.STRING,
 			nin: DataTypes.STRING,
 			study_program: DataTypes.STRING,
 			semester: DataTypes.STRING,
@@ -35,6 +37,7 @@ module.exports = (sequelize, DataTypes) => {
 			phone: DataTypes.STRING,
 			gender: DataTypes.STRING,
 			nsn: DataTypes.STRING,
+			university_of_origin: DataTypes.STRING,
 
 			father_name: DataTypes.STRING,
 			father_occupation: DataTypes.STRING,
@@ -50,12 +53,19 @@ module.exports = (sequelize, DataTypes) => {
 
 			// File
 			integrity_pact: DataTypes.STRING,
+			integrity_pact_link: DataTypes.STRING,
 			nin_card: DataTypes.STRING,
+			nin_card_link: DataTypes.STRING,
 			family_card: DataTypes.STRING,
+			family_card_link: DataTypes.STRING,
 			certificate: DataTypes.STRING,
+			certificate_link: DataTypes.STRING,
 			photo: DataTypes.STRING,
+			photo_link: DataTypes.STRING,
 			transcript: DataTypes.STRING,
+			transcript_link: DataTypes.STRING,
 			recommendation_letter: DataTypes.STRING,
+			recommendation_letter_link: DataTypes.STRING,
 
 			is_approved: DataTypes.STRING,
 			approved_by: DataTypes.UUID,

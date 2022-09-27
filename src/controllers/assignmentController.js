@@ -43,43 +43,43 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Get Assignment in session
-	 * @route     GET /api/v1/assignment/session/:sessionId
+	 * @route     GET /api/v1/assignment/session/:session_id
 	 * @access    Private
 	 */
 	getAssignmentInSession: asyncHandler(async (req, res) => {
-		const { sessionId } = req.params;
+		const { session_id } = req.params;
 		const assign = await Assignment.findAll({
 			where: {
-				session_id: sessionId,
+				session_id: session_id,
 			},
 		});
 		res.sendJson(200, true, "Success", assign);
 	}),
 	/**
 	 * @desc      Get Assignment
-	 * @route     GET /api/v1/assignment/:assignmentId
+	 * @route     GET /api/v1/assignment/:assignment_id
 	 * @access    Private
 	 */
 	getAssignment: asyncHandler(async (req, res) => {
-		const { assignmentID } = req.params;
+		const { assignment_id } = req.params;
 		const assign = await Assignment.findOne({
 			where: {
-				id: assignmentID,
+				id: assignment_id,
 			},
 		});
 		res.sendJson(200, true, "Success", assign);
 	}),
 	/**
 	 * @desc      update Assignment
-	 * @route     put /api/v1/assignment/:assignmentId
+	 * @route     put /api/v1/assignment/:assignment_id
 	 * @access    Private
 	 */
 	updateAssignment: asyncHandler(async (req, res) => {
-		const { assignmentID } = req.params;
+		const { assignment_id } = req.params;
 		let { session_id, duration, description, content, document_id } = req.body;
 		const exist = await Assignment.findOne({
 			where: {
-				id: assignmentID,
+				id: assignment_id,
 			},
 		});
 
@@ -117,7 +117,7 @@ module.exports = {
 			},
 			{
 				where: {
-					id: assignmentID,
+					id: assignment_id,
 				},
 				returning: true,
 			}
@@ -126,14 +126,14 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Delete assignment
-	 * @route     DELETE /api/v1/assignment/delete/:assignmentId
+	 * @route     DELETE /api/v1/assignment/delete/:assignment_id
 	 * @access    Private (Admin)
 	 */
 	removeAssignment: asyncHandler(async (req, res, next) => {
-		const { assignmentID } = req.params;
+		const { assignment_id } = req.params;
 
 		let data = await Assignment.findOne({
-			where: { id: assignmentID },
+			where: { id: assignment_id },
 		});
 
 		if (!data) {
@@ -145,12 +145,12 @@ module.exports = {
 		}
 
 		Assignment.destroy({
-			where: { id: assignmentID },
+			where: { id: assignment_id },
 		});
 
 		return res.status(200).json({
 			success: true,
-			message: `Delete Assignment with ID ${assignmentID} successfully.`,
+			message: `Delete Assignment with ID ${assignment_id} successfully.`,
 			data: {},
 		});
 	}),

@@ -29,6 +29,9 @@ module.exports = {
 			display_picture: {
 				type: Sequelize.STRING,
 			},
+			display_picture_link: {
+				type: Sequelize.STRING,
+			},
 			address: {
 				type: Sequelize.STRING,
 			},
