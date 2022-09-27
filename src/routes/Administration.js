@@ -40,12 +40,16 @@ route.put(
 	"/biodata",
 	protection,
 	authorize("user"),
+	validate("administrationBiodata"),
+	validatorMessage,
 	administrationController.selfDataAdministration
 );
 route.put(
 	"/familial",
 	protection,
 	authorize("user"),
+	validate("administrationFamilial"),
+	validatorMessage,
 	administrationController.familialAdministration
 );
 route.put(
@@ -67,6 +71,8 @@ route.put(
 	"/degree",
 	protection,
 	authorize("user"),
+	validate("administrationDegree"),
+	validatorMessage,
 	administrationController.degreeAdministration
 );
 

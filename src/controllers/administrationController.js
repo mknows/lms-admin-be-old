@@ -83,20 +83,20 @@ module.exports = {
 			university_of_origin,
 		} = req.body;
 
-		if (
-			!nin ||
-			!study_program ||
-			!semester ||
-			!nin_address ||
-			!residence_address ||
-			!birth_place ||
-			!birth_date ||
-			!phone ||
-			!gender ||
-			!nsn
-		) {
-			return res.sendJson(400, false, "Some fields are missing.", {});
-		}
+		// if (
+		// 	!nin ||
+		// 	!study_program ||
+		// 	!semester ||
+		// 	!nin_address ||
+		// 	!residence_address ||
+		// 	!birth_place ||
+		// 	!birth_date ||
+		// 	!phone ||
+		// 	!gender ||
+		// 	!nsn
+		// ) {
+		// 	return res.sendJson(400, false, "Some fields are missing.", {});
+		// }
 
 		let data = await Administration.findOne({
 			where: {
@@ -178,20 +178,20 @@ module.exports = {
 			financier,
 		} = req.body;
 
-		if (
-			!father_name ||
-			!father_occupation ||
-			!father_income ||
-			!mother_name ||
-			!mother_occupation ||
-			!mother_income ||
-			!occupation ||
-			!income ||
-			!living_partner ||
-			!financier
-		) {
-			return res.sendJson(400, false, "Some fields are missing.", {});
-		}
+		// if (
+		// 	!father_name ||
+		// 	!father_occupation ||
+		// 	!father_income ||
+		// 	!mother_name ||
+		// 	!mother_occupation ||
+		// 	!mother_income ||
+		// 	!occupation ||
+		// 	!income ||
+		// 	!living_partner ||
+		// 	!financier
+		// ) {
+		// 	return res.sendJson(400, false, "Some fields are missing.", {});
+		// }
 
 		let data = await Administration.findOne({
 			where: {
@@ -401,9 +401,9 @@ module.exports = {
 		const user = req.userData;
 		const { administration_id, degree } = req.body;
 
-		if (!administration_id || !degree) {
-			return res.sendJson(400, false, "Some fields are missing.", {});
-		}
+		// if (!administration_id || !degree) {
+		// 	return res.sendJson(400, false, "Some fields are missing.", {});
+		// }
 
 		let data = await Administration.update(
 			{
