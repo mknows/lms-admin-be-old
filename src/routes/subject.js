@@ -5,18 +5,17 @@ const subjectController = require("../controllers/subjectController");
 const { protection } = require("../middlewares/Authentication");
 
 route.post("/create", protection, subjectController.createSubject);
+route.post("/enroll", protection, subjectController.takeSubject);
 
-route.get("/", protection, subjectController.getAllSubject);
 route.get("/forstudent", protection, subjectController.getSubjectForStudent);
 route.get(
 	"/enrolledsubjects",
 	protection,
 	subjectController.getEnrolledSubject
 );
-
-route.post("/enroll", protection, subjectController.takeSubject);
-
 route.get("/:subject_id", protection, subjectController.getSubject);
+route.get("/", protection, subjectController.getAllSubject);
+
 route.put("/edit/:subject_id", protection, subjectController.editSubject);
 
 route.delete(

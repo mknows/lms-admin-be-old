@@ -60,7 +60,7 @@ module.exports = {
 	 * @access    Public
 	 */
 	getSubject: asyncHandler(async (req, res) => {
-		const { subject_id } = req.body;
+		const { subject_id } = req.params;
 		const data = await Subject.findOne({
 			where: {
 				id: subject_id,

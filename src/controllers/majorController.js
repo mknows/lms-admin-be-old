@@ -110,8 +110,8 @@ module.exports = {
 
 		const num_of_sub = subs.length;
 		return res.sendJson(200, true, "Search major successfully.", {
-			major: data.dataValues,
-			num_of_sub: num_of_sub,
+			...data.dataValues,
+			number_of_subjects: num_of_sub,
 		});
 	}),
 
