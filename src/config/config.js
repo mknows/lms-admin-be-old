@@ -21,11 +21,11 @@ const {
 module.exports = {
 	development: {
 		username: "postgres",
-		password: "postgres",
-		database: "postgres",
+		password: "root",
+		database: "kg",
 		host: "localhost",
 		dialect: "postgres",
-		port: 5433,
+		port: 5432,
 		define: {
 			paranoid: true,
 			timestamps: true,

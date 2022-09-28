@@ -25,8 +25,26 @@ module.exports = {
 			description: {
 				type: Sequelize.STRING,
 			},
+			basic_competencies:{
+				type: Sequelize.STRING,
+			},
+			indicator:{
+				type: Sequelize.STRING,
+			},
+			study_experience:{
+				type: Sequelize.STRING,
+			},
+			teaching_materials:{
+				type: Sequelize.STRING
+			},
 			credit: {
 				type: Sequelize.INTEGER,
+			},
+			tools_needed:{
+				type: Sequelize.STRING
+			},
+			scoring:{
+				type: Sequelize.STRING,
 			},
 			created_at: {
 				allowNull: false,

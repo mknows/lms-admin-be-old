@@ -10,6 +10,12 @@ module.exports = {
 			name: {
 				type: Sequelize.STRING,
 			},
+			head_of_major:{
+				type: Sequelize.UUID,
+			},
+			description:{
+				type: Sequelize.STRING,
+			},
 			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
