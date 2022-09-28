@@ -271,34 +271,17 @@ module.exports = {
 			return res.sendJson(400, false, "invalid administration ID", {});
 		}
 
-		if (data.integrity_pact) {
-			await deleteObject(ref(storage, data.integrity_pact));
-		}
-		if (data.nin_card) {
-			await deleteObject(ref(storage, data.nin_card));
-		}
-		if (data.family_card) {
-			await deleteObject(ref(storage, data.family_card));
-		}
-		if (data.certificate) {
-			await deleteObject(ref(storage, data.certificate));
-		}
-		if (data.photo) {
-			await deleteObject(ref(storage, data.photo));
-		}
-		if (data.transcript) {
-			await deleteObject(ref(storage, data.transcript));
-		}
-		if (data.recommendation_letter) {
-			await deleteObject(ref(storage, data.recommendation_letter));
-		}
+		checkIfExistFirebase(data.integrity_pact);
+		checkIfExistFirebase(data.nin_card);
+		checkIfExistFirebase(data.family_card);
+		checkIfExistFirebase(data.certificate);
+		checkIfExistFirebase(data.photo);
+		checkIfExistFirebase(data.transcript);
+		checkIfExistFirebase(data.recommendation_letter);
 
 		// ? optional
 		if (req.files.transcript) {
-			const transcriptFile =
-				uuidv4() +
-				"-" +
-				req.files.transcript[0].originalname.split(" ").join("-");
+			const transcriptFile = nameFile(req.files.transcript);
 			const transcriptBuffer = req.files.transcript[0].buffer;
 
 			bucket
@@ -327,10 +310,9 @@ module.exports = {
 		}
 		// ? optional
 		if (req.files.recommendation_letter) {
-			const recommendationLetterFile =
-				uuidv4() +
-				"-" +
-				req.files.recommendation_letter[0].originalname.split(" ").join("-");
+			const recommendationLetterFile = nameFile(
+				req.files.recommendation_letter
+			);
 			const recommendationLetterBuffer =
 				req.files.recommendation_letter[0].buffer;
 
@@ -363,30 +345,19 @@ module.exports = {
 		}
 
 		// required
-		const integrityPactFile =
-			uuidv4() +
-			"-" +
-			req.files.integrity_pact[0].originalname.split(" ").join("-");
+		const integrityPactFile = nameFile(req.files.integrity_pact);
 		const integrityPactBuffer = req.files.integrity_pact[0].buffer;
 
-		const ninCardFile =
-			uuidv4() + "-" + req.files.nin_card[0].originalname.split(" ").join("-");
+		const ninCardFile = nameFile(req.files.nin_card);
 		const ninCardBuffer = req.files.nin_card[0].buffer;
 
-		const familyCardFile =
-			uuidv4() +
-			"-" +
-			req.files.family_card[0].originalname.split(" ").join("-");
+		const familyCardFile = nameFile(req.files.family_card);
 		const familyCardBuffer = req.files.family_card[0].buffer;
 
-		const certificateFile =
-			uuidv4() +
-			"-" +
-			req.files.certificate[0].originalname.split(" ").join("-");
+		const certificateFile = nameFile(req.files.certificate);
 		const certificateBuffer = req.files.certificate[0].buffer;
 
-		const photoFile =
-			uuidv4() + "-" + req.files.photo[0].originalname.split(" ").join("-");
+		const photoFile = nameFile(req.files.photo);
 		const photoBuffer = req.files.photo[0].buffer;
 
 		bucket
@@ -501,178 +472,6 @@ module.exports = {
 			ret_data
 		);
 	}),
-
-	//   /**
-	//    * @desc      Insert Administration (Input Administrasi)
-	//    * @route     POST /api/v1/administrations/create-administration
-	//    * @access    Private (User)
-	//    */
-	//   createAdministration: asyncHandler(async (req, res, next) => {
-	//     const user = req.userData;
-
-	//     const {
-	//       nin,
-	//       study_program,
-	//       semester,
-	//       nin_address,
-	//       residence_address,
-	//       birth_place,
-	//       birth_date,
-	//       phone,
-	//       gender,
-	//       nsn,
-
-	//       domicile,
-	//       financier,
-	//       father_name,
-	//       mother_name,
-	//       father_occupation,
-	//       mother_occupation,
-	//       job,
-	//       income,
-	//       father_income,
-	//       mother_income,
-	//     } = req.body;
-
-	//     const integrityPactFile =
-	//       uuidv4() +
-	//       "-" +
-	//       req.files.integrity_pact[0].originalname.split(" ").join("-");
-	//     const integrityPactBuffer = req.files.integrity_pact[0].buffer;
-
-	//     const ninCardFile =
-	//       uuidv4() + "-" + req.files.nin_card[0].originalname.split(" ").join("-");
-	//     const ninCardBuffer = req.files.nin_card[0].buffer;
-
-	//     const familyCardFile =
-	//       uuidv4() +
-	//       "-" +
-	//       req.files.family_card[0].originalname.split(" ").join("-");
-	//     const familyCardBuffer = req.files.family_card[0].buffer;
-
-	//     const certificateFile =
-	//       uuidv4() +
-	//       "-" +
-	//       req.files.certificate[0].originalname.split(" ").join("-");
-	//     const certificateBuffer = req.files.certificate[0].buffer;
-
-	//     const photoFile =
-	//       uuidv4() + "-" + req.files.photo[0].originalname.split(" ").join("-");
-	//     const photoBuffer = req.files.photo[0].buffer;
-
-	//     const transcriptFile =
-	//       uuidv4() +
-	//       "-" +
-	//       req.files.transcript[0].originalname.split(" ").join("-");
-	//     const transcriptBuffer = req.files.transcript[0].buffer;
-
-	//     const recommendationLetterFile =
-	//       uuidv4() +
-	//       "-" +
-	//       req.files.recommendation_letter[0].originalname.split(" ").join("-");
-	//     const recommendationLetterBuffer =
-	//       req.files.recommendation_letter[0].buffer;
-
-	//     const bucket = admin.storage().bucket();
-
-	//     bucket
-	//       .file(`documents/${integrityPactFile}`)
-	//       .createWriteStream()
-	//       .end(integrityPactBuffer);
-	//     bucket
-	//       .file(`documents/${ninCardFile}`)
-	//       .createWriteStream()
-	//       .end(ninCardBuffer);
-	//     bucket
-	//       .file(`documents/${familyCardFile}`)
-	//       .createWriteStream()
-	//       .end(familyCardBuffer);
-	//     bucket
-	//       .file(`documents/${certificateFile}`)
-	//       .createWriteStream()
-	//       .end(certificateBuffer);
-	//     bucket.file(`documents/${photoFile}`).createWriteStream().end(photoBuffer);
-	//     bucket
-	//       .file(`documents/${transcriptFile}`)
-	//       .createWriteStream()
-	//       .end(transcriptBuffer);
-	//     bucket
-	//       .file(`documents/${recommendationLetterFile}`)
-	//       .createWriteStream()
-	//       .end(recommendationLetterBuffer);
-
-	//     const data = await Administration.create(
-	//       {
-	//         // non - file
-	//         user_id: user.id,
-	//         nin,
-	//         study_program,
-	//         semester,
-	//         residence_address,
-	//         nin_address,
-	//         phone,
-	//         birth_place,
-	//         domicile,
-	//         financier,
-	//         father_name,
-	//         mother_name,
-	//         father_occupation,
-	//         mother_occupation,
-	//         job,
-	//         income,
-	//         father_income,
-	//         mother_income,
-
-	//         // file
-	//         integrity_pact: `documents/${integrityPactFile}`,
-	//         nin_card: `documents/${ninCardFile}`,
-	//         family_card: `documents/${familyCardFile}`,
-	//         certificate: `documents/${certificateFile}`,
-	//         photo: `documents/${photoFile}`,
-	//         transcript: `documents/${transcriptFile}`,
-	//         recommendation_letter: `documents/${recommendationLetterFile}`,
-	//         is_approved: "waiting",
-	//         approved_by: null,
-	//       },
-	//       {
-	//         include: User,
-	//       }
-	//     );
-
-	//     await sleep(1000);
-	//     createLinkFirebaseIntegrityPact(integrityPactFile, data.id);
-	//     await sleep(1000);
-	//     createLinkFirebaseNinCard(ninCardFile, data.id);
-	//     await sleep(1000);
-	//     createLinkFirebaseFamilyCard(familyCardFile, data.id);
-	//     await sleep(1000);
-	//     createLinkFirebaseCertificate(certificateFile, data.id);
-	//     await sleep(1000);
-	//     createLinkFirebasePhoto(photoFile, data.id);
-	//     await sleep(1000);
-	//     createLinkFirebaseTranscript(transcriptFile, data.id);
-	//     await sleep(1000);
-	//     createLinkFirebaseRecommendationLetter(recommendationLetterFile, data.id);
-
-	//     const asdasd = await Administration.findOne({
-	//       where: { id: data.dataValues.id },
-	//       include: [
-	//         {
-	//           model: User,
-	//         },
-	//       ],
-	//       attributes: {
-	//         exclude: ["user_id"],
-	//       },
-	//     });
-
-	//     return res.sendJson(
-	//       201,
-	//       true,
-	//       "Your administration has been submited.",
-	//       asdasd
-	//     );
-	//   }),
 
 	/**
 	 * @desc      Delete data Administration
@@ -888,4 +687,15 @@ const createLinkFirebaseRecommendationLetter = (file, id) => {
 			}
 		);
 	});
+};
+
+const checkIfExistFirebase = async (data) => {
+	const storage = getStorage();
+	if (data) {
+		await deleteObject(ref(storage, data));
+	}
+};
+
+const nameFile = (file_name) => {
+	return uuidv4() + "-" + file_name[0].originalname.split(" ").join("-");
 };
