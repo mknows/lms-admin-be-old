@@ -8,13 +8,15 @@ route.post("/create", protection, subjectController.createSubject);
 
 route.get("/", protection, subjectController.getAllSubject);
 route.get("/forstudent", protection, subjectController.getSubjectForStudent);
-route.get("/:subject_id", protection, subjectController.getSubject);
 route.get(
 	"/enrolledsubjects",
 	protection,
 	subjectController.getEnrolledSubject
 );
 
+route.post("/enroll", protection, subjectController.takeSubject);
+
+route.get("/:subject_id", protection, subjectController.getSubject);
 route.put("/edit/:subject_id", protection, subjectController.editSubject);
 
 route.delete(
@@ -22,8 +24,5 @@ route.delete(
 	protection,
 	subjectController.removeSubject
 );
-
-route.post("/enroll", protection, subjectController.takeSubject);
-route.get("/forstudent", protection, subjectController.getSubjectForStudent);
 
 module.exports = route;
