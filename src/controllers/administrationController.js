@@ -83,20 +83,20 @@ module.exports = {
 			university_of_origin,
 		} = req.body;
 
-		// if (
-		// 	!nin ||
-		// 	!study_program ||
-		// 	!semester ||
-		// 	!nin_address ||
-		// 	!residence_address ||
-		// 	!birth_place ||
-		// 	!birth_date ||
-		// 	!phone ||
-		// 	!gender ||
-		// 	!nsn
-		// ) {
-		// 	return res.sendJson(400, false, "Some fields are missing.", {});
-		// }
+		if (
+			!nin ||
+			!study_program ||
+			!semester ||
+			!nin_address ||
+			!residence_address ||
+			!birth_place ||
+			!birth_date ||
+			!phone ||
+			!gender ||
+			!nsn
+		) {
+			return res.sendJson(400, false, "Some fields are missing.", {});
+		}
 
 		let data = await Administration.findOne({
 			where: {
@@ -123,7 +123,6 @@ module.exports = {
 				phone,
 				gender,
 				nsn,
-				university_of_origin,
 
 				updated_by: user.id,
 				is_approved: "waiting",
@@ -179,20 +178,20 @@ module.exports = {
 			financier,
 		} = req.body;
 
-		// if (
-		// 	!father_name ||
-		// 	!father_occupation ||
-		// 	!father_income ||
-		// 	!mother_name ||
-		// 	!mother_occupation ||
-		// 	!mother_income ||
-		// 	!occupation ||
-		// 	!income ||
-		// 	!living_partner ||
-		// 	!financier
-		// ) {
-		// 	return res.sendJson(400, false, "Some fields are missing.", {});
-		// }
+		if (
+			!father_name ||
+			!father_occupation ||
+			!father_income ||
+			!mother_name ||
+			!mother_occupation ||
+			!mother_income ||
+			!occupation ||
+			!income ||
+			!living_partner ||
+			!financier
+		) {
+			return res.sendJson(400, false, "Some fields are missing.", {});
+		}
 
 		let data = await Administration.findOne({
 			where: {
@@ -253,6 +252,8 @@ module.exports = {
 	 */
 	filesAdministration: asyncHandler(async (req, res, next) => {
 		const user = req.userData;
+		const storage = getStorage();
+		const bucket = admin.storage().bucket();
 
 		const { administration_id } = req.body;
 
@@ -270,6 +271,98 @@ module.exports = {
 			return res.sendJson(400, false, "invalid administration ID", {});
 		}
 
+		if (data.integrity_pact) {
+			await deleteObject(ref(storage, data.integrity_pact));
+		}
+		if (data.nin_card) {
+			await deleteObject(ref(storage, data.nin_card));
+		}
+		if (data.family_card) {
+			await deleteObject(ref(storage, data.family_card));
+		}
+		if (data.certificate) {
+			await deleteObject(ref(storage, data.certificate));
+		}
+		if (data.photo) {
+			await deleteObject(ref(storage, data.photo));
+		}
+		if (data.transcript) {
+			await deleteObject(ref(storage, data.transcript));
+		}
+		if (data.recommendation_letter) {
+			await deleteObject(ref(storage, data.recommendation_letter));
+		}
+
+		// ? optional
+		if (req.files.transcript) {
+			const transcriptFile =
+				uuidv4() +
+				"-" +
+				req.files.transcript[0].originalname.split(" ").join("-");
+			const transcriptBuffer = req.files.transcript[0].buffer;
+
+			bucket
+				.file(`documents/${transcriptFile}`)
+				.createWriteStream()
+				.end(transcriptBuffer);
+
+			await sleep(1500);
+			createLinkFirebaseTranscript(transcriptFile, administration_id);
+
+			await Administration.update(
+				{
+					updated_by: user.id,
+					transcript: `documents/${transcriptFile}`,
+
+					is_approved: "waiting",
+					approved_by: null,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+		// ? optional
+		if (req.files.recommendation_letter) {
+			const recommendationLetterFile =
+				uuidv4() +
+				"-" +
+				req.files.recommendation_letter[0].originalname.split(" ").join("-");
+			const recommendationLetterBuffer =
+				req.files.recommendation_letter[0].buffer;
+
+			bucket
+				.file(`documents/${recommendationLetterFile}`)
+				.createWriteStream()
+				.end(recommendationLetterBuffer);
+
+			await sleep(1500);
+			createLinkFirebaseRecommendationLetter(
+				recommendationLetterFile,
+				administration_id
+			);
+
+			await Administration.update(
+				{
+					updated_by: user.id,
+					recommendation_letter: `documents/${recommendationLetterFile}`,
+
+					is_approved: "waiting",
+					approved_by: null,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+
+		// required
 		const integrityPactFile =
 			uuidv4() +
 			"-" +
@@ -296,22 +389,6 @@ module.exports = {
 			uuidv4() + "-" + req.files.photo[0].originalname.split(" ").join("-");
 		const photoBuffer = req.files.photo[0].buffer;
 
-		const transcriptFile =
-			uuidv4() +
-			"-" +
-			req.files.transcript[0].originalname.split(" ").join("-");
-		const transcriptBuffer = req.files.transcript[0].buffer;
-
-		const recommendationLetterFile =
-			uuidv4() +
-			"-" +
-			req.files.recommendation_letter[0].originalname.split(" ").join("-");
-		const recommendationLetterBuffer =
-			req.files.recommendation_letter[0].buffer;
-
-		const bucket = admin.storage().bucket();
-		const storage = getStorage();
-
 		bucket
 			.file(`documents/${integrityPactFile}`)
 			.createWriteStream()
@@ -329,14 +406,6 @@ module.exports = {
 			.createWriteStream()
 			.end(certificateBuffer);
 		bucket.file(`documents/${photoFile}`).createWriteStream().end(photoBuffer);
-		bucket
-			.file(`documents/${transcriptFile}`)
-			.createWriteStream()
-			.end(transcriptBuffer);
-		bucket
-			.file(`documents/${recommendationLetterFile}`)
-			.createWriteStream()
-			.end(recommendationLetterBuffer);
 
 		data = await Administration.update(
 			{
@@ -348,8 +417,6 @@ module.exports = {
 				family_card: `documents/${familyCardFile}`,
 				certificate: `documents/${certificateFile}`,
 				photo: `documents/${photoFile}`,
-				transcript: `documents/${transcriptFile}`,
-				recommendation_letter: `documents/${recommendationLetterFile}`,
 
 				is_approved: "waiting",
 				approved_by: null,
@@ -361,23 +428,16 @@ module.exports = {
 				include: User,
 			}
 		);
-		await sleep(1000);
+		await sleep(1500);
 		createLinkFirebaseIntegrityPact(integrityPactFile, administration_id);
-		await sleep(1000);
+		await sleep(1500);
 		createLinkFirebaseNinCard(ninCardFile, administration_id);
-		await sleep(1000);
+		await sleep(1500);
 		createLinkFirebaseFamilyCard(familyCardFile, administration_id);
-		await sleep(1000);
+		await sleep(1500);
 		createLinkFirebaseCertificate(certificateFile, administration_id);
-		await sleep(1000);
+		await sleep(1500);
 		createLinkFirebasePhoto(photoFile, administration_id);
-		await sleep(1000);
-		createLinkFirebaseTranscript(transcriptFile, administration_id);
-		await sleep(1000);
-		createLinkFirebaseRecommendationLetter(
-			recommendationLetterFile,
-			administration_id
-		);
 
 		data = await Administration.findOne({
 			where: { id: administration_id },
@@ -392,7 +452,7 @@ module.exports = {
 		});
 
 		return res.sendJson(201, true, "Successfully uploaded files", {
-			...data,
+			data,
 		});
 	}),
 
@@ -405,9 +465,9 @@ module.exports = {
 		const user = req.userData;
 		const { administration_id, degree } = req.body;
 
-		// if (!administration_id || !degree) {
-		// 	return res.sendJson(400, false, "Some fields are missing.", {});
-		// }
+		if (!administration_id || !degree) {
+			return res.sendJson(400, false, "Some fields are missing.", {});
+		}
 
 		let data = await Administration.update(
 			{
@@ -669,7 +729,7 @@ async function sortData(data) {
 		administration_id: data.id,
 		biodata: {
 			full_name: data.full_name,
-			email: data.email,
+			email: data.full_name,
 			nin: data.nin,
 			study_program: data.study_program,
 			semester: data.semester,
