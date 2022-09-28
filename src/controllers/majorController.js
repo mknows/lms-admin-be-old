@@ -101,7 +101,18 @@ module.exports = {
 				id: major_id,
 			},
 		});
-		return res.sendJson(200, true, "Search major successfully.", data);
+
+		const subs = await MajorSubject.findAll({
+			where: {
+				major_id: major_id,
+			},
+		});
+
+		const num_of_sub = subs.length;
+		return res.sendJson(200, true, "Search major successfully.", {
+			major: data.dataValues,
+			num_of_sub: num_of_sub,
+		});
 	}),
 
 	/**
