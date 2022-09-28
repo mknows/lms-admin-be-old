@@ -1,4 +1,4 @@
-const { Major } = require("../models");
+const { Major, Subject, MajorSubject } = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -23,6 +23,59 @@ module.exports = {
 			true,
 			"Create New Major Success.",
 			data.dataValues
+		);
+	}),
+
+	/**
+	 * @desc      post MajorSubjects
+	 * @route     POST /api/v1/major/insertsubjects/:major_id
+	 * @access    Private
+	 */
+	insertSubjectToMajor: asyncHandler(async (req, res) => {
+		const { subjects } = req.body;
+		const { major_id } = req.params;
+
+		if (!major_id) {
+			return res.sendJson(400, false, "Some fields are missing.", {});
+		}
+
+		const major = await Major.findOne({
+			where: {
+				id: major_id,
+			},
+		});
+
+		if (!major) {
+			return res.sendJson(400, false, "Invalid major id", {});
+		}
+
+		for (let i = 0; i < subjects.length; i++) {
+			let sub = await Subject.findOne({
+				where: {
+					id: subjects[i],
+				},
+			});
+
+			if (!sub) {
+				return res.sendJson(
+					400,
+					false,
+					`invalid subject id ${subjects[i]}`,
+					{}
+				);
+			}
+
+			await MajorSubject.create({
+				major_id: major_id,
+				subject_id: subjects[i],
+			});
+		}
+
+		return res.sendJson(
+			200,
+			true,
+			"Successfully Created New MajorSubjects",
+			major
 		);
 	}),
 
