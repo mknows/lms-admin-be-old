@@ -19,32 +19,23 @@ module.exports = {
 	 * @access    Private
 	 */
 	getMe: asyncHandler(async (req, res) => {
-		try {
-			let token = req.firebaseToken;
-			let user = req.userData;
+		let token = req.firebaseToken;
+		let user = req.userData;
 
-			console.log(token, user);
-			// delete user["firebase_uid"];
+		const data = await User.findOne({
+			where: {
+				firebase_uid: user.firebase_uid,
+			},
+			attributes: {
+				exclude: ["id", "firebase_uid", "password"],
+			},
+		});
 
-			const data = await User.findOne({
-				where: {
-					firebase_uid: user.firebase_uid,
-				},
-				attributes: {
-					exclude: ["id", "firebase_uid", "password"],
-				},
-			});
-
-			return res.status(200).json({
-				success: true,
-				message: "Account connected.",
-				data: { ...data.dataValues, role: req.role },
-			});
-		} catch (error) {
-			console.error(error);
-			let message = res.getErrorFirebase(error.code);
-			return res.sendJson(403, false, message, {});
-		}
+		return res.status(200).json({
+			success: true,
+			message: "Account connected.",
+			data: { ...data.dataValues, role: req.role },
+		});
 	}),
 
 	/**
@@ -53,39 +44,36 @@ module.exports = {
 	 * @access    Private
 	 */
 	updateMe: asyncHandler(async (req, res) => {
-		try {
-			let token = req.firebaseToken;
-			let user = req.userData;
-			const storage = getStorage();
+		let token = req.firebaseToken;
+		let user = req.userData;
+		const storage = getStorage();
 
-			const { full_name, gender, phone, address } = req.body;
+		const { full_name, gender, phone, address } = req.body;
 
-			if (req.file) {
-				const getFile = await User.findOne({
-					where: {
-						id: user.id,
-					},
-				});
+		if (req.file) {
+			const getFile = await User.findOne({
+				where: {
+					id: user.id,
+				},
+			});
 
-				if (getFile.display_picture_link != null) {
-					deleteObject(ref(storage, getFile.display_picture_link));
-				}
+			if (getFile.display_picture) {
+				deleteObject(ref(storage, getFile.display_picture_link));
+			}
 
-				const bucket = admin.storage().bucket();
-				const displayPictureFile =
-					uuidv4() + "-" + req.file.originalname.split(" ").join("-");
-				const displayPictureBuffer = req.file.buffer;
+			const bucket = admin.storage().bucket();
+			const displayPictureFile =
+				uuidv4() + "-" + req.file.originalname.split(" ").join("-");
+			const displayPictureBuffer = req.file.buffer;
 
-				bucket
-					.file(`images/profile/${displayPictureFile}`)
-					.createWriteStream()
-					.end(displayPictureBuffer);
+			bucket
+				.file(`images/profile/${displayPictureFile}`)
+				.createWriteStream()
+				.end(displayPictureBuffer);
 
-				await sleep(3000);
-				getDownloadURL(
-					ref(storage, `images/profile/${displayPictureFile}`)
-				).then(async (linkFile) => {
-					console.log("linkFile => ", linkFile);
+			await sleep(1500);
+			getDownloadURL(ref(storage, `images/profile/${displayPictureFile}`)).then(
+				async (linkFile) => {
 					await User.update(
 						{
 							display_picture_link: linkFile,
@@ -95,45 +83,43 @@ module.exports = {
 							where: {
 								id: user.id,
 							},
+							returning: true,
+							plain: true,
 						}
 					);
-				});
-			}
-
-			const data = await User.update(
-				{
-					full_name: titleCase(full_name),
-					gender,
-					phone,
-					address,
-				},
-				{
-					where: {
-						id: user.id,
-					},
-					returning: true,
-					plain: true,
 				}
 			);
-
-			delete data[1].dataValues["id"];
-			delete data[1].dataValues["firebase_uid"];
-			delete data[1].dataValues["password"];
-
-			await updateProfile(getClientAuth(), {
-				full_name: titleCase(full_name),
-			});
-
-			return res.status(200).json({
-				success: true,
-				message: "Profile updated.",
-				data: { ...data[1].dataValues, role: req.role },
-			});
-		} catch (error) {
-			console.error(error);
-			let message = res.getErrorFirebase(error.code);
-			return res.sendJson(403, false, message, {});
 		}
+
+		let data = await User.update(
+			{
+				full_name: titleCase(full_name),
+				gender,
+				phone,
+				address,
+			},
+			{
+				where: {
+					id: user.id,
+				},
+				returning: true,
+				plain: true,
+			}
+		);
+
+		delete data[1].dataValues["id"];
+		delete data[1].dataValues["firebase_uid"];
+		delete data[1].dataValues["password"];
+
+		await updateProfile(getClientAuth(), {
+			full_name: titleCase(full_name),
+		});
+
+		return res.status(200).json({
+			success: true,
+			message: "Profile updated.",
+			data: { ...data[1].dataValues, role: req.role },
+		});
 	}),
 };
 
