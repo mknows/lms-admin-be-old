@@ -8,6 +8,11 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: "major_id",
 			});
 		}
+		static associate(models) {
+			this.belongsTo(models.Lecturer, {
+				foreignKey: "head_of_major"
+			});
+		}
 	}
 	Major.init(
 		{

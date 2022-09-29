@@ -8,7 +8,14 @@ module.exports = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			// define association here
+			this.hasMany(models.Major, {
+				foreignKey: "head_of_major"	
+			});
+		}
+		static associate(models) {
+			this.belongsTo(models.User, {
+				foreignKey: "user_id"	
+			});
 		}
 	}
 	Lecturer.init(
@@ -18,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
 				primaryKey: true,
 				defaultValue: sequelize.literal("gen_random_uuid()"),
 			},
-			user_id: DataTypes.STRING,
+			user_id: DataTypes.UUID,
 			is_lecturer: DataTypes.BOOLEAN,
 			is_mentor: DataTypes.BOOLEAN,
 			approvedBy: DataTypes.UUID,

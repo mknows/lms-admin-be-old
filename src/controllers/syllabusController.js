@@ -35,7 +35,6 @@ module.exports = {
 				}
 			}
 		}
-		console.log(major);
 		return res.sendJson(200, true, "Success", major);
 	}),
 	/**
