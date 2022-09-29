@@ -1,7 +1,7 @@
 function pagination(data, offset, limit) {
-	if (Number.isInteger(limit) && Number.isInteger(offset)) {
+	if (Number.isInteger(parseInt(limit)) && Number.isInteger(parseInt(offset))) {
 		const firstIndex = (offset - 1) * limit;
-		const lastIndex = firstIndex + limit;
+		const lastIndex = firstIndex + limit;	
 		if (typeof data === "object") {
 			return data.slice(firstIndex, lastIndex);
 		} else {

@@ -1,4 +1,4 @@
-const { Major, Subject, MajorSubject } = require("../models");
+const { Major, Subject, MajorSubject,User,Lecturer } = require("../models");
 const { Op } = require("sequelize");
 const Sequelize = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -45,7 +45,21 @@ module.exports = {
 		const { offset, limit } = req.query;
 
 		const major = await Major.findAll({
-			attributes: ["id", "name", "description", "head_of_major"],
+			attributes: ["id", "name", "description"],
+            include:[{
+                model:Lecturer,
+                attributes:[
+                    'is_mentor',
+                    'is_lecturer',
+                    'id'
+                ],
+                include:[{
+                    model:User,
+                    attributes:[
+                        'full_name'
+                    ]
+                }]
+            }]
 		});
 		const majorSubject = await MajorSubject.findAll({
 			attributes: [
@@ -66,6 +80,7 @@ module.exports = {
 				}
 			}
 		}
+
 		const pagedMajor = pagination(major, offset, limit);
 		return res.sendJson(200, true, "Success", pagedMajor);
 	}),
