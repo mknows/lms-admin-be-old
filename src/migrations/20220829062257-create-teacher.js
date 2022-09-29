@@ -8,7 +8,7 @@ module.exports = {
 				type: Sequelize.UUID,
 			},
 			user_id: {
-				type: Sequelize.STRING,
+				type: Sequelize.UUID,
 			},
 			is_lecturer: {
 				type: Sequelize.BOOLEAN,
