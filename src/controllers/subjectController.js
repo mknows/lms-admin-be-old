@@ -245,12 +245,9 @@ module.exports = {
 		const { subject_id } = req.body;
 		const student_id = req.userData.id;
 		const credit_thresh = 24;
-		const subjectsEnrolled = await StudentSubject.findAll({
-			where: {
-				student_id: student_id,
-				[Op.or]: [{ status: "ONGOING" }, { status: "PENDING" }],
-			},
-		});
+		let subjectsEnrolled = await getPlan(student_id);
+
+		subjectsEnrolled = subjectsEnrolled[0].concat(subjectsEnrolled[1]);
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
@@ -292,6 +289,8 @@ module.exports = {
 	getStudyPlan: asyncHandler(async (req, res) => {
 		const student_id = req.userData.id;
 		const subjectsEnrolled = await getPlan(student_id);
+
+		console.log(subjectsEnrolled);
 
 		const datapending = subjectsEnrolled[0];
 		const dataongoing = subjectsEnrolled[1];
@@ -336,19 +335,22 @@ module.exports = {
 
 			ongoingres.push(dataval);
 		}
-		return res.sendJson(200, true, "success", [pendingres, ongoingres]);
+		return res.sendJson(200, true, "success", {
+			pengind: pendingres,
+			ongoing: ongoingres,
+		});
 	}),
 };
 
 async function getPlan(student_id) {
-	const datapending = await subjectTaken.findAll({
+	const datapending = await StudentSubject.findAll({
 		where: {
 			student_id: student_id,
 			status: "PENDING",
 		},
 	});
 
-	const dataongoing = await subjectTaken.findAll({
+	const dataongoing = await StudentSubject.findAll({
 		where: {
 			student_id: student_id,
 			status: "ONGOING",

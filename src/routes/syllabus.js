@@ -4,15 +4,15 @@ const route = express.Router();
 const syllabusController = require("../controllers/syllabusController");
 const { protection } = require("../middlewares/Authentication");
 
-route.get("/getAllMajors", protection, syllabusController.getAllMajors);
+route.get("/majors/all", protection, syllabusController.getAllMajors);
 route.get(
-	"/getAllMajorsPagination",
+	"/majors/paginate",
 	protection,
 	syllabusController.getAllMajorsPagination
 );
-route.get("/getAllSubjects", protection, syllabusController.getAllSubjects);
+route.get("/subjects/all", protection, syllabusController.getAllSubjects);
 route.get(
-	"/getAllSubjectsPagination",
+	"/subjects/paginate",
 	protection,
 	syllabusController.getAllSubjectsPagination
 );
