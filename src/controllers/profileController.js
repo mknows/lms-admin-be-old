@@ -22,9 +22,6 @@ module.exports = {
 		let token = req.firebaseToken;
 		let user = req.userData;
 
-		console.log(token, user);
-		// delete user["firebase_uid"];
-
 		const data = await User.findOne({
 			where: {
 				firebase_uid: user.firebase_uid,
