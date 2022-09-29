@@ -7,6 +7,9 @@ module.exports = {
 				allowNull: false,
 				primaryKey: true,
 			},
+			user_id: {
+				type: Sequelize.UUID,
+			},
 			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,

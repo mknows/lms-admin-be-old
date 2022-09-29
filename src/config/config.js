@@ -36,23 +36,6 @@ module.exports = {
 			deletedAt: "deleted_at",
 		},
 	},
-	GCP_sql_postge: {
-		username: "postgres",
-		password: "D^Eos<=#hyusu{P8",
-		database: "kampus-gratis-develop",
-		host: "34.101.250.5",
-		dialect: "postgres",
-		port: 5432,
-		define: {
-			paranoid: true,
-			timestamps: true,
-			underscored: true,
-			underscoredAll: true,
-			createdAt: "created_at",
-			updatedAt: "updated_at",
-			deletedAt: "deleted_at",
-		},
-	},
 	nonmsib: {
 		username: DB_USERNAME_NONMSIB,
 		password: DB_PASSWORD_NONMSIB,
