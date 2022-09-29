@@ -1,4 +1,4 @@
-const { User, Lecturer, Student } = require("../models");
+const { User, Lecturer, Student, Admin } = require("../models");
 const { getAuth } = require("firebase-admin/auth");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("express-async-handler");
@@ -53,12 +53,14 @@ exports.authorize = (...roles) => {
 			User.findOne({ where: { id: req.userData.id } }),
 			Lecturer.findOne({ where: { id: req.userData.id } }),
 			Student.findOne({ where: { id: req.userData.id } }),
+			Admin.findOne({ where: { id: req.userData.id } }),
 		]).then((values) => {
 			let userRoles = [];
 
 			if (values[0] !== null) userRoles.push("user");
 			if (values[1] !== null) userRoles.push("lecturer");
 			if (values[2] !== null) userRoles.push("student");
+			if (values[3] !== null) userRoles.push("admin");
 
 			return userRoles;
 		});
@@ -70,7 +72,9 @@ exports.authorize = (...roles) => {
 		}
 
 		let role = "not registered";
-		if (currentUserRole.includes("lecturer")) {
+		if (currentUserRole.includes("admin")) {
+			role = "admin";
+		} else if (currentUserRole.includes("lecturer")) {
 			role = "lecturer";
 		} else if (currentUserRole.includes("student")) {
 			role = "student";

@@ -298,7 +298,10 @@ module.exports = {
 		let credit = 0;
 
 		let pendingres = [];
+		let pendingcred = 0;
+
 		let ongoingres = [];
+		let ongoingcred = 0;
 
 		for (let i = 0; i < datapending.length; i++) {
 			let currStudSub = datapending[i];
@@ -308,6 +311,8 @@ module.exports = {
 					id: currStudSub.subject_id,
 				},
 			});
+
+			pendingcred += currSub.credit;
 
 			let dataval = {
 				name: currSub.name,
@@ -327,6 +332,8 @@ module.exports = {
 				},
 			});
 
+			ongoingcred += currSub.credit;
+
 			let dataval = {
 				name: currSub.name,
 				credit: currSub.credit,
@@ -335,9 +342,13 @@ module.exports = {
 
 			ongoingres.push(dataval);
 		}
+
+		let total_plan_cred = pendingcred + ongoingcred;
+
 		return res.sendJson(200, true, "success", {
-			pengind: pendingres,
-			ongoing: ongoingres,
+			pending: { subjects: pendingres, credit: pendingcred },
+			ongoing: { subjects: ongoingres, credit: ongoingcred },
+			total_credit: total_plan_cred,
 		});
 	}),
 };
