@@ -39,10 +39,10 @@ module.exports = {
 	}),
 	/**
 	 * @desc      update module enrolled
-	 * @route     PUT /api/v1/syllabus/getAllMajorsPagination?offset=(number)&&limit=(number)
+	 * @route     PUT /api/v1/syllabus/getAllMajorsPagination?page=(number)&&limit=(number)
 	 * @access    Private
 	 */ getAllMajorsPagination: asyncHandler(async (req, res) => {
-		const { offset, limit } = req.query;
+		const { page, limit } = req.query;
 
 		const major = await Major.findAll({
 			attributes: ["id", "name", "description"],
@@ -81,7 +81,7 @@ module.exports = {
 			}
 		}
 
-		const pagedMajor = pagination(major, offset, limit);
+		const pagedMajor = pagination(major, page, limit);
 		return res.sendJson(200, true, "Success", pagedMajor);
 	}),
 	/**
@@ -101,11 +101,11 @@ module.exports = {
 	}),
 	/**
 	 * @desc      update module enrolled
-	 * @route     PUT /api/v1/syllabus/getAllSubjectsPagination?offset=(number)&&limit=(number)
+	 * @route     PUT /api/v1/syllabus/getAllSubjectsPagination?page=(number)&&limit=(number)
 	 * @access   Private
 	 */
 	getAllSubjectsPagination: asyncHandler(async (req, res) => {
-		const { offset, limit } = req.query;
+		const { page, limit } = req.query;
 
 		const SubjectMajor = await Major.findAll({
 			attributes: ["name", "description"],
@@ -114,7 +114,7 @@ module.exports = {
 				attributes: ["id", "name", "credit", "degree"],
 			},
 		});
-		pagination(SubjectMajor, offset, limit);
+		pagination(SubjectMajor, page, limit);
 		return res.sendJson(200, true, "Success", SubjectMajor);
 	}),
 };
