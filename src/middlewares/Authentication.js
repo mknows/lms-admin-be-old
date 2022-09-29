@@ -65,11 +65,7 @@ exports.authorize = (...roles) => {
 			return userRoles;
 		});
 
-		if (!roles.includes(...currentUserRole)) {
-			return next(
-				new ErrorResponse(`Not authorized to access this route`, 401)
-			);
-		}
+		console.log(currentUserRole);
 
 		let role = "not registered";
 		if (currentUserRole.includes("admin")) {
@@ -81,6 +77,13 @@ exports.authorize = (...roles) => {
 		} else if (currentUserRole.includes("user")) {
 			role = "guest";
 		}
+
+		if (!roles.includes(role)) {
+			return next(
+				new ErrorResponse(`Not authorized to access this route`, 401)
+			);
+		}
+
 		req.role = role;
 
 		next();
