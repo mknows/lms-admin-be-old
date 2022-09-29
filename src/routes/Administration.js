@@ -8,7 +8,7 @@ const { protection, authorize } = require("../middlewares/Authentication");
 
 const upload = multer({
 	storage: multer.memoryStorage(),
-	limits: "2mb",
+	limits: { fileSize: 2000000 },
 	fileFilter: (req, file, cb) => {
 		if (
 			file.mimetype == "application/pdf" ||
@@ -20,7 +20,7 @@ const upload = multer({
 		} else {
 			cb(null, true);
 			return cb(
-				new ErrorResponse(
+				new Error(
 					"Sorry, this upload only support file with type .pdf, .png, .jpg or .jpeg.",
 					400
 				)
@@ -75,24 +75,6 @@ route.put(
 	validatorMessage,
 	administrationController.degreeAdministration
 );
-
-// route.post(
-//   "/create-administration",
-//   protection,
-//   authorize("user"),
-//   //   validate("createAdministration"),
-//   //   validatorMessage,
-//   upload.fields([
-//     { name: "integrity_pact", maxCount: 1 },
-//     { name: "nin_card", maxCount: 1 },
-//     { name: "family_card", maxCount: 1 },
-//     { name: "certificate", maxCount: 1 },
-//     { name: "photo", maxCount: 1 },
-//     { name: "transcript", maxCount: 1 },
-//     { name: "recommendation_letter", maxCount: 1 },
-//   ]),
-//   administrationController.createAdministration
-// );
 
 route.delete("/delete/:id", administrationController.deleteAdministration);
 

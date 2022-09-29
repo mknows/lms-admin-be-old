@@ -36,6 +36,16 @@ const errorHandler = (err, req, res, next) => {
       errors = new ErrorResponse(message, 400);
       break;
     }
+    case "storage/object-not-found": {
+      const message = "storage/object-not-found";
+      errors = new ErrorResponse(message, 404);
+      break;
+    }
+    case "LIMIT_FILE_SIZE": {
+      const message = "sorry this upload file max 2mb";
+      errors = new ErrorResponse(message, 400);
+      break;
+    }
   }
 
   // ==========================
