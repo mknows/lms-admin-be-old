@@ -80,6 +80,28 @@ module.exports = {
 				student_id: student_id,
 				status: "ONGOING",
 			},
+			include: {
+				model: Subject,
+				attributes: [
+					"id",
+					"name",
+					"number_of_sessions",
+					"level",
+					"indicator",
+					"teaching_materials",
+					"credit",
+					"lecturer",
+				],
+			},
+			attributes: {
+				exclude: [
+					"updated_by",
+					"created_by",
+					"deleted_at",
+					"created_at",
+					"updated_at",
+				],
+			},
 		});
 		return res.sendJson(200, true, "sucess get subject", subjectsEnrolled);
 	}),
