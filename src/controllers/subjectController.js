@@ -290,8 +290,6 @@ module.exports = {
 		const student_id = req.userData.id;
 		const subjectsEnrolled = await getPlan(student_id);
 
-		console.log(subjectsEnrolled);
-
 		const datapending = subjectsEnrolled[0];
 		const dataongoing = subjectsEnrolled[1];
 

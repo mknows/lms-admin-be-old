@@ -5,7 +5,6 @@ module.exports = (req, res, next) => {
 		switch (role) {
 			case "user": {
 				message = await checkUser(id);
-				console.log(message);
 				break;
 			}
 			case "lecturer": {
