@@ -43,12 +43,18 @@ module.exports = {
 	 */ getAllMajorsPagination: asyncHandler(async (req, res) => {
 		const { page, limit, search } = req.query;
 
+		let search_query = "%%";
+
+		if (search) {
+			search_query = "%" + search + "%";
+		}
+
 		const major = await Major.findAll({
 			attributes: ["id", "name", "description"],
-			where:{
-				name:{
-					[Op.like]:"%"+search+"%"
-				}	
+			where: {
+				name: {
+					[Op.like]: search_query,
+				},
 			},
 			include: [
 				{
