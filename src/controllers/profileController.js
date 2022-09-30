@@ -27,7 +27,7 @@ module.exports = {
 				firebase_uid: user.firebase_uid,
 			},
 			attributes: {
-				exclude: ["id", "firebase_uid", "password"],
+				exclude: ["id", "firebase_uid", "password", "deleted_at", "updated_at"],
 			},
 		});
 
