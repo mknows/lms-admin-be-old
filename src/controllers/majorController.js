@@ -3,6 +3,14 @@ const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
+const { v4: uuidv4 } = require("uuid");
+const admin = require("firebase-admin");
+const {
+	getStorage,
+	ref,
+	getDownloadURL,
+	deleteObject,
+} = require("firebase/storage");
 
 module.exports = {
 	/**
@@ -12,18 +20,46 @@ module.exports = {
 	 */
 	postMajor: asyncHandler(async (req, res) => {
 		const { major } = req.body;
+		const storage = getStorage();
+		const bucket = admin.storage().bucket();
 		if (!major) return res.sendJson(400, false, "Some fields is missing.", {});
 
-		const data = await Major.create({
+		const thumbnailFile =
+			uuidv4() + "-" + req.file.originalname.split(" ").join("-");
+		const thumbnailBuffer = req.file.buffer;
+
+		let data = await Major.create({
 			name: major[0].toUpperCase() + major.slice(1),
 		});
 
-		return res.sendJson(
-			200,
-			true,
-			"Create New Major Success.",
-			data.dataValues
-		);
+		bucket
+			.file(`images/thumbnail/${thumbnailFile}`)
+			.createWriteStream()
+			.end(thumbnailBuffer)
+			.on("finish", () => {
+				getDownloadURL(ref(storage, `images/thumbnail/${thumbnailFile}`)).then(
+					async (fileLink) => {
+						await Major.update(
+							{
+								thumbnail: `images/thumbnail/${thumbnailFile}`,
+								thumbnail_link: fileLink,
+							},
+							{
+								where: {
+									id: data.id,
+								},
+							}
+						);
+
+						return res.sendJson(
+							200,
+							true,
+							"Create New Major Success.",
+							data.dataValues
+						);
+					}
+				);
+			});
 	}),
 
 	/**
@@ -161,6 +197,7 @@ module.exports = {
 	 */
 	removeMajor: asyncHandler(async (req, res) => {
 		const { major_id } = req.params;
+		const storage = getStorage();
 
 		let data = await Major.findOne({
 			where: { id: major_id },
@@ -173,14 +210,16 @@ module.exports = {
 				data: {},
 			});
 
-		Major.destroy({
-			where: { id: major_id },
-		});
+		deleteObject(ref(storage, data.thumbnail)).then(() => {
+			Major.destroy({
+				where: { id: major_id },
+			});
 
-		return res.status(200).json({
-			success: true,
-			message: `Delete Major with ID ${major_id} successfully.`,
-			data: {},
+			return res.status(200).json({
+				success: true,
+				message: `Delete Major with ID ${major_id} successfully.`,
+				data: {},
+			});
 		});
 	}),
 };

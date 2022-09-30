@@ -59,9 +59,6 @@ exports.validate = (method) => {
 
 		case "administrationBiodata": {
 			return [
-				body("administration_id", "Invalid administration id")
-					.notEmpty()
-					.trim(),
 				body("full_name", "Invalid full name")
 					.notEmpty()
 					.trim()
@@ -83,10 +80,6 @@ exports.validate = (method) => {
 
 		case "administrationFamilial": {
 			return [
-				body("administration_id", "Invalid administration id")
-					.notEmpty()
-					.trim(),
-
 				body("father_name", "Invalid father name").notEmpty(),
 				body("father_occupation", "Invalid father occupation").notEmpty(),
 				body("father_income", "Invalid father income").notEmpty().trim(),
@@ -103,12 +96,7 @@ exports.validate = (method) => {
 		}
 
 		case "administrationDegree": {
-			return [
-				body("administration_id", "Invalid administration id")
-					.notEmpty()
-					.trim(),
-				body("degree", "Invalid degree").notEmpty(),
-			];
+			return [body("degree", "Invalid degree").notEmpty()];
 		}
 
 		case "createAdministration": {

@@ -16,6 +16,12 @@ module.exports = {
 			description:{
 				type: Sequelize.STRING,
 			},
+			thumbnail:{
+				type: Sequelize.STRING,
+			},
+			thumbnail_link:{
+				type: Sequelize.STRING,
+			},
 			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
