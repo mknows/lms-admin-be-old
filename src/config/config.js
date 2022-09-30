@@ -100,6 +100,7 @@ module.exports = {
 			updatedAt: "updated_at",
 			deletedAt: "deleted_at",
 		},
+		logging: false,
 	},
 
 	production: {

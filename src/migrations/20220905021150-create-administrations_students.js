@@ -54,7 +54,7 @@ module.exports = {
 			recommendation_letter: Sequelize.STRING,
 			recommendation_letter_link: Sequelize.STRING,
 
-			is_approved: Sequelize.STRING,
+			is_approved: Sequelize.JSON,
 			approved_by: Sequelize.UUID,
 
 			degree: Sequelize.STRING,

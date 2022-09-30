@@ -1,4 +1,4 @@
-const { Major, Subject, MajorSubject,User,Lecturer } = require("../models");
+const { Major, Subject, MajorSubject, User, Lecturer } = require("../models");
 const { Op } = require("sequelize");
 const Sequelize = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -8,7 +8,7 @@ const pagination = require("../helpers/pagination");
 module.exports = {
 	/**
 	 * @desc      update module enrolled
-	 * @route     PUT /api/v1/syllabus/getAllMajors
+	 * @route     PUT /api/v1/syllabus/major/all
 	 * @access    Private
 	 */
 	getAllMajors: asyncHandler(async (req, res) => {
@@ -39,27 +39,25 @@ module.exports = {
 	}),
 	/**
 	 * @desc      update module enrolled
-	 * @route     PUT /api/v1/syllabus/getAllMajorsPagination?page=(number)&&limit=(number)
+	 * @route     PUT /api/v1/syllabus/majors/paginate?page=(number)&&limit=(number)
 	 * @access    Private
 	 */ getAllMajorsPagination: asyncHandler(async (req, res) => {
 		const { page, limit } = req.query;
 
 		const major = await Major.findAll({
 			attributes: ["id", "name", "description"],
-            include:[{
-                model:Lecturer,
-                attributes:[
-                    'is_mentor',
-                    'is_lecturer',
-                    'id'
-                ],
-                include:[{
-                    model:User,
-                    attributes:[
-                        'full_name'
-                    ]
-                }]
-            }]
+			include: [
+				{
+					model: Lecturer,
+					attributes: ["is_mentor", "is_lecturer", "id"],
+					include: [
+						{
+							model: User,
+							attributes: ["full_name"],
+						},
+					],
+				},
+			],
 		});
 		const majorSubject = await MajorSubject.findAll({
 			attributes: [
@@ -81,12 +79,18 @@ module.exports = {
 			}
 		}
 
-		const pagedMajor = pagination(major, page, limit);
+		const pagedMajor = await pagination(major, page, limit);
+
+		if (pagedMajor === "Data cannot be sliced") {
+			return res.sendJson(400, false, pagedMajor, {});
+		} else if (pagedMajor === "Limit and / or Page is not an integer") {
+			return res.sendJson(400, false, pagedMajor, {});
+		}
 		return res.sendJson(200, true, "Success", pagedMajor);
 	}),
 	/**
 	 * @desc      update module enrolled
-	 * @route     PUT /api/v1/syllabus/getAllSubjects
+	 * @route     PUT /api/v1/syllabus/subjects/all
 	 * @access   Private
 	 */
 	getAllSubjects: asyncHandler(async (req, res) => {
@@ -101,7 +105,7 @@ module.exports = {
 	}),
 	/**
 	 * @desc      update module enrolled
-	 * @route     PUT /api/v1/syllabus/getAllSubjectsPagination?page=(number)&&limit=(number)
+	 * @route     PUT /api/v1/syllabus/subjects/paginate?page=(number)&&limit=(number)
 	 * @access   Private
 	 */
 	getAllSubjectsPagination: asyncHandler(async (req, res) => {

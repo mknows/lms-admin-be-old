@@ -1,5 +1,6 @@
-const { Admins } = require("../models");
+const { Admin, User } = require("../models");
 const bcrypt = require("bcryptjs");
+const asyncHandler = require("express-async-handler");
 
 module.exports = {
 	getAllAdmin: async (req, res) => {
@@ -12,25 +13,39 @@ module.exports = {
 		}
 	},
 
-	createAdmin: async (req, res) => {
-		try {
-			const { fullName, email, password, gender, phone } = req.body;
+	createAdmin: asyncHandler(async (req, res) => {
+		let { user_id } = req.body;
 
-			const hashPassword = bcrypt.hashSync(password, 10);
+		let user = await User.findOne({
+			where: {
+				id: user_id,
+			},
+		});
 
-			const created = await Admins.create({
-				fullName,
-				email,
-				password: hashPassword,
-				gender,
-				phone,
-				isLecturer: false,
-				isVerified: false,
-			});
-
-			return res.sendJson(200, true, "sucess create data admin", created);
-		} catch (error) {
-			return res.sendJson(403, false, error, {});
+		if (!user) {
+			return res.sendJson(400, false, "Invalid user Id", {});
 		}
-	},
+
+		let admin = await Admin.findOne({
+			where: {
+				id: user_id,
+			},
+		});
+
+		if (admin) {
+			return res.sendJson(
+				400,
+				false,
+				`user with id ${user_id} is already an admin`,
+				admin
+			);
+		}
+
+		const created = await Admin.create({
+			id: user_id,
+			name: user.full_name,
+		});
+
+		return res.sendJson(200, true, "sucess create data admin", created);
+	}),
 };

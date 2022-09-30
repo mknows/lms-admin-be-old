@@ -245,12 +245,9 @@ module.exports = {
 		const { subject_id } = req.body;
 		const student_id = req.userData.id;
 		const credit_thresh = 24;
-		const subjectsEnrolled = await StudentSubject.findAll({
-			where: {
-				student_id: student_id,
-				[Op.or]: [{ status: "ONGOING" }, { status: "PENDING" }],
-			},
-		});
+		let subjectsEnrolled = await getPlan(student_id);
+
+		subjectsEnrolled = subjectsEnrolled[0].concat(subjectsEnrolled[1]);
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
@@ -284,7 +281,96 @@ module.exports = {
 		}
 		return res.sendJson(400, false, "something went wrong", null);
 	}),
+	/**
+	 * @desc      get plan
+	 * @route     POST /api/v1/subject/studyplan
+	 * @access    Private
+	 */
+	getStudyPlan: asyncHandler(async (req, res) => {
+		const student_id = req.userData.id;
+		const subjectsEnrolled = await getPlan(student_id);
+
+		console.log(subjectsEnrolled);
+
+		const datapending = subjectsEnrolled[0];
+		const dataongoing = subjectsEnrolled[1];
+
+		let credit = 0;
+
+		let pendingres = [];
+		let pendingcred = 0;
+
+		let ongoingres = [];
+		let ongoingcred = 0;
+
+		for (let i = 0; i < datapending.length; i++) {
+			let currStudSub = datapending[i];
+
+			let currSub = await Subject.findOne({
+				where: {
+					id: currStudSub.subject_id,
+				},
+			});
+
+			pendingcred += currSub.credit;
+
+			let dataval = {
+				name: currSub.name,
+				credit: currSub.credit,
+				status: currStudSub.status,
+			};
+
+			pendingres.push(dataval);
+		}
+
+		for (let i = 0; i < dataongoing.length; i++) {
+			let currStudSub = dataongoing[i];
+
+			let currSub = await Subject.findOne({
+				where: {
+					id: currStudSub.subject_id,
+				},
+			});
+
+			ongoingcred += currSub.credit;
+
+			let dataval = {
+				name: currSub.name,
+				credit: currSub.credit,
+				status: currStudSub.status,
+			};
+
+			ongoingres.push(dataval);
+		}
+
+		let total_plan_cred = pendingcred + ongoingcred;
+
+		return res.sendJson(200, true, "success", {
+			pending: { subjects: pendingres, credit: pendingcred },
+			ongoing: { subjects: ongoingres, credit: ongoingcred },
+			total_credit: total_plan_cred,
+		});
+	}),
 };
+
+async function getPlan(student_id) {
+	const datapending = await StudentSubject.findAll({
+		where: {
+			student_id: student_id,
+			status: "PENDING",
+		},
+	});
+
+	const dataongoing = await StudentSubject.findAll({
+		where: {
+			student_id: student_id,
+			status: "ONGOING",
+		},
+	});
+
+	let plan = [datapending, dataongoing];
+	return plan;
+}
 
 async function getID(subjectTaken) {
 	const idReturn = [];

@@ -13,6 +13,7 @@ route.get(
 	protection,
 	subjectController.getEnrolledSubject
 );
+route.get("/studyplan", protection, subjectController.getStudyPlan);
 route.get("/:subject_id", protection, subjectController.getSubject);
 route.get("/", protection, subjectController.getAllSubject);
 

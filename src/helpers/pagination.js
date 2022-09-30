@@ -1,17 +1,24 @@
-function pagination(data, page, limit) {
-	const intPage = parseInt(page)
-	const intLimit = parseInt(limit)
+const ErrorResponse = require("../utils/errorResponse");
+
+async function pagination(data, page, limit) {
+	const intPage = parseInt(page);
+	const intLimit = parseInt(limit);
 	if (Number.isInteger(intPage) && Number.isInteger(intLimit)) {
 		const firstIndex = (intPage - 1) * intLimit;
-		const lastIndex = firstIndex + intLimit;	
-		const maxPage = Math.ceil(data.length/intLimit)
+		const lastIndex = firstIndex + intLimit;
+		const maxPage = Math.ceil(data.length / intLimit);
 		if (typeof data === "object") {
-			return [{maxPage : maxPage}, data.slice(firstIndex,lastIndex)];
+			let result = data.slice(firstIndex, lastIndex);
+			console.log("test");
+			return {
+				max_page: maxPage,
+				result: result,
+			};
 		} else {
-			return 	"error cannot be sliced";
+			return "Data cannot be sliced";
 		}
 	} else {
-		return "Limit or Page is not an integer";
+		return "Limit and / or Page is not an integer";
 	}
 }
 module.exports = pagination;
