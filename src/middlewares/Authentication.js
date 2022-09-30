@@ -63,8 +63,6 @@ exports.authorize = (...roles) => {
 			return userRoles;
 		});
 
-		console.log(currentUserRole);
-
 		let role = "not registered";
 		if (currentUserRole.includes("lecturer")) {
 			role = "lecturer";

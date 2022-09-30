@@ -25,11 +25,10 @@ module.exports = {
 			],
 			group: "major_id",
 		});
-		console.log(majorSubject);
+
 		for (i = 0; i < major.length; i++) {
 			for (j = 0; j < majorSubject.length; j++) {
 				if (major[i].dataValues.id === majorSubject[j].dataValues.major_id) {
-					console.log(major[i].dataValues);
 					major[i].dataValues["number_of_subjects"] =
 						majorSubject[j].dataValues.number_of_subjects;
 				}
@@ -42,10 +41,15 @@ module.exports = {
 	 * @route     PUT /api/v1/syllabus/majors/paginate?page=(number)&&limit=(number)
 	 * @access    Private
 	 */ getAllMajorsPagination: asyncHandler(async (req, res) => {
-		const { page, limit } = req.query;
+		const { page, limit, search } = req.query;
 
 		const major = await Major.findAll({
 			attributes: ["id", "name", "description"],
+			where:{
+				name:{
+					[Op.like]:"%"+search+"%"
+				}	
+			},
 			include: [
 				{
 					model: Lecturer,
@@ -72,7 +76,6 @@ module.exports = {
 		for (i = 0; i < major.length; i++) {
 			for (j = 0; j < majorSubject.length; j++) {
 				if (major[i].dataValues.id === majorSubject[j].dataValues.major_id) {
-					console.log(major[i].dataValues);
 					major[i].dataValues["number_of_subjects"] =
 						majorSubject[j].dataValues.number_of_subjects;
 				}
