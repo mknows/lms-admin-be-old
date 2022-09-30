@@ -673,10 +673,16 @@ const createLinkFirebaseRecommendationLetter = (file, id) => {
 	});
 };
 
-const checkIfExistFirebase = async (data) => {
+const checkIfExistFirebase = async (res, data) => {
 	const storage = getStorage();
 	if (data) {
-		await deleteObject(ref(storage, data));
+		await deleteObject(ref(storage, data))
+			.then(() => {
+				console.log("success deleteObject");
+			})
+			.catch(err, () => {
+				return res.sendJson(400, false, "failed upload", err);
+			});
 	}
 };
 
