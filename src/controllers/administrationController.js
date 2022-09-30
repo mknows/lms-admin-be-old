@@ -26,17 +26,28 @@ module.exports = {
 			include: User,
 		});
 
+		let approval = {
+			component: {
+				biodata: false,
+				familial: false,
+				files: false,
+				degree: false,
+			},
+			overall: false,
+		};
+
+		const comp = approval.component;
+
+		if (comp.biodata && comp.familial && comp.files && comp.degree) {
+			approval.overall = true;
+		}
+
 		if (!data) {
 			data = await Administration.create(
 				{
 					user_id: user.id,
 					created_by: user.id,
-					is_approved: {
-						biodata: false,
-						familial: false,
-						files: false,
-						degree: false,
-					},
+					is_approved: approval,
 					approved_by: null,
 				},
 				{
@@ -87,18 +98,18 @@ module.exports = {
 			university_of_origin,
 		} = req.body;
 
-		let data = await Administration.findOne({
+		const exist = await Administration.findOne({
 			where: {
 				user_id: user.id,
 			},
 			include: User,
 		});
 
-		if (!data) {
+		if (!exist) {
 			return res.sendJson(400, false, "invalid administration user data.", {});
 		}
 
-		data = await Administration.update(
+		let data = await Administration.update(
 			{
 				// non - file
 				full_name,
@@ -119,7 +130,7 @@ module.exports = {
 			},
 			{
 				where: {
-					id: administration_id,
+					id: exist.id,
 				},
 				include: User,
 				returning: true,
@@ -129,7 +140,7 @@ module.exports = {
 
 		data = await Administration.findOne({
 			where: {
-				id: administration_id,
+				id: exist.id,
 			},
 			exclude: ["user_id"],
 		});
@@ -165,18 +176,18 @@ module.exports = {
 			financier,
 		} = req.body;
 
-		let data = await Administration.findOne({
+		const exist = await Administration.findOne({
 			where: {
 				user_id: user.id,
 			},
 			include: User,
 		});
 
-		if (!data) {
+		if (!exist) {
 			return res.sendJson(400, false, "invalid administration id", {});
 		}
 
-		data = await Administration.update(
+		let data = await Administration.update(
 			{
 				father_name,
 				father_occupation,
@@ -194,7 +205,7 @@ module.exports = {
 			},
 			{
 				where: {
-					id: administration_id,
+					id: exist.id,
 				},
 				returning: true,
 				plain: true,
@@ -203,7 +214,7 @@ module.exports = {
 
 		data = await Administration.findOne({
 			where: {
-				id: administration_id,
+				id: exist.id,
 			},
 			exclude: ["user_id"],
 		});
@@ -228,24 +239,26 @@ module.exports = {
 		const storage = getStorage();
 		const bucket = admin.storage().bucket();
 
-		let data = await Administration.findOne({
+		const exist = await Administration.findOne({
 			where: {
 				user_id: user.id,
 			},
 			include: User,
 		});
 
-		if (!data) {
-			return res.sendJson(400, false, "invalid administration ID", {});
+		if (!exist) {
+			return res.sendJson(400, false, "invalid administration user data", {});
 		}
 
-		checkIfExistFirebase(data.integrity_pact);
-		checkIfExistFirebase(data.nin_card);
-		checkIfExistFirebase(data.family_card);
-		checkIfExistFirebase(data.certificate);
-		checkIfExistFirebase(data.photo);
-		checkIfExistFirebase(data.transcript);
-		checkIfExistFirebase(data.recommendation_letter);
+		checkIfExistFirebase(exist.integrity_pact);
+		checkIfExistFirebase(exist.nin_card);
+		checkIfExistFirebase(exist.family_card);
+		checkIfExistFirebase(exist.certificate);
+		checkIfExistFirebase(exist.photo);
+		checkIfExistFirebase(exist.transcript);
+		checkIfExistFirebase(exist.recommendation_letter);
+
+		let administration_id = exist.id;
 
 		// ? optional
 		if (req.files.transcript) {
@@ -398,18 +411,18 @@ module.exports = {
 		const user = req.userData;
 		const { degree } = req.body;
 
-		let data = await Administration.findOne({
+		const exist = await Administration.findOne({
 			where: {
 				user_id: user.id,
 			},
 			include: User,
 		});
 
-		if (!data) {
+		if (!exist) {
 			return res.sendJson(400, false, "invalid administration id", {});
 		}
 
-		data = await Administration.update(
+		let data = await Administration.update(
 			{
 				// non - file
 				degree,
@@ -417,14 +430,14 @@ module.exports = {
 			{
 				include: User,
 				where: {
-					id: administration_id,
+					id: exist.id,
 				},
 			}
 		);
 
 		data = await Administration.findOne({
 			where: {
-				id: administration_id,
+				id: exist.id,
 			},
 			exclude: ["user_id"],
 		});
