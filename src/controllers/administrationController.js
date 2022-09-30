@@ -250,13 +250,13 @@ module.exports = {
 			return res.sendJson(400, false, "invalid administration user data", {});
 		}
 
-		checkIfExistFirebase(data.integrity_pact);
-		checkIfExistFirebase(data.nin_card);
-		checkIfExistFirebase(data.family_card);
-		checkIfExistFirebase(data.certificate);
-		checkIfExistFirebase(data.photo);
-		checkIfExistFirebase(data.transcript);
-		checkIfExistFirebase(data.recommendation_letter);
+		checkIfExistFirebase(res, data.integrity_pact);
+		checkIfExistFirebase(res, data.nin_card);
+		checkIfExistFirebase(res, data.family_card);
+		checkIfExistFirebase(res, data.certificate);
+		checkIfExistFirebase(res, data.photo);
+		checkIfExistFirebase(res, data.transcript);
+		checkIfExistFirebase(res, data.recommendation_letter);
 
 		// ? optional
 		if (req.files.transcript) {
