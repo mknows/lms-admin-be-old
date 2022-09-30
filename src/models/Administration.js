@@ -67,7 +67,7 @@ module.exports = (sequelize, DataTypes) => {
 			recommendation_letter: DataTypes.STRING,
 			recommendation_letter_link: DataTypes.STRING,
 
-			is_approved: DataTypes.STRING,
+			is_approved: DataTypes.JSON,
 			approved_by: DataTypes.UUID,
 			created_at: {
 				allowNull: false,

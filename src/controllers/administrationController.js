@@ -31,7 +31,12 @@ module.exports = {
 				{
 					user_id: user.id,
 					created_by: user.id,
-					is_approved: "waiting",
+					is_approved: {
+						biodata: false,
+						familial: false,
+						files: false,
+						degree: false,
+					},
 					approved_by: null,
 				},
 				{
@@ -65,9 +70,8 @@ module.exports = {
 	 */
 	selfDataAdministration: asyncHandler(async (req, res, next) => {
 		const user = req.userData;
-		const {
-			administration_id,
 
+		const {
 			full_name,
 			email,
 			nin,
@@ -85,12 +89,13 @@ module.exports = {
 
 		let data = await Administration.findOne({
 			where: {
-				id: administration_id,
+				user_id: user.id,
 			},
+			include: User,
 		});
 
 		if (!data) {
-			return res.sendJson(400, false, "invalid administration Id.", {});
+			return res.sendJson(400, false, "invalid administration user data.", {});
 		}
 
 		data = await Administration.update(
@@ -111,8 +116,6 @@ module.exports = {
 				university_of_origin,
 
 				updated_by: user.id,
-				is_approved: "waiting",
-				approved_by: null,
 			},
 			{
 				where: {
@@ -149,8 +152,6 @@ module.exports = {
 		const user = req.userData;
 
 		const {
-			administration_id,
-
 			father_name,
 			father_occupation,
 			father_income,
@@ -166,8 +167,9 @@ module.exports = {
 
 		let data = await Administration.findOne({
 			where: {
-				id: administration_id,
+				user_id: user.id,
 			},
+			include: User,
 		});
 
 		if (!data) {
@@ -226,16 +228,11 @@ module.exports = {
 		const storage = getStorage();
 		const bucket = admin.storage().bucket();
 
-		const { administration_id } = req.body;
-
-		if (!administration_id) {
-			return res.sendJson(400, false, "no administration ID", {});
-		}
-
 		let data = await Administration.findOne({
 			where: {
-				id: administration_id,
+				user_id: user.id,
 			},
+			include: User,
 		});
 
 		if (!data) {
@@ -267,9 +264,6 @@ module.exports = {
 				{
 					updated_by: user.id,
 					transcript: `documents/${transcriptFile}`,
-
-					is_approved: "waiting",
-					approved_by: null,
 				},
 				{
 					where: { id: administration_id },
@@ -302,9 +296,6 @@ module.exports = {
 				{
 					updated_by: user.id,
 					recommendation_letter: `documents/${recommendationLetterFile}`,
-
-					is_approved: "waiting",
-					approved_by: null,
 				},
 				{
 					where: { id: administration_id },
@@ -405,15 +396,23 @@ module.exports = {
 	 */
 	degreeAdministration: asyncHandler(async (req, res, next) => {
 		const user = req.userData;
-		const { administration_id, degree } = req.body;
+		const { degree } = req.body;
 
-		let data = await Administration.update(
+		let data = await Administration.findOne({
+			where: {
+				user_id: user.id,
+			},
+			include: User,
+		});
+
+		if (!data) {
+			return res.sendJson(400, false, "invalid administration id", {});
+		}
+
+		data = await Administration.update(
 			{
 				// non - file
 				degree,
-
-				is_approved: "waiting",
-				approved_by: null,
 			},
 			{
 				include: User,
