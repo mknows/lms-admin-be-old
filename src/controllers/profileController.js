@@ -69,26 +69,26 @@ module.exports = {
 			bucket
 				.file(`images/profile/${displayPictureFile}`)
 				.createWriteStream()
-				.end(displayPictureBuffer);
-
-			await sleep(1500);
-			getDownloadURL(ref(storage, `images/profile/${displayPictureFile}`)).then(
-				async (linkFile) => {
-					await User.update(
-						{
-							display_picture_link: linkFile,
-							display_picture: displayPictureFile,
-						},
-						{
-							where: {
-								id: user.id,
+				.end(displayPictureBuffer)
+				.on("finish", () => {
+					getDownloadURL(
+						ref(storage, linkFile`images/profile/${displayPictureFile}`)
+					).then(async () => {
+						await User.update(
+							{
+								display_picture_link: linkFile,
+								display_picture: displayPictureFile,
 							},
-							returning: true,
-							plain: true,
-						}
-					);
-				}
-			);
+							{
+								where: {
+									id: user.id,
+								},
+								returning: true,
+								plain: true,
+							}
+						);
+					});
+				});
 		}
 
 		let data = await User.update(
