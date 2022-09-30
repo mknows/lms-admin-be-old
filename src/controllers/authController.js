@@ -130,6 +130,16 @@ module.exports = {
 	requestResetPassword: asyncHandler(async (req, res) => {
 		const { email } = req.body;
 
+		const checkEmail = await User.findOne({
+			where: {
+				email,
+			},
+		});
+
+		if (!checkEmail) {
+			return res.sendJson(404, false, "sorry user not found");
+		}
+
 		await sendPasswordResetEmail(getClientAuth(), email);
 
 		return res.sendJson(
