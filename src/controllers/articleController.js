@@ -39,25 +39,25 @@ module.exports = {
 			uuidv4() + "-" + req.file.originalname.split(" ").join("-");
 		const articleBuffer = req.file.buffer;
 
-		bucket
-			.file(`images/article/${articleFile}`)
-			.createWriteStream()
-			.end(articleBuffer);
-
 		const created = await Article.create({
 			title,
 			description,
-			image: `images/article/${articleFile}`,
 		});
 
-		await sleep(1000);
-		firebaseLinkFileArticle(articleFile, created.id);
+		bucket
+			.file(`images/article/${articleFile}`)
+			.createWriteStream()
+			.end(articleBuffer)
+			.on("finish", () => {
+				firebaseLinkFileArticle(
+					`images/article/${articleFile}`,
+					articleFile,
+					created.id
+				);
+			});
 
 		return res.sendJson(201, true, "success create new article", {
-			title: created.title,
-			description: created.description,
-			image: created.image,
-			image_link: created.image_link,
+			created,
 		});
 	}),
 
@@ -161,12 +161,13 @@ module.exports = {
 	}),
 };
 
-const firebaseLinkFileArticle = (file, id) => {
+const firebaseLinkFileArticle = (image, file, id) => {
 	const storage = getStorage();
 	getDownloadURL(ref(storage, `images/article/${file}`)).then(
 		async (linkFile) => {
 			await Article.update(
 				{
+					image: image,
 					image_link: linkFile,
 				},
 				{

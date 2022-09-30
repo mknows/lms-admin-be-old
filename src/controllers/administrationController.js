@@ -268,10 +268,10 @@ module.exports = {
 			bucket
 				.file(`documents/${transcriptFile}`)
 				.createWriteStream()
-				.end(transcriptBuffer);
-
-			await sleep(1500);
-			createLinkFirebaseTranscript(transcriptFile, administration_id);
+				.end(transcriptBuffer)
+				.on("finish", () => {
+					createLinkFirebaseTranscript(transcriptFile, administration_id);
+				});
 
 			await Administration.update(
 				{
@@ -297,13 +297,13 @@ module.exports = {
 			bucket
 				.file(`documents/${recommendationLetterFile}`)
 				.createWriteStream()
-				.end(recommendationLetterBuffer);
-
-			await sleep(1500);
-			createLinkFirebaseRecommendationLetter(
-				recommendationLetterFile,
-				administration_id
-			);
+				.end(recommendationLetterBuffer)
+				.on("finish", () => {
+					createLinkFirebaseRecommendationLetter(
+						recommendationLetterFile,
+						administration_id
+					);
+				});
 
 			await Administration.update(
 				{
@@ -338,20 +338,38 @@ module.exports = {
 		bucket
 			.file(`documents/${integrityPactFile}`)
 			.createWriteStream()
-			.end(integrityPactBuffer);
+			.end(integrityPactBuffer)
+			.on("finish", () => {
+				createLinkFirebaseIntegrityPact(integrityPactFile, administration_id);
+			});
 		bucket
 			.file(`documents/${ninCardFile}`)
 			.createWriteStream()
-			.end(ninCardBuffer);
+			.end(ninCardBuffer)
+			.on("finish", () => {
+				createLinkFirebaseNinCard(ninCardFile, administration_id);
+			});
 		bucket
 			.file(`documents/${familyCardFile}`)
 			.createWriteStream()
-			.end(familyCardBuffer);
+			.end(familyCardBuffer)
+			.on("finish", () => {
+				createLinkFirebaseFamilyCard(familyCardFile, administration_id);
+			});
 		bucket
 			.file(`documents/${certificateFile}`)
 			.createWriteStream()
-			.end(certificateBuffer);
-		bucket.file(`documents/${photoFile}`).createWriteStream().end(photoBuffer);
+			.end(certificateBuffer)
+			.on("finish", () => {
+				createLinkFirebaseCertificate(certificateFile, administration_id);
+			});
+		bucket
+			.file(`documents/${photoFile}`)
+			.createWriteStream()
+			.end(photoBuffer)
+			.on("finish", () => {
+				createLinkFirebasePhoto(photoFile, administration_id);
+			});
 
 		data = await Administration.update(
 			{
@@ -374,16 +392,6 @@ module.exports = {
 				include: User,
 			}
 		);
-		await sleep(1500);
-		createLinkFirebaseIntegrityPact(integrityPactFile, administration_id);
-		await sleep(1500);
-		createLinkFirebaseNinCard(ninCardFile, administration_id);
-		await sleep(1500);
-		createLinkFirebaseFamilyCard(familyCardFile, administration_id);
-		await sleep(1500);
-		createLinkFirebaseCertificate(certificateFile, administration_id);
-		await sleep(1500);
-		createLinkFirebasePhoto(photoFile, administration_id);
 
 		data = await Administration.findOne({
 			where: { id: administration_id },
@@ -397,9 +405,7 @@ module.exports = {
 			},
 		});
 
-		return res.sendJson(201, true, "Successfully uploaded files", {
-			data,
-		});
+		return res.sendJson(201, true, "Successfully uploaded files");
 	}),
 
 	/**
@@ -668,10 +674,16 @@ const createLinkFirebaseRecommendationLetter = (file, id) => {
 	});
 };
 
-const checkIfExistFirebase = async (data) => {
+const checkIfExistFirebase = async (res, data) => {
 	const storage = getStorage();
 	if (data) {
-		await deleteObject(ref(storage, data));
+		await deleteObject(ref(storage, data))
+			.then(() => {
+				console.log("success deleteObject");
+			})
+			.catch(err, () => {
+				return res.sendJson(400, false, "failed upload", err);
+			});
 	}
 };
 
