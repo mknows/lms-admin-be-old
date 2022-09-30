@@ -250,15 +250,13 @@ module.exports = {
 			return res.sendJson(400, false, "invalid administration user data", {});
 		}
 
-		checkIfExistFirebase(exist.integrity_pact);
-		checkIfExistFirebase(exist.nin_card);
-		checkIfExistFirebase(exist.family_card);
-		checkIfExistFirebase(exist.certificate);
-		checkIfExistFirebase(exist.photo);
-		checkIfExistFirebase(exist.transcript);
-		checkIfExistFirebase(exist.recommendation_letter);
-
-		let administration_id = exist.id;
+		checkIfExistFirebase(data.integrity_pact);
+		checkIfExistFirebase(data.nin_card);
+		checkIfExistFirebase(data.family_card);
+		checkIfExistFirebase(data.certificate);
+		checkIfExistFirebase(data.photo);
+		checkIfExistFirebase(data.transcript);
+		checkIfExistFirebase(data.recommendation_letter);
 
 		// ? optional
 		if (req.files.transcript) {
@@ -674,16 +672,10 @@ const createLinkFirebaseRecommendationLetter = (file, id) => {
 	});
 };
 
-const checkIfExistFirebase = async (res, data) => {
+const checkIfExistFirebase = async (data) => {
 	const storage = getStorage();
 	if (data) {
-		await deleteObject(ref(storage, data))
-			.then(() => {
-				console.log("success deleteObject");
-			})
-			.catch(err, () => {
-				return res.sendJson(400, false, "failed upload", err);
-			});
+		await deleteObject(ref(storage, data));
 	}
 };
 
