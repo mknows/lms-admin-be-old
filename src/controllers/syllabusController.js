@@ -53,7 +53,7 @@ module.exports = {
 			attributes: ["id", "name", "description"],
 			where: {
 				name: {
-					[Op.like]: search_query,
+					[Op.iLike]: search_query,
 				},
 			},
 			include: [
