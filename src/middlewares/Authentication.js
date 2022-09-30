@@ -53,14 +53,12 @@ exports.authorize = (...roles) => {
 			User.findOne({ where: { id: req.userData.id } }),
 			Lecturer.findOne({ where: { id: req.userData.id } }),
 			Student.findOne({ where: { id: req.userData.id } }),
-			Admin.findOne({ where: { id: req.userData.id } }),
 		]).then((values) => {
 			let userRoles = [];
 
 			if (values[0] !== null) userRoles.push("user");
 			if (values[1] !== null) userRoles.push("lecturer");
 			if (values[2] !== null) userRoles.push("student");
-			if (values[3] !== null) userRoles.push("admin");
 
 			return userRoles;
 		});
@@ -68,9 +66,7 @@ exports.authorize = (...roles) => {
 		console.log(currentUserRole);
 
 		let role = "not registered";
-		if (currentUserRole.includes("admin")) {
-			role = "admin";
-		} else if (currentUserRole.includes("lecturer")) {
+		if (currentUserRole.includes("lecturer")) {
 			role = "lecturer";
 		} else if (currentUserRole.includes("student")) {
 			role = "student";
@@ -78,7 +74,7 @@ exports.authorize = (...roles) => {
 			role = "guest";
 		}
 
-		if (!roles.includes(role)) {
+		if (!roles.includes(...currentUserRole)) {
 			return next(
 				new ErrorResponse(`Not authorized to access this route`, 401)
 			);
