@@ -16,5 +16,10 @@ route.get(
 	protection,
 	syllabusController.getAllSubjectsPagination
 );
+route.get(
+	"/subjectByMajor/:major_id",
+	protection,
+	syllabusController.subjectByMajor
+);
 
 module.exports = route;

@@ -130,4 +130,40 @@ module.exports = {
 		pagination(SubjectMajor, page, limit);
 		return res.sendJson(200, true, "Success", SubjectMajor);
 	}),
+	
+	/**
+	 * @desc      update module enrolled
+	 * @route     PUT /api/v1/syllabus/subjectByMajor/:major_id
+	 * @access   Private
+	 */
+	 subjectByMajor: asyncHandler(async (req, res) => {
+		const { major_id } = req.params;
+		let subjectByMajor;
+		
+		const major = await Major.findOne({
+			attributes:[
+				'id'
+			]
+		})
+		if(major.length===0){
+			return res.sendJson(400, false, "Error, Major doesn't exist", {});
+		}
+		if(major.length!==0){
+			subjectByMajor = await Subject.findAll({
+				attributes:[
+					'id','name'
+				],
+				include:{
+					model:Major,
+					attributes:[
+						'id','name'
+					],
+					where:{
+						id: major_id
+					}
+				}
+			})
+		}
+		return res.sendJson(200, true, "Success", subjectByMajor);
+	}),
 };
