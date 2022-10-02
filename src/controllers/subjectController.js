@@ -1,8 +1,16 @@
-const { Student, Subject, StudentSubject, Major } = require("../models");
+const {
+	Student,
+	Subject,
+	StudentSubject,
+	Major,
+	Lecturer,
+	User,
+} = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
+const { UserAgent } = require("express-useragent");
 
 module.exports = {
 	// this should make it
@@ -104,7 +112,42 @@ module.exports = {
 				],
 			},
 		});
-		return res.sendJson(200, true, "sucess get subject", subjectsEnrolled);
+
+		let result = [];
+
+		for (let i = 0; i < subjectsEnrolled.length; i++) {
+			let lect = subjectsEnrolled[i].Subject.lecturer;
+
+			let leturers = [];
+			for (let i = 0; i < lect.length; i++) {
+				leturers.push(lect[i]);
+			}
+
+			let teachers = await Lecturer.findAll({
+				where: {
+					id: leturers,
+				},
+				attributes: [],
+				include: {
+					model: User,
+					attributes: ["full_name"],
+				},
+			});
+
+			let teach = [];
+
+			for (let i = 0; i < teachers.length; i++) {
+				teach.push(teachers[i].User.full_name);
+			}
+
+			let resval = {
+				item: subjectsEnrolled[i],
+				lecturers: teach,
+			};
+
+			result.push(resval);
+		}
+		return res.sendJson(200, true, "sucess get subject", result);
 	}),
 	/**
 	 * @desc      Edit Subject
