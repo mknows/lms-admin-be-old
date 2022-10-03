@@ -29,7 +29,7 @@ module.exports = {
 			duration: duration,
 			description: description,
 			content: content,
-			// document_id: document_id,
+			document_id: document_id,
 		});
 
 		const file_assignment =
