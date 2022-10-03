@@ -238,15 +238,16 @@ module.exports = {
 		const user = req.userData;
 		const storage = getStorage();
 		const bucket = admin.storage().bucket();
+		const { administration_id } = req.body;
 
-		const exist = await Administration.findOne({
+		let data = await Administration.findOne({
 			where: {
 				user_id: user.id,
 			},
 			include: User,
 		});
 
-		if (!exist) {
+		if (!data) {
 			return res.sendJson(400, false, "invalid administration user data", {});
 		}
 
