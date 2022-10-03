@@ -13,6 +13,12 @@ module.exports = {
 			subject_id: {
 				type: Sequelize.UUID,
 			},
+			degree: {
+				type: Sequelize.STRING,
+			},
+			semester: {
+				type: Sequelize.STRING,
+			},
 			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,

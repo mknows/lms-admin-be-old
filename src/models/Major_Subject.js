@@ -20,6 +20,8 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			major_id: DataTypes.UUID,
 			subject_id: DataTypes.UUID,
+			degree: DataTypes.STRING,
+			semester: DataTypes.STRING,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
 			deleted_at: DataTypes.DATE,
