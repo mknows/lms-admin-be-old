@@ -8,12 +8,12 @@ module.exports = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			this.belongsToMany(models.Student, {
-				through: models.StudentSubject,
-				foreignKey: "subject_id",
-			});
 			this.belongsToMany(models.Major, {
 				through: models.MajorSubject,
+				foreignKey: "subject_id",
+			});
+			this.belongsToMany(models.Student, {
+				through: models.StudentSubject,
 				foreignKey: "subject_id",
 			});
 		}

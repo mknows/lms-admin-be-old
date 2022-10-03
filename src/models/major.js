@@ -7,10 +7,8 @@ module.exports = (sequelize, DataTypes) => {
 				through: models.MajorSubject,
 				foreignKey: "major_id",
 			});
-		}
-		static associate(models) {
 			this.belongsTo(models.Lecturer, {
-				foreignKey: "head_of_major"
+				foreignKey: "head_of_major",
 			});
 		}
 	}

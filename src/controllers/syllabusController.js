@@ -170,119 +170,103 @@ module.exports = {
 		const { major_id, degree } = req.query;
 		let result = [];
 
-		result = await MajorSubject.findAll({
-			where: {
-				degree,
-				major_id,
-			},
-		});
-
 		let resser = await Promise.all([
-			MajorSubject.findAll({
+			Major.findOne({
 				where: {
-					degree,
-					major_id,
-					semester: "0",
+					id: major_id,
 				},
-				attributes: ["major_id", "subject_id"],
+				attributes: ["id", "name"],
 				include: {
 					model: Subject,
+					through: { where: { semester: "0", degree: degree }, attributes: [] },
 					attributes: ["name"],
 				},
 			}),
-			MajorSubject.findAll({
+			Major.findOne({
 				where: {
-					degree,
-					major_id,
-					semester: "1",
+					id: major_id,
 				},
-				attributes: ["major_id", "subject_id"],
+				attributes: ["id", "name"],
 				include: {
 					model: Subject,
+					through: { where: { semester: "1", degree: degree }, attributes: [] },
 					attributes: ["name"],
 				},
 			}),
-			MajorSubject.findAll({
+			Major.findOne({
 				where: {
-					degree,
-					major_id,
-					semester: "2",
+					id: major_id,
 				},
-				attributes: ["major_id", "subject_id"],
+				attributes: ["id", "name"],
 				include: {
 					model: Subject,
+					through: { where: { semester: "2", degree: degree }, attributes: [] },
 					attributes: ["name"],
 				},
 			}),
-			MajorSubject.findAll({
+			Major.findOne({
 				where: {
-					degree,
-					major_id,
-					semester: "3",
+					id: major_id,
 				},
-				attributes: ["major_id", "subject_id"],
+				attributes: ["id", "name"],
 				include: {
 					model: Subject,
+					through: { where: { semester: "3", degree: degree }, attributes: [] },
 					attributes: ["name"],
 				},
 			}),
-			MajorSubject.findAll({
+			Major.findOne({
 				where: {
-					degree,
-					major_id,
-					semester: "4",
+					id: major_id,
 				},
-				attributes: ["major_id", "subject_id"],
+				attributes: ["id", "name"],
 				include: {
 					model: Subject,
+					through: { where: { semester: "4", degree: degree }, attributes: [] },
 					attributes: ["name"],
 				},
 			}),
-			MajorSubject.findAll({
+			Major.findOne({
 				where: {
-					degree,
-					major_id,
-					semester: "5",
+					id: major_id,
 				},
-				attributes: ["major_id", "subject_id"],
+				attributes: ["id", "name"],
 				include: {
 					model: Subject,
+					through: { where: { semester: "5", degree: degree }, attributes: [] },
 					attributes: ["name"],
 				},
 			}),
-			MajorSubject.findAll({
+			Major.findOne({
 				where: {
-					degree,
-					major_id,
-					semester: "6",
+					id: major_id,
 				},
-				attributes: ["major_id", "subject_id"],
+				attributes: ["id", "name"],
 				include: {
 					model: Subject,
+					through: { where: { semester: "6", degree: degree }, attributes: [] },
 					attributes: ["name"],
 				},
 			}),
-			MajorSubject.findAll({
+			Major.findOne({
 				where: {
-					degree,
-					major_id,
-					semester: "7",
+					id: major_id,
 				},
-				attributes: ["major_id", "subject_id"],
+				attributes: ["id", "name"],
 				include: {
 					model: Subject,
+					through: { where: { semester: "7", degree: degree }, attributes: [] },
 					attributes: ["name"],
 				},
 			}),
-			MajorSubject.findAll({
+			Major.findOne({
 				where: {
-					degree,
-					major_id,
-					semester: "8",
+					id: major_id,
 				},
-				attributes: ["major_id", "subject_id"],
+				attributes: ["id", "name"],
 				include: {
 					model: Subject,
+					through: { where: { semester: "8", degree: degree }, attributes: [] },
 					attributes: ["name"],
 				},
 			}),
