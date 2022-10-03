@@ -1,4 +1,10 @@
-const { Module, Video, Document, Material } = require("../models");
+const {
+	Module,
+	Video,
+	Document,
+	Material,
+	Material_Enrolled,
+} = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -18,11 +24,10 @@ module.exports = {
 			video_id: video_id,
 			document_id: document_id,
 		});
-
+		console.log(modcr.id);
 		await Material.create({
 			session_id: session_id,
 			type: "MODULE",
-			id_referrer: modcr.id,
 		});
 
 		return res.sendJson(200, true, "Success", modcr);
@@ -96,7 +101,11 @@ module.exports = {
 			where: {
 				session_id: session_id,
 			},
+			include: {
+				Material_Enrolled,
+			},
 		});
+
 		return res.sendJson(200, true, "Success", mods);
 	}),
 	/**

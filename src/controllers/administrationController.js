@@ -429,7 +429,7 @@ module.exports = {
 		let data = await Administration.update(
 			{
 				// non - file
-				degree,
+				degree: degree,
 			},
 			{
 				include: User,
@@ -509,9 +509,10 @@ module.exports = {
 async function sortData(data) {
 	const ret_data = {
 		administration_id: data.id,
+		degree: data.degree,
 		biodata: {
 			full_name: data.full_name,
-			email: data.full_name,
+			email: data.email,
 			nin: data.nin,
 			study_program: data.study_program,
 			semester: data.semester,
@@ -546,7 +547,7 @@ async function sortData(data) {
 			transcript: data.transcript,
 			recommendation_letter: data.recommendation_letter,
 		},
-		degree: data.degree,
+
 		is_approved: data.is_approved,
 		approved_by: data.approved_by,
 	};

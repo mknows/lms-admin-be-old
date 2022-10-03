@@ -17,8 +17,9 @@ module.exports = {
 	 * @access    Private
 	 */
 	finishMaterial: asyncHandler(async (req, res) => {
-		const { student_id, session_id, id_referrer, activity_detail, score } =
-			req.body;
+		const { session_id, id_referrer, activity_detail, score } = req.body;
+
+		const student_id = req.student_id;
 
 		const data = await Material_Enrolled.update(
 			{

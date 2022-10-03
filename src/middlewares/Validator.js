@@ -73,8 +73,6 @@ exports.validate = (method) => {
 				body("birth_date", "Invalid birth date").notEmpty(),
 				body("phone", "Invalid phone").notEmpty().trim(),
 				body("gender", "Invalid gender").notEmpty().trim().isIn([0, 1, 2, 9]),
-				body("nsn", "Invalid nsn").notEmpty().trim(),
-				body("university_of_origin", "Invalid university of origin").notEmpty(),
 			];
 		}
 
@@ -91,7 +89,6 @@ exports.validate = (method) => {
 				body("occupation", "Invalid occupation").notEmpty(),
 				body("income", "Invalid income").notEmpty().trim(),
 				body("living_partner", "Invalid living partner").notEmpty(),
-				body("financier", "Invalid financier").notEmpty(),
 			];
 		}
 
