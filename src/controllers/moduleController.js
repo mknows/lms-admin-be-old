@@ -101,12 +101,36 @@ module.exports = {
 			where: {
 				session_id: session_id,
 			},
-			include: {
-				Material_Enrolled,
-			},
 		});
 
-		return res.sendJson(200, true, "Success", mods);
+		let result = [];
+
+		for (let i = 0; i < mods.length; i++) {
+			let currmod = mods[i];
+
+			let met_enr = await Material_Enrolled.findOne({
+				where: {
+					id_referrer: currmod.id,
+				},
+				attribute: ["status"],
+			});
+
+			let stat;
+			if (!met_enr) {
+				stat = "NOT ENROLLED";
+			} else {
+				stat = met_enr.status;
+			}
+
+			let datval = {
+				modul: currmod,
+				status: stat,
+			};
+
+			result.push(datval);
+		}
+
+		return res.sendJson(200, true, "Success", result);
 	}),
 	/**
 	 * @desc      Get Module
