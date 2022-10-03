@@ -11,10 +11,8 @@ module.exports = (sequelize, DataTypes) => {
 			this.hasMany(models.Major, {
 				foreignKey: "head_of_major"	
 			});
-		}
-		static associate(models) {
 			this.belongsTo(models.User, {
-				foreignKey: "user_id"	
+				foreignKey: "user_id"
 			});
 		}
 	}
