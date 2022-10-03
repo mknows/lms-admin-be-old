@@ -22,6 +22,8 @@ module.exports = (sequelize, DataTypes) => {
 			duration: DataTypes.INTEGER,
 			description: DataTypes.TEXT,
 			content: DataTypes.TEXT,
+			file_assignment: DataTypes.STRING,
+			file_assignment_link: DataTypes.STRING,
 			document_id: { type: DataTypes.ARRAY(DataTypes.UUID), defaultValue: [] },
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,

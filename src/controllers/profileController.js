@@ -72,8 +72,8 @@ module.exports = {
 				.end(displayPictureBuffer)
 				.on("finish", () => {
 					getDownloadURL(
-						ref(storage, linkFile`images/profile/${displayPictureFile}`)
-					).then(async () => {
+						ref(storage, `images/profile/${displayPictureFile}`)
+					).then(async (linkFile) => {
 						await User.update(
 							{
 								display_picture_link: linkFile,
