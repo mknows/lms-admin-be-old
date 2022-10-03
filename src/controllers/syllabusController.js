@@ -182,7 +182,24 @@ module.exports = {
 				where: {
 					degree,
 					major_id,
+					semester: "0",
+				},
+				attributes: ["major_id", "subject_id"],
+				include: {
+					model: Subject,
+					attributes: ["name"],
+				},
+			}),
+			MajorSubject.findAll({
+				where: {
+					degree,
+					major_id,
 					semester: "1",
+				},
+				attributes: ["major_id", "subject_id"],
+				include: {
+					model: Subject,
+					attributes: ["name"],
 				},
 			}),
 			MajorSubject.findAll({
@@ -191,12 +208,22 @@ module.exports = {
 					major_id,
 					semester: "2",
 				},
+				attributes: ["major_id", "subject_id"],
+				include: {
+					model: Subject,
+					attributes: ["name"],
+				},
 			}),
 			MajorSubject.findAll({
 				where: {
 					degree,
 					major_id,
 					semester: "3",
+				},
+				attributes: ["major_id", "subject_id"],
+				include: {
+					model: Subject,
+					attributes: ["name"],
 				},
 			}),
 			MajorSubject.findAll({
@@ -205,12 +232,22 @@ module.exports = {
 					major_id,
 					semester: "4",
 				},
+				attributes: ["major_id", "subject_id"],
+				include: {
+					model: Subject,
+					attributes: ["name"],
+				},
 			}),
 			MajorSubject.findAll({
 				where: {
 					degree,
 					major_id,
 					semester: "5",
+				},
+				attributes: ["major_id", "subject_id"],
+				include: {
+					model: Subject,
+					attributes: ["name"],
 				},
 			}),
 			MajorSubject.findAll({
@@ -219,12 +256,22 @@ module.exports = {
 					major_id,
 					semester: "6",
 				},
+				attributes: ["major_id", "subject_id"],
+				include: {
+					model: Subject,
+					attributes: ["name"],
+				},
 			}),
 			MajorSubject.findAll({
 				where: {
 					degree,
 					major_id,
 					semester: "7",
+				},
+				attributes: ["major_id", "subject_id"],
+				include: {
+					model: Subject,
+					attributes: ["name"],
 				},
 			}),
 			MajorSubject.findAll({
@@ -233,12 +280,10 @@ module.exports = {
 					major_id,
 					semester: "8",
 				},
-			}),
-			MajorSubject.findAll({
-				where: {
-					degree,
-					major_id,
-					semester: null,
+				attributes: ["major_id", "subject_id"],
+				include: {
+					model: Subject,
+					attributes: ["name"],
 				},
 			}),
 		]);
