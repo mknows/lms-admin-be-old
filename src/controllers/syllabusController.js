@@ -130,40 +130,119 @@ module.exports = {
 		pagination(SubjectMajor, page, limit);
 		return res.sendJson(200, true, "Success", SubjectMajor);
 	}),
-	
+
 	/**
 	 * @desc      update module enrolled
 	 * @route     PUT /api/v1/syllabus/subjectByMajor/:major_id
 	 * @access   Private
 	 */
-	 subjectByMajor: asyncHandler(async (req, res) => {
+	subjectByMajor: asyncHandler(async (req, res) => {
 		const { major_id } = req.params;
 		let subjectByMajor;
-		
+
 		const major = await Major.findOne({
-			attributes:[
-				'id'
-			]
-		})
-		if(major.length===0){
+			attributes: ["id"],
+		});
+		if (major.length === 0) {
 			return res.sendJson(400, false, "Error, Major doesn't exist", {});
 		}
-		if(major.length!==0){
+		if (major.length !== 0) {
 			subjectByMajor = await Subject.findAll({
-				attributes:[
-					'id','name'
-				],
-				include:{
-					model:Major,
-					attributes:[
-						'id','name'
-					],
-					where:{
-						id: major_id
-					}
-				}
-			})
+				attributes: ["id", "name"],
+				include: {
+					model: Major,
+					attributes: ["id", "name"],
+					where: {
+						id: major_id,
+					},
+				},
+			});
 		}
 		return res.sendJson(200, true, "Success", subjectByMajor);
+	}),
+
+	/**
+	 * @desc      get curriculum
+	 * @route     GET /api/v1/syllabus/curriculum/
+	 * @access   Private
+	 */
+	getCurriculum: asyncHandler(async (req, res) => {
+		const { major_id, degree } = req.query;
+		let result = [];
+
+		result = await MajorSubject.findAll({
+			where: {
+				degree,
+				major_id,
+			},
+		});
+
+		let resser = await Promise.all([
+			MajorSubject.findAll({
+				where: {
+					degree,
+					major_id,
+					semester: "1",
+				},
+			}),
+			MajorSubject.findAll({
+				where: {
+					degree,
+					major_id,
+					semester: "2",
+				},
+			}),
+			MajorSubject.findAll({
+				where: {
+					degree,
+					major_id,
+					semester: "3",
+				},
+			}),
+			MajorSubject.findAll({
+				where: {
+					degree,
+					major_id,
+					semester: "4",
+				},
+			}),
+			MajorSubject.findAll({
+				where: {
+					degree,
+					major_id,
+					semester: "5",
+				},
+			}),
+			MajorSubject.findAll({
+				where: {
+					degree,
+					major_id,
+					semester: "6",
+				},
+			}),
+			MajorSubject.findAll({
+				where: {
+					degree,
+					major_id,
+					semester: "7",
+				},
+			}),
+			MajorSubject.findAll({
+				where: {
+					degree,
+					major_id,
+					semester: "8",
+				},
+			}),
+			MajorSubject.findAll({
+				where: {
+					degree,
+					major_id,
+					semester: null,
+				},
+			}),
+		]);
+
+		return res.sendJson(200, true, "Success", resser);
 	}),
 };

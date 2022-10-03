@@ -10,6 +10,7 @@ route.get(
 	protection,
 	syllabusController.getAllMajorsPagination
 );
+route.get("/curriculum", protection, syllabusController.getCurriculum);
 route.get("/subjects/all", protection, syllabusController.getAllSubjects);
 route.get(
 	"/subjects/paginate",
