@@ -367,9 +367,9 @@ module.exports = {
 	 * @access    Private (user)
 	 */
 	existKhsUpload: asyncHandler(async (req, res) => {
-		const {subject_id} = req.params;
+		const { subject_id } = req.params;
 		const student_id = req.student_id;
-		
+
 		const storage = getStorage();
 		const bucket = admin.storage().bucket();
 
@@ -429,24 +429,22 @@ module.exports = {
 		}
 		if (enrolled === false && credit <= credit_thresh) {
 			bucket
-			.file(nameFile)
-			.createWriteStream()
-			.end(fileBuffer)
-			.on("finish", () => {
-				console.log("Lanjut finish ini");
-				getDownloadURL(ref(storage, nameFile)).then(async (linkFile) => {
-					console.log("link nya => ", linkFile);
-					await StudentSubject.create(
-						{
-							student_id : student_id,
-							subject_id : subject_id,
+				.file(nameFile)
+				.createWriteStream()
+				.end(fileBuffer)
+				.on("finish", () => {
+					console.log("Lanjut finish ini");
+					getDownloadURL(ref(storage, nameFile)).then(async (linkFile) => {
+						console.log("link nya => ", linkFile);
+						await StudentSubject.create({
+							student_id: student_id,
+							subject_id: subject_id,
 							proof: nameFile,
 							proof_link: linkFile,
-							status: DRAFT
-						}
-					);
+							status: DRAFT,
+						});
+					});
 				});
-			});		
 			return res.sendJson(200, true, "Enrolled Subject");
 		} else if (credit > credit_thresh) {
 			return res.sendJson(400, false, "Exceeded maximum credit", {
@@ -564,7 +562,7 @@ module.exports = {
 		const student_id = req.student_id;
 		await StudentSubject.update(
 			{
-				status: PENDING
+				status: PENDING,
 			},
 			{
 				where: {
@@ -584,12 +582,12 @@ module.exports = {
 		const student_id = req.student_id;
 		const { student_subject_id } = req.params;
 
-		const exists= StudentSubject.findOne({
+		const exists = StudentSubject.findOne({
 			where: {
 				id: student_subject_id,
 			},
 		});
-		if(!exists){
+		if (!exists) {
 			return res.sendJson(400, false, "Draft doesn't exist");
 		}
 		await StudentSubject.destroy({

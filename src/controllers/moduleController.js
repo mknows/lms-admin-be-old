@@ -23,9 +23,12 @@ const {
 	FINISHED,
 	NOT_ENROLLED,
 
+<<<<<<< HEAD
 	MODULE,
 } = process.env;
 
+=======
+>>>>>>> 46e62f1 (add endpoint and controller uploadKhsStudentSubject)
 module.exports = {
 	/**
 	 * @desc      post make module
@@ -119,7 +122,10 @@ module.exports = {
 				session_id,
 			},
 			attributes: ["id", "description", "document_id", "video_id"],
+<<<<<<< HEAD
 			order: ["created_at", "ASC"],
+=======
+>>>>>>> 46e62f1 (add endpoint and controller uploadKhsStudentSubject)
 		});
 
 		for (let i = 0; i < mods.length; i++) {
@@ -134,6 +140,7 @@ module.exports = {
 			let met_enr = await Material_Enrolled.findOne({
 				where: {
 					id_referrer: currmod.id,
+<<<<<<< HEAD
 					student_id: req.student_id,
 				},
 				attribute: ["status"],
@@ -157,6 +164,20 @@ module.exports = {
 			result.push(datval);
 		}
 
+=======
+					student_id: student_id,
+				},
+			});
+			if (!met_enr) {
+				await Material_Enrolled.create({
+					student_id: student_id,
+					id_referrer: currmod.id,
+					status: "ONGOING",
+				});
+			}
+		}
+
+>>>>>>> 46e62f1 (add endpoint and controller uploadKhsStudentSubject)
 		return res.sendJson(200, true, "Success", mods);
 	}),
 	/**
