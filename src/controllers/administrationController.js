@@ -265,7 +265,7 @@ module.exports = {
 			const transcriptBuffer = req.files.transcript[0].buffer;
 
 			bucket
-				.file(`documents/${transcriptFile}`)
+				.file(transcriptFile)
 				.createWriteStream()
 				.end(transcriptBuffer)
 				.on("finish", () => {
@@ -275,7 +275,7 @@ module.exports = {
 			await Administration.update(
 				{
 					updated_by: user.id,
-					transcript: `documents/${transcriptFile}`,
+					transcript: transcriptFile,
 				},
 				{
 					where: { id: administration_id },
@@ -294,7 +294,7 @@ module.exports = {
 				req.files.recommendation_letter[0].buffer;
 
 			bucket
-				.file(`documents/${recommendationLetterFile}`)
+				.file(recommendationLetterFile)
 				.createWriteStream()
 				.end(recommendationLetterBuffer)
 				.on("finish", () => {
@@ -307,7 +307,7 @@ module.exports = {
 			await Administration.update(
 				{
 					updated_by: user.id,
-					recommendation_letter: `documents/${recommendationLetterFile}`,
+					recommendation_letter: recommendationLetterFile,
 				},
 				{
 					where: { id: administration_id },
@@ -335,35 +335,35 @@ module.exports = {
 		const photoBuffer = req.files.photo[0].buffer;
 
 		bucket
-			.file(`documents/${integrityPactFile}`)
+			.file(integrityPactFile)
 			.createWriteStream()
 			.end(integrityPactBuffer)
 			.on("finish", () => {
 				createLinkFirebaseIntegrityPact(integrityPactFile, administration_id);
 			});
 		bucket
-			.file(`documents/${ninCardFile}`)
+			.file(ninCardFile)
 			.createWriteStream()
 			.end(ninCardBuffer)
 			.on("finish", () => {
 				createLinkFirebaseNinCard(ninCardFile, administration_id);
 			});
 		bucket
-			.file(`documents/${familyCardFile}`)
+			.file(familyCardFile)
 			.createWriteStream()
 			.end(familyCardBuffer)
 			.on("finish", () => {
 				createLinkFirebaseFamilyCard(familyCardFile, administration_id);
 			});
 		bucket
-			.file(`documents/${certificateFile}`)
+			.file(certificateFile)
 			.createWriteStream()
 			.end(certificateBuffer)
 			.on("finish", () => {
 				createLinkFirebaseCertificate(certificateFile, administration_id);
 			});
 		bucket
-			.file(`documents/${photoFile}`)
+			.file(photoFile)
 			.createWriteStream()
 			.end(photoBuffer)
 			.on("finish", () => {
@@ -375,11 +375,11 @@ module.exports = {
 				updated_by: user.id,
 
 				// file
-				integrity_pact: `documents/${integrityPactFile}`,
-				nin_card: `documents/${ninCardFile}`,
-				family_card: `documents/${familyCardFile}`,
-				certificate: `documents/${certificateFile}`,
-				photo: `documents/${photoFile}`,
+				integrity_pact: integrityPactFile,
+				nin_card: ninCardFile,
+				family_card: familyCardFile,
+				certificate: certificateFile,
+				photo: photoFile,
 
 				is_approved: "waiting",
 				approved_by: null,
@@ -564,7 +564,7 @@ const sleep = (ms) => {
 
 const createLinkFirebaseIntegrityPact = (file, id) => {
 	const storage = getStorage();
-	getDownloadURL(ref(storage, `documents/${file}`)).then(async (linkFile) => {
+	getDownloadURL(ref(storage, file)).then(async (linkFile) => {
 		await Administration.update(
 			{
 				integrity_pact_link: linkFile,
@@ -580,7 +580,7 @@ const createLinkFirebaseIntegrityPact = (file, id) => {
 
 const createLinkFirebaseNinCard = (file, id) => {
 	const storage = getStorage();
-	getDownloadURL(ref(storage, `documents/${file}`)).then(async (linkFile) => {
+	getDownloadURL(ref(storage, file)).then(async (linkFile) => {
 		await Administration.update(
 			{
 				nin_card_link: linkFile,
@@ -596,7 +596,7 @@ const createLinkFirebaseNinCard = (file, id) => {
 
 const createLinkFirebaseFamilyCard = (file, id) => {
 	const storage = getStorage();
-	getDownloadURL(ref(storage, `documents/${file}`)).then(async (linkFile) => {
+	getDownloadURL(ref(storage, file)).then(async (linkFile) => {
 		await Administration.update(
 			{
 				family_card_link: linkFile,
@@ -612,7 +612,7 @@ const createLinkFirebaseFamilyCard = (file, id) => {
 
 const createLinkFirebaseCertificate = (file, id) => {
 	const storage = getStorage();
-	getDownloadURL(ref(storage, `documents/${file}`)).then(async (linkFile) => {
+	getDownloadURL(ref(storage, file)).then(async (linkFile) => {
 		await Administration.update(
 			{
 				certificate_link: linkFile,
@@ -628,7 +628,7 @@ const createLinkFirebaseCertificate = (file, id) => {
 
 const createLinkFirebasePhoto = (file, id) => {
 	const storage = getStorage();
-	getDownloadURL(ref(storage, `documents/${file}`)).then(async (linkFile) => {
+	getDownloadURL(ref(storage, file)).then(async (linkFile) => {
 		await Administration.update(
 			{
 				photo_link: linkFile,
@@ -644,7 +644,7 @@ const createLinkFirebasePhoto = (file, id) => {
 
 const createLinkFirebaseTranscript = (file, id) => {
 	const storage = getStorage();
-	getDownloadURL(ref(storage, `documents/${file}`)).then(async (linkFile) => {
+	getDownloadURL(ref(storage, file)).then(async (linkFile) => {
 		await Administration.update(
 			{
 				transcript_link: linkFile,
@@ -660,7 +660,7 @@ const createLinkFirebaseTranscript = (file, id) => {
 
 const createLinkFirebaseRecommendationLetter = (file, id) => {
 	const storage = getStorage();
-	getDownloadURL(ref(storage, `documents/${file}`)).then(async (linkFile) => {
+	getDownloadURL(ref(storage, file)).then(async (linkFile) => {
 		await Administration.update(
 			{
 				recommendation_letter_link: linkFile,
@@ -682,5 +682,10 @@ const checkIfExistFirebase = async (data) => {
 };
 
 const nameFile = (file_name) => {
-	return uuidv4() + "-" + file_name[0].originalname.split(" ").join("-");
+	return (
+		"documents/administrations/" +
+		uuidv4() +
+		"-" +
+		file_name[0].originalname.split(" ").join("-")
+	);
 };

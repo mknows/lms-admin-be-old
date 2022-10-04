@@ -167,6 +167,13 @@ exports.validate = (method) => {
 					.isAlpha("en-US", { ignore: " " }),
 			];
 		}
+
+		case "createDocumentQuestion": {
+			return [
+				body("content", "content is invalid").notEmpty().trim(),
+				body("description", "description is invalid").notEmpty().trim(),
+			];
+		}
 	}
 };
 
