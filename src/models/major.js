@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
 				through: models.MajorSubject,
 				foreignKey: "major_id",
 			});
+
 			this.belongsTo(models.Lecturer, {
 				foreignKey: "head_of_major",
 			});

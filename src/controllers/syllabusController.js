@@ -1,4 +1,11 @@
-const { Major, Subject, MajorSubject, User, Lecturer } = require("../models");
+const {
+	Major,
+	Subject,
+	MajorSubject,
+	User,
+	Lecturer,
+	Student,
+} = require("../models");
 const { Op } = require("sequelize");
 const Sequelize = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -139,26 +146,132 @@ module.exports = {
 	subjectByMajor: asyncHandler(async (req, res) => {
 		const { major_id } = req.params;
 		let subjectByMajor;
+		let studentSubject;
 
 		const major = await Major.findOne({
 			attributes: ["id"],
+			where: {
+				id: major_id,
+			},
 		});
 		if (major.length === 0) {
 			return res.sendJson(400, false, "Error, Major doesn't exist", {});
 		}
 		if (major.length !== 0) {
 			subjectByMajor = await Subject.findAll({
-				attributes: ["id", "name"],
+				attributes: ["id", "name", "level"],
 				include: {
 					model: Major,
-					attributes: ["id", "name"],
+					through: {
+						order: ["semester"],
+					},
+					attributes: ["id", "name", "description"],
 					where: {
 						id: major_id,
 					},
 				},
 			});
+			studentSubject = await Major.findAll({
+				where: {
+					id: major_id,
+				},
+				attributes: ["id"],
+				include: [
+					{
+						model: Subject,
+						attributes: ["id"],
+						include: [
+							{
+								model: Student,
+								attributes: ["user_id"],
+							},
+						],
+					},
+				],
+			});
+			for (i = 0; i < studentSubject[0].dataValues.Subjects.length; i++) {
+				const count =
+					studentSubject[0].dataValues.Subjects[i].dataValues.Students.length;
+				const id = studentSubject[0].dataValues.Subjects[i].dataValues.id;
+				for (j = 0; j < subjectByMajor.length; j++) {
+					if (subjectByMajor[j].dataValues.id == id) {
+						subjectByMajor[j].dataValues["studentEnrolled"] = count;
+					}
+				}
+			}
 		}
 		return res.sendJson(200, true, "Success", subjectByMajor);
+	}),
+	/**
+	 * @desc      Get subject
+	 * @route     GET /api/v1/syllabus/subject/:subject_id
+	 * @access    Public
+	 */
+	getSubject: asyncHandler(async (req, res) => {
+		const { subject_id } = req.params;
+		const subject = await Subject.findOne({
+			attributes: {
+				exclude: [
+					"created_at",
+					"updated_at",
+					"deleted_at",
+					"updated_by",
+					"created_by",
+				],
+			},
+			where: {
+				id: subject_id,
+			},
+		});
+		const name = await Lecturer.findAll({
+			where: {
+				id: {
+					[Op.in]: subject.lecturer,
+				},
+			},
+			include: [
+				{
+					model: User,
+				},
+			],
+		});
+		for (i = 0; i < subject.lecturer.length; i++) {
+			subject.lecturer = [];
+			subject.lecturer.push(name[i].User.dataValues.full_name);
+		}
+		return res.sendJson(200, true, "sucess get subject", subject);
+	}),
+	/**
+	 * @desc      Get subject
+	 * @route     GET /api/v1/syllabus/getCurrentKRS
+	 * @access    Public
+	 */
+	getKRS: asyncHandler(async (req, res) => {
+		let sum = 0;
+		const enrolledSubjects = await Student.findAll({
+			where: {
+				id: "d8ae2586-bd2d-40fd-86d2-9132c0beedce",
+			},
+			include: [
+				{
+					model: User,
+					attributes: ["full_name"],
+				},
+				{
+					model: Subject,
+					attributes: ["credit"],
+				},
+				{
+					model: Major,
+					attributes: ["name"],
+				},
+			],
+		});
+		for (i = 0; i < enrolledSubjects[0].dataValues.Subjects.length; i++) {
+			sum += enrolledSubjects[0].dataValues.Subjects[i].dataValues.credit;
+		}
+		enrolledSubjects[0].dataValues["totalCredit"] = sum;
+		return res.sendJson(200, true, "sucess get subject", enrolledSubjects);
 	}),
 
 	/**
