@@ -292,7 +292,7 @@ module.exports = {
 				include: {
 					model: Subject,
 					through: { where: { semester: "0", degree: degree }, attributes: [] },
-					attributes: ["name"],
+					attributes: ["name", "id"],
 				},
 			}),
 			Major.findOne({
@@ -303,7 +303,7 @@ module.exports = {
 				include: {
 					model: Subject,
 					through: { where: { semester: "1", degree: degree }, attributes: [] },
-					attributes: ["name"],
+					attributes: ["name", "id"],
 				},
 			}),
 			Major.findOne({
@@ -314,7 +314,7 @@ module.exports = {
 				include: {
 					model: Subject,
 					through: { where: { semester: "2", degree: degree }, attributes: [] },
-					attributes: ["name"],
+					attributes: ["name", "id"],
 				},
 			}),
 			Major.findOne({
@@ -325,7 +325,7 @@ module.exports = {
 				include: {
 					model: Subject,
 					through: { where: { semester: "3", degree: degree }, attributes: [] },
-					attributes: ["name"],
+					attributes: ["name", "id"],
 				},
 			}),
 			Major.findOne({
@@ -336,7 +336,7 @@ module.exports = {
 				include: {
 					model: Subject,
 					through: { where: { semester: "4", degree: degree }, attributes: [] },
-					attributes: ["name"],
+					attributes: ["name", "id"],
 				},
 			}),
 			Major.findOne({
@@ -347,7 +347,7 @@ module.exports = {
 				include: {
 					model: Subject,
 					through: { where: { semester: "5", degree: degree }, attributes: [] },
-					attributes: ["name"],
+					attributes: ["name", "id"],
 				},
 			}),
 			Major.findOne({
@@ -358,7 +358,7 @@ module.exports = {
 				include: {
 					model: Subject,
 					through: { where: { semester: "6", degree: degree }, attributes: [] },
-					attributes: ["name"],
+					attributes: ["name", "id"],
 				},
 			}),
 			Major.findOne({
@@ -369,7 +369,7 @@ module.exports = {
 				include: {
 					model: Subject,
 					through: { where: { semester: "7", degree: degree }, attributes: [] },
-					attributes: ["name"],
+					attributes: ["name", "id"],
 				},
 			}),
 			Major.findOne({
@@ -380,7 +380,7 @@ module.exports = {
 				include: {
 					model: Subject,
 					through: { where: { semester: "8", degree: degree }, attributes: [] },
-					attributes: ["name"],
+					attributes: ["name", "id"],
 				},
 			}),
 		]);
