@@ -38,6 +38,7 @@ module.exports = {
 		const user = req.userData;
 
 		let score = 0;
+		let tota_cred = 0;
 
 		let enr = await StudentSubject.findAll({
 			where: {
@@ -60,6 +61,10 @@ module.exports = {
 		});
 	}),
 };
+
+function letterByPercent(percent) {
+	return percent;
+}
 
 function scoreByLetter(letter, credit) {
 	if (letter === "A") {
