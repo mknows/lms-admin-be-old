@@ -289,7 +289,7 @@ module.exports = {
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name", "description", "updated_at"],
+				attributes: [],
 				include: {
 					model: Subject,
 					through: {
@@ -303,7 +303,7 @@ module.exports = {
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name", "description", "updated_at"],
+				attributes: [],
 				include: {
 					model: Subject,
 					through: {
@@ -317,7 +317,7 @@ module.exports = {
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name", "description", "updated_at"],
+				attributes: [],
 				include: {
 					model: Subject,
 					through: {
@@ -331,7 +331,7 @@ module.exports = {
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name", "description", "updated_at"],
+				attributes: [],
 				include: {
 					model: Subject,
 					through: {
@@ -345,7 +345,7 @@ module.exports = {
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name", "description", "updated_at"],
+				attributes: [],
 				include: {
 					model: Subject,
 					through: {
@@ -359,7 +359,7 @@ module.exports = {
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name", "description", "updated_at"],
+				attributes: [],
 				include: {
 					model: Subject,
 					through: {
@@ -373,7 +373,7 @@ module.exports = {
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name", "description", "updated_at"],
+				attributes: [],
 				include: {
 					model: Subject,
 					through: {
@@ -387,7 +387,7 @@ module.exports = {
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name", "description", "updated_at"],
+				attributes: [],
 				include: {
 					model: Subject,
 					through: {
@@ -401,7 +401,7 @@ module.exports = {
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name", "description", "updated_at"],
+				attributes: [],
 				include: {
 					model: Subject,
 					through: {
@@ -413,6 +413,16 @@ module.exports = {
 			}),
 		]);
 
-		return res.sendJson(200, true, "Success", resser);
+		result = [
+			await Major.findOne({
+				where: {
+					id: major_id,
+				},
+				attributes: ["id", "name", "description", "updated_at"],
+			}),
+			resser,
+		];
+
+		return res.sendJson(200, true, "Success", result);
 	}),
 };
