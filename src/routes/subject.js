@@ -3,7 +3,7 @@ const route = express.Router();
 const multer = require("multer");
 
 const subjectController = require("../controllers/subjectController");
-const { protection } = require("../middlewares/Authentication");
+const { protection, authorize } = require("../middlewares/Authentication");
 
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -33,7 +33,14 @@ route.post(
 	upload.single("thumbnail"),
 	subjectController.createSubject
 );
-route.post("/enroll", protection, subjectController.takeSubject);
+
+route.post("/create", protection, subjectController.createSubject);
+route.post(
+	"/enroll/:subject_id",
+	protection,
+	authorize("student"),
+	subjectController.takeSubject
+);
 
 route.get("/forstudent", protection, subjectController.getSubjectForStudent);
 route.get(
@@ -41,7 +48,12 @@ route.get(
 	protection,
 	subjectController.getEnrolledSubject
 );
-route.get("/studyplan", protection, subjectController.getStudyPlan);
+route.get(
+	"/studyplan",
+	protection,
+	authorize("student"),
+	subjectController.getStudyPlan
+);
 route.get("/:subject_id", protection, subjectController.getSubject);
 route.get("/", protection, subjectController.getAllSubject);
 
@@ -56,6 +68,19 @@ route.delete(
 	"/delete/:subject_id",
 	protection,
 	subjectController.removeSubject
+);
+
+route.delete(
+	"/deleteDraft/:student_subject_id",
+	protection,
+	authorize("student"),
+	subjectController.deleteDraft
+);
+route.put(
+	"/sendDraft",
+	protection,
+	authorize("student"),
+	subjectController.sendDraft
 );
 
 module.exports = route;
