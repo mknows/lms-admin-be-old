@@ -139,6 +139,7 @@ module.exports = {
 					"teaching_materials",
 					"credit",
 					"lecturer",
+					"thumbnail_link",
 				],
 			},
 			attributes: {
