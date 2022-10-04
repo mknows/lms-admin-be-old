@@ -32,9 +32,9 @@ const upload = multer({
 route.post(
 	"/create",
 	protection,
-	// validate("createDocumentQuestion"),
-	// validatorMessage,
 	upload.single("file"),
+	validate("createDocumentQuestion"),
+	validatorMessage,
 	documentControlller.createDocument
 );
 route.put(

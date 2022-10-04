@@ -12,7 +12,11 @@ const upload = multer({
 		if (
 			file.mimetype == "image/png" ||
 			file.mimetype == "image/jpg" ||
-			file.mimetype == "image/jpeg"
+			file.mimetype == "image/jpeg" ||
+			file.mimetype == "application/pdf" ||
+			file.mimetype == "application/msword" ||
+			file.mimetype ==
+				"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 		) {
 			return cb(null, true);
 		} else {
@@ -40,6 +44,13 @@ route.post(
 	protection,
 	authorize("student"),
 	subjectController.takeSubject
+);
+route.post(
+	"/uploadkhs/:student_subject_id",
+	protection,
+	// authorize("student"),
+	upload.single("poof"),
+	subjectController.existKhsUpload
 );
 
 route.get("/forstudent", protection, subjectController.getSubjectForStudent);
