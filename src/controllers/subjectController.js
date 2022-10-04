@@ -43,7 +43,7 @@ module.exports = {
 			!name ||
 			!number_of_sessions ||
 			!level ||
-			// !lecturer ||
+			!lecturer ||
 			!description ||
 			!credit ||
 			!degree
@@ -334,6 +334,71 @@ module.exports = {
 			message: `Delete Subject with ID ${subject_id} successfully.`,
 			data: {},
 		});
+	}),
+	/**
+	 * @desc      Post poof exist KHS
+	 * @route     POST /api/v1/subject/uploadkhs/:student_subject_id
+	 * @access    Private (user)
+	 */
+	existKhsUpload: asyncHandler(async (req, res) => {
+		const { student_subject_id } = req.params;
+		if (!student_subject_id) {
+			return res.sendJson(400, false, "student subjet id is required");
+		}
+
+		const search = await StudentSubject.findOne({
+			where: {
+				id: student_subject_id,
+			},
+		});
+
+		if (!search) {
+			return res.sendJson(404, false, "student subject not found");
+		}
+
+		if (search.poof) {
+			deleteObject(ref(storage, search.poof));
+		}
+
+		const storage = getStorage();
+		const bucket = admin.storage().bucket();
+
+		const nameFile = uuidv4() + req.file.originalname.split(" ").join("-");
+		const fileBuffer = req.file.buffer;
+
+		// bucket
+		// 	.upload("documents/khs/", {
+		// 		gzip: true,
+		// 		destination: nameFile,
+		// 	})
+		// 	.then((res) => {
+		// 		console.log("res => ", res);
+		// 	})
+		// 	.catch((err) => console.log(err));
+
+		bucket
+			.file(nameFile)
+			.createWriteStream()
+			.end(fileBuffer)
+			.on("finish", () => {
+				console.log("Lanjut finish ini");
+				getDownloadURL(ref(storage, nameFile)).then(async (linkFile) => {
+					console.log("link nya => ", linkFile);
+					await StudentSubject.update(
+						{
+							proof: nameFile,
+							proof_link: linkFile,
+						},
+						{
+							where: {
+								id: student_subject_id,
+							},
+						}
+					);
+				});
+			});
+
+		return res.sendJson(200, true, "success upload khs");
 	}),
 
 	// Student Specific
