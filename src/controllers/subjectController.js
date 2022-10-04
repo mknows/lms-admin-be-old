@@ -363,16 +363,15 @@ module.exports = {
 	}),
 	/**
 	 * @desc      enroll in a subject
-	 * @route     POST /api/v1/subject/enroll
+	 * @route     POST /api/v1/subject/enroll/:subject_id
 	 * @access    Private
 	 */
 	takeSubject: asyncHandler(async (req, res) => {
-		const { subject_id } = req.body;
-		const student_id = req.userData.id;
+		const { subject_id } = req.params;
+		const student_id = req.student_id;
 		const credit_thresh = 24;
 		let subjectsEnrolled = await getPlan(student_id);
-
-		subjectsEnrolled = subjectsEnrolled[0].concat(subjectsEnrolled[1]);
+		subjectsEnrolled = subjectsEnrolled[0].concat(subjectsEnrolled[1]).concat(subjectsEnrolled[2]);
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
@@ -392,7 +391,7 @@ module.exports = {
 			await StudentSubject.create({
 				subject_id: subject_id,
 				student_id: student_id,
-				status: "PENDING",
+				status: "DRAFT",
 			});
 			res.sendJson(200, true, "Enrolled test", credit);
 		} else if (credit > credit_thresh) {
@@ -407,24 +406,59 @@ module.exports = {
 		return res.sendJson(400, false, "something went wrong", null);
 	}),
 	/**
+	 * @desc      enroll in a subject
+	 * @route     PUT /api/v1/subject/sendDraft
+	 * @access    Private
+	 */
+	 sendDraft: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
+		await StudentSubject.update({
+			status : "DRAFT",
+			where:{
+				student_id:student_id
+			}
+		})
+	}),
+	/**
+	 * @desc      enroll in a subject
+	 * @route     DELETE /api/v1/subject/deleteDraft/:student_subject_id
+	 * @access    Private
+	 */
+	 deleteDraft: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
+		const student_subject_id = req.params;
+		await StudentSubject.destroy({
+			where:{
+				student_id:student_id,
+				student_subject_id: student_subject_id
+			},
+			force:true
+		})
+	}),
+	/**
 	 * @desc      get plan
 	 * @route     POST /api/v1/subject/studyplan
 	 * @access    Private
 	 */
 	getStudyPlan: asyncHandler(async (req, res) => {
-		const student_id = req.userData.id;
+		const student_id = req.student_id;
 		const subjectsEnrolled = await getPlan(student_id);
 
 		const datapending = subjectsEnrolled[0];
 		const dataongoing = subjectsEnrolled[1];
+		const datadraft = subjectsEnrolled[2];
 
 		let credit = 0;
 
+		let draftres = [];
+		let draftcred = 0;
+ 
 		let pendingres = [];
 		let pendingcred = 0;
 
 		let ongoingres = [];
 		let ongoingcred = 0;
+		
 
 		for (let i = 0; i < datapending.length; i++) {
 			let currStudSub = datapending[i];
@@ -466,32 +500,58 @@ module.exports = {
 			ongoingres.push(dataval);
 		}
 
-		let total_plan_cred = pendingcred + ongoingcred;
+		for (let i = 0; i < datadraft.length; i++) {
+			let currStudSub = datadraft[i];
+
+			let currSub = await Subject.findOne({
+				where: {
+					id: currStudSub.subject_id,
+				},
+			});
+
+			draftcred += currSub.credit;
+
+			let dataval = {
+				name: currSub.name,
+				credit: currSub.credit,
+				status: currStudSub.status,
+			};
+
+			draftres.push(dataval);
+		}
+
+		let total_plan_cred = pendingcred + ongoingcred + draftcred;
 
 		return res.sendJson(200, true, "success", {
 			pending: { subjects: pendingres, credit: pendingcred },
 			ongoing: { subjects: ongoingres, credit: ongoingcred },
+			draft : { subjects: draftres, credit: draftcred},
 			total_credit: total_plan_cred,
 		});
 	}),
 };
 
 async function getPlan(student_id) {
-	const datapending = await StudentSubject.findAll({
+	const datapending = await StudentSubject.findAll({		
 		where: {
 			student_id: student_id,
-			status: "PENDING",
+			status: "PENDING"
 		},
 	});
-
 	const dataongoing = await StudentSubject.findAll({
 		where: {
 			student_id: student_id,
 			status: "ONGOING",
 		},
 	});
+	const datadraft = await StudentSubject.findAll({
+		where: {
+			student_id: student_id,
+			status: "DRAFT",
+		},
+	});
 
-	let plan = [datapending, dataongoing];
+	let plan = [datapending, dataongoing,datadraft];
 	return plan;
 }
 
@@ -534,3 +594,4 @@ async function isEnrolled(subIdlist, subId) {
 	}
 	return false;
 }
+

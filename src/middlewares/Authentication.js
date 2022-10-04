@@ -77,7 +77,7 @@ exports.authorize = (...roles) => {
 			role = "guest";
 		}
 
-		if (!roles.includes(...currentUserRole)) {
+		if (!currentUserRole.includes(...roles)) {
 			return next(
 				new ErrorResponse(`Not authorized to access this route`, 401)
 			);
@@ -85,7 +85,6 @@ exports.authorize = (...roles) => {
 
 		req.student_id = student_id;
 		req.role = role;
-
 		next();
 	});
 };
