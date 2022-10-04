@@ -5,6 +5,7 @@ const {
 	User,
 	Lecturer,
 	Student,
+	StudentSubject,
 } = require("../models");
 const { Op } = require("sequelize");
 const Sequelize = require("sequelize");
@@ -412,6 +413,31 @@ module.exports = {
 			}),
 		]);
 
+		let ressress = [];
+
+		console.log(resser.length);
+
+		for (let i = 0; i < resser.length; i++) {
+			let semdat = [];
+			for (let j = 0; j < resser[i].Subjects.length; j++) {
+				let { count, rows } = await StudentSubject.findAndCountAll({
+					where: {
+						subject_id: resser[i].Subjects[j].id,
+					},
+				});
+				let onedat = {
+					subject: resser[i].Subjects[j],
+					student_count: count,
+				};
+				semdat.push(onedat);
+			}
+			let onesemdat = {
+				semester: i,
+				subjects: semdat,
+			};
+			ressress.push(onesemdat);
+		}
+
 		let maj = await Major.findOne({
 				where: {
 					id: major_id,
@@ -420,7 +446,7 @@ module.exports = {
 			}),
 			result = {
 				major: maj,
-				result: resser,
+				result: ressress,
 			};
 
 		return res.sendJson(200, true, "Success", result);
