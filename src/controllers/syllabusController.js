@@ -282,7 +282,6 @@ module.exports = {
 	 */
 	getCurriculum: asyncHandler(async (req, res) => {
 		const { major_id, degree } = req.query;
-		let result = [];
 
 		let resser = await Promise.all([
 			Major.findOne({
