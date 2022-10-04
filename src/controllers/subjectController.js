@@ -10,6 +10,14 @@ const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
+const {
+	getStorage,
+	ref,
+	getDownloadURL,
+	deleteObject,
+} = require("firebase/storage");
+const admin = require("firebase-admin");
+const { v4: uuidv4 } = require("uuid");
 
 module.exports = {
 	// this should make it
@@ -28,11 +36,14 @@ module.exports = {
 			credit,
 			degree,
 		} = req.body;
+		const storage = getStorage();
+		const bucket = admin.storage().bucket();
+
 		if (
 			!name ||
 			!number_of_sessions ||
 			!level ||
-			!lecturer ||
+			// !lecturer ||
 			!description ||
 			!credit ||
 			!degree
@@ -51,6 +62,35 @@ module.exports = {
 			credit: credit,
 			degree: degree,
 		});
+
+		const thumbnailFileName =
+			"images/thumbnail/" +
+			uuidv4() +
+			req.file.originalname.split(" ").join(" ");
+		const thumbnailFileBuffer = req.file.buffer;
+
+		bucket
+			.file(thumbnailFileName)
+			.createWriteStream()
+			.end(thumbnailFileBuffer)
+			.on("finish", () => {
+				getDownloadURL(ref(storage, thumbnailFileName)).then(
+					async (linkFile) => {
+						await Subject.update(
+							{
+								thumbnail: thumbnailFileName,
+								thumbnail_link: linkFile,
+							},
+							{
+								where: {
+									id: data.id,
+								},
+							}
+						);
+					}
+				);
+			});
+
 		return res.sendJson(200, true, "sucess make subject", data);
 	}),
 	/**
@@ -164,6 +204,8 @@ module.exports = {
 			credit,
 			degree,
 		} = req.body;
+		const storage = getStorage();
+		const bucket = admin.storage().bucket();
 
 		const study = await Subject.findOne({
 			where: { id: subject_id },
@@ -175,6 +217,40 @@ module.exports = {
 				message: "Invalid subject_id.",
 				data: {},
 			});
+		}
+
+		if (req.file) {
+			if (study.thumbnail) {
+				deleteObject(ref(storage, study.thumbnail));
+			}
+
+			const thumbnailFileName =
+				"images/thumbnail/" +
+				uuidv4() +
+				req.file.originalname.split(" ").join(" ");
+			const thumbnailFileBuffer = req.file.buffer;
+
+			bucket
+				.file(thumbnailFileName)
+				.createWriteStream()
+				.end(thumbnailFileBuffer)
+				.on("finish", () => {
+					getDownloadURL(ref(storage, thumbnailFileName)).then(
+						async (linkFile) => {
+							await Subject.update(
+								{
+									thumbnail: thumbnailFileName,
+									thumbnail_link: linkFile,
+								},
+								{
+									where: {
+										id: study.id,
+									},
+								}
+							);
+						}
+					);
+				});
 		}
 
 		if (name === null) {
@@ -229,6 +305,7 @@ module.exports = {
 	 */
 	removeSubject: asyncHandler(async (req, res, next) => {
 		const { subject_id } = req.params;
+		const storage = getStorage();
 
 		let data = await Subject.findOne({
 			where: { id: subject_id },
@@ -240,6 +317,10 @@ module.exports = {
 				message: "Invalid subject_id.",
 				data: {},
 			});
+		}
+
+		if (data.thumbnail) {
+			deleteObject(ref(storage, data.thumbnail));
 		}
 
 		Subject.destroy({

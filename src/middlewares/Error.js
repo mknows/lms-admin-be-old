@@ -42,7 +42,7 @@ const errorHandler = (err, req, res, next) => {
       break;
     }
     case "LIMIT_FILE_SIZE": {
-      const message = "sorry this upload file max 2mb";
+      const message = "sorry this upload file max 2mb, in document max 4mb";
       errors = new ErrorResponse(message, 400);
       break;
     }

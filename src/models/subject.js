@@ -41,6 +41,8 @@ module.exports = (sequelize, DataTypes) => {
 			tools_needed: DataTypes.STRING,
 			scoring: DataTypes.STRING,
 			description: DataTypes.STRING,
+			thumbnail: DataTypes.STRING,
+			thumbnail_link: DataTypes.STRING,
 			credit: DataTypes.INTEGER,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
