@@ -2,8 +2,9 @@ const express = require("express");
 const route = express.Router();
 const multer = require("multer");
 
-const assignmentController = require("../controllers/assignmentController");
+const documentControlller = require("../controllers/documentController");
 const { protection } = require("../middlewares/Authentication");
+const { validate, validatorMessage } = require("../middlewares/Validator");
 
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -31,28 +32,24 @@ const upload = multer({
 route.post(
 	"/create",
 	protection,
-	upload.single("file_assignment"),
-	assignmentController.createAssignment
+	// validate("createDocumentQuestion"),
+	// validatorMessage,
+	upload.single("file"),
+	documentControlller.createDocument
 );
-
-route.get("/", protection, assignmentController.getAllAssignment);
-route.get(
-	"/session/:session_id",
-	protection,
-	assignmentController.getAssignmentInSession
-);
-route.get("/:assignment_id", protection, assignmentController.getAssignment);
-
 route.put(
-	"/edit/:assignment_id",
+	"/update/:document_id",
 	protection,
-	upload.single("file_assignment"),
-	assignmentController.updateAssignment
+	upload.single("file"),
+	documentControlller.updateDocument
 );
+
 route.delete(
-	"/delete/:assignment_id",
+	"/delete/:document_id",
 	protection,
-	assignmentController.removeAssignment
+	documentControlller.deleteDocument
 );
+
+route.get("/", protection, documentControlller.getAllData);
 
 module.exports = route;

@@ -47,7 +47,8 @@ module.exports = {
 	 * @desc      update module enrolled
 	 * @route     PUT /api/v1/syllabus/majors/paginate?page=(number)&&limit=(number)
 	 * @access    Private
-	 */ getAllMajorsPagination: asyncHandler(async (req, res) => {
+	 */
+	getAllMajorsPagination: asyncHandler(async (req, res) => {
 		const { page, limit, search } = req.query;
 
 		let search_query = "%%";
@@ -288,99 +289,126 @@ module.exports = {
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name"],
+				attributes: ["id", "name", "description", "updated_at"],
 				include: {
 					model: Subject,
-					through: { where: { semester: "0", degree: degree }, attributes: [] },
-					attributes: ["name", "id"],
+					through: {
+						where: { semester: "0", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level"],
 				},
 			}),
 			Major.findOne({
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name"],
+				attributes: ["id", "name", "description", "updated_at"],
 				include: {
 					model: Subject,
-					through: { where: { semester: "1", degree: degree }, attributes: [] },
-					attributes: ["name", "id"],
+					through: {
+						where: { semester: "1", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level"],
 				},
 			}),
 			Major.findOne({
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name"],
+				attributes: ["id", "name", "description", "updated_at"],
 				include: {
 					model: Subject,
-					through: { where: { semester: "2", degree: degree }, attributes: [] },
-					attributes: ["name", "id"],
+					through: {
+						where: { semester: "2", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level"],
 				},
 			}),
 			Major.findOne({
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name"],
+				attributes: ["id", "name", "description", "updated_at"],
 				include: {
 					model: Subject,
-					through: { where: { semester: "3", degree: degree }, attributes: [] },
-					attributes: ["name", "id"],
+					through: {
+						where: { semester: "3", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level"],
 				},
 			}),
 			Major.findOne({
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name"],
+				attributes: ["id", "name", "description", "updated_at"],
 				include: {
 					model: Subject,
-					through: { where: { semester: "4", degree: degree }, attributes: [] },
-					attributes: ["name", "id"],
+					through: {
+						where: { semester: "4", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level"],
 				},
 			}),
 			Major.findOne({
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name"],
+				attributes: ["id", "name", "description", "updated_at"],
 				include: {
 					model: Subject,
-					through: { where: { semester: "5", degree: degree }, attributes: [] },
-					attributes: ["name", "id"],
+					through: {
+						where: { semester: "5", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level"],
 				},
 			}),
 			Major.findOne({
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name"],
+				attributes: ["id", "name", "description", "updated_at"],
 				include: {
 					model: Subject,
-					through: { where: { semester: "6", degree: degree }, attributes: [] },
-					attributes: ["name", "id"],
+					through: {
+						where: { semester: "6", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level"],
 				},
 			}),
 			Major.findOne({
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name"],
+				attributes: ["id", "name", "description", "updated_at"],
 				include: {
 					model: Subject,
-					through: { where: { semester: "7", degree: degree }, attributes: [] },
-					attributes: ["name", "id"],
+					through: {
+						where: { semester: "7", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level"],
 				},
 			}),
 			Major.findOne({
 				where: {
 					id: major_id,
 				},
-				attributes: ["id", "name"],
+				attributes: ["id", "name", "description", "updated_at"],
 				include: {
 					model: Subject,
-					through: { where: { semester: "8", degree: degree }, attributes: [] },
-					attributes: ["name", "id"],
+					through: {
+						where: { semester: "8", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level"],
 				},
 			}),
 		]);

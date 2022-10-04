@@ -33,7 +33,7 @@ module.exports = {
 		});
 
 		const file_assignment =
-			"document_assignment/" +
+			"documents/assignments/" +
 			uuidv4() +
 			"-" +
 			req.file.originalname.split(" ").join("-");
@@ -132,7 +132,7 @@ module.exports = {
 		}
 
 		if (exist.file_assignment) {
-			await deleteObject(
+			deleteObject(
 				ref(storage, `document_assignment/${exist.file_assignment}`)
 			);
 		}
