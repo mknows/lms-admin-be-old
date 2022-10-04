@@ -8,7 +8,7 @@ const { validate, validatorMessage } = require("../middlewares/Validator");
 
 const upload = multer({
 	storage: multer.memoryStorage(),
-	limits: { fileSize: 2000000 },
+	limits: { fileSize: 4000000 },
 	fileFilter: (req, file, cb) => {
 		if (
 			file.mimetype == "application/pdf" ||
