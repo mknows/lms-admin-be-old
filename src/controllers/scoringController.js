@@ -4,6 +4,7 @@ const {
 	StudentSubject,
 	Materials_Enrolled,
 	Subject,
+	StudentSession,
 } = require("../models");
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
@@ -25,24 +26,31 @@ const {
 	PASSED,
 	FAILED,
 	FINISHED,
+
+	FLOOR_A,
+	FLOOR_A_MINUS,
+	FLOOR_B_PLUS,
+	FLOOR_B,
+	FLOOR_B_MINUS,
+	FLOOR_C_PLUS,
+	FLOOR_C,
+	FLOOR_D,
+	FLOOR_E,
 } = process.env;
 const asyncHandler = require("express-async-handler");
 
 module.exports = {
 	/**
-	 * @desc      calculate
-	 * @route     GET /api/v1/profile/me
+	 * @desc      calculate final gpa
 	 * @access    Private
 	 */
-	getTotalScore: asyncHandler(async (req, res) => {
-		const user = req.userData;
-
+	getGPA: asyncHandler(async (student_id) => {
 		let score = 0;
-		let tota_cred = 0;
+		let total_cred = 0;
 
 		let enr = await StudentSubject.findAll({
 			where: {
-				student_id: req.student_id,
+				student_id: student_id,
 				status: GRADING,
 			},
 		});
@@ -52,21 +60,53 @@ module.exports = {
 				id: enr[i].subject_id,
 			});
 			score += scoreByLetter(enr[i].final_score, cursub.credit);
+			total_cred += cursub.credit;
 		}
 
-		return res.status(200).json({
-			success: true,
-			message: "get score",
-			data: score,
+		return score / total_cred;
+	}),
+
+	/**
+	 * @desc      calculate progress in a subject
+	 * @access    Private
+	 */
+	getProgress: asyncHandler(async (student_id) => {
+		let progress = 0;
+
+		let done = await StudentSession.findAll({
+			where: {
+				student_id: student_id,
+			},
 		});
+
+		return null;
 	}),
 };
 
 function letterByPercent(percent) {
-	return percent;
+	if (percent >= parseFloat(FLOOR_A)) {
+		return "A";
+	} else if (percent >= parseFloat(FLOOR_A_MINUS)) {
+		return "A-";
+	} else if (percent >= parseFloat(FLOOR_B_PLUS)) {
+		return "B+";
+	} else if (percent >= parseFloat(FLOOR_B)) {
+		return "B";
+	} else if (percent >= parseFloat(FLOOR_B_MINUS)) {
+		return "B-";
+	} else if (percent >= parseFloat(FLOOR_C_PLUS)) {
+		return "C+";
+	} else if (percent >= parseFloat(FLOOR_C)) {
+		return "C";
+	} else if (percent >= parseFloat(FLOOR_D)) {
+		return "D";
+	} else if (percent >= parseFloat(FLOOR_E)) {
+		return "E";
+	}
+	return null;
 }
 
-function scoreByLetter(letter, credit) {
+function GPAByLetter(letter, credit) {
 	if (letter === "A") {
 		return parseFloat(WEIGHT_A) * credit;
 	} else if (letter === "A-") {
@@ -88,4 +128,5 @@ function scoreByLetter(letter, credit) {
 	} else if (letter === "E") {
 		return parseFloat(WEIGHT_E) * credit;
 	}
+	return null;
 }

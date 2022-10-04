@@ -46,6 +46,7 @@ route.get("/forstudent", protection, subjectController.getSubjectForStudent);
 route.get(
 	"/enrolledsubjects",
 	protection,
+	authorize("student"),
 	subjectController.getEnrolledSubject
 );
 route.get(

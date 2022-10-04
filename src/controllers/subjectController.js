@@ -122,7 +122,7 @@ module.exports = {
 	 * @access    Public
 	 */
 	getEnrolledSubject: asyncHandler(async (req, res) => {
-		const student_id = req.userData.id;
+		const student_id = req.student_id;
 		const subjectsEnrolled = await StudentSubject.findAll({
 			where: {
 				student_id: student_id,
@@ -159,6 +159,7 @@ module.exports = {
 			let lect = subjectsEnrolled[i].Subject.lecturer;
 
 			let leturers = [];
+
 			for (let i = 0; i < lect.length; i++) {
 				leturers.push(lect[i]);
 			}
@@ -371,33 +372,33 @@ module.exports = {
 		const student_id = req.student_id;
 		const credit_thresh = 24;
 		let subjectsEnrolled = await getPlan(student_id);
-		subjectsEnrolled = subjectsEnrolled[0].concat(subjectsEnrolled[1]).concat(subjectsEnrolled[2]);
+		subjectsEnrolled = subjectsEnrolled[0]
+			.concat(subjectsEnrolled[1])
+			.concat(subjectsEnrolled[2]);
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
 		const studentMajor = await Student.findOne({
-			attributes:[
-				'major_id'
-			],
-			where:{
-				id:student_id
-			}
-		})
-		const majorSubject = await Major.findAll({
-			attributes:[
-				'id'
-			],
-			where:{
-				id:studentMajor.dataValues.major_id
+			attributes: ["major_id"],
+			where: {
+				id: student_id,
 			},
-			include:[{
-				model: Subject,
-				where:{
-					id:subject_id
-				}
-			}]
-		})
-		if(!majorSubject){
+		});
+		const majorSubject = await Major.findAll({
+			attributes: ["id"],
+			where: {
+				id: studentMajor.dataValues.major_id,
+			},
+			include: [
+				{
+					model: Subject,
+					where: {
+						id: subject_id,
+					},
+				},
+			],
+		});
+		if (!majorSubject) {
 			return res.sendJson(400, false, "Student is not in that major", null);
 		}
 		let credit = 0;
@@ -435,19 +436,19 @@ module.exports = {
 	 * @route     PUT /api/v1/subject/sendDraft
 	 * @access    Private
 	 */
-	 sendDraft: asyncHandler(async (req, res) => {
+	sendDraft: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
 		await StudentSubject.update(
 			{
-				status : "PENDING"
+				status: "PENDING",
 			},
 			{
-				where:{
+				where: {
 					id: student_id,
-					status: "DRAFT"
-				}
+					status: "DRAFT",
+				},
 			}
-		)
+		);
 		return res.sendJson(200, true, "Sent Draft");
 	}),
 	/**
@@ -455,23 +456,23 @@ module.exports = {
 	 * @route     DELETE /api/v1/subject/deleteDraft/:student_subject_id
 	 * @access    Private
 	 */
-	 deleteDraft: asyncHandler(async (req, res) => {
+	deleteDraft: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
-		const {student_subject_id} = req.params;
+		const { student_subject_id } = req.params;
 		const existing = StudentSubject.findOne({
-			where:{
-				id:student_subject_id
-			}
-		})
+			where: {
+				id: student_subject_id,
+			},
+		});
 
 		await StudentSubject.destroy({
-			where:{
-				student_id:student_id,
+			where: {
+				student_id: student_id,
 				id: student_subject_id,
-				status: "DRAFT"
+				status: "DRAFT",
 			},
-			force:true
-		})
+			force: true,
+		});
 		return res.sendJson(200, true, "Draft Deleted");
 	}),
 	/**
@@ -491,13 +492,12 @@ module.exports = {
 
 		let draftres = [];
 		let draftcred = 0;
- 
+
 		let pendingres = [];
 		let pendingcred = 0;
 
 		let ongoingres = [];
 		let ongoingcred = 0;
-		
 
 		for (let i = 0; i < datapending.length; i++) {
 			let currStudSub = datapending[i];
@@ -564,17 +564,17 @@ module.exports = {
 		return res.sendJson(200, true, "success", {
 			pending: { subjects: pendingres, credit: pendingcred },
 			ongoing: { subjects: ongoingres, credit: ongoingcred },
-			draft : { subjects: draftres, credit: draftcred},
+			draft: { subjects: draftres, credit: draftcred },
 			total_credit: total_plan_cred,
 		});
 	}),
 };
 
 async function getPlan(student_id) {
-	const datapending = await StudentSubject.findAll({		
+	const datapending = await StudentSubject.findAll({
 		where: {
 			student_id: student_id,
-			status: "PENDING"
+			status: "PENDING",
 		},
 	});
 	const dataongoing = await StudentSubject.findAll({
@@ -590,7 +590,7 @@ async function getPlan(student_id) {
 		},
 	});
 
-	let plan = [datapending, dataongoing,datadraft];
+	let plan = [datapending, dataongoing, datadraft];
 	return plan;
 }
 
@@ -633,4 +633,3 @@ async function isEnrolled(subIdlist, subId) {
 	}
 	return false;
 }
-
