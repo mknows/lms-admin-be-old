@@ -375,6 +375,31 @@ module.exports = {
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
+		const studentMajor = await Student.findOne({
+			attributes:[
+				'major_id'
+			],
+			where:{
+				id:student_id
+			}
+		})
+		const majorSubject = await Major.findAll({
+			attributes:[
+				'id'
+			],
+			where:{
+				id:studentMajor.dataValues.major_id
+			},
+			include:[{
+				model: Subject,
+				where:{
+					id:subject_id
+				}
+			}]
+		})
+		if(!majorSubject){
+			return res.sendJson(400, false, "Student is not in that major", null);
+		}
 		let credit = 0;
 		let enrolled = false;
 
@@ -393,7 +418,7 @@ module.exports = {
 				student_id: student_id,
 				status: "DRAFT",
 			});
-			res.sendJson(200, true, "Enrolled test", credit);
+			return res.sendJson(200, true, "Enrolled Subject");
 		} else if (credit > credit_thresh) {
 			return res.sendJson(400, false, "Exceeded maximum credit", {
 				credit: credit,
@@ -412,12 +437,18 @@ module.exports = {
 	 */
 	 sendDraft: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
-		await StudentSubject.update({
-			status : "DRAFT",
-			where:{
-				student_id:student_id
+		await StudentSubject.update(
+			{
+				status : "PENDING"
+			},
+			{
+				where:{
+					id: student_id,
+					status: "DRAFT"
+				}
 			}
-		})
+		)
+		return res.sendJson(200, true, "Sent Draft");
 	}),
 	/**
 	 * @desc      enroll in a subject
@@ -426,14 +457,22 @@ module.exports = {
 	 */
 	 deleteDraft: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
-		const student_subject_id = req.params;
+		const {student_subject_id} = req.params;
+		const existing = StudentSubject.findOne({
+			where:{
+				id:student_subject_id
+			}
+		})
+
 		await StudentSubject.destroy({
 			where:{
 				student_id:student_id,
-				student_subject_id: student_subject_id
+				id: student_subject_id,
+				status: "DRAFT"
 			},
 			force:true
 		})
+		return res.sendJson(200, true, "Draft Deleted");
 	}),
 	/**
 	 * @desc      get plan
