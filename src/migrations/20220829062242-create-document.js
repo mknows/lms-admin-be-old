@@ -13,6 +13,9 @@ module.exports = {
 			file: {
 				type: Sequelize.BLOB,
 			},
+			link: {
+				type: Sequelize.TEXT,
+			},
 			description: {
 				type: Sequelize.TEXT,
 			},
