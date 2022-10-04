@@ -6,9 +6,10 @@ const {
 	Material_Enrolled,
 } = require("../models");
 const moment = require("moment");
-const { Op } = require("sequelize");
+const { Op,Sequelize } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
+
 
 module.exports = {
 	/**
@@ -97,40 +98,38 @@ module.exports = {
 	 */
 	getModuleInSession: asyncHandler(async (req, res) => {
 		const { session_id } = req.params;
+		const student_id = req.student_id
 		const mods = await Module.findAll({
 			where: {
 				session_id: session_id,
 			},
+			attributes:[
+				'id',
+				[Sequelize.fn('COUNT', Sequelize.col('video_id')), 'number_of_videos'],
+				[Sequelize.fn('COUNT', Sequelize.col('document_id')), 'number_of_documents']
+			],
+			group:'id'
 		});
-
-		let result = [];
 
 		for (let i = 0; i < mods.length; i++) {
 			let currmod = mods[i];
-
 			let met_enr = await Material_Enrolled.findOne({
 				where: {
 					id_referrer: currmod.id,
-				},
-				attribute: ["status"],
+					student_id: student_id
+				}
 			});
-
-			let stat;
-			if (!met_enr) {
-				stat = "NOT ENROLLED";
-			} else {
-				stat = met_enr.status;
-			}
-
-			let datval = {
-				modul: currmod,
-				status: stat,
-			};
-
-			result.push(datval);
+			if (!met_enr){
+				await Material_Enrolled.create({
+					student_id:student_id,
+					id_referrer:currmod.id,
+					status:"ONGOING"
+				})
+			} 
 		}
 
-		return res.sendJson(200, true, "Success", result);
+
+		return res.sendJson(200, true, "Success", mods);
 	}),
 	/**
 	 * @desc      Get Module

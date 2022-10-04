@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			this.hasMany(models.Video, {
-				foreignKey: "id",
+				foreignKey: "id"
 			});
 			this.hasMany(models.Document, {
 				foreignKey: "id",
