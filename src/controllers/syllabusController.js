@@ -284,7 +284,7 @@ module.exports = {
 	getCurriculum: asyncHandler(async (req, res) => {
 		const { major_id, degree } = req.query;
 
-		let resser = await Promise.all([
+		let plain_curriculum = await Promise.all([
 			Major.findOne({
 				where: {
 					id: major_id,
@@ -413,19 +413,19 @@ module.exports = {
 			}),
 		]);
 
-		let ressress = [];
+		let fin_res = [];
 
-		for (let i = 0; i < resser.length; i++) {
+		for (let i = 0; i < plain_curriculum.length; i++) {
 			let semdat = [];
-			if (resser[i] !== null) {
-				for (let j = 0; j < resser[i].Subjects.length; j++) {
+			if (plain_curriculum[i] !== null) {
+				for (let j = 0; j < plain_curriculum[i].Subjects.length; j++) {
 					let { count, rows } = await StudentSubject.findAndCountAll({
 						where: {
-							subject_id: resser[i].Subjects[j].id,
+							subject_id: plain_curriculum[i].Subjects[j].id,
 						},
 					});
 					let onedat = {
-						subject: resser[i].Subjects[j],
+						subject: plain_curriculum[i].Subjects[j],
 						student_count: count,
 					};
 					semdat.push(onedat);
@@ -435,7 +435,7 @@ module.exports = {
 				semester: i,
 				subjects: semdat,
 			};
-			ressress.push(onesemdat);
+			fin_res.push(onesemdat);
 		}
 
 		let maj = await Major.findOne({
@@ -455,7 +455,7 @@ module.exports = {
 
 		let result = {
 			major: maj,
-			result: ressress,
+			result: fin_res,
 		};
 
 		if (!maj) {
