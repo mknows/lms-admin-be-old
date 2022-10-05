@@ -5,6 +5,11 @@ const quizController = require("../controllers/quizController");
 const { protection } = require("../middlewares/Authentication");
 
 route.post("/create", protection, quizController.createQuiz);
+route.get(
+	"/desc/session/:session_id",
+	protection,
+	quizController.getQuizDescBySession
+);
 
 route.get("/desc/:quiz_id", protection, quizController.getQuizDesc);
 

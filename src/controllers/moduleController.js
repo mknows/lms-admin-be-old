@@ -101,7 +101,7 @@ module.exports = {
 		const student_id = req.student_id
 		const mods = await Module.findAll({
 			where: {
-				session_id: session_id,
+				session_id,
 			},
 			attributes:[
 				'id','description','document_id','video_id'
