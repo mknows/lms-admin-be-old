@@ -417,17 +417,19 @@ module.exports = {
 
 		for (let i = 0; i < resser.length; i++) {
 			let semdat = [];
-			for (let j = 0; j < resser[i].Subjects.length; j++) {
-				let { count, rows } = await StudentSubject.findAndCountAll({
-					where: {
-						subject_id: resser[i].Subjects[j].id,
-					},
-				});
-				let onedat = {
-					subject: resser[i].Subjects[j],
-					student_count: count,
-				};
-				semdat.push(onedat);
+			if (resser[i] !== null) {
+				for (let j = 0; j < resser[i].Subjects.length; j++) {
+					let { count, rows } = await StudentSubject.findAndCountAll({
+						where: {
+							subject_id: resser[i].Subjects[j].id,
+						},
+					});
+					let onedat = {
+						subject: resser[i].Subjects[j],
+						student_count: count,
+					};
+					semdat.push(onedat);
+				}
 			}
 			let onesemdat = {
 				semester: i,
