@@ -182,7 +182,10 @@ module.exports = {
 				teach.push(teachers[i].User.full_name);
 			}
 
-			let progress = 0;
+			let progress = await scoringController.getSubjectProgress(
+				req.student_id,
+				subjectsEnrolled[i].Subject.id
+			);
 
 			let resval = {
 				item: subjectsEnrolled[i],

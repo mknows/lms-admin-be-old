@@ -5,6 +5,7 @@ const {
 	Materials_Enrolled,
 	Subject,
 	StudentSession,
+	Session,
 } = require("../models");
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
@@ -70,15 +71,30 @@ module.exports = {
 	 * @desc      calculate progress in a subject
 	 * @access    Private
 	 */
-	getProgress: asyncHandler(async (student_id, subject_id) => {
+	getSubjectProgress: asyncHandler(async (student_id, subject_id) => {
 		let progress = 0;
 
-		let done = await StudentSession.findAll({
+		let donelen = 0;
+		let totallen = 0;
+
+		let done = await Session.findAll({
 			where: {
-				student_id: student_id,
-				present: true,
+				subject_id: subject_id,
+			},
+			include: {
+				model: Student,
+				where: {
+					id: student_id,
+				},
+				through: {
+					where: {
+						present: true,
+					},
+				},
 			},
 		});
+
+		console.log(done);
 
 		let total = await Session.findAll({
 			where: {
@@ -86,7 +102,17 @@ module.exports = {
 			},
 		});
 
-		progress = done.length / total.length;
+		if (done !== null) {
+			donelen = done.length;
+		}
+		if (total !== null) {
+			totallen = total.length;
+		}
+
+		if (donelen >= 0 && totallen > 0) {
+			progress = (donelen / totallen) * 100;
+			progress = Math.round(progress);
+		}
 
 		return progress;
 	}),

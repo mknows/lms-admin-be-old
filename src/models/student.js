@@ -18,9 +18,13 @@ module.exports = (sequelize, DataTypes) => {
 				through: models.StudentMajor,
 				foreignKey: "student_id",
 			});
-			this.belongsTo(models.User,{
-				foreignKey:"user_id"
-			})
+			this.belongsTo(models.User, {
+				foreignKey: "user_id",
+			});
+			this.belongsToMany(models.Session, {
+				through: models.StudentSession,
+				foreignKey: "student_id",
+			});
 		}
 	}
 
