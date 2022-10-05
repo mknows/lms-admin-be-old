@@ -70,16 +70,25 @@ module.exports = {
 	 * @desc      calculate progress in a subject
 	 * @access    Private
 	 */
-	getProgress: asyncHandler(async (student_id) => {
+	getProgress: asyncHandler(async (student_id, subject_id) => {
 		let progress = 0;
 
 		let done = await StudentSession.findAll({
 			where: {
 				student_id: student_id,
+				present: true,
 			},
 		});
 
-		return null;
+		let total = await Session.findAll({
+			where: {
+				subject_id: subject_id,
+			},
+		});
+
+		progress = done.length / total.length;
+
+		return progress;
 	}),
 };
 

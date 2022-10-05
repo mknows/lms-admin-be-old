@@ -18,6 +18,7 @@ const {
 } = require("firebase/storage");
 const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
+const scoringController = require("./scoringController");
 
 module.exports = {
 	// this should make it
@@ -181,8 +182,11 @@ module.exports = {
 				teach.push(teachers[i].User.full_name);
 			}
 
+			let progress = 0;
+
 			let resval = {
 				item: subjectsEnrolled[i],
+				progress: progress,
 				lecturers: teach,
 			};
 
