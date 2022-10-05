@@ -3,6 +3,14 @@ const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
+const {
+	getStorage,
+	ref,
+	getDownloadURL,
+	deleteObject,
+} = require("firebase/storage");
+const admin = require("firebase-admin");
+const { v4: uuidv4 } = require("uuid");
 
 module.exports = {
 	/**
@@ -13,6 +21,8 @@ module.exports = {
 	createAssignment: asyncHandler(async (req, res) => {
 		const { session_id, duration, description, content, document_id } =
 			req.body;
+		const bucket = admin.storage().bucket();
+		const storage = getStorage();
 
 		const assign = await Assignment.create({
 			session_id: session_id,
@@ -21,6 +31,33 @@ module.exports = {
 			content: content,
 			document_id: document_id,
 		});
+
+		const file_assignment =
+			"documents/assignments/" +
+			uuidv4() +
+			"-" +
+			req.file.originalname.split(" ").join("-");
+		const file_assignment_buffer = req.file.buffer;
+
+		bucket
+			.file(file_assignment)
+			.createWriteStream()
+			.end(file_assignment_buffer)
+			.on("finish", () => {
+				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
+					await Assignment.update(
+						{
+							file_assignment: file_assignment,
+							file_assignment_link: linkFile,
+						},
+						{
+							where: {
+								id: assign.id,
+							},
+						}
+					);
+				});
+			});
 
 		await Material.create({
 			session_id: session_id,
@@ -77,6 +114,9 @@ module.exports = {
 	updateAssignment: asyncHandler(async (req, res) => {
 		const { assignment_id } = req.params;
 		let { session_id, duration, description, content, document_id } = req.body;
+		const storage = getStorage();
+		const bucket = admin.storage().bucket();
+
 		const exist = await Assignment.findOne({
 			where: {
 				id: assignment_id,
@@ -89,6 +129,12 @@ module.exports = {
 				message: "Invalid assignment id.",
 				data: {},
 			});
+		}
+
+		if (exist.file_assignment) {
+			deleteObject(
+				ref(storage, `document_assignment/${exist.file_assignment}`)
+			);
 		}
 
 		if (session_id === null) {
@@ -107,7 +153,34 @@ module.exports = {
 			document_id = exist.document_id;
 		}
 
-		const assign = await Assignment.update(
+		const file_assignment =
+			"document_assignment/" +
+			uuidv4() +
+			"-" +
+			req.file.originalname.split(" ").join("-");
+		const file_assignment_buffer = req.file.buffer;
+
+		bucket
+			.file(file_assignment)
+			.createWriteStream()
+			.end(file_assignment_buffer)
+			.on("finish", () => {
+				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
+					await Assignment.update(
+						{
+							file_assignment: file_assignment,
+							file_assignment_link: linkFile,
+						},
+						{
+							where: {
+								id: assignment_id,
+							},
+						}
+					);
+				});
+			});
+
+		await Assignment.update(
 			{
 				session_id,
 				duration,
@@ -122,7 +195,8 @@ module.exports = {
 				returning: true,
 			}
 		);
-		return res.sendJson(200, true, "Success", { ...assign[1].dataValues });
+
+		return res.sendJson(200, true, "Success");
 	}),
 	/**
 	 * @desc      Delete assignment

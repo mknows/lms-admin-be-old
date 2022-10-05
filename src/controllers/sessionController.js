@@ -1,4 +1,4 @@
-const { Session } = require("../models");
+const { Session, StudentSession } = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -151,5 +151,28 @@ module.exports = {
 			message: `Delete session with ID ${session_id} successfully.`,
 			data: {},
 		});
+	}),
+
+	/**
+	 * @desc      Enroll in session
+	 * @route     GET /api/v1/session/enroll/:session_id
+	 * @access    Public
+	 */
+	takeSession: asyncHandler(async (req, res) => {
+		const { session_id } = req.params;
+
+		const data = await Session.findOne({
+			where: {
+				id: session_id,
+			},
+		});
+
+		let studSess = await StudentSession.create({
+			session_id,
+			student_id: req.student_id,
+			present: false,
+		});
+
+		return res.sendJson(200, true, "success take session", studSess);
 	}),
 };

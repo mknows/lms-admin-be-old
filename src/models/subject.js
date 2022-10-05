@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
 				through: models.MajorSubject,
 				foreignKey: "subject_id",
 			});
+			this.hasMany(models.Lecturer, {
+				sourceKey: "lecturer",
+				foreignKey: "id",
+			});
 		}
 	}
 	Subject.init(
@@ -32,11 +36,13 @@ module.exports = (sequelize, DataTypes) => {
 			lecturer: DataTypes.ARRAY(DataTypes.UUID),
 			basic_competencies: DataTypes.STRING,
 			indicator: DataTypes.STRING,
-			study_experience : DataTypes.STRING,
-			teaching_materials:DataTypes.STRING,
+			study_experience: DataTypes.STRING,
+			teaching_materials: DataTypes.STRING,
 			tools_needed: DataTypes.STRING,
 			scoring: DataTypes.STRING,
 			description: DataTypes.STRING,
+			thumbnail: DataTypes.STRING,
+			thumbnail_link: DataTypes.STRING,
 			credit: DataTypes.INTEGER,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,

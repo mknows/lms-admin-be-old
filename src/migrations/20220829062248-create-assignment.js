@@ -19,6 +19,12 @@ module.exports = {
 			content: {
 				type: Sequelize.TEXT,
 			},
+			file_assignment: {
+				type: Sequelize.ARRAY(Sequelize.UUID),
+			},
+			file_assignment_link: {
+				type: Sequelize.ARRAY(Sequelize.UUID),
+			},
 			document_id: {
 				type: Sequelize.ARRAY(Sequelize.UUID),
 			},

@@ -1,8 +1,34 @@
-const { Student, Subject, StudentSubject, Major } = require("../models");
+const {
+	Student,
+	Subject,
+	StudentSubject,
+	Major,
+	Lecturer,
+	User,
+} = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
+const {
+	getStorage,
+	ref,
+	getDownloadURL,
+	deleteObject,
+} = require("firebase/storage");
+const admin = require("firebase-admin");
+const { v4: uuidv4 } = require("uuid");
+const scoringController = require("./scoringController");
+const {
+	DRAFT,
+	PENDING,
+	ONGOING,
+	GRADING,
+	PASSED,
+	FAILED,
+	FINISHED,
+	ABANDONED,
+} = process.env;
 
 module.exports = {
 	// this should make it
@@ -21,6 +47,9 @@ module.exports = {
 			credit,
 			degree,
 		} = req.body;
+		const storage = getStorage();
+		const bucket = admin.storage().bucket();
+
 		if (
 			!name ||
 			!number_of_sessions ||
@@ -44,6 +73,35 @@ module.exports = {
 			credit: credit,
 			degree: degree,
 		});
+
+		const thumbnailFileName =
+			"images/thumbnail/" +
+			uuidv4() +
+			req.file.originalname.split(" ").join(" ");
+		const thumbnailFileBuffer = req.file.buffer;
+
+		bucket
+			.file(thumbnailFileName)
+			.createWriteStream()
+			.end(thumbnailFileBuffer)
+			.on("finish", () => {
+				getDownloadURL(ref(storage, thumbnailFileName)).then(
+					async (linkFile) => {
+						await Subject.update(
+							{
+								thumbnail: thumbnailFileName,
+								thumbnail_link: linkFile,
+							},
+							{
+								where: {
+									id: data.id,
+								},
+							}
+						);
+					}
+				);
+			});
+
 		return res.sendJson(200, true, "sucess make subject", data);
 	}),
 	/**
@@ -75,7 +133,7 @@ module.exports = {
 	 * @access    Public
 	 */
 	getEnrolledSubject: asyncHandler(async (req, res) => {
-		const student_id = req.userData.id;
+		const student_id = req.student_id;
 		const subjectsEnrolled = await StudentSubject.findAll({
 			where: {
 				student_id: student_id,
@@ -92,6 +150,7 @@ module.exports = {
 					"teaching_materials",
 					"credit",
 					"lecturer",
+					"thumbnail_link",
 				],
 			},
 			attributes: {
@@ -104,7 +163,57 @@ module.exports = {
 				],
 			},
 		});
-		return res.sendJson(200, true, "sucess get subject", subjectsEnrolled);
+
+		let result = [];
+
+		for (let i = 0; i < subjectsEnrolled.length; i++) {
+			let lect = subjectsEnrolled[i].Subject.lecturer;
+
+			let leturers = [];
+
+			for (let i = 0; i < lect.length; i++) {
+				leturers.push(lect[i]);
+			}
+
+			let teachers = await Lecturer.findAll({
+				where: {
+					id: leturers,
+				},
+				attributes: [],
+				include: {
+					model: User,
+					attributes: ["full_name"],
+				},
+			});
+
+			let teach = [];
+
+			for (let i = 0; i < teachers.length; i++) {
+				teach.push(teachers[i].User.full_name);
+			}
+
+			let progress = await scoringController.getSubjectProgress(
+				req.student_id,
+				subjectsEnrolled[i].Subject.id
+			);
+
+			const { count, rows } = await StudentSubject.findAndCountAll({
+				where: {
+					subject_id: subjectsEnrolled[i].Subject.id,
+					status: ONGOING,
+				},
+			});
+
+			let resval = {
+				item: subjectsEnrolled[i],
+				progress: progress,
+				student_count: count,
+				lecturers: teach,
+			};
+
+			result.push(resval);
+		}
+		return res.sendJson(200, true, "sucess get subject", result);
 	}),
 	/**
 	 * @desc      Edit Subject
@@ -122,6 +231,8 @@ module.exports = {
 			credit,
 			degree,
 		} = req.body;
+		const storage = getStorage();
+		const bucket = admin.storage().bucket();
 
 		const study = await Subject.findOne({
 			where: { id: subject_id },
@@ -133,6 +244,40 @@ module.exports = {
 				message: "Invalid subject_id.",
 				data: {},
 			});
+		}
+
+		if (req.file) {
+			if (study.thumbnail) {
+				deleteObject(ref(storage, study.thumbnail));
+			}
+
+			const thumbnailFileName =
+				"images/thumbnail/" +
+				uuidv4() +
+				req.file.originalname.split(" ").join(" ");
+			const thumbnailFileBuffer = req.file.buffer;
+
+			bucket
+				.file(thumbnailFileName)
+				.createWriteStream()
+				.end(thumbnailFileBuffer)
+				.on("finish", () => {
+					getDownloadURL(ref(storage, thumbnailFileName)).then(
+						async (linkFile) => {
+							await Subject.update(
+								{
+									thumbnail: thumbnailFileName,
+									thumbnail_link: linkFile,
+								},
+								{
+									where: {
+										id: study.id,
+									},
+								}
+							);
+						}
+					);
+				});
 		}
 
 		if (name === null) {
@@ -187,6 +332,7 @@ module.exports = {
 	 */
 	removeSubject: asyncHandler(async (req, res, next) => {
 		const { subject_id } = req.params;
+		const storage = getStorage();
 
 		let data = await Subject.findOne({
 			where: { id: subject_id },
@@ -200,6 +346,10 @@ module.exports = {
 			});
 		}
 
+		if (data.thumbnail) {
+			deleteObject(ref(storage, data.thumbnail));
+		}
+
 		Subject.destroy({
 			where: { id: subject_id },
 		});
@@ -209,6 +359,71 @@ module.exports = {
 			message: `Delete Subject with ID ${subject_id} successfully.`,
 			data: {},
 		});
+	}),
+	/**
+	 * @desc      Post poof exist KHS
+	 * @route     POST /api/v1/subject/uploadkhs/:student_subject_id
+	 * @access    Private (user)
+	 */
+	existKhsUpload: asyncHandler(async (req, res) => {
+		const { student_subject_id } = req.params;
+		if (!student_subject_id) {
+			return res.sendJson(400, false, "student subjet id is required");
+		}
+
+		const search = await StudentSubject.findOne({
+			where: {
+				id: student_subject_id,
+			},
+		});
+
+		if (!search) {
+			return res.sendJson(404, false, "student subject not found");
+		}
+
+		if (search.poof) {
+			deleteObject(ref(storage, search.poof));
+		}
+
+		const storage = getStorage();
+		const bucket = admin.storage().bucket();
+
+		const nameFile = uuidv4() + req.file.originalname.split(" ").join("-");
+		const fileBuffer = req.file.buffer;
+
+		// bucket
+		// 	.upload("documents/khs/", {
+		// 		gzip: true,
+		// 		destination: nameFile,
+		// 	})
+		// 	.then((res) => {
+		// 		console.log("res => ", res);
+		// 	})
+		// 	.catch((err) => console.log(err));
+
+		bucket
+			.file(nameFile)
+			.createWriteStream()
+			.end(fileBuffer)
+			.on("finish", () => {
+				console.log("Lanjut finish ini");
+				getDownloadURL(ref(storage, nameFile)).then(async (linkFile) => {
+					console.log("link nya => ", linkFile);
+					await StudentSubject.update(
+						{
+							proof: nameFile,
+							proof_link: linkFile,
+						},
+						{
+							where: {
+								id: student_subject_id,
+							},
+						}
+					);
+				});
+			});
+
+		return res.sendJson(200, true, "success upload khs");
 	}),
 
 	// Student Specific
@@ -239,19 +454,43 @@ module.exports = {
 	}),
 	/**
 	 * @desc      enroll in a subject
-	 * @route     POST /api/v1/subject/enroll
+	 * @route     POST /api/v1/subject/enroll/:subject_id
 	 * @access    Private
 	 */
 	takeSubject: asyncHandler(async (req, res) => {
-		const { subject_id } = req.body;
-		const student_id = req.userData.id;
+		const { subject_id } = req.params;
+		const student_id = req.student_id;
 		const credit_thresh = 24;
 		let subjectsEnrolled = await getPlan(student_id);
-
-		subjectsEnrolled = subjectsEnrolled[0].concat(subjectsEnrolled[1]);
+		subjectsEnrolled = subjectsEnrolled[0]
+			.concat(subjectsEnrolled[1])
+			.concat(subjectsEnrolled[2]);
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
+		const studentMajor = await Student.findOne({
+			attributes: ["major_id"],
+			where: {
+				id: student_id,
+			},
+		});
+		const majorSubject = await Major.findAll({
+			attributes: ["id"],
+			where: {
+				id: studentMajor.dataValues.major_id,
+			},
+			include: [
+				{
+					model: Subject,
+					where: {
+						id: subject_id,
+					},
+				},
+			],
+		});
+		if (!majorSubject) {
+			return res.sendJson(400, false, "Student is not in that major", null);
+		}
 		let credit = 0;
 		let enrolled = false;
 
@@ -268,9 +507,9 @@ module.exports = {
 			await StudentSubject.create({
 				subject_id: subject_id,
 				student_id: student_id,
-				status: "PENDING",
+				status: "DRAFT",
 			});
-			res.sendJson(200, true, "Enrolled test", credit);
+			return res.sendJson(200, true, "Enrolled Subject");
 		} else if (credit > credit_thresh) {
 			return res.sendJson(400, false, "Exceeded maximum credit", {
 				credit: credit,
@@ -283,18 +522,66 @@ module.exports = {
 		return res.sendJson(400, false, "something went wrong", null);
 	}),
 	/**
+	 * @desc      enroll in a subject
+	 * @route     PUT /api/v1/subject/sendDraft
+	 * @access    Private
+	 */
+	sendDraft: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
+		await StudentSubject.update(
+			{
+				status: "PENDING",
+			},
+			{
+				where: {
+					id: student_id,
+					status: "DRAFT",
+				},
+			}
+		);
+		return res.sendJson(200, true, "Sent Draft");
+	}),
+	/**
+	 * @desc      enroll in a subject
+	 * @route     DELETE /api/v1/subject/deleteDraft/:student_subject_id
+	 * @access    Private
+	 */
+	deleteDraft: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
+		const { student_subject_id } = req.params;
+		const existing = StudentSubject.findOne({
+			where: {
+				id: student_subject_id,
+			},
+		});
+
+		await StudentSubject.destroy({
+			where: {
+				student_id: student_id,
+				id: student_subject_id,
+				status: "DRAFT",
+			},
+			force: true,
+		});
+		return res.sendJson(200, true, "Draft Deleted");
+	}),
+	/**
 	 * @desc      get plan
 	 * @route     POST /api/v1/subject/studyplan
 	 * @access    Private
 	 */
 	getStudyPlan: asyncHandler(async (req, res) => {
-		const student_id = req.userData.id;
+		const student_id = req.student_id;
 		const subjectsEnrolled = await getPlan(student_id);
 
 		const datapending = subjectsEnrolled[0];
 		const dataongoing = subjectsEnrolled[1];
+		const datadraft = subjectsEnrolled[2];
 
 		let credit = 0;
+
+		let draftres = [];
+		let draftcred = 0;
 
 		let pendingres = [];
 		let pendingcred = 0;
@@ -342,11 +629,32 @@ module.exports = {
 			ongoingres.push(dataval);
 		}
 
-		let total_plan_cred = pendingcred + ongoingcred;
+		for (let i = 0; i < datadraft.length; i++) {
+			let currStudSub = datadraft[i];
+
+			let currSub = await Subject.findOne({
+				where: {
+					id: currStudSub.subject_id,
+				},
+			});
+
+			draftcred += currSub.credit;
+
+			let dataval = {
+				name: currSub.name,
+				credit: currSub.credit,
+				status: currStudSub.status,
+			};
+
+			draftres.push(dataval);
+		}
+
+		let total_plan_cred = pendingcred + ongoingcred + draftcred;
 
 		return res.sendJson(200, true, "success", {
 			pending: { subjects: pendingres, credit: pendingcred },
 			ongoing: { subjects: ongoingres, credit: ongoingcred },
+			draft: { subjects: draftres, credit: draftcred },
 			total_credit: total_plan_cred,
 		});
 	}),
@@ -359,15 +667,20 @@ async function getPlan(student_id) {
 			status: "PENDING",
 		},
 	});
-
 	const dataongoing = await StudentSubject.findAll({
 		where: {
 			student_id: student_id,
 			status: "ONGOING",
 		},
 	});
+	const datadraft = await StudentSubject.findAll({
+		where: {
+			student_id: student_id,
+			status: "DRAFT",
+		},
+	});
 
-	let plan = [datapending, dataongoing];
+	let plan = [datapending, dataongoing, datadraft];
 	return plan;
 }
 

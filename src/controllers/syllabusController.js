@@ -1,4 +1,12 @@
-const { Major, Subject, MajorSubject, User, Lecturer } = require("../models");
+const {
+	Major,
+	Subject,
+	MajorSubject,
+	User,
+	Lecturer,
+	Student,
+	StudentSubject,
+} = require("../models");
 const { Op } = require("sequelize");
 const Sequelize = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -40,7 +48,8 @@ module.exports = {
 	 * @desc      update module enrolled
 	 * @route     PUT /api/v1/syllabus/majors/paginate?page=(number)&&limit=(number)
 	 * @access    Private
-	 */ getAllMajorsPagination: asyncHandler(async (req, res) => {
+	 */
+	getAllMajorsPagination: asyncHandler(async (req, res) => {
 		const { page, limit, search } = req.query;
 
 		let search_query = "%%";
@@ -50,7 +59,7 @@ module.exports = {
 		}
 
 		const major = await Major.findAll({
-			attributes: ["id", "name", "description"],
+			attributes: ["id", "name", "description", "thumbnail_link"],
 			where: {
 				name: {
 					[Op.iLike]: search_query,
@@ -129,5 +138,330 @@ module.exports = {
 		});
 		pagination(SubjectMajor, page, limit);
 		return res.sendJson(200, true, "Success", SubjectMajor);
+	}),
+
+	/**
+	 * @desc      update module enrolled
+	 * @route     PUT /api/v1/syllabus/subjectByMajor/:major_id
+	 * @access   Private
+	 */
+	subjectByMajor: asyncHandler(async (req, res) => {
+		const { major_id } = req.params;
+		let subjectByMajor;
+		let studentSubject;
+
+		const major = await Major.findOne({
+			attributes: ["id"],
+			where: {
+				id: major_id,
+			},
+		});
+		if (major.length === 0) {
+			return res.sendJson(400, false, "Error, Major doesn't exist", {});
+		}
+		if (major.length !== 0) {
+			subjectByMajor = await Subject.findAll({
+				attributes: ["id", "name", "level"],
+				include: {
+					model: Major,
+					through: {
+						order: ["semester"],
+					},
+					attributes: ["id", "name", "description"],
+					where: {
+						id: major_id,
+					},
+				},
+			});
+			studentSubject = await Major.findAll({
+				where: {
+					id: major_id,
+				},
+				attributes: ["id"],
+				include: [
+					{
+						model: Subject,
+						attributes: ["id"],
+						include: [
+							{
+								model: Student,
+								attributes: ["user_id"],
+							},
+						],
+					},
+				],
+			});
+			for (i = 0; i < studentSubject[0].dataValues.Subjects.length; i++) {
+				const count =
+					studentSubject[0].dataValues.Subjects[i].dataValues.Students.length;
+				const id = studentSubject[0].dataValues.Subjects[i].dataValues.id;
+				for (j = 0; j < subjectByMajor.length; j++) {
+					if (subjectByMajor[j].dataValues.id == id) {
+						subjectByMajor[j].dataValues["studentEnrolled"] = count;
+					}
+				}
+			}
+		}
+		return res.sendJson(200, true, "Success", subjectByMajor);
+	}),
+	/**
+	 * @desc      Get subject
+	 * @route     GET /api/v1/syllabus/subject/:subject_id
+	 * @access    Public
+	 */
+	getSubject: asyncHandler(async (req, res) => {
+		const { subject_id } = req.params;
+		const subject = await Subject.findOne({
+			attributes: {
+				exclude: [
+					"created_at",
+					"updated_at",
+					"deleted_at",
+					"updated_by",
+					"created_by",
+				],
+			},
+			where: {
+				id: subject_id,
+			},
+		});
+		const name = await Lecturer.findAll({
+			where: {
+				id: {
+					[Op.in]: subject.lecturer,
+				},
+			},
+			include: [
+				{
+					model: User,
+				},
+			],
+		});
+		for (i = 0; i < subject.lecturer.length; i++) {
+			subject.lecturer = [];
+			subject.lecturer.push(name[i].User.dataValues.full_name);
+		}
+		return res.sendJson(200, true, "sucess get subject", subject);
+	}),
+	/**
+	 * @desc      Get subject
+	 * @route     GET /api/v1/syllabus/getCurrentKRS
+	 * @access    Public
+	 */
+	getKRS: asyncHandler(async (req, res) => {
+		let sum = 0;
+		const enrolledSubjects = await Student.findAll({
+			where: {
+				id: "d8ae2586-bd2d-40fd-86d2-9132c0beedce",
+			},
+			include: [
+				{
+					model: User,
+					attributes: ["full_name"],
+				},
+				{
+					model: Subject,
+					attributes: ["credit"],
+				},
+				{
+					model: Major,
+					attributes: ["name"],
+				},
+			],
+		});
+		for (i = 0; i < enrolledSubjects[0].dataValues.Subjects.length; i++) {
+			sum += enrolledSubjects[0].dataValues.Subjects[i].dataValues.credit;
+		}
+		enrolledSubjects[0].dataValues["totalCredit"] = sum;
+		return res.sendJson(200, true, "sucess get subject", enrolledSubjects);
+	}),
+
+	/**
+	 * @desc      get curriculum
+	 * @route     GET /api/v1/syllabus/curriculum/
+	 * @access   Private
+	 */
+	getCurriculum: asyncHandler(async (req, res) => {
+		const { major_id, degree } = req.query;
+
+		let plain_curriculum = await Promise.all([
+			Major.findOne({
+				where: {
+					id: major_id,
+				},
+				attributes: [],
+				include: {
+					model: Subject,
+					through: {
+						where: { semester: "0", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+				},
+			}),
+			Major.findOne({
+				where: {
+					id: major_id,
+				},
+				attributes: [],
+				include: {
+					model: Subject,
+					through: {
+						where: { semester: "1", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+				},
+			}),
+			Major.findOne({
+				where: {
+					id: major_id,
+				},
+				attributes: [],
+				include: {
+					model: Subject,
+					through: {
+						where: { semester: "2", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+				},
+			}),
+			Major.findOne({
+				where: {
+					id: major_id,
+				},
+				attributes: [],
+				include: {
+					model: Subject,
+					through: {
+						where: { semester: "3", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+				},
+			}),
+			Major.findOne({
+				where: {
+					id: major_id,
+				},
+				attributes: [],
+				include: {
+					model: Subject,
+					through: {
+						where: { semester: "4", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+				},
+			}),
+			Major.findOne({
+				where: {
+					id: major_id,
+				},
+				attributes: [],
+				include: {
+					model: Subject,
+					through: {
+						where: { semester: "5", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+				},
+			}),
+			Major.findOne({
+				where: {
+					id: major_id,
+				},
+				attributes: [],
+				include: {
+					model: Subject,
+					through: {
+						where: { semester: "6", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+				},
+			}),
+			Major.findOne({
+				where: {
+					id: major_id,
+				},
+				attributes: [],
+				include: {
+					model: Subject,
+					through: {
+						where: { semester: "7", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+				},
+			}),
+			Major.findOne({
+				where: {
+					id: major_id,
+				},
+				attributes: [],
+				include: {
+					model: Subject,
+					through: {
+						where: { semester: "8", degree: degree },
+						attributes: [],
+					},
+					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+				},
+			}),
+		]);
+
+		let fin_res = [];
+
+		for (let i = 0; i < plain_curriculum.length; i++) {
+			let semdat = [];
+			if (plain_curriculum[i] !== null) {
+				for (let j = 0; j < plain_curriculum[i].Subjects.length; j++) {
+					let { count, rows } = await StudentSubject.findAndCountAll({
+						where: {
+							subject_id: plain_curriculum[i].Subjects[j].id,
+						},
+					});
+					let onedat = {
+						subject: plain_curriculum[i].Subjects[j],
+						student_count: count,
+					};
+					semdat.push(onedat);
+				}
+			}
+			let onesemdat = {
+				semester: i,
+				subjects: semdat,
+			};
+			fin_res.push(onesemdat);
+		}
+
+		let maj = await Major.findOne({
+			where: {
+				id: major_id,
+			},
+			attributes: ["id", "name", "description", "updated_at"],
+			include: {
+				model: Lecturer,
+				attributes: ["id"],
+				include: {
+					model: User,
+					attributes: ["full_name"],
+				},
+			},
+		});
+
+		let result = {
+			major: maj,
+			result: fin_res,
+		};
+
+		if (!maj) {
+			return res.sendJson(400, false, "Major ID not found", null);
+		}
+
+		return res.sendJson(200, true, "Success", result);
 	}),
 };

@@ -49,16 +49,21 @@ exports.protection = asyncHandler(async (req, res, next) => {
 
 exports.authorize = (...roles) => {
 	return asyncHandler(async (req, res, next) => {
+		let student_id;
+
 		const currentUserRole = await Promise.all([
 			User.findOne({ where: { id: req.userData.id } }),
-			Lecturer.findOne({ where: { id: req.userData.id } }),
-			Student.findOne({ where: { id: req.userData.id } }),
+			Lecturer.findOne({ where: { user_id: req.userData.id } }),
+			Student.findOne({ where: { user_id: req.userData.id } }),
 		]).then((values) => {
 			let userRoles = [];
 
 			if (values[0] !== null) userRoles.push("user");
 			if (values[1] !== null) userRoles.push("lecturer");
-			if (values[2] !== null) userRoles.push("student");
+			if (values[2] !== null) {
+				userRoles.push("student");
+				student_id = values[2].id;
+			}
 
 			return userRoles;
 		});
@@ -72,14 +77,14 @@ exports.authorize = (...roles) => {
 			role = "guest";
 		}
 
-		if (!roles.includes(...currentUserRole)) {
+		if (!currentUserRole.includes(...roles)) {
 			return next(
 				new ErrorResponse(`Not authorized to access this route`, 401)
 			);
 		}
 
+		req.student_id = student_id;
 		req.role = role;
-
 		next();
 	});
 };

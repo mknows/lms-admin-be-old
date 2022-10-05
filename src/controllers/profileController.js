@@ -58,36 +58,39 @@ module.exports = {
 			});
 
 			if (getFile.display_picture) {
-				deleteObject(ref(storage, getFile.display_picture_link));
+				deleteObject(ref(storage, getFile.display_picture));
 			}
 
 			const bucket = admin.storage().bucket();
 			const displayPictureFile =
-				uuidv4() + "-" + req.file.originalname.split(" ").join("-");
+				"images/profile/" +
+				uuidv4() +
+				"-" +
+				req.file.originalname.split(" ").join("-");
 			const displayPictureBuffer = req.file.buffer;
 
 			bucket
-				.file(`images/profile/${displayPictureFile}`)
+				.file(displayPictureFile)
 				.createWriteStream()
 				.end(displayPictureBuffer)
 				.on("finish", () => {
-					getDownloadURL(
-						ref(storage, linkFile`images/profile/${displayPictureFile}`)
-					).then(async () => {
-						await User.update(
-							{
-								display_picture_link: linkFile,
-								display_picture: displayPictureFile,
-							},
-							{
-								where: {
-									id: user.id,
+					getDownloadURL(ref(storage, displayPictureFile)).then(
+						async (linkFile) => {
+							await User.update(
+								{
+									display_picture_link: linkFile,
+									display_picture: displayPictureFile,
 								},
-								returning: true,
-								plain: true,
-							}
-						);
-					});
+								{
+									where: {
+										id: user.id,
+									},
+									returning: true,
+									plain: true,
+								}
+							);
+						}
+					);
 				});
 		}
 

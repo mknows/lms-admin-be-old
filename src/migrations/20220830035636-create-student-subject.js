@@ -25,6 +25,12 @@ module.exports = {
 			status: {
 				type: Sequelize.STRING,
 			},
+			proof: {
+				type: Sequelize.STRING,
+			},
+			proof_link: {
+				type: Sequelize.STRING,
+			},
 			final_score: {
 				type: Sequelize.FLOAT,
 			},

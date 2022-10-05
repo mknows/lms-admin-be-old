@@ -1,8 +1,15 @@
-const { Module, Video, Document, Material } = require("../models");
+const {
+	Module,
+	Video,
+	Document,
+	Material,
+	Material_Enrolled,
+} = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
+const scoringController = require("./scoringController");
 
 module.exports = {
 	/**
@@ -18,11 +25,10 @@ module.exports = {
 			video_id: video_id,
 			document_id: document_id,
 		});
-
+		console.log(modcr.id);
 		await Material.create({
 			session_id: session_id,
 			type: "MODULE",
-			id_referrer: modcr.id,
 		});
 
 		return res.sendJson(200, true, "Success", modcr);
@@ -97,7 +103,38 @@ module.exports = {
 				session_id: session_id,
 			},
 		});
-		return res.sendJson(200, true, "Success", mods);
+
+		let result = [];
+
+		for (let i = 0; i < mods.length; i++) {
+			let currmod = mods[i];
+
+			let met_enr = await Material_Enrolled.findOne({
+				where: {
+					id_referrer: currmod.id,
+				},
+				attribute: ["status"],
+			});
+
+			let stat;
+			if (!met_enr) {
+				stat = "NOT ENROLLED";
+			} else {
+				stat = met_enr.status;
+			}
+
+			let progress = 0;
+
+			let datval = {
+				modul: currmod,
+				status: stat,
+				progress: progress,
+			};
+
+			result.push(datval);
+		}
+
+		return res.sendJson(200, true, "Success", result);
 	}),
 	/**
 	 * @desc      Get Module
