@@ -19,6 +19,8 @@ const {
 const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
 const scoringController = require("./scoringController");
+const { DRAFT, PENDING, ONGOING, GRADING, PASSED, FAILED, FINISHED } =
+	process.env;
 
 module.exports = {
 	// this should make it
@@ -187,9 +189,17 @@ module.exports = {
 				subjectsEnrolled[i].Subject.id
 			);
 
+			const { count, rows } = await StudentSubject.findAndCountAll({
+				where: {
+					subject_id: subjectsEnrolled[i].Subject.id,
+					status: ONGOING,
+				},
+			});
+
 			let resval = {
 				item: subjectsEnrolled[i],
 				progress: progress,
+				student_count: count,
 				lecturers: teach,
 			};
 
