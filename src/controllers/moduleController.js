@@ -9,6 +9,7 @@ const moment = require("moment");
 const { Op, Sequelize } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
+const scoringController = require("./scoringController");
 
 module.exports = {
 	/**
