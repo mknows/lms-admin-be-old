@@ -245,16 +245,18 @@ module.exports = {
 				data: {},
 			});
 
-		deleteObject(ref(storage, data.thumbnail)).then(() => {
-			Major.destroy({
-				where: { id: major_id },
-			});
+		if (data.thumbnail) {
+			deleteObject(ref(storage, data.thumbnail));
+		}
 
-			return res.status(200).json({
-				success: true,
-				message: `Delete Major with ID ${major_id} successfully.`,
-				data: {},
-			});
+		Major.destroy({
+			where: { id: major_id },
+		});
+
+		return res.status(200).json({
+			success: true,
+			message: `Delete Major with ID ${major_id} successfully.`,
+			data: {},
 		});
 	}),
 };
