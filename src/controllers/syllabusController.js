@@ -439,15 +439,25 @@ module.exports = {
 		}
 
 		let maj = await Major.findOne({
-				where: {
-					id: major_id,
+			where: {
+				id: major_id,
+			},
+			attributes: ["id", "name", "description", "updated_at"],
+			include: {
+				model: Lecturer,
+				attributes: [],
+				include: {
+					model: User,
+					attributes: "full_name",
 				},
-				attributes: ["id", "name", "description", "updated_at"],
-			}),
-			result = {
-				major: maj,
-				result: ressress,
-			};
+			},
+		});
+
+		console.log(head_of_major.full_name);
+		let result = {
+			major: maj,
+			result: ressress,
+		};
 
 		return res.sendJson(200, true, "Success", result);
 	}),

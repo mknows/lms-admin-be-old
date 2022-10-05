@@ -122,9 +122,12 @@ module.exports = {
 				stat = met_enr.status;
 			}
 
+			let progress = 0;
+
 			let datval = {
 				modul: currmod,
 				status: stat,
+				progress: progress,
 			};
 
 			result.push(datval);
