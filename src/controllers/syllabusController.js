@@ -441,14 +441,14 @@ module.exports = {
 				id: major_id,
 			},
 			attributes: ["id", "name", "description", "updated_at"],
-			// include: {
-			// 	model: Lecturer,
-			// 	attributes: [],
-			// 	include: {
-			// 		model: User,
-			// 		attributes: "full_name",
-			// 	},
-			// },
+			include: {
+				model: Lecturer,
+				attributes: ["id"],
+				include: {
+					model: User,
+					attributes: ["full_name"],
+				},
+			},
 		});
 
 		let result = {
