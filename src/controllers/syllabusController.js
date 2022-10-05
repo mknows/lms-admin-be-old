@@ -59,7 +59,7 @@ module.exports = {
 		}
 
 		const major = await Major.findAll({
-			attributes: ["id", "name", "description"],
+			attributes: ["id", "name", "description", "thumbnail_link"],
 			where: {
 				name: {
 					[Op.iLike]: search_query,
