@@ -42,7 +42,12 @@ route.post(
 	majorController.insertSubjectToMajor
 );
 
-route.put("/edit/:major_id", protection, majorController.editMajor);
+route.put(
+	"/edit/:major_id",
+	protection,
+	upload.single("thumbnail"),
+	majorController.editMajor
+);
 route.delete("/delete/:major_id", protection, majorController.removeMajor);
 
 module.exports = route;
