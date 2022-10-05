@@ -25,7 +25,10 @@ module.exports = {
 		if (!major) return res.sendJson(400, false, "Some fields is missing.", {});
 
 		const thumbnailFile =
-			uuidv4() + "-" + req.file.originalname.split(" ").join("-");
+			"images/thumbnail_major/" +
+			uuidv4() +
+			"-" +
+			req.file.originalname.split(" ").join("-");
 		const thumbnailBuffer = req.file.buffer;
 
 		let data = await Major.create({
@@ -33,32 +36,30 @@ module.exports = {
 		});
 
 		bucket
-			.file(`images/thumbnail/${thumbnailFile}`)
+			.file(thumbnailFile)
 			.createWriteStream()
 			.end(thumbnailBuffer)
 			.on("finish", () => {
-				getDownloadURL(ref(storage, `images/thumbnail/${thumbnailFile}`)).then(
-					async (fileLink) => {
-						await Major.update(
-							{
-								thumbnail: `images/thumbnail/${thumbnailFile}`,
-								thumbnail_link: fileLink,
+				getDownloadURL(ref(storage, thumbnailFile)).then(async (fileLink) => {
+					await Major.update(
+						{
+							thumbnail: thumbnailFile,
+							thumbnail_link: fileLink,
+						},
+						{
+							where: {
+								id: data.id,
 							},
-							{
-								where: {
-									id: data.id,
-								},
-							}
-						);
+						}
+					);
 
-						return res.sendJson(
-							200,
-							true,
-							"Create New Major Success.",
-							data.dataValues
-						);
-					}
-				);
+					return res.sendJson(
+						200,
+						true,
+						"Create New Major Success.",
+						data.dataValues
+					);
+				});
 			});
 	}),
 
@@ -159,6 +160,8 @@ module.exports = {
 	editMajor: asyncHandler(async (req, res) => {
 		const { major_id } = req.params;
 		const { major } = req.body;
+		const storage = getStorage();
+		const bucket = admin.storage().bucket();
 
 		let data = await Major.findOne({
 			where: { id: major_id },
@@ -170,6 +173,39 @@ module.exports = {
 				message: "Invalid major_id.",
 				data: {},
 			});
+		}
+
+		if (req.file) {
+			if (data.thumbnail) {
+				deleteObject(ref(storage, data.thumbnail));
+			}
+
+			const thumbnailFile =
+				"images/thumbnail_major/" +
+				uuidv4() +
+				"-" +
+				req.file.originalname.split(" ").join("-");
+			const thumbnailBuffer = req.file.buffer;
+
+			bucket
+				.file(thumbnailFile)
+				.createWriteStream()
+				.end(thumbnailBuffer)
+				.on("finish", () => {
+					getDownloadURL(ref(storage, thumbnailFile)).then(async (fileLink) => {
+						await Major.update(
+							{
+								thumbnail: thumbnailFile,
+								thumbnail_link: fileLink,
+							},
+							{
+								where: {
+									id: major_id,
+								},
+							}
+						);
+					});
+				});
 		}
 
 		data = await Major.update(
@@ -186,7 +222,6 @@ module.exports = {
 		return res.status(200).json({
 			success: true,
 			message: `Edit Major with ID ${major_id} successfully.`,
-			data: { ...data[1].dataValues },
 		});
 	}),
 
