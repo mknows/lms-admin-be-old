@@ -415,8 +415,6 @@ module.exports = {
 
 		let ressress = [];
 
-		console.log(resser.length);
-
 		for (let i = 0; i < resser.length; i++) {
 			let semdat = [];
 			for (let j = 0; j < resser[i].Subjects.length; j++) {
@@ -443,17 +441,16 @@ module.exports = {
 				id: major_id,
 			},
 			attributes: ["id", "name", "description", "updated_at"],
-			include: {
-				model: Lecturer,
-				attributes: [],
-				include: {
-					model: User,
-					attributes: "full_name",
-				},
-			},
+			// include: {
+			// 	model: Lecturer,
+			// 	attributes: [],
+			// 	include: {
+			// 		model: User,
+			// 		attributes: "full_name",
+			// 	},
+			// },
 		});
 
-		console.log(head_of_major.full_name);
 		let result = {
 			major: maj,
 			result: ressress,
