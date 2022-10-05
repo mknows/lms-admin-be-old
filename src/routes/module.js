@@ -2,6 +2,7 @@ const express = require("express");
 const route = express.Router();
 const { protection, authorize } = require("../middlewares/Authentication");
 const moduleController = require("../controllers/moduleController");
+const { protection, authorize } = require("../middlewares/Authentication");
 
 route.post("/create", protection, moduleController.createModule);
 route.post("/createvideo", protection, moduleController.createVideo);
@@ -14,8 +15,14 @@ route.get("/document", protection, moduleController.getAllDocument);
 route.get(
 	"/session/:session_id",
 	protection,
-	authorize('student'),
+	authorize("student"),
 	moduleController.getModuleInSession
+);
+route.post(
+	"/enroll/:module_id",
+	protection,
+	authorize("student"),
+	moduleController.takeModule
 );
 
 route.get("/:id", protection, moduleController.getModule);
