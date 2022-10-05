@@ -458,6 +458,10 @@ module.exports = {
 			result: ressress,
 		};
 
+		if (!maj) {
+			return res.sendJson(400, false, "Invalid major ID", null);
+		}
+
 		return res.sendJson(200, true, "Success", result);
 	}),
 };
