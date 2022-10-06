@@ -119,6 +119,7 @@ module.exports = {
 				session_id,
 			},
 			attributes: ["id", "description", "document_id", "video_id"],
+			order: ["created_at", "ASC"],
 		});
 
 		for (let i = 0; i < mods.length; i++) {
