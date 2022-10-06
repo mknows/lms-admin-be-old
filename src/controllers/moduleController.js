@@ -104,14 +104,14 @@ module.exports = {
 				session_id: session_id,
 			},
 			attributes:[
-				'id','description'
+				'id','description','document_id','video_id'
 			],
 		});
 
 		for (let i = 0; i<mods.length; i++){
 			mods[i].dataValues.content_length = {
-				number_of_video : mods[i].document_id.length,
-				number_of_document : mods[i].video.id.length
+				number_of_video : mods[i].video_id.length,
+				number_of_document : mods[i].document_id.length
 			}
 		}
 
