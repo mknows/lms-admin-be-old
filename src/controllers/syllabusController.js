@@ -442,7 +442,7 @@ module.exports = {
 			where: {
 				id: major_id,
 			},
-			attributes: ["id", "name", "description", "updated_at"],
+			attributes: ["id", "name", "description", "updated_at", "thumbnail_link"],
 			include: {
 				model: Lecturer,
 				attributes: ["id"],
