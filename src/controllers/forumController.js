@@ -22,7 +22,9 @@ module.exports = {
 	getAllDiscussionForumInSession: asyncHandler(async (req, res) => {
 		const { session_id } = req.params;
 		const data = await Discussion_forum.findAll({
-			where: session_id,
+			where: {
+				session_id: session_id,
+			},
 		});
 		return res.sendJson(200, true, "sucess get all df in session", data);
 	}),
