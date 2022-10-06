@@ -104,12 +104,16 @@ module.exports = {
 				session_id: session_id,
 			},
 			attributes:[
-				'id',
-				[Sequelize.fn('COUNT', Sequelize.col('video_id')), 'number_of_videos'],
-				[Sequelize.fn('COUNT', Sequelize.col('document_id')), 'number_of_documents']
+				'id','description'
 			],
-			group:'id'
 		});
+
+		for (let i = 0; i<mods.length; i++){
+			mods[i].dataValues.content_length = {
+				number_of_video : mods[i].document_id.length,
+				number_of_document : mods[i].video.id.length
+			}
+		}
 
 		for (let i = 0; i < mods.length; i++) {
 			let currmod = mods[i];
