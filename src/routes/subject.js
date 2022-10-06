@@ -46,10 +46,10 @@ route.post(
 	subjectController.takeSubject
 );
 route.post(
-	"/uploadkhs/:student_subject_id",
+	"/uploadkhs/:subject_id",
 	protection,
-	// authorize("student"),
-	upload.single("poof"),
+	authorize("student"),
+	upload.single("proof"),
 	subjectController.existKhsUpload
 );
 
