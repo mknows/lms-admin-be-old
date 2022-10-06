@@ -137,7 +137,7 @@ module.exports = {
 		const subjectsEnrolled = await StudentSubject.findAll({
 			where: {
 				student_id: student_id,
-				status: "ONGOING",
+				status: ONGOING,
 			},
 			include: {
 				model: Subject,
@@ -362,29 +362,13 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Post poof exist KHS
-	 * @route     POST /api/v1/subject/uploadkhs/:student_subject_id
+	 * @route     POST /api/v1/subject/uploadkhs/:subject_id
 	 * @access    Private (user)
 	 */
 	existKhsUpload: asyncHandler(async (req, res) => {
-		const { student_subject_id } = req.params;
-		if (!student_subject_id) {
-			return res.sendJson(400, false, "student subjet id is required");
-		}
-
-		const search = await StudentSubject.findOne({
-			where: {
-				id: student_subject_id,
-			},
-		});
-
-		if (!search) {
-			return res.sendJson(404, false, "student subject not found");
-		}
-
-		if (search.poof) {
-			deleteObject(ref(storage, search.poof));
-		}
-
+		const {subject_id} = req.params;
+		const student_id = req.student_id;
+		
 		const storage = getStorage();
 		const bucket = admin.storage().bucket();
 
@@ -400,8 +384,50 @@ module.exports = {
 		// 		console.log("res => ", res);
 		// 	})
 		// 	.catch((err) => console.log(err));
+		const credit_thresh = 24;
+		let subjectsEnrolled = await getPlan(student_id);
+		subjectsEnrolled = subjectsEnrolled[0]
+			.concat(subjectsEnrolled[1])
+			.concat(subjectsEnrolled[2]);
 
-		bucket
+		const sub = await Subject.findOne({ where: { id: subject_id } });
+
+		const studentMajor = await Student.findOne({
+			attributes: ["major_id"],
+			where: {
+				id: student_id,
+			},
+		});
+		const majorSubject = await Major.findAll({
+			attributes: ["id"],
+			where: {
+				id: studentMajor.dataValues.major_id,
+			},
+			include: [
+				{
+					model: Subject,
+					where: {
+						id: subject_id,
+					},
+				},
+			],
+		});
+		if (!majorSubject) {
+			return res.sendJson(400, false, "Student is not in that major", null);
+		}
+		let credit = 0;
+		let enrolled = false;
+
+		if (subjectsEnrolled !== null) {
+			credit = await totalCredit(subjectsEnrolled);
+			enrolled = await isEnrolled(subjectsEnrolled, sub.id);
+		}
+
+		if (sub !== null) {
+			credit += sub.credit;
+		}
+		if (enrolled === false && credit <= credit_thresh) {
+			bucket
 			.file(nameFile)
 			.createWriteStream()
 			.end(fileBuffer)
@@ -409,20 +435,27 @@ module.exports = {
 				console.log("Lanjut finish ini");
 				getDownloadURL(ref(storage, nameFile)).then(async (linkFile) => {
 					console.log("link nya => ", linkFile);
-					await StudentSubject.update(
+					await StudentSubject.create(
 						{
+							student_id : student_id,
+							subject_id : subject_id,
 							proof: nameFile,
 							proof_link: linkFile,
-						},
-						{
-							where: {
-								id: student_subject_id,
-							},
+							status: DRAFT
 						}
 					);
 				});
+			});		
+			return res.sendJson(200, true, "Enrolled Subject");
+		} else if (credit > credit_thresh) {
+			return res.sendJson(400, false, "Exceeded maximum credit", {
+				credit: credit,
 			});
-
+		} else if (enrolled) {
+			return res.sendJson(400, false, "Subject already taken", {
+				enrolled_in: subject_id,
+			});
+		}
 		return res.sendJson(200, true, "success upload khs");
 	}),
 
@@ -507,7 +540,7 @@ module.exports = {
 			await StudentSubject.create({
 				subject_id: subject_id,
 				student_id: student_id,
-				status: "DRAFT",
+				status: DRAFT,
 			});
 			return res.sendJson(200, true, "Enrolled Subject");
 		} else if (credit > credit_thresh) {
@@ -530,12 +563,12 @@ module.exports = {
 		const student_id = req.student_id;
 		await StudentSubject.update(
 			{
-				status: "PENDING",
+				status: PENDING
 			},
 			{
 				where: {
 					id: student_id,
-					status: "DRAFT",
+					status: DRAFT,
 				},
 			}
 		);
@@ -549,17 +582,20 @@ module.exports = {
 	deleteDraft: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
 		const { student_subject_id } = req.params;
-		const existing = StudentSubject.findOne({
+
+		const exists= StudentSubject.findOne({
 			where: {
 				id: student_subject_id,
 			},
 		});
-
+		if(!exists){
+			return res.sendJson(400, false, "Draft doesn't exist");
+		}
 		await StudentSubject.destroy({
 			where: {
 				student_id: student_id,
 				id: student_subject_id,
-				status: "DRAFT",
+				status: DRAFT,
 			},
 			force: true,
 		});
@@ -664,19 +700,19 @@ async function getPlan(student_id) {
 	const datapending = await StudentSubject.findAll({
 		where: {
 			student_id: student_id,
-			status: "PENDING",
+			status: PENDING,
 		},
 	});
 	const dataongoing = await StudentSubject.findAll({
 		where: {
 			student_id: student_id,
-			status: "ONGOING",
+			status: ONGOING,
 		},
 	});
 	const datadraft = await StudentSubject.findAll({
 		where: {
 			student_id: student_id,
-			status: "DRAFT",
+			status: DRAFT,
 		},
 	});
 
