@@ -28,12 +28,17 @@ const profileController = require("../controllers/profileController");
 const { validate, validatorMessage } = require("../middlewares/Validator");
 const { protection, authorize } = require("../middlewares/Authentication");
 
-route.get("/me", protection, authorize("user"), profileController.getMe);
+route.get(
+	"/me",
+	protection,
+	authorize("user", "student"),
+	profileController.getMe
+);
 route.put(
 	"/me",
 	protection,
 	upload.single("display_picture"),
-	authorize("user"),
+	authorize("user", "student"),
 	validate("updateDataUser"),
 	validatorMessage,
 	profileController.updateMe
