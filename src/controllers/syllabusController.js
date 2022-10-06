@@ -296,7 +296,14 @@ module.exports = {
 						where: { semester: "0", degree: degree },
 						attributes: [],
 					},
-					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+					attributes: [
+						"name",
+						"id",
+						"credit",
+						"level",
+						"thumbnail_link",
+						"lecturer",
+					],
 				},
 			}),
 			Major.findOne({
@@ -310,7 +317,14 @@ module.exports = {
 						where: { semester: "1", degree: degree },
 						attributes: [],
 					},
-					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+					attributes: [
+						"name",
+						"id",
+						"credit",
+						"level",
+						"thumbnail_link",
+						"lecturer",
+					],
 				},
 			}),
 			Major.findOne({
@@ -324,7 +338,14 @@ module.exports = {
 						where: { semester: "2", degree: degree },
 						attributes: [],
 					},
-					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+					attributes: [
+						"name",
+						"id",
+						"credit",
+						"level",
+						"thumbnail_link",
+						"lecturer",
+					],
 				},
 			}),
 			Major.findOne({
@@ -338,7 +359,14 @@ module.exports = {
 						where: { semester: "3", degree: degree },
 						attributes: [],
 					},
-					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+					attributes: [
+						"name",
+						"id",
+						"credit",
+						"level",
+						"thumbnail_link",
+						"lecturer",
+					],
 				},
 			}),
 			Major.findOne({
@@ -352,7 +380,14 @@ module.exports = {
 						where: { semester: "4", degree: degree },
 						attributes: [],
 					},
-					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+					attributes: [
+						"name",
+						"id",
+						"credit",
+						"level",
+						"thumbnail_link",
+						"lecturer",
+					],
 				},
 			}),
 			Major.findOne({
@@ -366,7 +401,14 @@ module.exports = {
 						where: { semester: "5", degree: degree },
 						attributes: [],
 					},
-					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+					attributes: [
+						"name",
+						"id",
+						"credit",
+						"level",
+						"thumbnail_link",
+						"lecturer",
+					],
 				},
 			}),
 			Major.findOne({
@@ -380,7 +422,14 @@ module.exports = {
 						where: { semester: "6", degree: degree },
 						attributes: [],
 					},
-					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+					attributes: [
+						"name",
+						"id",
+						"credit",
+						"level",
+						"thumbnail_link",
+						"lecturer",
+					],
 				},
 			}),
 			Major.findOne({
@@ -394,7 +443,14 @@ module.exports = {
 						where: { semester: "7", degree: degree },
 						attributes: [],
 					},
-					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+					attributes: [
+						"name",
+						"id",
+						"credit",
+						"level",
+						"thumbnail_link",
+						"lecturer",
+					],
 				},
 			}),
 			Major.findOne({
@@ -408,7 +464,14 @@ module.exports = {
 						where: { semester: "8", degree: degree },
 						attributes: [],
 					},
-					attributes: ["name", "id", "credit", "level", "thumbnail_link"],
+					attributes: [
+						"name",
+						"id",
+						"credit",
+						"level",
+						"thumbnail_link",
+						"lecturer",
+					],
 				},
 			}),
 		]);
@@ -419,13 +482,26 @@ module.exports = {
 			let semdat = [];
 			if (plain_curriculum[i] !== null) {
 				for (let j = 0; j < plain_curriculum[i].Subjects.length; j++) {
+					let teachers = [];
 					let { count, rows } = await StudentSubject.findAndCountAll({
 						where: {
 							subject_id: plain_curriculum[i].Subjects[j].id,
 						},
 					});
+
+					teachers = await Lecturer.findAll({
+						where: {
+							id: plain_curriculum[i].Subjects[j].lecturer,
+						},
+						include: {
+							model: User,
+							attributes: ["full_name"],
+						},
+						attributes: [],
+					});
 					let onedat = {
 						subject: plain_curriculum[i].Subjects[j],
+						lecturers: teachers,
 						student_count: count,
 					};
 					semdat.push(onedat);
