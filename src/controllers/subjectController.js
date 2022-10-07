@@ -652,8 +652,6 @@ async function getParsedPlan(student_id) {
 	const dataongoing = subjectsEnrolled[1];
 	const datadraft = subjectsEnrolled[2];
 
-	let credit = 0;
-
 	let draftres = [];
 	let draftcred = 0;
 
@@ -678,6 +676,7 @@ async function getParsedPlan(student_id) {
 			name: currSub.name,
 			credit: currSub.credit,
 			status: currStudSub.status,
+			student_subject_id: datapending[i].id,
 		};
 
 		pendingres.push(dataval);
@@ -698,6 +697,7 @@ async function getParsedPlan(student_id) {
 			name: currSub.name,
 			credit: currSub.credit,
 			status: currStudSub.status,
+			student_subject_id: dataongoing[i].id,
 		};
 
 		ongoingres.push(dataval);
@@ -718,6 +718,7 @@ async function getParsedPlan(student_id) {
 			name: currSub.name,
 			credit: currSub.credit,
 			status: currStudSub.status,
+			student_subject_id: datadraft[i].id,
 		};
 
 		draftres.push(dataval);
