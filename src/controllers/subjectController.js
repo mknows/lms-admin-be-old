@@ -20,6 +20,9 @@ const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
 const scoringController = require("./scoringController");
 const { async } = require("@firebase/util");
+const {
+	resetFileContentCache,
+} = require("@sentry/node/types/integrations/contextlines");
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	DRAFT,
@@ -536,7 +539,7 @@ module.exports = {
 			credit += sub.credit;
 		}
 
-		let result = await getParsedPlan(student_id);
+		let result;
 
 		if (enrolled === false && credit <= credit_thresh) {
 			await StudentSubject.create({
@@ -544,6 +547,8 @@ module.exports = {
 				student_id: student_id,
 				status: DRAFT,
 			});
+
+			result = await getParsedPlan(student_id);
 			return res.sendJson(
 				200,
 				true,
