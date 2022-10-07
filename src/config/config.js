@@ -99,6 +99,17 @@ module.exports = {
 			createdAt: "created_at",
 			updatedAt: "updated_at",
 			deletedAt: "deleted_at",
+			defaultScope: {
+				attributes: {
+					exclude: [
+						"created_at",
+						"updated_at",
+						"deleted_at",
+						"created_by",
+						"updated_by",
+					],
+				},
+			},
 		},
 		logging: false,
 	},

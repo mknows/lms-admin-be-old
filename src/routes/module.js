@@ -14,8 +14,14 @@ route.get("/document", protection, moduleController.getAllDocument);
 route.get(
 	"/session/:session_id",
 	protection,
-	authorize('student'),
+	authorize("student"),
 	moduleController.getModuleInSession
+);
+route.post(
+	"/enroll/:module_id",
+	protection,
+	authorize("student"),
+	moduleController.takeModule
 );
 
 route.get("/:id", protection, moduleController.getModule);

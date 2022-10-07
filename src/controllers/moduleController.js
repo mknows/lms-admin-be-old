@@ -4,12 +4,27 @@ const {
 	Document,
 	Material,
 	Material_Enrolled,
+	Session,
 } = require("../models");
 const moment = require("moment");
-const { Op,Sequelize } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
+const scoringController = require("./scoringController");
+const { SessionFlusher } = require("@sentry/hub");
+require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
+const {
+	DRAFT,
+	PENDING,
+	ONGOING,
+	GRADING,
+	PASSED,
+	FAILED,
+	FINISHED,
+	NOT_ENROLLED,
 
+	MODULE,
+} = process.env;
 
 module.exports = {
 	/**
@@ -25,7 +40,7 @@ module.exports = {
 			video_id: video_id,
 			document_id: document_id,
 		});
-		console.log(modcr.id);
+
 		await Material.create({
 			session_id: session_id,
 			type: "MODULE",
@@ -98,21 +113,22 @@ module.exports = {
 	 */
 	getModuleInSession: asyncHandler(async (req, res) => {
 		const { session_id } = req.params;
-		const student_id = req.student_id
+		const student_id = req.student_id;
 		const mods = await Module.findAll({
 			where: {
-				session_id: session_id,
+				session_id,
 			},
-			attributes:[
-				'id','description','document_id','video_id'
-			],
+			attributes: ["id", "description", "document_id", "video_id"],
+			order: ["created_at"],
 		});
 
-		for (let i = 0; i<mods.length; i++){
+		let result = [];
+
+		for (let i = 0; i < mods.length; i++) {
 			mods[i].dataValues.content_length = {
-				number_of_video : mods[i].video_id.length,
-				number_of_document : mods[i].document_id.length
-			}
+				number_of_video: mods[i].video_id.length,
+				number_of_document: mods[i].document_id.length,
+			};
 		}
 
 		for (let i = 0; i < mods.length; i++) {
@@ -120,18 +136,28 @@ module.exports = {
 			let met_enr = await Material_Enrolled.findOne({
 				where: {
 					id_referrer: currmod.id,
-					student_id: student_id
-				}
+					student_id: student_id,
+				},
+				attribute: ["status"],
 			});
-			if (!met_enr){
-				await Material_Enrolled.create({
-					student_id:student_id,
-					id_referrer:currmod.id,
-					status:"ONGOING"
-				})
-			} 
-		}
 
+			let stat;
+			if (!met_enr) {
+				stat = NOT_ENROLLED;
+			} else {
+				stat = met_enr.status;
+			}
+
+			let progress = 0;
+
+			let datval = {
+				modul: currmod,
+				status: stat,
+				progress: progress,
+			};
+
+			result.push(datval);
+		}
 
 		return res.sendJson(200, true, "Success", mods);
 	}),
@@ -426,27 +452,39 @@ module.exports = {
 	}),
 	/**
 	 * @desc      post make module
-	 * @route     POST /api/v1/module/enroll
+	 * @route     POST /api/v1/module/enroll/:module_id
 	 * @access    Private
 	 */
 	takeModule: asyncHandler(async (req, res) => {
-		const student_id = req.userData.id;
-		const { module_id } = req.body;
+		const student_id = req.student_id;
+		const { module_id } = req.params;
 
-		const material = await Material.findOne({
+		// const material = await Material.findOne({
+		// 	where: {
+		// 		id_referrer: module_id,
+		// 	},
+		// });
+
+		let mod = await Module.findOne({
 			where: {
-				id_referrer: module_id,
+				id: module_id,
+			},
+		});
+
+		let sesh = await Session.findOne({
+			where: {
+				id: mod.session_id,
 			},
 		});
 
 		const enrolldata = await Material_Enrolled.create({
-			session_id: material.session_id,
+			session_id: mod.session_id,
 			student_id: student_id,
-			material_id: material.id,
-			subject_id: material.subject_id,
+			// material_id: material.id,
+			subject_id: sesh.subject_id,
 			id_referrer: module_id,
-			status: "ONGOING",
-			type: material.type,
+			status: ONGOING,
+			type: MODULE,
 		});
 		return res.sendJson(200, true, "Success", enrolldata);
 	}),

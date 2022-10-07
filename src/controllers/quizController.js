@@ -47,6 +47,21 @@ module.exports = {
 		return res.sendJson(200, true, "Success", quizzDesc);
 	}),
 	/**
+	 * @desc      Get quiz
+	 * @route     GET /api/v1/quiz/desc/session/:session_id
+	 * @access    Private
+	 */
+	getQuizDescBySession: asyncHandler(async (req, res) => {
+		const { session_id } = req.params;
+		const quizzDesc = await Quiz.findAll({
+			where: {
+				session_id,
+			},
+			attributes: ["id", "description"],
+		});
+		return res.sendJson(200, true, "Success", quizzDesc);
+	}),
+	/**
 	 * @desc      update quiz
 	 * @route     PUT /api/v1/quiz/:quiz_id
 	 * @access    Private

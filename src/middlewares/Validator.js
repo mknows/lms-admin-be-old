@@ -184,5 +184,5 @@ exports.validatorMessage = (req, res, next) => {
 	errors = errors.map((error) => error.msg);
 	errors = `${errors.join(", ")}.`;
 
-	return res.status(422).json({ success: false, message: errors, data: {} });
+	return res.status(400).json({ success: false, message: errors, data: {} });
 };
