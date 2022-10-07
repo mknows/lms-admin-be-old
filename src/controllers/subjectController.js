@@ -19,6 +19,7 @@ const {
 const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
 const scoringController = require("./scoringController");
+const { async } = require("@firebase/util");
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	DRAFT,
@@ -535,19 +536,26 @@ module.exports = {
 			credit += sub.credit;
 		}
 
+		let result = await getParsedPlan(student_id);
+
 		if (enrolled === false && credit <= credit_thresh) {
 			await StudentSubject.create({
 				subject_id: subject_id,
 				student_id: student_id,
 				status: DRAFT,
 			});
-			return res.sendJson(200, true, "Enrolled Subject");
+			return res.sendJson(
+				200,
+				true,
+				`successfully enrolled in ${sub.name}`,
+				result
+			);
 		} else if (credit > credit_thresh) {
 			return res.sendJson(400, false, "Exceeded maximum credit", {
 				credit: credit,
 			});
 		} else if (enrolled) {
-			return res.sendJson(400, false, "Subject already taken", {
+			return res.sendJson(400, false, `already enrolled in ${sub.name}`, {
 				enrolled_in: subject_id,
 			});
 		}
@@ -607,91 +615,9 @@ module.exports = {
 	 */
 	getStudyPlan: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
-		const subjectsEnrolled = await getPlan(student_id);
+		const subjectsEnrolled = await getParsedPlan(student_id);
 
-		const datapending = subjectsEnrolled[0];
-		const dataongoing = subjectsEnrolled[1];
-		const datadraft = subjectsEnrolled[2];
-
-		let credit = 0;
-
-		let draftres = [];
-		let draftcred = 0;
-
-		let pendingres = [];
-		let pendingcred = 0;
-
-		let ongoingres = [];
-		let ongoingcred = 0;
-
-		for (let i = 0; i < datapending.length; i++) {
-			let currStudSub = datapending[i];
-
-			let currSub = await Subject.findOne({
-				where: {
-					id: currStudSub.subject_id,
-				},
-			});
-
-			pendingcred += currSub.credit;
-
-			let dataval = {
-				name: currSub.name,
-				credit: currSub.credit,
-				status: currStudSub.status,
-			};
-
-			pendingres.push(dataval);
-		}
-
-		for (let i = 0; i < dataongoing.length; i++) {
-			let currStudSub = dataongoing[i];
-
-			let currSub = await Subject.findOne({
-				where: {
-					id: currStudSub.subject_id,
-				},
-			});
-
-			ongoingcred += currSub.credit;
-
-			let dataval = {
-				name: currSub.name,
-				credit: currSub.credit,
-				status: currStudSub.status,
-			};
-
-			ongoingres.push(dataval);
-		}
-
-		for (let i = 0; i < datadraft.length; i++) {
-			let currStudSub = datadraft[i];
-
-			let currSub = await Subject.findOne({
-				where: {
-					id: currStudSub.subject_id,
-				},
-			});
-
-			draftcred += currSub.credit;
-
-			let dataval = {
-				name: currSub.name,
-				credit: currSub.credit,
-				status: currStudSub.status,
-			};
-
-			draftres.push(dataval);
-		}
-
-		let total_plan_cred = pendingcred + ongoingcred + draftcred;
-
-		return res.sendJson(200, true, "success", {
-			pending: { subjects: pendingres, credit: pendingcred },
-			ongoing: { subjects: ongoingres, credit: ongoingcred },
-			draft: { subjects: draftres, credit: draftcred },
-			total_credit: total_plan_cred,
-		});
+		return res.sendJson(200, true, "success", subjectsEnrolled);
 	}),
 };
 
@@ -717,6 +643,94 @@ async function getPlan(student_id) {
 
 	let plan = [datapending, dataongoing, datadraft];
 	return plan;
+}
+
+async function getParsedPlan(student_id) {
+	const subjectsEnrolled = await getPlan(student_id);
+
+	const datapending = subjectsEnrolled[0];
+	const dataongoing = subjectsEnrolled[1];
+	const datadraft = subjectsEnrolled[2];
+
+	let credit = 0;
+
+	let draftres = [];
+	let draftcred = 0;
+
+	let pendingres = [];
+	let pendingcred = 0;
+
+	let ongoingres = [];
+	let ongoingcred = 0;
+
+	for (let i = 0; i < datapending.length; i++) {
+		let currStudSub = datapending[i];
+
+		let currSub = await Subject.findOne({
+			where: {
+				id: currStudSub.subject_id,
+			},
+		});
+
+		pendingcred += currSub.credit;
+
+		let dataval = {
+			name: currSub.name,
+			credit: currSub.credit,
+			status: currStudSub.status,
+		};
+
+		pendingres.push(dataval);
+	}
+
+	for (let i = 0; i < dataongoing.length; i++) {
+		let currStudSub = dataongoing[i];
+
+		let currSub = await Subject.findOne({
+			where: {
+				id: currStudSub.subject_id,
+			},
+		});
+
+		ongoingcred += currSub.credit;
+
+		let dataval = {
+			name: currSub.name,
+			credit: currSub.credit,
+			status: currStudSub.status,
+		};
+
+		ongoingres.push(dataval);
+	}
+
+	for (let i = 0; i < datadraft.length; i++) {
+		let currStudSub = datadraft[i];
+
+		let currSub = await Subject.findOne({
+			where: {
+				id: currStudSub.subject_id,
+			},
+		});
+
+		draftcred += currSub.credit;
+
+		let dataval = {
+			name: currSub.name,
+			credit: currSub.credit,
+			status: currStudSub.status,
+		};
+
+		draftres.push(dataval);
+	}
+
+	let total_plan_cred = pendingcred + ongoingcred + draftcred;
+
+	return {
+		pending: { subjects: pendingres, credit: pendingcred },
+		ongoing: { subjects: ongoingres, credit: ongoingcred },
+		draft: { subjects: draftres, credit: draftcred },
+		total_credit: total_plan_cred,
+	};
 }
 
 async function getID(subjectTaken) {

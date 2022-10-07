@@ -94,8 +94,6 @@ module.exports = {
 			},
 		});
 
-		console.log(done);
-
 		let total = await Session.findAll({
 			where: {
 				subject_id: subject_id,
