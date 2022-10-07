@@ -606,7 +606,9 @@ module.exports = {
 			},
 			force: true,
 		});
-		return res.sendJson(200, true, "Draft Deleted");
+
+		let studyplan = await getParsedPlan(student_id);
+		return res.sendJson(200, true, "Draft Deleted", studyplan);
 	}),
 	/**
 	 * @desc      get plan
