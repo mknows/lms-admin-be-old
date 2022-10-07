@@ -20,9 +20,6 @@ const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
 const scoringController = require("./scoringController");
 const { async } = require("@firebase/util");
-const {
-	resetFileContentCache,
-} = require("@sentry/node/types/integrations/contextlines");
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	DRAFT,
