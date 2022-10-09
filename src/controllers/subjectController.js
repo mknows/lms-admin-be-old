@@ -536,7 +536,7 @@ module.exports = {
 			credit += sub.credit;
 		}
 
-		let result = await getParsedPlan(student_id);
+		let result;
 
 		if (enrolled === false && credit <= credit_thresh) {
 			await StudentSubject.create({
@@ -544,6 +544,8 @@ module.exports = {
 				student_id: student_id,
 				status: DRAFT,
 			});
+
+			result = await getParsedPlan(student_id);
 			return res.sendJson(
 				200,
 				true,
