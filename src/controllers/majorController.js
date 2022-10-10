@@ -1,4 +1,4 @@
-const { Major, Subject, MajorSubject } = require("../models");
+const { Major, Subject, MajorSubject, Student } = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -11,6 +11,7 @@ const {
 	getDownloadURL,
 	deleteObject,
 } = require("firebase/storage");
+const student = require("../models/student");
 
 module.exports = {
 	/**
@@ -258,5 +259,63 @@ module.exports = {
 			message: `Delete Major with ID ${major_id} successfully.`,
 			data: {},
 		});
+	}),
+	/**
+	 * @desc      Delete Major (Hapus Major)
+	 * @route     PUT /api/v1/majors/take/:major_id
+	 * @access    Private
+	 */
+	 enrollMajor: asyncHandler(async (req, res) => {
+		const { major_id } = req.params;
+		const student_id = req.student_id;
+
+		const major = await Major.findOne({
+			attributes:[
+				'id'
+			],
+			where:{
+				id: major_id
+			}
+		});
+
+		if(major.length === 0){
+			return res.status(400).json({
+				success: false,
+				message: `Major doesn't exist`
+			});
+		}
+		
+		const studentsMajor = await Student.findOne({
+			attributes:[
+				'major_id'
+			],
+			where:{
+				id: student_id
+			}
+		})
+		
+		if(!studentsMajor.major_id.includes(major.id)){
+			await Student.update(
+				{
+					major_id: major_id
+				},
+				{
+					where:
+					{
+						id: student_id
+					}
+				}
+			)
+			return res.status(200).json({
+				success: true,
+				message: 'Enrolled to this major'
+			});
+		}
+		if(studentsMajor.major_id.includes(major_id)){
+			return res.status(400).json({
+				success: false,
+				message: 'Already enrolled to major'
+			});
+		}
 	}),
 };
