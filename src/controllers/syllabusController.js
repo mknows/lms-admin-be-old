@@ -300,7 +300,7 @@ module.exports = {
 						"level",
 						"thumbnail_link",
 						"lecturer",
-						'subject_code'
+						"subject_code",
 					],
 				},
 			}),
@@ -526,7 +526,7 @@ module.exports = {
 				},
 			},
 		});
-		const studentsInformation = await Student.findAll({
+		const studentsInformation = await Student.findOne({
 			where: {
 				id: student_id,
 			},
@@ -544,12 +544,10 @@ module.exports = {
 					include: [
 						{
 							model: User,
-							attributes:[
-								'full_name'
-							]
-						}
-					]
-				}
+							attributes: ["full_name"],
+						},
+					],
+				},
 			],
 		});
 		let result = {
