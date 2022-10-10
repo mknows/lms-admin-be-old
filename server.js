@@ -8,7 +8,6 @@ const useragent = require("express-useragent");
 const path = require("path");
 const cors = require("cors");
 
-
 dotenv.config({ path: "./src/config/config.env" });
 
 const response = require("./src/helpers/responseFormatter");
@@ -21,8 +20,12 @@ const app = express();
 
 initializeFirebase();
 
+app.disable("x-powered-by");
 
-app.use("/file/documents", express.static(path.join(__dirname, "public/documents")));
+app.use(
+	"/file/documents",
+	express.static(path.join(__dirname, "public/documents"))
+);
 app.use("/file/images", express.static(path.join(__dirname, "public/images")));
 app.use(device.capture());
 app.use(useragent.express());

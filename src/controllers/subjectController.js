@@ -507,7 +507,7 @@ module.exports = {
 				id: student_id,
 			},
 		});
-		
+
 		const majorSubject = await Major.findAll({
 			attributes: ["id"],
 			where: {
@@ -539,7 +539,39 @@ module.exports = {
 
 		let result;
 
-		if (enrolled === false && credit <= credit_thresh) {
+		// if (enrolled === false && credit <= credit_thresh) {
+		// 	await StudentSubject.create({
+		// 		subject_id: subject_id,
+		// 		student_id: student_id,
+		// 		status: DRAFT,
+		// 	});
+
+		// 	result = await getParsedPlan(student_id);
+		// 	return res.sendJson(
+		// 		200,
+		// 		true,
+		// 		`successfully enrolled in ${sub.name}`,
+		// 		result
+		// 	);
+		// } else if (credit > credit_thresh) {
+		// 	return res.sendJson(400, false, "Exceeded maximum credit", {
+		// 		credit: credit,
+		// 	});
+		// } else if (enrolled) {
+		// 	return res.sendJson(400, false, `already enrolled in ${sub.name}`, {
+		// 		enrolled_in: subject_id,
+		// 	});
+		// }
+
+		if (credit > credit_thresh) {
+			return res.sendJson(400, false, "Exceeded maximum credit", {
+				credit: credit,
+			});
+		} else if (enrolled) {
+			return res.sendJson(400, false, `already enrolled in ${sub.name}`, {
+				enrolled_in: subject_id,
+			});
+		} else if (enrolled === false && credit <= credit_thresh) {
 			await StudentSubject.create({
 				subject_id: subject_id,
 				student_id: student_id,
@@ -553,15 +585,8 @@ module.exports = {
 				`successfully enrolled in ${sub.name}`,
 				result
 			);
-		} else if (credit > credit_thresh) {
-			return res.sendJson(400, false, "Exceeded maximum credit", {
-				credit: credit,
-			});
-		} else if (enrolled) {
-			return res.sendJson(400, false, `already enrolled in ${sub.name}`, {
-				enrolled_in: subject_id,
-			});
 		}
+
 		return res.sendJson(400, false, "something went wrong", null);
 	}),
 	/**
@@ -582,7 +607,8 @@ module.exports = {
 				},
 			}
 		);
-		return res.sendJson(200, true, "Sent Draft");
+		let studyplan = await getParsedPlan(student_id);
+		return res.sendJson(200, true, "Sent Draft", studyplan);
 	}),
 	/**
 	 * @desc      enroll in a subject
@@ -628,34 +654,28 @@ module.exports = {
 
 async function getPlan(student_id) {
 	const datapending = await StudentSubject.findAll({
-		attributes:[
-			'subject_id'
-		],
+		attributes: ["subject_id"],
 		where: {
 			student_id: student_id,
 			status: PENDING,
 		},
-		order: ['created_at']
+		order: ["created_at"],
 	});
 	const dataongoing = await StudentSubject.findAll({
-		attributes:[
-			'subject_id'
-		],
+		attributes: ["subject_id"],
 		where: {
 			student_id: student_id,
 			status: ONGOING,
 		},
-		order: ['created_at']
+		order: ["created_at"],
 	});
 	const datadraft = await StudentSubject.findAll({
-		attributes:[
-			'subject_id'
-		],
+		attributes: ["subject_id"],
 		where: {
 			student_id: student_id,
 			status: DRAFT,
 		},
-		order: ['created_at']
+		order: ["created_at"],
 	});
 
 	let plan = [datapending, dataongoing, datadraft];
