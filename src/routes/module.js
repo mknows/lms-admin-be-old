@@ -1,6 +1,5 @@
 const express = require("express");
 const route = express.Router();
-const { protection, authorize } = require("../middlewares/Authentication");
 const moduleController = require("../controllers/moduleController");
 
 route.post("/create", protection, moduleController.createModule);
