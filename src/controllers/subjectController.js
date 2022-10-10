@@ -507,6 +507,7 @@ module.exports = {
 				id: student_id,
 			},
 		});
+		
 		const majorSubject = await Major.findAll({
 			attributes: ["id"],
 			where: {
@@ -521,8 +522,8 @@ module.exports = {
 				},
 			],
 		});
-		if (!majorSubject) {
-			return res.sendJson(400, false, "Student is not in that major", null);
+		if (majorSubject.length === 0) {
+			return res.sendJson(400, false, "Student is not in that major");
 		}
 		let credit = 0;
 		let enrolled = false;
