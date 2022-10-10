@@ -260,10 +260,6 @@ module.exports = {
 					attributes: ["full_name"],
 				},
 				{
-					model: Subject,
-					attributes: ["credit"],
-				},
-				{
 					model: Major,
 					attributes: ["name"],
 				},
@@ -283,6 +279,7 @@ module.exports = {
 	 */
 	getCurriculum: asyncHandler(async (req, res) => {
 		const { major_id, degree } = req.query;
+		const student_id = req.student_id;
 
 		let plain_curriculum = await Promise.all([
 			Major.findOne({
@@ -528,8 +525,34 @@ module.exports = {
 				},
 			},
 		});
-
+		const studentsInformation = await Student.findAll({
+			where: {
+				id: student_id,
+			},
+			include: [
+				{
+					model: User,
+					attributes: ["full_name"],
+				},
+				{
+					model: Major,
+					attributes: ["name"],
+				},
+				{
+					model: Lecturer,
+					include: [
+						{
+							model: User,
+							attributes:[
+								'full_name'
+							]
+						}
+					]
+				}
+			],
+		});
 		let result = {
+			studentsInformation: studentsInformation,
 			major: maj,
 			result: fin_res,
 		};

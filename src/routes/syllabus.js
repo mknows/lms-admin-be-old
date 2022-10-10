@@ -2,7 +2,7 @@ const express = require("express");
 const route = express.Router();
 
 const syllabusController = require("../controllers/syllabusController");
-const { protection } = require("../middlewares/Authentication");
+const { protection, authorize } = require("../middlewares/Authentication");
 
 route.get("/majors/all", protection, syllabusController.getAllMajors);
 route.get(
@@ -10,7 +10,7 @@ route.get(
 	protection,
 	syllabusController.getAllMajorsPagination
 );
-route.get("/curriculum", protection, syllabusController.getCurriculum);
+route.get("/curriculum", protection, authorize("student","user"), syllabusController.getCurriculum);
 route.get("/subjects/all", protection, syllabusController.getAllSubjects);
 route.get(
 	"/subjects/paginate",
