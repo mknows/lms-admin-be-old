@@ -539,7 +539,39 @@ module.exports = {
 
 		let result;
 
-		if (enrolled === false && credit <= credit_thresh) {
+		// if (enrolled === false && credit <= credit_thresh) {
+		// 	await StudentSubject.create({
+		// 		subject_id: subject_id,
+		// 		student_id: student_id,
+		// 		status: DRAFT,
+		// 	});
+
+		// 	result = await getParsedPlan(student_id);
+		// 	return res.sendJson(
+		// 		200,
+		// 		true,
+		// 		`successfully enrolled in ${sub.name}`,
+		// 		result
+		// 	);
+		// } else if (credit > credit_thresh) {
+		// 	return res.sendJson(400, false, "Exceeded maximum credit", {
+		// 		credit: credit,
+		// 	});
+		// } else if (enrolled) {
+		// 	return res.sendJson(400, false, `already enrolled in ${sub.name}`, {
+		// 		enrolled_in: subject_id,
+		// 	});
+		// }
+
+		if (credit > credit_thresh) {
+			return res.sendJson(400, false, "Exceeded maximum credit", {
+				credit: credit,
+			});
+		} else if (enrolled) {
+			return res.sendJson(400, false, `already enrolled in ${sub.name}`, {
+				enrolled_in: subject_id,
+			});
+		} else if (enrolled === false && credit <= credit_thresh) {
 			await StudentSubject.create({
 				subject_id: subject_id,
 				student_id: student_id,
@@ -553,15 +585,8 @@ module.exports = {
 				`successfully enrolled in ${sub.name}`,
 				result
 			);
-		} else if (credit > credit_thresh) {
-			return res.sendJson(400, false, "Exceeded maximum credit", {
-				credit: credit,
-			});
-		} else if (enrolled) {
-			return res.sendJson(400, false, `already enrolled in ${sub.name}`, {
-				enrolled_in: subject_id,
-			});
 		}
+
 		return res.sendJson(400, false, "something went wrong", null);
 	}),
 	/**

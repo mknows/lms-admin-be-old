@@ -53,13 +53,31 @@ module.exports = {
 	 */
 	getQuizDescBySession: asyncHandler(async (req, res) => {
 		const { session_id } = req.params;
-		const quizzDesc = await Quiz.findAll({
+		const student_id = req.student_id;
+
+		let result;
+
+		const quizDesc = await Quiz.findOne({
 			where: {
 				session_id,
 			},
 			attributes: ["id", "description"],
 		});
-		return res.sendJson(200, true, "Success", quizzDesc);
+
+		console.log(quizDesc.id);
+
+		const summary = await Material_Enrolled.findOne({
+			where: {
+				student_id,
+				id_referrer: quizDesc.id,
+			},
+		});
+
+		result = {
+			quiz: quizDesc,
+			summary: summary,
+		};
+		return res.sendJson(200, true, "Success", result);
 	}),
 	/**
 	 * @desc      update quiz
@@ -155,7 +173,7 @@ module.exports = {
 	 */
 	takeQuiz: asyncHandler(async (req, res) => {
 		const { quiz_id } = req.params;
-		const user_id = req.userData.id;
+		const student_id = req.userData.id;
 		const quizQuestions = await Quiz.findOne({
 			where: {
 				id: quiz_id,
@@ -175,7 +193,7 @@ module.exports = {
 		});
 		const checkIfCurrentlyTaking = await Material_Enrolled.findOne({
 			where: {
-				student_id: user_id,
+				student_id: student_id,
 				session_id: session_id,
 				material_id: material.id,
 				subject_id: session.subject_id,
@@ -185,7 +203,7 @@ module.exports = {
 		});
 		if (checkIfCurrentlyTaking == null) {
 			await Material_Enrolled.create({
-				student_id: user_id,
+				student_id: student_id,
 				session_id: session_id,
 				material_id: material.id,
 				subject_id: session.subject_id,
@@ -261,5 +279,19 @@ module.exports = {
 			}
 		);
 		return res.sendJson(200, true, "Success", null);
+	}),
+
+	/**
+	 * @desc      get Quiz review
+	 * @route     POST /api/v1/quiz/review/:id
+	 * @access    Private
+	 */
+	getQuizReview: asyncHandler(async (req, res) => {
+		const { quiz_id } = req.params;
+		const student_id = req.student_id;
+
+		let result = [];
+
+		return res.sendJson(200, true, "Success", result);
 	}),
 };
