@@ -80,13 +80,18 @@ module.exports = {
 			attributes: ["id", "description"],
 		});
 
-		console.log(quizDesc.id);
-
 		const summary = await Material_Enrolled.findOne({
 			where: {
 				student_id,
 				id_referrer: quizDesc.id,
 			},
+			attributes: [
+				"activity_detail",
+				"score",
+				"subject_id",
+				"session_id",
+				"status",
+			],
 		});
 
 		result = {
@@ -189,7 +194,7 @@ module.exports = {
 	 */
 	takeQuiz: asyncHandler(async (req, res) => {
 		const { quiz_id } = req.params;
-		const student_id = req.userData.id;
+		const student_id = req.student_id;
 		const quizQuestions = await Quiz.findOne({
 			where: {
 				id: quiz_id,
@@ -286,7 +291,7 @@ module.exports = {
 				score: score,
 				status: status,
 				activity_detail: quizResultDetail,
-				status: GRADING,
+				status: status,
 			},
 			{
 				where: {
@@ -312,14 +317,22 @@ module.exports = {
 		const { quiz_id } = req.params;
 		const student_id = req.student_id;
 
-		const user_answer = await Material_Enrolled.findOne({
+		let user_enroll_data = await Material_Enrolled.findOne({
 			where: {
 				student_id,
 				id_referrer: quiz_id,
-				status: [GRADING, FINISHED],
+				status: [GRADING, FINISHED, PASSED, FAILED],
 			},
-			attributes: ["activity_detail"],
+			attributes: ["activity_detail", "score", "status"],
 		});
+
+		if (!user_enroll_data) {
+			return res.sendJson(
+				404,
+				false,
+				"user enroll data not found, haven't enrolled / havent submitted"
+			);
+		}
 
 		const quiz = await Quiz.findOne({
 			where: {
@@ -328,14 +341,41 @@ module.exports = {
 			attributes: ["answer", "questions"],
 		});
 
-		let result = {
-			user_answer: user_answer,
-			real_answer: quiz.answer,
-			questions: quiz.questions,
-		};
+		if (!quiz) {
+			return res.sendJson(404, false, "quiz not found");
+		}
 
-		// for (let i = 0; i<)
-		console.log(result);
+		let summary = [];
+
+		const user_answer = user_enroll_data.activity_detail.answer;
+		const real_answer = quiz.answer;
+		const questions = quiz.questions;
+
+		if (
+			user_answer.length !== real_answer.length &&
+			user_answer.length !== questions.length
+		) {
+			return res.sendJson(
+				400,
+				false,
+				"answer, user answer, or question length is not equal"
+			);
+		}
+
+		for (let i = 0; i < user_answer.length; i++) {
+			let val = {
+				question: questions[i],
+				user_answer: user_answer[i],
+				real_answer: real_answer[i],
+				is_correct: user_answer[i] === real_answer[i],
+			};
+			summary.push(val);
+		}
+
+		let result = {
+			summary: summary,
+			status: user_enroll_data.status,
+		};
 
 		return res.sendJson(200, true, "Success", result);
 	}),

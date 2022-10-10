@@ -507,7 +507,7 @@ module.exports = {
 				id: student_id,
 			},
 		});
-		
+
 		const majorSubject = await Major.findAll({
 			attributes: ["id"],
 			where: {
@@ -607,7 +607,8 @@ module.exports = {
 				},
 			}
 		);
-		return res.sendJson(200, true, "Sent Draft");
+		let studyplan = await getParsedPlan(student_id);
+		return res.sendJson(200, true, "Sent Draft", studyplan);
 	}),
 	/**
 	 * @desc      enroll in a subject
@@ -653,34 +654,28 @@ module.exports = {
 
 async function getPlan(student_id) {
 	const datapending = await StudentSubject.findAll({
-		attributes:[
-			'subject_id'
-		],
+		attributes: ["subject_id"],
 		where: {
 			student_id: student_id,
 			status: PENDING,
 		},
-		order: ['created_at']
+		order: ["created_at"],
 	});
 	const dataongoing = await StudentSubject.findAll({
-		attributes:[
-			'subject_id'
-		],
+		attributes: ["subject_id"],
 		where: {
 			student_id: student_id,
 			status: ONGOING,
 		},
-		order: ['created_at']
+		order: ["created_at"],
 	});
 	const datadraft = await StudentSubject.findAll({
-		attributes:[
-			'subject_id'
-		],
+		attributes: ["subject_id"],
 		where: {
 			student_id: student_id,
 			status: DRAFT,
 		},
-		order: ['created_at']
+		order: ["created_at"],
 	});
 
 	let plan = [datapending, dataongoing, datadraft];
