@@ -300,6 +300,7 @@ module.exports = {
 						"level",
 						"thumbnail_link",
 						"lecturer",
+						'subject_code'
 					],
 				},
 			}),

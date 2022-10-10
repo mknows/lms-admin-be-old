@@ -44,6 +44,8 @@ module.exports = (sequelize, DataTypes) => {
 			thumbnail: DataTypes.STRING,
 			thumbnail_link: DataTypes.STRING,
 			credit: DataTypes.INTEGER,
+			subject_code: DataTypes.STRING,
+			prerequisite: DataTypes.ARRAY(DataTypes.UUID),
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
 			deleted_at: DataTypes.DATE,
