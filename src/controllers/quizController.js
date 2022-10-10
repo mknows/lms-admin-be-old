@@ -3,6 +3,22 @@ const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
+require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
+const {
+	DRAFT,
+	PENDING,
+	ONGOING,
+	GRADING,
+	PASSED,
+	FAILED,
+	FINISHED,
+	ABANDONED,
+	INVALID,
+
+	KKM,
+
+	QUIZ,
+} = process.env;
 
 module.exports = {
 	/**
@@ -25,7 +41,7 @@ module.exports = {
 			session_id: session_id,
 			duration: duration,
 			description: description,
-			type: "QUIZ",
+			type: QUIZ,
 			id_referrer: quizzDesc.id,
 		});
 
@@ -198,6 +214,7 @@ module.exports = {
 				material_id: material.id,
 				subject_id: session.subject_id,
 				id_referrer: quiz_id,
+				status: ONGOING,
 			},
 			attributes: ["id"],
 		});
@@ -208,7 +225,7 @@ module.exports = {
 				material_id: material.id,
 				subject_id: session.subject_id,
 				id_referrer: quiz_id,
-				type: "QUIZ",
+				type: QUIZ,
 			});
 		}
 		return res.sendJson(200, true, "Success", quizQuestions);
@@ -221,8 +238,8 @@ module.exports = {
 	postQuizAnswer: asyncHandler(async (req, res) => {
 		const { answer, quiz_id, duration_taken } = req.body;
 		const userAnswer = answer;
-		const user_id = req.userData.id;
-		const kkm = 70;
+		const student_id = req.student_id;
+		const kkm = parseInt(KKM);
 		let status;
 		let correct = 0;
 		const quiz = await Quiz.findOne({
@@ -252,15 +269,16 @@ module.exports = {
 			number_of_questions: quizAns.length,
 			correct_answers: correct,
 			duration_taken: duration_taken,
+			answer: answer,
 		};
 		if (score >= kkm) {
-			status = "Passed";
+			status = PASSED;
 		}
 		if (score < kkm) {
-			status = "Failed";
+			status = FAILED;
 		}
 		if (score > 100 || score < 0) {
-			status = "Invalid";
+			status = INVALID;
 		}
 
 		const result = await Material_Enrolled.update(
@@ -268,17 +286,21 @@ module.exports = {
 				score: score,
 				status: status,
 				activity_detail: quizResultDetail,
+				status: GRADING,
 			},
 			{
 				where: {
-					student_id: user_id,
+					student_id: student_id,
 					subject_id: quiz_session.subject_id,
 					id_referrer: quiz_id,
 					session_id: session_id,
 				},
+			},
+			{
+				returning: true,
 			}
 		);
-		return res.sendJson(200, true, "Success", null);
+		return res.sendJson(200, true, "Success", result);
 	}),
 
 	/**
@@ -290,7 +312,30 @@ module.exports = {
 		const { quiz_id } = req.params;
 		const student_id = req.student_id;
 
-		let result = [];
+		const user_answer = await Material_Enrolled.findOne({
+			where: {
+				student_id,
+				id_referrer: quiz_id,
+				status: [GRADING, FINISHED],
+			},
+			attributes: ["activity_detail"],
+		});
+
+		const quiz = await Quiz.findOne({
+			where: {
+				id: quiz_id,
+			},
+			attributes: ["answer", "questions"],
+		});
+
+		let result = {
+			user_answer: user_answer,
+			real_answer: quiz.answer,
+			questions: quiz.questions,
+		};
+
+		// for (let i = 0; i<)
+		console.log(result);
 
 		return res.sendJson(200, true, "Success", result);
 	}),

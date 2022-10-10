@@ -36,4 +36,11 @@ route.post(
 	quizController.postQuizAnswer
 );
 
+route.get(
+	"/review/:quiz_id",
+	protection,
+	authorize("student"),
+	quizController.getQuizReview
+);
+
 module.exports = route;
