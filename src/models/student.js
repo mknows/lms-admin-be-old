@@ -25,18 +25,22 @@ module.exports = (sequelize, DataTypes) => {
 				through: models.StudentSession,
 				foreignKey: "student_id",
 			});
+			this.belongsTo(models.Lecturer, {
+				foreignKey: 'supervisor_id'
+			});
 		}
 	}
 
 	Student.init(
 		{
 			id: {
-				type: DataTypes.UUID,
+				type: DataTypes.UUID,		
 				primaryKey: true,
 				defaultValue: sequelize.literal("gen_random_uuid()"),
 			},
 			user_id: DataTypes.UUID,
 			major_id: DataTypes.ARRAY(DataTypes.STRING),
+			supervisor_id: DataTypes.UUID,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
 			deleted_at: DataTypes.DATE,
