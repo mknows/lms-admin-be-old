@@ -174,6 +174,15 @@ exports.validate = (method) => {
 				body("description", "description is invalid").notEmpty().trim(),
 			];
 		}
+
+		case "createCertificate": {
+			return [
+				body("user_id", "user_id is invalid").notEmpty().trim(),
+				body("student_id", "student_id is invalid").notEmpty().trim(),
+				body("subject_id", "subject_id is invalid").notEmpty().trim(),
+				body("id_certificate", "id_certificate is invalid").notEmpty().trim(),
+			];
+		}
 	}
 };
 
