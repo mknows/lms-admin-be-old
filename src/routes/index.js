@@ -16,6 +16,7 @@ const majorRoute = require("./major");
 const materialEnrolledRoute = require("./materialEnrolled");
 const syllabusRoute = require("./syllabus");
 const documentRoute = require("./document");
+const certificateController = require("./certificate");
 
 //punya ryo
 const administrationRoute = require("./Administration");
@@ -36,5 +37,6 @@ route.use("/major", majorRoute);
 route.use("/materialenrolled", materialEnrolledRoute);
 route.use("/syllabus", syllabusRoute);
 route.use("/document", documentRoute);
+route.use("/certificate", certificateController);
 
 module.exports = route;
