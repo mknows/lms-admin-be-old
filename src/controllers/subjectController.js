@@ -712,8 +712,8 @@ async function getParsedPlan(student_id) {
 		let dataval = {
 			name: currSub.name,
 			credit: currSub.credit,
-			status: currStudSub.status,
-			student_subject_id: datapending[i].id,
+			subject_id: currSub.id,
+			student_subject_id: currStudSub.id,
 		};
 
 		pendingres.push(dataval);
@@ -733,8 +733,8 @@ async function getParsedPlan(student_id) {
 		let dataval = {
 			name: currSub.name,
 			credit: currSub.credit,
-			status: currStudSub.status,
-			student_subject_id: dataongoing[i].id,
+			subject_id: currSub.id,
+			student_subject_id: currStudSub.id,
 		};
 
 		ongoingres.push(dataval);
@@ -754,8 +754,8 @@ async function getParsedPlan(student_id) {
 		let dataval = {
 			name: currSub.name,
 			credit: currSub.credit,
-			status: currStudSub.status,
-			student_subject_id: datadraft[i].id,
+			subject_id: currSub.id,
+			student_subject_id: currStudSub.id,
 		};
 
 		draftres.push(dataval);
