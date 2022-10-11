@@ -552,7 +552,7 @@ module.exports = {
 					},
 				},
 			});
-			const studentsInformation = await Student.findOne({
+			const students_information = await Student.findOne({
 				where: {
 					id: student_id,
 				},
@@ -577,7 +577,7 @@ module.exports = {
 				],
 			});
 			result = {
-				studentsInformation: studentsInformation,
+				students_information: students_information,
 				major: maj,
 				result: fin_res,
 			};
