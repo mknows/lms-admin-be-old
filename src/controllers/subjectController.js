@@ -631,8 +631,37 @@ module.exports = {
 	getStudyPlan: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
 		const subjectsEnrolled = await getParsedPlan(student_id);
+		
+		const studentsInformation = await Student.findOne({
+			where: {
+				id: student_id,
+			},
+			include: [
+				{
+					model: User,
+					attributes: ["full_name"],
+				},
+				{
+					model: Major,
+					attributes: ["name"],
+				},
+				{
+					model: Lecturer,
+					include: [
+						{
+							model: User,
+							attributes: ["full_name"],
+						},
+					],
+				},
+			],
+		});
+		let result = {
+			studentsInformation: studentsInformation,
+			subjectsEnrolled : subjectsEnrolled
+		};
 
-		return res.sendJson(200, true, "success", subjectsEnrolled);
+		return res.sendJson(200, true, "success", result);
 	}),
 };
 
