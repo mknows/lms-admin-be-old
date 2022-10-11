@@ -3,6 +3,7 @@ const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
+const { redisClient } = require("../helpers/redis");
 
 module.exports = {
 	/**
@@ -30,8 +31,21 @@ module.exports = {
 	 * @access    Public
 	 */
 	getAllSessions: asyncHandler(async (req, res) => {
-		const data = await Session.findAll();
-		return res.sendJson(200, true, "success get all sessions", data);
+		let result;
+		const key = "getAllSessions-" + req.userData.id;
+		const cacheResult = await redisClient.get(key);
+
+		if (cacheResult) {
+			result = JSON.parse(cacheResult);
+		} else {
+			const data = await Session.findAll();
+			result = data;
+			await redisClient.set(key, JSON.stringify(result), {
+				EX: 150,
+			});
+		}
+
+		return res.sendJson(200, true, "success get all sessions", result);
 	}),
 	/**
 	 * @desc      Get All Session in Subject

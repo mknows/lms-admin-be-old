@@ -15,6 +15,7 @@ const errResponseFirebase = require("./src/helpers/responseErrorFirebase");
 const allRoutes = require("./src/routes/index");
 const initializeFirebase = require("./src/config/firebaseConnection");
 const errorHandler = require("./src/middlewares/Error");
+require("./src/helpers/redis");
 
 const app = express();
 

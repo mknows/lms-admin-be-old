@@ -51,6 +51,11 @@ const errorHandler = (err, req, res, next) => {
       errors = new ErrorResponse(message, 500);
       break;
     }
+    case "ECONNRESET": {
+			const message = "error ECONNRESET";
+			errors = new ErrorResponse(message, 500);
+			break;
+		}
   }
 
   // ==========================
