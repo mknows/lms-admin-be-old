@@ -85,7 +85,7 @@ module.exports = {
 	 */
 	getAssignmentInSession: asyncHandler(async (req, res) => {
 		const { session_id } = req.params;
-		const assign = await Assignment.findAll({
+		const assign = await Assignment.findOne({
 			where: {
 				session_id: session_id,
 			},
@@ -94,7 +94,7 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Get Assignment
-	 * @route     GET /api/v1/assignment/:assignment_id
+	 * @route     POST /api/v1/assignment/:assignment_id
 	 * @access    Private
 	 */
 	getAssignment: asyncHandler(async (req, res) => {
