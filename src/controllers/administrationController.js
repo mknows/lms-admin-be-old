@@ -240,7 +240,7 @@ module.exports = {
 		const bucket = admin.storage().bucket();
 		const { administration_id } = req.body;
 
-		const exist = await Administration.findOne({
+		let data = await Administration.findOne({
 			where: {
 				user_id: user.id,
 			},
