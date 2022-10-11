@@ -41,7 +41,7 @@ module.exports = {
 			const data = await Session.findAll();
 			result = data;
 			await redisClient.set(key, JSON.stringify(result), {
-				EX: 150,
+				EX: 120,
 			});
 		}
 

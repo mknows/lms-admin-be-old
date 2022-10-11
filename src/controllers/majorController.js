@@ -134,7 +134,7 @@ module.exports = {
 			const data = await Major.findAll();
 			result = data;
 			await redisClient.set(key, JSON.stringify(result), {
-				EX: 150,
+				EX: 120,
 			});
 		}
 		return res.sendJson(200, true, "Search all major successfully.", result);

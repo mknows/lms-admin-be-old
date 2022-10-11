@@ -251,7 +251,7 @@ module.exports = {
 			}
 			result = subject;
 			await redisClient.set(key, JSON.stringify(result), {
-				EX: 150,
+				EX: 120,
 			});
 		}
 
@@ -583,7 +583,7 @@ module.exports = {
 			};
 
 			await redisClient.set(key, JSON.stringify(result), {
-				EX: 150,
+				EX: 120,
 			});
 
 			if (!maj) {

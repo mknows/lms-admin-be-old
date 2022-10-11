@@ -1,6 +1,7 @@
 const dotenv = require("dotenv");
 dotenv.config({ path: "../config/config.env" });
 const redis = require("redis");
+const ErrorResponse = require("../utils/errorResponse");
 
 let redisClient;
 
@@ -11,13 +12,12 @@ let redisClient;
 	});
 
 	redisClient.on("connect", () => {
-		// console.log("connected redis");
+		console.log("connected to redis");
 	});
-	redisClient.on("error", (error) => console.log("error redis : ", error));
-	redisClient.on("timeout", (time) =>
-		console.log("connection time out redis : ", time)
-	);
-
+	redisClient.on("error", (error) => {
+		return console.error("error redis : ", error.message);
+		// return new Error(error.message);
+	});
 	await redisClient.connect();
 })();
 
