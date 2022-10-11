@@ -2,12 +2,18 @@ const express = require("express");
 const route = express.Router();
 
 const forumController = require("../controllers/forumController");
-const { protection } = require("../middlewares/Authentication");
+const { protection, authorize } = require("../middlewares/Authentication");
 
 route.get(
 	"/discussionforum",
 	protection,
 	forumController.getAllDiscussionForum
+);
+
+route.get(
+	"/discussionforum/allcontent/:df_id",
+	protection,
+	forumController.getAllDiscussionForumContent
 );
 
 route.get(
@@ -59,6 +65,13 @@ route.delete(
 	"/reply/delete/:reply_id",
 	protection,
 	forumController.deleteReply
+);
+
+route.put(
+	"/like",
+	protection,
+	authorize("student", "lecturer"),
+	forumController.likePost
 );
 
 module.exports = route;
