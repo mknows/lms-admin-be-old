@@ -625,14 +625,14 @@ module.exports = {
 	}),
 	/**
 	 * @desc      get plan
-	 * @route     POST /api/v1/subject/studyplan
+	 * @route     POST 	
 	 * @access    Private
 	 */
 	getStudyPlan: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
-		const subjectsEnrolled = await getParsedPlan(student_id);
+		const subjects_enrolled = await getParsedPlan(student_id);
 		
-		const studentsInformation = await Student.findOne({
+		const students_information = await Student.findOne({
 			where: {
 				id: student_id,
 			},
@@ -657,8 +657,8 @@ module.exports = {
 			],
 		});
 		let result = {
-			studentsInformation: studentsInformation,
-			subjectsEnrolled : subjectsEnrolled
+			studentsInformation: students_information,
+			subjects_enrolled : subjects_enrolled
 		};
 
 		return res.sendJson(200, true, "success", result);
