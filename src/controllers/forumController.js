@@ -459,7 +459,8 @@ module.exports = {
 		const user_id = req.userData.id;
 
 		let data;
-
+		let liker_id;
+		let likes;
 		switch (type) {
 			case "reply":
 				data = await Reply.findOne({
@@ -467,6 +468,50 @@ module.exports = {
 						id: id,
 					},
 				});
+
+				if (data == null) {
+					return res.sendJson(404, false, "cannot find post", data);
+				}
+
+				if (user_role === "student") {
+					liker_id = await getLikerId(data.student_like, user_id, user_role);
+					if (liker_id.status === false) {
+						return res.sendJson(404, false, liker_id.msg, data);
+					}
+					likes = data.student_like;
+					await likes.push(liker_id.msg);
+					data = await Reply.update(
+						{
+							student_like: likes,
+						},
+						{
+							where: { id: id },
+						},
+						{
+							returning: true,
+							raw: true,
+						}
+					);
+				} else if (user_role === "lecturer") {
+					liker_id = await getLikerId(data.lecturer_like, user_id, user_role);
+					if (liker_id.status === false) {
+						return res.sendJson(404, false, liker_id.msg, data);
+					}
+					likes = data.lecturer_like;
+					await likes.push(liker_id.msg);
+					data = await Reply.update(
+						{
+							lecturer_like: likes,
+						},
+						{
+							where: { id: id },
+						},
+						{
+							returning: true,
+							raw: true,
+						}
+					);
+				}
 
 				break;
 			case "comment":
@@ -476,6 +521,50 @@ module.exports = {
 					},
 				});
 
+				if (data == null) {
+					return res.sendJson(404, false, "cannot find post", data);
+				}
+
+				if (user_role === "student") {
+					liker_id = await getLikerId(data.student_like, user_id, user_role);
+					if (liker_id.status === false) {
+						return res.sendJson(404, false, liker_id.msg, data);
+					}
+					likes = data.student_like;
+					await likes.push(liker_id.msg);
+					data = await Comment.update(
+						{
+							student_like: likes,
+						},
+						{
+							where: { id: id },
+						},
+						{
+							returning: true,
+							raw: true,
+						}
+					);
+				} else if (user_role === "lecturer") {
+					liker_id = await getLikerId(data.lecturer_like, user_id, user_role);
+					if (liker_id.status === false) {
+						return res.sendJson(404, false, liker_id.msg, data);
+					}
+					likes = data.lecturer_like;
+					await likes.push(liker_id.msg);
+					data = await Comment.update(
+						{
+							lecturer_like: likes,
+						},
+						{
+							where: { id: id },
+						},
+						{
+							returning: true,
+							raw: true,
+						}
+					);
+				}
+
 				break;
 			case "df":
 				data = await Discussion_forum.findOne({
@@ -484,51 +573,107 @@ module.exports = {
 					},
 				});
 
+				if (data == null) {
+					return res.sendJson(404, false, "cannot find post", data);
+				}
+
+				if (user_role === "student") {
+					liker_id = await getLikerId(data.student_like, user_id, user_role);
+					if (liker_id.status === false) {
+						return res.sendJson(404, false, liker_id.msg, data);
+					}
+					likes = data.student_like;
+					await likes.push(liker_id.msg);
+					data = await Discussion_forum.update(
+						{
+							student_like: likes,
+						},
+						{
+							where: { id: id },
+						},
+						{
+							returning: true,
+							raw: true,
+						}
+					);
+				} else if (user_role === "lecturer") {
+					liker_id = await getLikerId(data.lecturer_like, user_id, user_role);
+					if (liker_id.status === false) {
+						return res.sendJson(404, false, liker_id.msg, data);
+					}
+					likes = data.lecturer_like;
+					await likes.push(liker_id.msg);
+					data = await Discussion_forum.update(
+						{
+							lecturer_like: likes,
+						},
+						{
+							where: { id: id },
+						},
+						{
+							returning: true,
+							raw: true,
+						}
+					);
+				}
+
 				break;
 		}
-
-		if (data == null) {
-			return res.sendJson(404, false, "cannot find post", data);
-		}
-
-		let liker;
-		switch (user_role) {
-			case "student":
-				liker = await Student.findOne({
-					where: {
-						user_id: user_id,
-					},
-				});
-
-				if (liker == null) {
-					return res.sendJson(404, false, "student not found", liker);
-				}
-
-				if (data.student_like.includes(liker.id)) {
-					return res.sendJson(404, false, "student already liked", liker);
-				}
-				data.student_like.push(liker.id);
-				break;
-
-			case "lecturer":
-				liker = await Lecturer.findOne({
-					where: {
-						user_id: user_id,
-					},
-				});
-
-				if (liker == null) {
-					return res.sendJson(404, false, "lecturer not found", liker);
-				}
-				if (data.lecturer_like.includes(liker.id)) {
-					return res.sendJson(404, false, "lecturer already liked", liker);
-				}
-				data.lecturer_like.push(liker.id);
-				break;
-		}
-
-		await data.save();
 
 		return res.sendJson(200, true, "Success", data);
 	}),
 };
+
+async function getLikerId(like_data, user_id, user_role) {
+	let liker;
+	switch (user_role) {
+		case "student":
+			liker = await Student.findOne({
+				where: {
+					user_id: user_id,
+				},
+			});
+
+			if (liker == null) {
+				return {
+					msg: "student not found",
+					status: false,
+				};
+			}
+
+			if (like_data.includes(liker.id)) {
+				return {
+					msg: "student already liked",
+					status: false,
+				};
+			}
+			liker = liker.id;
+			break;
+
+		case "lecturer":
+			liker = await Lecturer.findOne({
+				where: {
+					user_id: user_id,
+				},
+			});
+
+			if (liker == null) {
+				return {
+					msg: "lecturer not found",
+					status: false,
+				};
+			}
+			if (like_data.includes(liker.id)) {
+				return {
+					msg: "lecturer already liked",
+					status: false,
+				};
+			}
+			liker = liker.id;
+			break;
+	}
+	return {
+		msg: liker,
+		status: true,
+	};
+}
