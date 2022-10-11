@@ -39,7 +39,6 @@ module.exports = (sequelize, DataTypes) => {
 				defaultValue: sequelize.literal("gen_random_uuid()"),
 			},
 			user_id: DataTypes.UUID,
-			major_id: DataTypes.ARRAY(DataTypes.STRING),
 			supervisor_id: DataTypes.UUID,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,

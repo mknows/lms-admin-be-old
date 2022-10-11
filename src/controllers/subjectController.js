@@ -19,7 +19,6 @@ const {
 const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
 const scoringController = require("./scoringController");
-const { async } = require("@firebase/util");
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	DRAFT,
@@ -376,17 +375,8 @@ module.exports = {
 
 		const nameFile = uuidv4() + req.file.originalname.split(" ").join("-");
 		const fileBuffer = req.file.buffer;
-
-		// bucket
-		// 	.upload("documents/khs/", {
-		// 		gzip: true,
-		// 		destination: nameFile,
-		// 	})
-		// 	.then((res) => {
-		// 		console.log("res => ", res);
-		// 	})
-		// 	.catch((err) => console.log(err));
 		const credit_thresh = 24;
+
 		let subjectsEnrolled = await getPlan(student_id);
 		subjectsEnrolled = subjectsEnrolled[0]
 			.concat(subjectsEnrolled[1])
@@ -394,29 +384,28 @@ module.exports = {
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
-		const studentMajor = await Student.findOne({
-			attributes: ["major_id"],
-			where: {
-				id: student_id,
-			},
-		});
-		const majorSubject = await Major.findAll({
-			attributes: ["id"],
-			where: {
-				id: studentMajor.dataValues.major_id,
-			},
-			include: [
-				{
-					model: Subject,
-					where: {
-						id: subject_id,
-					},
+		const students_major = await Student.findOne(
+			{
+				where:{
+					id:student_id
 				},
-			],
-		});
-		if (!majorSubject) {
-			return res.sendJson(400, false, "Student is not in that major", null);
+				include:{
+					model:Major,
+					attributes:['id'],
+					include:{
+						model:Subject,
+						attributes:['id'],
+						where:{
+							id:sub.id
+						}
+					}
+				}
+			}
+		)
+		if(students_major.Majors.length===0){
+			return res.sendJson(400, false, "Student's major doesn't have that subject");
 		}
+		
 		let credit = 0;
 		let enrolled = false;
 
@@ -501,29 +490,26 @@ module.exports = {
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
-		const studentMajor = await Student.findOne({
-			attributes: ["major_id"],
-			where: {
-				id: student_id,
-			},
-		});
-
-		const majorSubject = await Major.findAll({
-			attributes: ["id"],
-			where: {
-				id: studentMajor.dataValues.major_id,
-			},
-			include: [
-				{
-					model: Subject,
-					where: {
-						id: subject_id,
-					},
+		const students_major = await Student.findOne(
+			{
+				where:{
+					id:student_id
 				},
-			],
-		});
-		if (majorSubject.length === 0) {
-			return res.sendJson(400, false, "Student is not in that major");
+				include:{
+					model:Major,
+					attributes:['id'],
+					include:{
+						model:Subject,
+						attributes:['id'],
+						where:{
+							id:sub.id
+						}
+					}
+				}
+			}
+		)
+		if(students_major.Majors.length===0){
+			return res.sendJson(400, false, "Student's major doesn't have that subject");
 		}
 		let credit = 0;
 		let enrolled = false;
@@ -539,29 +525,29 @@ module.exports = {
 
 		let result;
 
-		// if (enrolled === false && credit <= credit_thresh) {
-		// 	await StudentSubject.create({
-		// 		subject_id: subject_id,
-		// 		student_id: student_id,
-		// 		status: DRAFT,
-		// 	});
+		if (enrolled === false && credit <= credit_thresh) {
+			await StudentSubject.create({
+				subject_id: subject_id,
+				student_id: student_id,
+				status: DRAFT,
+			});
 
-		// 	result = await getParsedPlan(student_id);
-		// 	return res.sendJson(
-		// 		200,
-		// 		true,
-		// 		`successfully enrolled in ${sub.name}`,
-		// 		result
-		// 	);
-		// } else if (credit > credit_thresh) {
-		// 	return res.sendJson(400, false, "Exceeded maximum credit", {
-		// 		credit: credit,
-		// 	});
-		// } else if (enrolled) {
-		// 	return res.sendJson(400, false, `already enrolled in ${sub.name}`, {
-		// 		enrolled_in: subject_id,
-		// 	});
-		// }
+			result = await getParsedPlan(student_id);
+			return res.sendJson(
+				200,
+				true,
+				`successfully enrolled in ${sub.name}`,
+				result
+			);
+		} else if (credit > credit_thresh) {
+			return res.sendJson(400, false, "Exceeded maximum credit", {
+				credit: credit,
+			});
+		} else if (enrolled) {
+			return res.sendJson(400, false, `already enrolled in ${sub.name}`, {
+				enrolled_in: subject_id,
+			});
+		}
 
 		if (credit > credit_thresh) {
 			return res.sendJson(400, false, "Exceeded maximum credit", {
@@ -586,8 +572,6 @@ module.exports = {
 				result
 			);
 		}
-
-		return res.sendJson(400, false, "something went wrong", null);
 	}),
 	/**
 	 * @desc      enroll in a subject
