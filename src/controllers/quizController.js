@@ -85,6 +85,7 @@ module.exports = {
 			return res.sendJson(404, false, "no quiz found", result);
 		}
 
+<<<<<<< HEAD
 		let summary = await MaterialEnrolled.findAll({
 			where: {
 				student_id,
@@ -92,6 +93,14 @@ module.exports = {
 				[Op.not]: {
 					status: ONGOING,
 				},
+=======
+		let summary;
+		summary = await Material_Enrolled.findOne({
+			where: {
+				student_id,
+				id_referrer: quizDesc.id,
+				status: [PASSED, FAILED, INVALID],
+>>>>>>> 31250c9 (quiz filtr)
 			},
 			attributes: [
 				"id",
@@ -280,6 +289,7 @@ module.exports = {
 				material_id: material.id,
 				subject_id: session.subject_id,
 				id_referrer: quiz_id,
+				status: ONGOING,
 				type: QUIZ,
 				status: ONGOING,
 			});
