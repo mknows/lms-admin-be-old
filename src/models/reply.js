@@ -10,6 +10,8 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// define association here
+			this.belongsTo(models.Comment, { foreignKey: "id" });
+			this.belongsTo(models.User, { foreignKey: "author_id" });
 		}
 	}
 

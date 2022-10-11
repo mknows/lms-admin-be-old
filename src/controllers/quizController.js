@@ -80,6 +80,10 @@ module.exports = {
 			attributes: ["id", "description"],
 		});
 
+		if (!quizDesc) {
+			return res.sendJson(404, false, "no quiz found", result);
+		}
+
 		const summary = await Material_Enrolled.findOne({
 			where: {
 				student_id,
