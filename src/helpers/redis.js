@@ -11,9 +11,12 @@ let redisClient;
 	});
 
 	redisClient.on("connect", () => {
-		console.log("connected redis");
+		// console.log("connected redis");
 	});
-	redisClient.on("error redis : ", (error) => console.log(error));
+	redisClient.on("error", (error) => console.log("error redis : ", error));
+	redisClient.on("timeout", (time) =>
+		console.log("connection time out redis : ", time)
+	);
 
 	await redisClient.connect();
 })();

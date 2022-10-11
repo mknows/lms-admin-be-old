@@ -12,6 +12,7 @@ const Sequelize = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const pagination = require("../helpers/pagination");
+const { redisClient } = require("../helpers/redis");
 
 module.exports = {
 	/**
@@ -211,37 +212,50 @@ module.exports = {
 	 */
 	getSubject: asyncHandler(async (req, res) => {
 		const { subject_id } = req.params;
-		const subject = await Subject.findOne({
-			attributes: {
-				exclude: [
-					"created_at",
-					"updated_at",
-					"deleted_at",
-					"updated_by",
-					"created_by",
+		let result;
+		const key = "getSubject-" + subject_id;
+
+		const cacheResult = await redisClient.get(key);
+		if (cacheResult) {
+			result = JSON.parse(cacheResult);
+		} else {
+			const subject = await Subject.findOne({
+				attributes: {
+					exclude: [
+						"created_at",
+						"updated_at",
+						"deleted_at",
+						"updated_by",
+						"created_by",
+					],
+				},
+				where: {
+					id: subject_id,
+				},
+			});
+			const name = await Lecturer.findAll({
+				where: {
+					id: {
+						[Op.in]: subject.lecturer,
+					},
+				},
+				include: [
+					{
+						model: User,
+					},
 				],
-			},
-			where: {
-				id: subject_id,
-			},
-		});
-		const name = await Lecturer.findAll({
-			where: {
-				id: {
-					[Op.in]: subject.lecturer,
-				},
-			},
-			include: [
-				{
-					model: User,
-				},
-			],
-		});
-		for (i = 0; i < subject.lecturer.length; i++) {
-			subject.lecturer = [];
-			subject.lecturer.push(name[i].User.dataValues.full_name);
+			});
+			for (i = 0; i < subject.lecturer.length; i++) {
+				subject.lecturer = [];
+				subject.lecturer.push(name[i].User.dataValues.full_name);
+			}
+			result = subject;
+			await redisClient.set(key, JSON.stringify(result), {
+				EX: 150,
+			});
 		}
-		return res.sendJson(200, true, "sucess get subject", subject);
+
+		return res.sendJson(200, true, "sucess get subject", result);
 	}),
 	/**
 	 * @desc      Get subject
@@ -280,284 +294,301 @@ module.exports = {
 	getCurriculum: asyncHandler(async (req, res) => {
 		const { major_id, degree } = req.query;
 		const student_id = req.student_id;
+		let result;
+		const key = "getCurriculum-" + student_id;
 
-		let plain_curriculum = await Promise.all([
-			Major.findOne({
-				where: {
-					id: major_id,
-				},
-				attributes: [],
-				include: {
-					model: Subject,
-					through: {
-						where: { semester: "0", degree: degree },
-						attributes: [],
+		const cacheResult = await redisClient.get(key);
+		if (cacheResult) {
+			result = JSON.parse(cacheResult);
+		} else {
+			let plain_curriculum = await Promise.all([
+				Major.findOne({
+					where: {
+						id: major_id,
 					},
-					attributes: [
-						"name",
-						"id",
-						"credit",
-						"level",
-						"thumbnail_link",
-						"lecturer",
-						"subject_code",
-					],
-				},
-			}),
-			Major.findOne({
-				where: {
-					id: major_id,
-				},
-				attributes: [],
-				include: {
-					model: Subject,
-					through: {
-						where: { semester: "1", degree: degree },
-						attributes: [],
-					},
-					attributes: [
-						"name",
-						"id",
-						"credit",
-						"level",
-						"thumbnail_link",
-						"lecturer",
-					],
-				},
-			}),
-			Major.findOne({
-				where: {
-					id: major_id,
-				},
-				attributes: [],
-				include: {
-					model: Subject,
-					through: {
-						where: { semester: "2", degree: degree },
-						attributes: [],
-					},
-					attributes: [
-						"name",
-						"id",
-						"credit",
-						"level",
-						"thumbnail_link",
-						"lecturer",
-					],
-				},
-			}),
-			Major.findOne({
-				where: {
-					id: major_id,
-				},
-				attributes: [],
-				include: {
-					model: Subject,
-					through: {
-						where: { semester: "3", degree: degree },
-						attributes: [],
-					},
-					attributes: [
-						"name",
-						"id",
-						"credit",
-						"level",
-						"thumbnail_link",
-						"lecturer",
-					],
-				},
-			}),
-			Major.findOne({
-				where: {
-					id: major_id,
-				},
-				attributes: [],
-				include: {
-					model: Subject,
-					through: {
-						where: { semester: "4", degree: degree },
-						attributes: [],
-					},
-					attributes: [
-						"name",
-						"id",
-						"credit",
-						"level",
-						"thumbnail_link",
-						"lecturer",
-					],
-				},
-			}),
-			Major.findOne({
-				where: {
-					id: major_id,
-				},
-				attributes: [],
-				include: {
-					model: Subject,
-					through: {
-						where: { semester: "5", degree: degree },
-						attributes: [],
-					},
-					attributes: [
-						"name",
-						"id",
-						"credit",
-						"level",
-						"thumbnail_link",
-						"lecturer",
-					],
-				},
-			}),
-			Major.findOne({
-				where: {
-					id: major_id,
-				},
-				attributes: [],
-				include: {
-					model: Subject,
-					through: {
-						where: { semester: "6", degree: degree },
-						attributes: [],
-					},
-					attributes: [
-						"name",
-						"id",
-						"credit",
-						"level",
-						"thumbnail_link",
-						"lecturer",
-					],
-				},
-			}),
-			Major.findOne({
-				where: {
-					id: major_id,
-				},
-				attributes: [],
-				include: {
-					model: Subject,
-					through: {
-						where: { semester: "7", degree: degree },
-						attributes: [],
-					},
-					attributes: [
-						"name",
-						"id",
-						"credit",
-						"level",
-						"thumbnail_link",
-						"lecturer",
-					],
-				},
-			}),
-			Major.findOne({
-				where: {
-					id: major_id,
-				},
-				attributes: [],
-				include: {
-					model: Subject,
-					through: {
-						where: { semester: "8", degree: degree },
-						attributes: [],
-					},
-					attributes: [
-						"name",
-						"id",
-						"credit",
-						"level",
-						"thumbnail_link",
-						"lecturer",
-					],
-				},
-			}),
-		]);
-
-		let fin_res = [];
-
-		for (let i = 0; i < plain_curriculum.length; i++) {
-			let semdat = [];
-			if (plain_curriculum[i] !== null) {
-				for (let j = 0; j < plain_curriculum[i].Subjects.length; j++) {
-					let teachers = [];
-					let { count, rows } = await StudentSubject.findAndCountAll({
-						where: {
-							subject_id: plain_curriculum[i].Subjects[j].id,
+					attributes: [],
+					include: {
+						model: Subject,
+						through: {
+							where: { semester: "0", degree: degree },
+							attributes: [],
 						},
-					});
+						attributes: [
+							"name",
+							"id",
+							"credit",
+							"level",
+							"thumbnail_link",
+							"lecturer",
+							"subject_code",
+						],
+					},
+				}),
+				Major.findOne({
+					where: {
+						id: major_id,
+					},
+					attributes: [],
+					include: {
+						model: Subject,
+						through: {
+							where: { semester: "1", degree: degree },
+							attributes: [],
+						},
+						attributes: [
+							"name",
+							"id",
+							"credit",
+							"level",
+							"thumbnail_link",
+							"lecturer",
+						],
+					},
+				}),
+				Major.findOne({
+					where: {
+						id: major_id,
+					},
+					attributes: [],
+					include: {
+						model: Subject,
+						through: {
+							where: { semester: "2", degree: degree },
+							attributes: [],
+						},
+						attributes: [
+							"name",
+							"id",
+							"credit",
+							"level",
+							"thumbnail_link",
+							"lecturer",
+						],
+					},
+				}),
+				Major.findOne({
+					where: {
+						id: major_id,
+					},
+					attributes: [],
+					include: {
+						model: Subject,
+						through: {
+							where: { semester: "3", degree: degree },
+							attributes: [],
+						},
+						attributes: [
+							"name",
+							"id",
+							"credit",
+							"level",
+							"thumbnail_link",
+							"lecturer",
+						],
+					},
+				}),
+				Major.findOne({
+					where: {
+						id: major_id,
+					},
+					attributes: [],
+					include: {
+						model: Subject,
+						through: {
+							where: { semester: "4", degree: degree },
+							attributes: [],
+						},
+						attributes: [
+							"name",
+							"id",
+							"credit",
+							"level",
+							"thumbnail_link",
+							"lecturer",
+						],
+					},
+				}),
+				Major.findOne({
+					where: {
+						id: major_id,
+					},
+					attributes: [],
+					include: {
+						model: Subject,
+						through: {
+							where: { semester: "5", degree: degree },
+							attributes: [],
+						},
+						attributes: [
+							"name",
+							"id",
+							"credit",
+							"level",
+							"thumbnail_link",
+							"lecturer",
+						],
+					},
+				}),
+				Major.findOne({
+					where: {
+						id: major_id,
+					},
+					attributes: [],
+					include: {
+						model: Subject,
+						through: {
+							where: { semester: "6", degree: degree },
+							attributes: [],
+						},
+						attributes: [
+							"name",
+							"id",
+							"credit",
+							"level",
+							"thumbnail_link",
+							"lecturer",
+						],
+					},
+				}),
+				Major.findOne({
+					where: {
+						id: major_id,
+					},
+					attributes: [],
+					include: {
+						model: Subject,
+						through: {
+							where: { semester: "7", degree: degree },
+							attributes: [],
+						},
+						attributes: [
+							"name",
+							"id",
+							"credit",
+							"level",
+							"thumbnail_link",
+							"lecturer",
+						],
+					},
+				}),
+				Major.findOne({
+					where: {
+						id: major_id,
+					},
+					attributes: [],
+					include: {
+						model: Subject,
+						through: {
+							where: { semester: "8", degree: degree },
+							attributes: [],
+						},
+						attributes: [
+							"name",
+							"id",
+							"credit",
+							"level",
+							"thumbnail_link",
+							"lecturer",
+						],
+					},
+				}),
+			]);
 
-					teachers = await Lecturer.findAll({
-						where: {
-							id: plain_curriculum[i].Subjects[j].lecturer,
-						},
-						include: {
-							model: User,
-							attributes: ["full_name"],
-						},
-						attributes: [],
-					});
-					let onedat = {
-						subject: plain_curriculum[i].Subjects[j],
-						lecturers: teachers,
-						student_count: count,
-					};
-					semdat.push(onedat);
+			let fin_res = [];
+
+			for (let i = 0; i < plain_curriculum.length; i++) {
+				let semdat = [];
+				if (plain_curriculum[i] !== null) {
+					for (let j = 0; j < plain_curriculum[i].Subjects.length; j++) {
+						let teachers = [];
+						let { count, rows } = await StudentSubject.findAndCountAll({
+							where: {
+								subject_id: plain_curriculum[i].Subjects[j].id,
+							},
+						});
+
+						teachers = await Lecturer.findAll({
+							where: {
+								id: plain_curriculum[i].Subjects[j].lecturer,
+							},
+							include: {
+								model: User,
+								attributes: ["full_name"],
+							},
+							attributes: [],
+						});
+						let onedat = {
+							subject: plain_curriculum[i].Subjects[j],
+							lecturers: teachers,
+							student_count: count,
+						};
+						semdat.push(onedat);
+					}
 				}
+				let onesemdat = {
+					semester: i,
+					subjects: semdat,
+				};
+				fin_res.push(onesemdat);
 			}
-			let onesemdat = {
-				semester: i,
-				subjects: semdat,
-			};
-			fin_res.push(onesemdat);
-		}
 
-		let maj = await Major.findOne({
-			where: {
-				id: major_id,
-			},
-			attributes: ["id", "name", "description", "updated_at", "thumbnail_link"],
-			include: {
-				model: Lecturer,
-				attributes: ["id"],
+			let maj = await Major.findOne({
+				where: {
+					id: major_id,
+				},
+				attributes: [
+					"id",
+					"name",
+					"description",
+					"updated_at",
+					"thumbnail_link",
+				],
 				include: {
-					model: User,
-					attributes: ["full_name"],
-				},
-			},
-		});
-		const studentsInformation = await Student.findOne({
-			where: {
-				id: student_id,
-			},
-			include: [
-				{
-					model: User,
-					attributes: ["full_name"],
-				},
-				{
-					model: Major,
-					attributes: ["name"],
-				},
-				{
 					model: Lecturer,
-					include: [
-						{
-							model: User,
-							attributes: ["full_name"],
-						},
-					],
+					attributes: ["id"],
+					include: {
+						model: User,
+						attributes: ["full_name"],
+					},
 				},
-			],
-		});
-		let result = {
-			studentsInformation: studentsInformation,
-			major: maj,
-			result: fin_res,
-		};
+			});
+			const studentsInformation = await Student.findOne({
+				where: {
+					id: student_id,
+				},
+				include: [
+					{
+						model: User,
+						attributes: ["full_name"],
+					},
+					{
+						model: Major,
+						attributes: ["name"],
+					},
+					{
+						model: Lecturer,
+						include: [
+							{
+								model: User,
+								attributes: ["full_name"],
+							},
+						],
+					},
+				],
+			});
+			result = {
+				studentsInformation: studentsInformation,
+				major: maj,
+				result: fin_res,
+			};
 
-		if (!maj) {
-			return res.sendJson(400, false, "Major ID not found", null);
+			await redisClient.set(key, JSON.stringify(result), {
+				EX: 150,
+			});
+
+			if (!maj) {
+				return res.sendJson(400, false, "Major ID not found", null);
+			}
 		}
 
 		return res.sendJson(200, true, "Success", result);
