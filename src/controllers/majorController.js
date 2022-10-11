@@ -12,6 +12,7 @@ const {
 	deleteObject,
 } = require("firebase/storage");
 const student = require("../models/student");
+const { redisClient } = require("../helpers/redis");
 
 module.exports = {
 	/**
@@ -123,8 +124,18 @@ module.exports = {
 	 * @access    Public
 	 */
 	getAllMajors: asyncHandler(async (req, res) => {
-		const data = await Major.findAll();
-		return res.sendJson(200, true, "Search all major successfully.", data);
+		let result;
+		const key = "getAllMajors-" + req.userData.id;
+		const cacheResult = await redisClient.get(key);
+
+		if (cacheResult) {
+			result = JSON.parse(cacheResult);
+		} else {
+			const data = await Major.findAll();
+			result = data;
+			await redisClient.set(key, JSON.stringify(result));
+		}
+		return res.sendJson(200, true, "Search all major successfully.", result);
 	}),
 
 	/**
@@ -265,50 +276,46 @@ module.exports = {
 	 * @route     POST /api/v1/majors/take/:major_id
 	 * @access    Private
 	 */
-	 enrollMajor: asyncHandler(async (req, res) => {
+	enrollMajor: asyncHandler(async (req, res) => {
 		const { major_id } = req.params;
 		const student_id = req.student_id;
 
-		const major_exists = await Major.findOne({	
-			attribute:[
-				'id','name'
-			],	
-			where:{
-				id:major_id
-			}
-		})
+		const major_exists = await Major.findOne({
+			attribute: ["id", "name"],
+			where: {
+				id: major_id,
+			},
+		});
 
-		if(!major_exists){
+		if (!major_exists) {
 			return res.status(400).json({
 				success: true,
-				message: `Major doesn't exist`
+				message: `Major doesn't exist`,
 			});
 		}
 
 		const students_major = await StudentMajor.findOne({
-			where:{
-				student_id:student_id,
-				major_id: major_id
-			}
-		})
+			where: {
+				student_id: student_id,
+				major_id: major_id,
+			},
+		});
 
-		if(students_major){
+		if (students_major) {
 			return res.status(400).json({
 				success: false,
-				message: `Student is already enrolled in this major`
+				message: `Student is already enrolled in this major`,
 			});
 		}
-		if(!students_major){
-			await StudentMajor.create(
-				{
-					student_id:student_id,
-					major_id:major_id,
-					status: "ONGOING"
-				}
-			)
+		if (!students_major) {
+			await StudentMajor.create({
+				student_id: student_id,
+				major_id: major_id,
+				status: "ONGOING",
+			});
 			return res.status(200).json({
 				success: true,
-				message: `Enrolled to ${major_exists.name}`
+				message: `Enrolled to ${major_exists.name}`,
 			});
 		}
 	}),
