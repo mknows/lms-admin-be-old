@@ -1,10 +1,54 @@
-const { Student, Discussion_forum, Comment, Reply } = require("../models");
+const {
+	Student,
+	Lecturer,
+	Discussion_forum,
+	Comment,
+	Reply,
+	User,
+} = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 
 module.exports = {
+	/**
+	 * @desc      Get All content in a df
+	 * @route     GET /api/v1/forum/discussionforum/allcontent/:df_id
+	 * @access    Public
+	 */
+	getAllDiscussionForumContent: asyncHandler(async (req, res) => {
+		const { df_id } = req.params;
+		const data = await Discussion_forum.findOne({
+			where: {
+				id: df_id,
+			},
+			attributes: { include: ["created_at", "updated_at"] },
+			include: [
+				{
+					model: User,
+					attributes: ["full_name"],
+				},
+				{
+					model: Comment,
+					include: [
+						{
+							model: User,
+							attributes: ["full_name"],
+						},
+						{
+							model: Reply,
+							include: {
+								model: User,
+								attributes: ["full_name"],
+							},
+						},
+					],
+				},
+			],
+		});
+		return res.sendJson(200, true, "sucess get all discussion forums", data);
+	}),
 	/**
 	 * @desc      Get All Forums
 	 * @route     GET /api/v1/forum/discussionforum/
@@ -402,5 +446,89 @@ module.exports = {
 		});
 
 		return res.sendJson(200, true, "Success", {});
+	}),
+
+	/**
+	 * @desc      like thing
+	 * @route     PUT /api/v1/forum/like?type=<df/comment/reply>&id=<idnum>
+	 * @access    Private
+	 */
+	likePost: asyncHandler(async (req, res) => {
+		const { type, id } = req.query;
+		const user_role = req.role;
+		const user_id = req.userData.id;
+
+		let data;
+
+		switch (type) {
+			case "reply":
+				data = await Reply.findOne({
+					where: {
+						id: id,
+					},
+				});
+
+				break;
+			case "comment":
+				data = await Comment.findOne({
+					where: {
+						id: id,
+					},
+				});
+
+				break;
+			case "df":
+				data = await Discussion_forum.findOne({
+					where: {
+						id: id,
+					},
+				});
+
+				break;
+		}
+
+		if (data == null) {
+			return res.sendJson(404, false, "cannot find post", data);
+		}
+
+		let liker;
+		switch (user_role) {
+			case "student":
+				liker = await Student.findOne({
+					where: {
+						user_id: user_id,
+					},
+				});
+
+				if (liker == null) {
+					return res.sendJson(404, false, "student not found", liker);
+				}
+
+				if (data.student_like.includes(liker.id)) {
+					return res.sendJson(404, false, "student already liked", liker);
+				}
+				data.student_like.push(liker.id);
+				break;
+
+			case "lecturer":
+				liker = await Lecturer.findOne({
+					where: {
+						user_id: user_id,
+					},
+				});
+
+				if (liker == null) {
+					return res.sendJson(404, false, "lecturer not found", liker);
+				}
+				if (data.lecturer_like.includes(liker.id)) {
+					return res.sendJson(404, false, "lecturer already liked", liker);
+				}
+				data.lecturer_like.push(liker.id);
+				break;
+		}
+
+		await data.save();
+
+		return res.sendJson(200, true, "Success", data);
 	}),
 };

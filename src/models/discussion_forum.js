@@ -10,6 +10,8 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// define association here
+			this.hasMany(models.Comment, { foreignKey: "df_id" });
+			this.belongsTo(models.User, { foreignKey: "author_id" });
 		}
 	}
 	Discussion_forum.init(

@@ -4,6 +4,9 @@ module.exports = (sequelize, DataTypes) => {
 	class User extends Model {
 		static associate(models) {
 			this.hasOne(models.Lecturer);
+			this.hasMany(models.Discussion_forum, { foreignKey: "author_id" });
+			this.hasMany(models.Comment, { foreignKey: "author_id" });
+			this.hasMany(models.Reply, { foreignKey: "author_id" });
 		}
 	}
 	User.init(
