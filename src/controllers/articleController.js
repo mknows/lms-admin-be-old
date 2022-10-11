@@ -9,6 +9,7 @@ const {
 	deleteObject,
 } = require("firebase/storage");
 const asyncHandler = require("express-async-handler");
+const { redisClient } = require("../helpers/redis");
 
 module.exports = {
 	/**
@@ -17,13 +18,28 @@ module.exports = {
 	 * @access    Private
 	 */
 	index: asyncHandler(async (req, res) => {
-		const data = await Article.findAll();
+		let results;
+		const key = "get-all-data-article";
 
-		if (data.length == 0) {
-			return res.sendJson(200, true, "success get, but not have data article");
+		const cacheResult = await redisClient.get(key);
+		if (cacheResult) {
+			results = JSON.parse(cacheResult);
+		} else {
+			results = await Article.findAll();
+			await redisClient.set(key, JSON.stringify(results), {
+				EX: 120,
+			});
+
+			if (results.length == 0) {
+				return res.sendJson(
+					200,
+					true,
+					"success get, but not have data article"
+				);
+			}
 		}
 
-		return res.sendJson(200, true, "success get all data", data);
+		return res.sendJson(200, true, "success get all data", results);
 	}),
 
 	/**
