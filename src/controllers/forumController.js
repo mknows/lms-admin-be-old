@@ -11,7 +11,11 @@ module.exports = {
 	 * @access    Public
 	 */
 	getAllDiscussionForum: asyncHandler(async (req, res) => {
-		const data = await Discussion_forum.findAll();
+		const data = await Discussion_forum.findAll({
+			attributes: {
+				include: ["created_at", "updated_at"],
+			},
+		});
 		return res.sendJson(200, true, "sucess get all discussion forums", data);
 	}),
 	/**
@@ -25,6 +29,9 @@ module.exports = {
 			where: {
 				session_id: session_id,
 			},
+			attributes: {
+				include: ["created_at", "updated_at"],
+			},
 		});
 		return res.sendJson(200, true, "sucess get all df in session", data);
 	}),
@@ -34,7 +41,11 @@ module.exports = {
 	 * @access    Public
 	 */
 	getAllComment: asyncHandler(async (req, res) => {
-		const data = await Comment.findAll();
+		const data = await Comment.findAll({
+			attributes: {
+				include: ["created_at", "updated_at"],
+			},
+		});
 		return res.sendJson(200, true, "sucess get all comments", data);
 	}),
 	/**
@@ -43,7 +54,11 @@ module.exports = {
 	 * @access    Public
 	 */
 	getAllReply: asyncHandler(async (req, res) => {
-		const data = await Reply.findAll();
+		const data = await Reply.findAll({
+			attributes: {
+				include: ["created_at", "updated_at"],
+			},
+		});
 		return res.sendJson(200, true, "sucess get all replies", data);
 	}),
 	/**
@@ -56,6 +71,9 @@ module.exports = {
 		const data = await Comment.findAll({
 			where: {
 				df_id: dfId,
+			},
+			attributes: {
+				include: ["created_at", "updated_at"],
 			},
 		});
 		return res.sendJson(200, true, "success get comment in a df", data);
@@ -70,6 +88,9 @@ module.exports = {
 		const data = await Reply.findAll({
 			where: {
 				comment_id: comment_id,
+			},
+			attributes: {
+				include: ["created_at", "updated_at"],
 			},
 		});
 		return res.sendJson(200, true, "sucess get reply on a comment", data);

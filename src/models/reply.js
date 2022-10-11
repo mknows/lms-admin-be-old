@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
 			comment_id: DataTypes.UUID,
 			author_id: DataTypes.UUID,
 			content: DataTypes.STRING,
-			tteacher_like: {
+			teacher_like: {
 				type: DataTypes.ARRAY(DataTypes.STRING),
 				defaultValue: [],
 			},

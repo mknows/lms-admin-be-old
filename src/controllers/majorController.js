@@ -1,4 +1,4 @@
-const { Major, Subject, MajorSubject, Student } = require("../models");
+const { Major, Subject, MajorSubject, StudentMajor } = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -262,59 +262,53 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Delete Major (Hapus Major)
-	 * @route     PUT /api/v1/majors/take/:major_id
+	 * @route     POST /api/v1/majors/take/:major_id
 	 * @access    Private
 	 */
 	 enrollMajor: asyncHandler(async (req, res) => {
 		const { major_id } = req.params;
 		const student_id = req.student_id;
 
-		const major = await Major.findOne({
-			attributes:[
-				'id'
-			],
+		const major_exists = await Major.findOne({	
+			attribute:[
+				'id','name'
+			],	
 			where:{
-				id: major_id
+				id:major_id
 			}
-		});
+		})
 
-		if(major.length === 0){
+		if(!major_exists){
 			return res.status(400).json({
-				success: false,
+				success: true,
 				message: `Major doesn't exist`
 			});
 		}
-		
-		const studentsMajor = await Student.findOne({
-			attributes:[
-				'major_id'
-			],
+
+		const students_major = await StudentMajor.findOne({
 			where:{
-				id: student_id
+				student_id:student_id,
+				major_id: major_id
 			}
 		})
-		
-		if(!studentsMajor.major_id.includes(major.id)){
-			await Student.update(
+
+		if(students_major){
+			return res.status(400).json({
+				success: false,
+				message: `Student is already enrolled in this major`
+			});
+		}
+		if(!students_major){
+			await StudentMajor.create(
 				{
-					major_id: major_id
-				},
-				{
-					where:
-					{
-						id: student_id
-					}
+					student_id:student_id,
+					major_id:major_id,
+					status: "ONGOING"
 				}
 			)
 			return res.status(200).json({
 				success: true,
-				message: 'Enrolled to this major'
-			});
-		}
-		if(studentsMajor.major_id.includes(major_id)){
-			return res.status(400).json({
-				success: false,
-				message: 'Already enrolled to major'
+				message: `Enrolled to ${major_exists.name}`
 			});
 		}
 	}),

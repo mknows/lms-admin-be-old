@@ -50,6 +50,6 @@ route.put(
 );
 route.delete("/delete/:major_id", protection, majorController.removeMajor);
 
-route.put("/take/:major_id", protection, authorize('student','user'), majorController.enrollMajor);
+route.post("/take/:major_id", protection, authorize('student','user'), majorController.enrollMajor);
 
 module.exports = route;
