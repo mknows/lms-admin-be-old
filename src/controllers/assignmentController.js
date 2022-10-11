@@ -1,6 +1,6 @@
-const { Assignment, Material } = require("../models");
+const { Assignment, Material , MaterialEnrolled, Sequelize} = require("../models");
 const moment = require("moment");
-const { Op } = require("sequelize");
+const { Op,sequelize } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const {
@@ -11,26 +11,42 @@ const {
 } = require("firebase/storage");
 const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
+require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
+const {
+	ONGOING,
+	GRADING,
+	PASSED,
+	FAILED,
+	FINISHED,
+	ABANDONED,
+	MODULE,
+	QUIZ ,
+	ASSIGNMENT ,
+} = process.env;
 
 module.exports = {
 	/**
-	 * @desc      POST create Assignment
-	 * @route     GET /api/v1/assignment/create
+	 * @desc      POST submit Assignment
+	 * @route     GET /api/v1/assignment/submit/:session_id
 	 * @access    Private
 	 */
-	createAssignment: asyncHandler(async (req, res) => {
-		const { session_id, duration, description, content, document_id } =
-			req.body;
+	submitAssignment: asyncHandler(async (req, res) => {
+		const {session_id} = req.params;
 		const bucket = admin.storage().bucket();
 		const storage = getStorage();
 
-		const assign = await Assignment.create({
-			session_id: session_id,
-			duration: duration,
-			description: description,
-			content: content,
-			document_id: document_id,
+		const assign = await Assignment.findOne({
+			attributes:[
+				'id','content','description','file_assignment','file_assignment_link'
+			],
+			where: {
+				session_id: session_id,
+			},
 		});
+
+		if(!assign){
+			return res.sendJson(400, false, "Assignment not found");
+		}
 
 		const file_assignment =
 			"documents/assignments/" +
@@ -45,29 +61,25 @@ module.exports = {
 			.end(file_assignment_buffer)
 			.on("finish", () => {
 				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
-					await Assignment.update(
+					const activity_detail = {
+						"date_submit": moment.now(),
+						"file_assignment": file_assignment,
+						"file_assignment_link": linkFile,
+					}
+					await MaterialEnrolled.update(
 						{
-							file_assignment: file_assignment,
-							file_assignment_link: linkFile,
+							activity_detail: activity_detail,
+							status: GRADING
 						},
 						{
 							where: {
-								id: assign.id,
+								id_referrer: assign.id,
 							},
 						}
 					);
+					return res.sendJson(200, true, "Successfully Submitted");
 				});
 			});
-
-		await Material.create({
-			session_id: session_id,
-			duration: duration,
-			description: description,
-			type: "ASSIGNMENT",
-			id_referrer: assign.id,
-		});
-
-		return res.sendJson(200, true, "Success", assign);
 	}),
 	/**
 	 * @desc      Get all Assignment
@@ -85,12 +97,42 @@ module.exports = {
 	 */
 	getAssignmentInSession: asyncHandler(async (req, res) => {
 		const { session_id } = req.params;
+		const student_id = req.student_id
 		const assign = await Assignment.findOne({
+			attributes:[
+				'id','content','description','file_assignment','file_assignment_link'
+			],
 			where: {
 				session_id: session_id,
 			},
 		});
-		res.sendJson(200, true, "Success", assign);
+
+		if(!assign){
+			return res.sendJson(400, false, "No assignment was assigned");
+		}
+
+		const student_taken_assignment = await MaterialEnrolled.findOne({
+			where:{
+				student_id:student_id,
+				session_id:session_id,
+				id_referrer: assign.id
+			}
+		})
+		if(!student_taken_assignment){
+			await MaterialEnrolled.create({
+				student_id,
+				session_id,
+				description:"Assignment",
+				status:ONGOING,
+				id_referrer:assign.id,
+				type: ASSIGNMENT,
+			})
+		}
+		let result = {
+			"assignment":assign,
+			"students_work":student_taken_assignment
+		};
+		return res.sendJson(200, true, "Success", result);
 	}),
 	/**
 	 * @desc      Get Assignment
@@ -108,51 +150,35 @@ module.exports = {
 	}),
 	/**
 	 * @desc      update Assignment
-	 * @route     put /api/v1/assignment/:assignment_id
+	 * @route     put /api/v1/assignment/:session_id
 	 * @access    Private
 	 */
 	updateAssignment: asyncHandler(async (req, res) => {
-		const { assignment_id } = req.params;
-		let { session_id, duration, description, content, document_id } = req.body;
+		const { session_id } = req.params;
+		const student_id = req.student_id;
 		const storage = getStorage();
 		const bucket = admin.storage().bucket();
 
-		const exist = await Assignment.findOne({
+		const exist = await MaterialEnrolled.findOne({
 			where: {
-				id: assignment_id,
+				student_id: student_id,
+				session_id: session_id
 			},
 		});
 
 		if (!exist) {
 			return res.status(404).json({
 				success: false,
-				message: "Invalid assignment id.",
+				message: "Assignment not found",
 				data: {},
 			});
 		}
 
-		if (exist.file_assignment) {
+		if (exist.activity_detail.file_assignment) {
 			deleteObject(
 				ref(storage, `document_assignment/${exist.file_assignment}`)
 			);
 		}
-
-		if (session_id === null) {
-			session_id = exist.session_id;
-		}
-		if (duration === null) {
-			duration = exist.duration;
-		}
-		if (description === null) {
-			description = exist.description;
-		}
-		if (content === null) {
-			content = exist.content;
-		}
-		if (document_id === null) {
-			document_id = exist.document_id;
-		}
-
 		const file_assignment =
 			"document_assignment/" +
 			uuidv4() +
@@ -166,66 +192,71 @@ module.exports = {
 			.end(file_assignment_buffer)
 			.on("finish", () => {
 				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
-					await Assignment.update(
+					await MaterialEnrolled.update(
 						{
-							file_assignment: file_assignment,
-							file_assignment_link: linkFile,
+							activity_detail:null,
+							status:ONGOING
 						},
 						{
-							where: {
-								id: assignment_id,
-							},
+							where:{
+								session_id:session_id,
+								student_id:student_id
+							}
 						}
 					);
 				});
 			});
-
-		await Assignment.update(
-			{
-				session_id,
-				duration,
-				description,
-				content,
-				document_id,
-			},
-			{
-				where: {
-					id: assignment_id,
-				},
-				returning: true,
-			}
-		);
-
 		return res.sendJson(200, true, "Success");
 	}),
 	/**
-	 * @desc      Delete assignment
-	 * @route     DELETE /api/v1/assignment/delete/:assignment_id
+	 * @desc      Delete submission
+	 * @route     DELETE /api/v1/assignment/delete/:session_id
 	 * @access    Private (Admin)
 	 */
-	removeAssignment: asyncHandler(async (req, res, next) => {
-		const { assignment_id } = req.params;
+	removeSubmission: asyncHandler(async (req, res, next) => {
+		const { session_id } = req.params;
+		const student_id = req.student_id;
+		const storage = getStorage();
 
-		let data = await Assignment.findOne({
-			where: { id: assignment_id },
+		const exist = await MaterialEnrolled.findOne({
+			attributes:[
+				'activity_detail'
+			],
+			where: {
+				student_id: student_id,
+				session_id: session_id
+			},
 		});
 
-		if (!data) {
+		if (!exist) {
 			return res.status(404).json({
 				success: false,
-				message: "Invalid assignment id.",
+				message: "Assignment not found",
 				data: {},
 			});
 		}
+		if (exist.activity_detail) {
+			deleteObject(
+				ref(storage, `document_assignment/${exist.activity_detail.file_assignment}`)
+			);
+		}
 
-		Assignment.destroy({
-			where: { id: assignment_id },
-		});
+		await MaterialEnrolled.update(
+			{
+				activity_detail:null,
+				status: ONGOING
+			},
+			{
+				where:{
+					session_id:session_id,
+					student_id:student_id
+				}
+			}
+		)
 
 		return res.status(200).json({
 			success: true,
-			message: `Delete Assignment with ID ${assignment_id} successfully.`,
-			data: {},
+			message: 'Submission Removed'
 		});
 	}),
 };

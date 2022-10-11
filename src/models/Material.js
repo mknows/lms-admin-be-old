@@ -8,7 +8,18 @@ module.exports = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			// define association here
+			this.belongsTo(models.Assignment,{
+				foreignKey:"id_referrer",
+				targetKey:"id"
+			})
+			this.belongsTo(models.Module,{
+				foreignKey:"id_referrer",
+				targetKey:"id"
+			})
+			this.belongsTo(models.Quiz,{
+				foreignKey:"id_referrer",
+				targetKey:"id"
+			})
 		}
 	}
 	Material.init(
