@@ -25,7 +25,11 @@ module.exports = {
 		if (cacheResult) {
 			results = JSON.parse(cacheResult);
 		} else {
-			results = await Article.findAll();
+			results = await Article.findAll({
+				attributes: {
+					include: ["created_at"],
+				},
+			});
 			await redisClient.set(key, JSON.stringify(results), {
 				EX: 120,
 			});
