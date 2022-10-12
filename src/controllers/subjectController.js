@@ -223,10 +223,11 @@ module.exports = {
 		}
 
 		if (limit == null) {
-			limit = result.length;
+			limit = result;
 		}
 
 		result = await pagination(result, page, limit);
+		result = { ...result, total_subject: subjectsEnrolled.length };
 		return res.sendJson(200, true, "sucess get subject", result);
 	}),
 	/**
