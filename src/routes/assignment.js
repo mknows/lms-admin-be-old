@@ -3,7 +3,7 @@ const route = express.Router();
 const multer = require("multer");
 
 const assignmentController = require("../controllers/assignmentController");
-const { protection } = require("../middlewares/Authentication");
+const { protection,authorize } = require("../middlewares/Authentication");
 
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -29,16 +29,18 @@ const upload = multer({
 });
 
 route.post(
-	"/create",
+	"/submit/:session_id",
 	protection,
+	authorize("student","user"),
 	upload.single("file_assignment"),
-	assignmentController.createAssignment
+	assignmentController.submitAssignment
 );
 
 route.get("/", protection, assignmentController.getAllAssignment);
 route.get(
 	"/session/:session_id",
 	protection,
+	authorize("student","user"),
 	assignmentController.getAssignmentInSession
 );
 route.get("/:assignment_id", protection, assignmentController.getAssignment);
@@ -50,9 +52,10 @@ route.put(
 	assignmentController.updateAssignment
 );
 route.delete(
-	"/delete/:assignment_id",
+	"/delete/:session_id",
 	protection,
-	assignmentController.removeAssignment
+	authorize("user","student"),
+	assignmentController.removeSubmission
 );
 
 module.exports = route;
