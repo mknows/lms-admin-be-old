@@ -19,6 +19,7 @@ const {
 const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
 const scoringController = require("./scoringController");
+const pagination = require("../helpers/pagination");
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	DRAFT,
@@ -130,10 +131,18 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Get enrolled subject
-	 * @route     GET /api/v1/subject/enrolledsubjects
+	 * @route     GET /api/v1/subject/enrolledsubjects/paginate?page=(number)&limit=(number)&search=(str)
 	 * @access    Public
 	 */
 	getEnrolledSubject: asyncHandler(async (req, res) => {
+		let { page, limit, search } = req.query;
+
+		let search_query = "%%";
+
+		if (search) {
+			search_query = "%" + search + "%";
+		}
+
 		const student_id = req.student_id;
 		const subjectsEnrolled = await StudentSubject.findAll({
 			where: {
@@ -153,6 +162,9 @@ module.exports = {
 					"lecturer",
 					"thumbnail_link",
 				],
+				where: {
+					name: { [Op.iLike]: search_query },
+				},
 			},
 		});
 
@@ -205,6 +217,16 @@ module.exports = {
 
 			result.push(resval);
 		}
+
+		if (page == null) {
+			page = 1;
+		}
+
+		if (limit == null) {
+			limit = result.length;
+		}
+
+		result = await pagination(result, page, limit);
 		return res.sendJson(200, true, "sucess get subject", result);
 	}),
 	/**

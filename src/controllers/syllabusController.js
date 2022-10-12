@@ -183,7 +183,7 @@ module.exports = {
 			result.push(datval);
 		}
 
-		pagination(result, page, limit);
+		result = await pagination(result, page, limit);
 		return res.sendJson(200, true, "Success", result);
 	}),
 
