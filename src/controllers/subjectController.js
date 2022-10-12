@@ -154,15 +154,6 @@ module.exports = {
 					"thumbnail_link",
 				],
 			},
-			attributes: {
-				exclude: [
-					"updated_by",
-					"created_by",
-					"deleted_at",
-					"created_at",
-					"updated_at",
-				],
-			},
 		});
 
 		let result = [];
@@ -384,28 +375,30 @@ module.exports = {
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
-		const students_major = await Student.findOne(
-			{
-				where:{
-					id:student_id
+		const students_major = await Student.findOne({
+			where: {
+				id: student_id,
+			},
+			include: {
+				model: Major,
+				attributes: ["id"],
+				include: {
+					model: Subject,
+					attributes: ["id"],
+					where: {
+						id: sub.id,
+					},
 				},
-				include:{
-					model:Major,
-					attributes:['id'],
-					include:{
-						model:Subject,
-						attributes:['id'],
-						where:{
-							id:sub.id
-						}
-					}
-				}
-			}
-		)
-		if(students_major.Majors.length===0){
-			return res.sendJson(400, false, "Student's major doesn't have that subject");
+			},
+		});
+		if (students_major.Majors.length === 0) {
+			return res.sendJson(
+				400,
+				false,
+				"Student's major doesn't have that subject"
+			);
 		}
-		
+
 		let credit = 0;
 		let enrolled = false;
 
@@ -490,26 +483,28 @@ module.exports = {
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
-		const students_major = await Student.findOne(
-			{
-				where:{
-					id:student_id
+		const students_major = await Student.findOne({
+			where: {
+				id: student_id,
+			},
+			include: {
+				model: Major,
+				attributes: ["id"],
+				include: {
+					model: Subject,
+					attributes: ["id"],
+					where: {
+						id: sub.id,
+					},
 				},
-				include:{
-					model:Major,
-					attributes:['id'],
-					include:{
-						model:Subject,
-						attributes:['id'],
-						where:{
-							id:sub.id
-						}
-					}
-				}
-			}
-		)
-		if(students_major.Majors.length===0){
-			return res.sendJson(400, false, "Student's major doesn't have that subject");
+			},
+		});
+		if (students_major.Majors.length === 0) {
+			return res.sendJson(
+				400,
+				false,
+				"Student's major doesn't have that subject"
+			);
 		}
 		let credit = 0;
 		let enrolled = false;
@@ -625,13 +620,13 @@ module.exports = {
 	}),
 	/**
 	 * @desc      get plan
-	 * @route     POST 	
+	 * @route     POST
 	 * @access    Private
 	 */
 	getStudyPlan: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
 		const subjects_enrolled = await getParsedPlan(student_id);
-		
+
 		const students_information = await Student.findOne({
 			where: {
 				id: student_id,
@@ -658,7 +653,7 @@ module.exports = {
 		});
 		let result = {
 			studentsInformation: students_information,
-			subjects_enrolled : subjects_enrolled
+			subjects_enrolled: subjects_enrolled,
 		};
 
 		return res.sendJson(200, true, "success", result);

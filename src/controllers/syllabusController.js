@@ -46,8 +46,8 @@ module.exports = {
 		return res.sendJson(200, true, "Success", major);
 	}),
 	/**
-	 * @desc      update module enrolled
-	 * @route     PUT /api/v1/syllabus/majors/paginate?page=(number)&&limit=(number)
+	 * @desc      get major paginated
+	 * @route     GET /api/v1/syllabus/majors/paginate?page=(number)&limit=(number)&search=(str)
 	 * @access    Private
 	 */
 	getAllMajorsPagination: asyncHandler(async (req, res) => {
@@ -123,22 +123,68 @@ module.exports = {
 		return res.sendJson(200, true, "Success", SubjectMajor);
 	}),
 	/**
-	 * @desc      update module enrolled
-	 * @route     PUT /api/v1/syllabus/subjects/paginate?page=(number)&&limit=(number)
+	 * @desc     get subject paginated
+	 * @route    GET /api/v1/syllabus/subjects/paginate?page=(number)&limit=(number)&search=(str)
 	 * @access   Private
 	 */
 	getAllSubjectsPagination: asyncHandler(async (req, res) => {
-		const { page, limit } = req.query;
+		const { page, limit, search } = req.query;
 
-		const SubjectMajor = await Major.findAll({
-			attributes: ["name", "description"],
-			include: {
-				model: Subject,
-				attributes: ["id", "name", "credit", "degree"],
+		let search_query = "%%";
+
+		if (search) {
+			search_query = "%" + search + "%";
+		}
+
+		const subjects = await Subject.findAll({
+			attributes: [
+				"id",
+				"name",
+				"description",
+				"level",
+				"thumbnail_link",
+				"lecturer",
+			],
+			where: {
+				name: {
+					[Op.iLike]: search_query,
+				},
 			},
 		});
-		pagination(SubjectMajor, page, limit);
-		return res.sendJson(200, true, "Success", SubjectMajor);
+
+		let result = [];
+
+		for (let i = 0; i < subjects.length; i++) {
+			let currsub = subjects[i].dataValues;
+
+			let { count, rows } = await StudentSubject.findAndCountAll({
+				where: {
+					subject_id: currsub.id,
+				},
+			});
+			let lecturer = await Lecturer.findAll({
+				where: {
+					id: currsub.lecturer,
+				},
+				include: {
+					model: User,
+					attributes: ["full_name"],
+				},
+				attributes: ["id"],
+			});
+
+			delete currsub["lecturer"];
+
+			let datval = {
+				subject: currsub,
+				lecturers: lecturer,
+				student_count: count,
+			};
+			result.push(datval);
+		}
+
+		pagination(result, page, limit);
+		return res.sendJson(200, true, "Success", result);
 	}),
 
 	/**

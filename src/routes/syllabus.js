@@ -10,7 +10,12 @@ route.get(
 	protection,
 	syllabusController.getAllMajorsPagination
 );
-route.get("/curriculum", protection, authorize("student","user"), syllabusController.getCurriculum);
+route.get(
+	"/curriculum",
+	protection,
+	authorize("student", "user"),
+	syllabusController.getCurriculum
+);
 route.get("/subjects/all", protection, syllabusController.getAllSubjects);
 route.get(
 	"/subjects/paginate",
@@ -22,15 +27,7 @@ route.get(
 	protection,
 	syllabusController.subjectByMajor
 );
-route.get(
-	"/subject/:subject_id",
-	protection,
-	syllabusController.getSubject
-);
-route.get(
-	"/getCurrentKRS",
-	protection,
-	syllabusController.getKRS
-);
+route.get("/subject/:subject_id", protection, syllabusController.getSubject);
+route.get("/getCurrentKRS", protection, syllabusController.getKRS);
 
 module.exports = route;
