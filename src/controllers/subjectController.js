@@ -223,7 +223,7 @@ module.exports = {
 		}
 
 		if (limit == null) {
-			limit = result;
+			limit = result.length;
 		}
 
 		result = await pagination(result, page, limit);
