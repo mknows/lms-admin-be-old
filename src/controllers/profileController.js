@@ -124,11 +124,7 @@ module.exports = {
 			full_name: titleCase(full_name),
 		});
 
-		return res.status(200).json({
-			success: true,
-			message: "Profile updated.",
-			data: { ...data[1].dataValues, role: req.role },
-		});
+		return res.sendJson(200, true, "success update profile");
 	}),
 };
 

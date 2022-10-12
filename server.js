@@ -7,6 +7,7 @@ const device = require("express-device");
 const useragent = require("express-useragent");
 const path = require("path");
 const cors = require("cors");
+const helmet = require("helmet");
 
 dotenv.config({ path: "./src/config/config.env" });
 
@@ -38,6 +39,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, strict: false }));
 app.use(cookieParser());
 app.use(cors());
+app.use(helmet());
+app.use(helmet.hidePoweredBy());
 
 const PORT = process.env.PORT || 8080;
 
