@@ -1,4 +1,4 @@
-const { Material_Enrolled, Quiz, Material, Session } = require("../models");
+const { MaterialEnrolled, Quiz, Material, Session } = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -84,7 +84,7 @@ module.exports = {
 			return res.sendJson(404, false, "no quiz found", result);
 		}
 
-		const summary = await Material_Enrolled.findOne({
+		const summary = await MaterialEnrolled.findOne({
 			where: {
 				student_id,
 				id_referrer: quizDesc.id,
@@ -216,7 +216,7 @@ module.exports = {
 				id: session_id,
 			},
 		});
-		const checkIfCurrentlyTaking = await Material_Enrolled.findOne({
+		const checkIfCurrentlyTaking = await MaterialEnrolled.findOne({
 			where: {
 				student_id: student_id,
 				session_id: session_id,
@@ -228,7 +228,7 @@ module.exports = {
 			attributes: ["id"],
 		});
 		if (checkIfCurrentlyTaking == null) {
-			await Material_Enrolled.create({
+			await MaterialEnrolled.create({
 				student_id: student_id,
 				session_id: session_id,
 				material_id: material.id,
@@ -290,7 +290,7 @@ module.exports = {
 			status = INVALID;
 		}
 
-		const result = await Material_Enrolled.update(
+		const result = await MaterialEnrolled.update(
 			{
 				score: score,
 				status: status,
@@ -321,7 +321,7 @@ module.exports = {
 		const { quiz_id } = req.params;
 		const student_id = req.student_id;
 
-		let user_enroll_data = await Material_Enrolled.findOne({
+		let user_enroll_data = await MaterialEnrolled.findOne({
 			where: {
 				student_id,
 				id_referrer: quiz_id,

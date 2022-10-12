@@ -1,7 +1,7 @@
 const {
 	Student,
 	Lecturer,
-	Discussion_forum,
+	DiscussionForum,
 	Comment,
 	Reply,
 	User,
@@ -19,7 +19,7 @@ module.exports = {
 	 */
 	getAllDiscussionForumContent: asyncHandler(async (req, res) => {
 		const { df_id } = req.params;
-		const data = await Discussion_forum.findOne({
+		const data = await DiscussionForum.findOne({
 			where: {
 				id: df_id,
 			},
@@ -55,7 +55,7 @@ module.exports = {
 	 * @access    Public
 	 */
 	getAllDiscussionForum: asyncHandler(async (req, res) => {
-		const data = await Discussion_forum.findAll({
+		const data = await DiscussionForum.findAll({
 			attributes: {
 				include: ["created_at", "updated_at"],
 			},
@@ -69,7 +69,7 @@ module.exports = {
 	 */
 	getAllDiscussionForumInSession: asyncHandler(async (req, res) => {
 		const { session_id } = req.params;
-		const data = await Discussion_forum.findAll({
+		const data = await DiscussionForum.findAll({
 			where: {
 				session_id: session_id,
 			},
@@ -148,7 +148,7 @@ module.exports = {
 		const { content, title, session_id } = req.body;
 		const user_id = req.userData.id;
 
-		const data = await Discussion_forum.create({
+		const data = await DiscussionForum.create({
 			session_id: session_id,
 			content: content,
 			title: title,
@@ -207,7 +207,7 @@ module.exports = {
 		let { content, title, session_id } = req.body;
 		const user_id = req.userData.id;
 
-		let data = await Discussion_forum.findOne({
+		let data = await DiscussionForum.findOne({
 			where: {
 				id: dfId,
 			},
@@ -238,7 +238,7 @@ module.exports = {
 			session_id = data.session_id;
 		}
 
-		data = await Discussion_forum.update(
+		data = await DiscussionForum.update(
 			{
 				content,
 				title,
@@ -292,7 +292,7 @@ module.exports = {
 			content = data.content;
 		}
 
-		data = await Discussion_forum.update(
+		data = await DiscussionForum.update(
 			{
 				content,
 			},
@@ -367,7 +367,7 @@ module.exports = {
 	 */
 	deleteDiscussionForum: asyncHandler(async (req, res) => {
 		const { dfId } = req.params;
-		let data = await Discussion_forum.findOne({
+		let data = await DiscussionForum.findOne({
 			where: {
 				id: dfId,
 			},
@@ -381,7 +381,7 @@ module.exports = {
 			});
 		}
 
-		Discussion_forum.destroy({
+		DiscussionForum.destroy({
 			where: {
 				id: dfId,
 			},
@@ -567,7 +567,7 @@ module.exports = {
 
 				break;
 			case "df":
-				data = await Discussion_forum.findOne({
+				data = await DiscussionForum.findOne({
 					where: {
 						id: id,
 					},
@@ -584,7 +584,7 @@ module.exports = {
 					}
 					likes = data.student_like;
 					await likes.push(liker_id.msg);
-					data = await Discussion_forum.update(
+					data = await DiscussionForum.update(
 						{
 							student_like: likes,
 						},
@@ -603,7 +603,7 @@ module.exports = {
 					}
 					likes = data.lecturer_like;
 					await likes.push(liker_id.msg);
-					data = await Discussion_forum.update(
+					data = await DiscussionForum.update(
 						{
 							lecturer_like: likes,
 						},
