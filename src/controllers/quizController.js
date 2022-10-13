@@ -251,6 +251,8 @@ module.exports = {
 		const kkm = parseInt(KKM);
 		let status;
 		let correct = 0;
+		date_submitted = moment().format("MMMM Do YYYY, h:mm:ss a");
+
 		const quiz = await Quiz.findOne({
 			where: {
 				id: quiz_id,
@@ -274,7 +276,7 @@ module.exports = {
 		}
 		const score = (correct / quizAns.length) * 100;
 		const quizResultDetail = {
-			date_submit: moment().format("MMMM Do YYYY, h:mm:ss a"),
+			date_submit: date_submitted,
 			number_of_questions: quizAns.length,
 			correct_answers: correct,
 			duration_taken: duration_taken,
@@ -304,12 +306,18 @@ module.exports = {
 					id_referrer: quiz_id,
 					session_id: session_id,
 				},
-			},
-			{
-				returning: true,
 			}
 		);
-		return res.sendJson(200, true, "Success", result);
+
+		let summary = {
+			score: score,
+			status: status,
+			date_submitted: date_submitted,
+			number_of_questions: quizAns.length,
+			correct_answers: correct,
+			duration_taken: duration_taken,
+		};
+		return res.sendJson(200, true, "Success", summary);
 	}),
 
 	/**
