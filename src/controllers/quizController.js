@@ -274,7 +274,8 @@ module.exports = {
 				correct++;
 			}
 		}
-		const score = (correct / quizAns.length) * 100;
+		let score = (correct / quizAns.length) * 100;
+		score = parseFloat(score.toFixed(2));
 		const quizResultDetail = {
 			date_submit: date_submitted,
 			number_of_questions: quizAns.length,
