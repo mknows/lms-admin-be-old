@@ -16,6 +16,7 @@ const {
 	INVALID,
 
 	KKM,
+	MAX_ATTEMPT,
 
 	QUIZ,
 } = process.env;
@@ -98,7 +99,7 @@ module.exports = {
 			],
 		});
 
-		if (summary.score === null) {
+		if (summary !== null && summary.score === null) {
 			summary = null;
 		}
 
@@ -203,6 +204,8 @@ module.exports = {
 	takeQuiz: asyncHandler(async (req, res) => {
 		const { quiz_id } = req.params;
 		const student_id = req.student_id;
+		const max_attempt = parseInt(MAX_ATTEMPT);
+
 		const quizQuestions = await Quiz.findOne({
 			where: {
 				id: quiz_id,
@@ -231,17 +234,61 @@ module.exports = {
 			},
 			attributes: ["id"],
 		});
-		if (checkIfCurrentlyTaking == null) {
-			await MaterialEnrolled.create({
+
+		const checkHowManyTries = await MaterialEnrolled.findAll({
+			where: {
+				student_id: student_id,
+				session_id: session_id,
+				material_id: material.id,
+				subject_id: session.subject_id,
+				id_referrer: quiz_id,
+				[Op.not]: { status: ONGOING },
+			},
+			attributes: ["id"],
+		});
+
+		let this_material_enrolled;
+		// if (
+		// 	checkIfCurrentlyTaking == null &&
+		// 	checkHowManyTries.length < max_attempt
+		// ) {
+		// 	this_material_enrolled = await MaterialEnrolled.create({
+		// 		student_id: student_id,
+		// 		session_id: session_id,
+		// 		material_id: material.id,
+		// 		subject_id: session.subject_id,
+		// 		id_referrer: quiz_id,
+		// 		type: QUIZ,
+		// 		status: ONGOING,
+		// 	});
+		// } else {
+		// 	return res.sendJson(400, false, "user have exceeded maximum attempts");
+		// }
+
+		if (checkIfCurrentlyTaking != null) {
+			return res.sendJson(400, false, "user is currenty having an attempt", {
+				meterial_enrolled_id: checkIfCurrentlyTaking.id,
+			});
+		} else if (checkHowManyTries.length >= max_attempt) {
+			return res.sendJson(400, false, "user have exceeded maximum attempts", {
+				total_attempts: checkHowManyTries.length,
+			});
+		} else {
+			this_material_enrolled = await MaterialEnrolled.create({
 				student_id: student_id,
 				session_id: session_id,
 				material_id: material.id,
 				subject_id: session.subject_id,
 				id_referrer: quiz_id,
 				type: QUIZ,
+				status: ONGOING,
 			});
 		}
-		return res.sendJson(200, true, "Success", quizQuestions);
+
+		return res.sendJson(200, true, "Success", {
+			quiz: quizQuestions,
+			material_enrolled_id: this_material_enrolled.id,
+		});
 	}),
 	/**
 	 * @desc      submit quiz
@@ -249,9 +296,10 @@ module.exports = {
 	 * @access    Private
 	 */
 	postQuizAnswer: asyncHandler(async (req, res) => {
-		const { answer, quiz_id, duration_taken } = req.body;
+		const { answer, quiz_id, material_enrolled_id, duration_taken } = req.body;
 		const userAnswer = answer;
 		const student_id = req.student_id;
+
 		const kkm = parseInt(KKM);
 		let status;
 		let correct = 0;
@@ -278,6 +326,7 @@ module.exports = {
 				correct++;
 			}
 		}
+
 		let score = (correct / quizAns.length) * 100;
 		score = parseFloat(score.toFixed(2));
 		const quizResultDetail = {
@@ -287,6 +336,7 @@ module.exports = {
 			duration_taken: duration_taken,
 			answer: answer,
 		};
+
 		if (score >= kkm) {
 			status = PASSED;
 		}
@@ -295,6 +345,20 @@ module.exports = {
 		}
 		if (score > 100 || score < 0) {
 			status = INVALID;
+		}
+
+		const material_enrolled_data = await MaterialEnrolled.findOne({
+			where: {
+				id: material_enrolled_id,
+			},
+		});
+
+		if (student_id !== material_enrolled_data.student_id) {
+			return res.sendJson(
+				400,
+				false,
+				"user who submitted is not the student taking the quiz"
+			);
 		}
 
 		const result = await MaterialEnrolled.update(
@@ -306,10 +370,8 @@ module.exports = {
 			},
 			{
 				where: {
-					student_id: student_id,
-					subject_id: quiz_session.subject_id,
+					id: material_enrolled_id,
 					id_referrer: quiz_id,
-					session_id: session_id,
 				},
 			}
 		);
