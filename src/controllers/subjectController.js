@@ -215,6 +215,10 @@ module.exports = {
 				progress: progress,
 				student_count: count,
 				lecturers: teach,
+				score: await scoringController.getSubjectScore(
+					student_id,
+					subjectsEnrolled[i].Subject.id
+				),
 			};
 
 			result.push(resval);

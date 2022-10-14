@@ -27,6 +27,9 @@ const {
 	PASSED,
 	FAILED,
 	FINISHED,
+	ABANDONED,
+	NOT_ENROLLED,
+	INVALID,
 
 	FLOOR_A,
 	FLOOR_A_MINUS,
@@ -37,8 +40,15 @@ const {
 	FLOOR_C,
 	FLOOR_D,
 	FLOOR_E,
+
+	KKM,
+
+	MODULE,
+	QUIZ,
+	ASSIGNMENT,
 } = process.env;
 const asyncHandler = require("express-async-handler");
+const { getCurrentHub } = require("@sentry/hub");
 
 module.exports = {
 	/**
@@ -113,6 +123,52 @@ module.exports = {
 		}
 
 		return progress;
+	}),
+
+	/**
+	 * @desc      calculate Subject score
+	 * @access    Private
+	 */
+	getSubjectScore: asyncHandler(async (student_id, subject_id) => {
+		let score = 0;
+
+		let sub = await Subject.findOne({
+			where: { id: subject_id },
+			attributes: ["number_of_sessions"],
+		});
+
+		let finished_sessions = await Student.findOne({
+			where: {
+				id: student_id,
+			},
+			include: {
+				model: Session,
+				where: {
+					subject_id: subject_id,
+				},
+				through: {
+					attributes: ["final_score"],
+				},
+			},
+		});
+
+		if (!finished_sessions) {
+			return 0;
+		}
+		for (let i = 0; i < finished_sessions.Sessions.length; i++) {
+			let curr_sesh = finished_sessions.Sessions[i].StudentSession;
+			let curr_score = curr_sesh.final_score;
+			if (curr_score == null) {
+				curr_score = 0;
+			}
+
+			score += curr_score;
+		}
+
+		// TODO: ASSUMING EVERY SESSION IS EQUAL
+		score = score / sub.number_of_sessions;
+
+		return score;
 	}),
 };
 
