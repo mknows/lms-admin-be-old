@@ -264,8 +264,9 @@ module.exports = {
 		let this_material_enrolled;
 
 		if (checkIfCurrentlyTaking != null) {
-			return res.sendJson(400, false, "user is currenty having an attempt", {
-				meterial_enrolled_id: checkIfCurrentlyTaking.id,
+			// TODO: CHECK THAT THIS IS ERROR BUT RETURNS TRUE TO ACCOMODATE APPS
+			return res.sendJson(200, true, "user is currenty having an attempt", {
+				quiz: quizQuestions,
 			});
 		} else if (checkHowManyTries.length >= max_attempt) {
 			return res.sendJson(400, false, "user have exceeded maximum attempts", {
