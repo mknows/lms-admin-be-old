@@ -78,6 +78,10 @@ module.exports = {
 			attributes: {
 				include: ["created_at", "updated_at"],
 			},
+			include: {
+				model: User,
+				attributes: ["full_name"],
+			},
 		});
 		return res.sendJson(200, true, "sucess get all df in session", data);
 	}),
