@@ -31,10 +31,16 @@ module.exports = {
 			},
 		});
 
+		let student_id = "Not a STUDENT";
+
+		if (req.role === "student") {
+			student_id = req.student_id;
+		}
+
 		return res.status(200).json({
 			success: true,
 			message: "Account connected.",
-			data: { ...data.dataValues, role: req.role },
+			data: { ...data.dataValues, role: req.role, student_id: student_id },
 		});
 	}),
 
