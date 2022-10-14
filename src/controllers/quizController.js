@@ -114,7 +114,7 @@ module.exports = {
 		});
 
 		if (checkIfCurrentlyTaking !== null) {
-			summary = null;
+			summary = [];
 		}
 
 		result = {
