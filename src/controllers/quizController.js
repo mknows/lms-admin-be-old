@@ -84,7 +84,7 @@ module.exports = {
 			return res.sendJson(404, false, "no quiz found", result);
 		}
 
-		const summary = await MaterialEnrolled.findOne({
+		let summary = await MaterialEnrolled.findOne({
 			where: {
 				student_id,
 				id_referrer: quizDesc.id,
@@ -97,6 +97,10 @@ module.exports = {
 				"status",
 			],
 		});
+
+		if (summary.score === null) {
+			summary = null;
+		}
 
 		result = {
 			quiz: quizDesc,
