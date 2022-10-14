@@ -31,6 +31,7 @@ module.exports = {
 				},
 				{
 					model: Comment,
+					attributes: { include: ["created_at", "updated_at"] },
 					include: [
 						{
 							model: User,
@@ -38,6 +39,7 @@ module.exports = {
 						},
 						{
 							model: Reply,
+							attributes: { include: ["created_at", "updated_at"] },
 							include: {
 								model: User,
 								attributes: ["full_name"],
