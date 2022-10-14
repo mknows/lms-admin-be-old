@@ -398,12 +398,11 @@ module.exports = {
 			where: {
 				student_id,
 				id: material_enrolled_id,
-				status: [GRADING, FINISHED, PASSED, FAILED],
 			},
-			attributes: ["activity_detail", "score", "status"],
+			attributes: ["activity_detail", "score", "status", "type", "id_referrer"],
 		});
 
-		if (!user_enroll_data.type) {
+		if (!user_enroll_data) {
 			return res.sendJson(404, false, `material enrolled data not found`);
 		}
 
@@ -425,7 +424,7 @@ module.exports = {
 
 		const quiz = await Quiz.findOne({
 			where: {
-				id: quiz_id,
+				id: user_enroll_data.id_referrer,
 			},
 			attributes: ["answer", "questions"],
 		});
