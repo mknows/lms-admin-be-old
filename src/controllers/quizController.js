@@ -85,12 +85,16 @@ module.exports = {
 			return res.sendJson(404, false, "no quiz found", result);
 		}
 
-		let summary = await MaterialEnrolled.findOne({
+		let summary = await MaterialEnrolled.findAll({
 			where: {
 				student_id,
 				id_referrer: quizDesc.id,
+				[Op.not]: {
+					status: ONGOING,
+				},
 			},
 			attributes: [
+				"id",
 				"activity_detail",
 				"score",
 				"subject_id",
@@ -99,7 +103,17 @@ module.exports = {
 			],
 		});
 
-		if (summary !== null && summary.score === null) {
+		const checkIfCurrentlyTaking = await MaterialEnrolled.findOne({
+			where: {
+				student_id: student_id,
+				session_id: session_id,
+				id_referrer: quizDesc.id,
+				status: ONGOING,
+			},
+			attributes: ["id"],
+		});
+
+		if (checkIfCurrentlyTaking !== null) {
 			summary = null;
 		}
 
@@ -248,22 +262,6 @@ module.exports = {
 		});
 
 		let this_material_enrolled;
-		// if (
-		// 	checkIfCurrentlyTaking == null &&
-		// 	checkHowManyTries.length < max_attempt
-		// ) {
-		// 	this_material_enrolled = await MaterialEnrolled.create({
-		// 		student_id: student_id,
-		// 		session_id: session_id,
-		// 		material_id: material.id,
-		// 		subject_id: session.subject_id,
-		// 		id_referrer: quiz_id,
-		// 		type: QUIZ,
-		// 		status: ONGOING,
-		// 	});
-		// } else {
-		// 	return res.sendJson(400, false, "user have exceeded maximum attempts");
-		// }
 
 		if (checkIfCurrentlyTaking != null) {
 			return res.sendJson(400, false, "user is currenty having an attempt", {
@@ -393,17 +391,29 @@ module.exports = {
 	 * @access    Private
 	 */
 	getQuizReview: asyncHandler(async (req, res) => {
-		const { quiz_id } = req.params;
+		const { material_enrolled_id } = req.params;
 		const student_id = req.student_id;
 
 		let user_enroll_data = await MaterialEnrolled.findOne({
 			where: {
 				student_id,
-				id_referrer: quiz_id,
+				id: material_enrolled_id,
 				status: [GRADING, FINISHED, PASSED, FAILED],
 			},
 			attributes: ["activity_detail", "score", "status"],
 		});
+
+		if (!user_enroll_data.type) {
+			return res.sendJson(404, false, `material enrolled data not found`);
+		}
+
+		if (user_enroll_data.type !== QUIZ) {
+			return res.sendJson(
+				400,
+				false,
+				`material enrolled id entered is not of a QUIZ but of a ${user_enroll_data.type}`
+			);
+		}
 
 		if (!user_enroll_data) {
 			return res.sendJson(
