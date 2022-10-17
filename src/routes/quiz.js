@@ -37,7 +37,7 @@ route.post(
 );
 
 route.get(
-	"/review/:quiz_id",
+	"/review/:material_enrolled_id",
 	protection,
 	authorize("student"),
 	quizController.getQuizReview

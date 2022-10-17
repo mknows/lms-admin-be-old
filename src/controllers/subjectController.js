@@ -4,8 +4,10 @@ const {
 	StudentSubject,
 	Major,
 	Lecturer,
-	User,
+	User
 } = require("../models");
+const prerequisiteChecker = require("../helpers/prerequsitieChecker")
+const checkExistence = require('../helpers/checkExistence')
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -227,6 +229,7 @@ module.exports = {
 		}
 
 		result = await pagination(result, page, limit);
+		result = { ...result, total_subject: subjectsEnrolled.length };
 		return res.sendJson(200, true, "sucess get subject", result);
 	}),
 	/**
@@ -495,8 +498,9 @@ module.exports = {
 	 * @access    Private
 	 */
 	takeSubject: asyncHandler(async (req, res) => {
-		const { subject_id } = req.params;
+		const {subject_id} = req.params;
 		const student_id = req.student_id;
+		
 		const credit_thresh = 24;
 		let subjectsEnrolled = await getPlan(student_id);
 		subjectsEnrolled = subjectsEnrolled[0]
@@ -504,6 +508,12 @@ module.exports = {
 			.concat(subjectsEnrolled[2]);
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
+		if(!checkExistence(Subject,subject_id)) return 
+			res.sendJson(
+				400,
+				false,
+				"Subject doesnt exist"
+			);
 
 		const students_major = await Student.findOne({
 			where: {

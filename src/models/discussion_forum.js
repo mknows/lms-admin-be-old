@@ -2,7 +2,7 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-	class Discussion_forum extends Model {
+	class DiscussionForum extends Model {
 		/**
 		 * Helper method for defining associations.
 		 * This method is not a part of Sequelize lifecycle.
@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
 			this.belongsTo(models.User, { foreignKey: "author_id" });
 		}
 	}
-	Discussion_forum.init(
+	DiscussionForum.init(
 		{
 			id: {
 				type: DataTypes.UUID,
@@ -44,5 +44,5 @@ module.exports = (sequelize, DataTypes) => {
 			tableName: "discussion_forums",
 		}
 	);
-	return Discussion_forum;
+	return DiscussionForum;
 };

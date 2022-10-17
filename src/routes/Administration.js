@@ -10,7 +10,6 @@ const upload = multer({
 	storage: multer.memoryStorage(),
 	limits: { fileSize: 2000000 },
 	fileFilter: (req, file, cb) => {
-		console.log(file.mimetype);
 		if (
 			file.mimetype == "application/pdf" ||
 			file.mimetype == "image/png" ||

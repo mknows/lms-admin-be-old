@@ -1,4 +1,4 @@
-const { User, Nrus, Daus, User_Activity } = require("../models");
+const { User, Nrus, Daus, UserActivity } = require("../models");
 const { Op } = require("sequelize");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("express-async-handler");
@@ -296,7 +296,7 @@ function phoneNumber(number) {
 
 // Usage for Insert Log Activity
 const insertLogActivity = asyncHandler(async (req, userId, activity) => {
-	await User_Activity.create({
+	await UserActivity.create({
 		user_id: userId,
 		activity,
 		ip_address: req.headers["x-real-ip"] || req.connection.remoteAddress,

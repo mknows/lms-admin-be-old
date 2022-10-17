@@ -3,7 +3,7 @@ const {
 	Video,
 	Document,
 	Material,
-	Material_Enrolled,
+	MaterialEnrolled,
 	Session,
 } = require("../models");
 const moment = require("moment");
@@ -133,7 +133,7 @@ module.exports = {
 
 		for (let i = 0; i < mods.length; i++) {
 			let currmod = mods[i];
-			let met_enr = await Material_Enrolled.findOne({
+			let met_enr = await MaterialEnrolled.findOne({
 				where: {
 					id_referrer: currmod.id,
 					student_id: student_id,
@@ -477,7 +477,7 @@ module.exports = {
 			},
 		});
 
-		const enrolldata = await Material_Enrolled.create({
+		const enrolldata = await MaterialEnrolled.create({
 			session_id: mod.session_id,
 			student_id: student_id,
 			// material_id: material.id,

@@ -3,7 +3,7 @@ const {
 	Quiz,
 	Assignment,
 	Material,
-	Material_Enrolled,
+	MaterialEnrolled,
 } = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
@@ -21,7 +21,7 @@ module.exports = {
 
 		const student_id = req.student_id;
 
-		const data = await Material_Enrolled.update(
+		const data = await MaterialEnrolled.update(
 			{
 				activity_detail,
 				score,
@@ -47,7 +47,7 @@ module.exports = {
 	getMaterialHistory: asyncHandler(async (req, res) => {
 		const { student_id, id_referrer } = req.body;
 
-		const data = await Material_Enrolled.findOne({
+		const data = await MaterialEnrolled.findOne({
 			where: {
 				student_id,
 				id_referrer,
@@ -66,7 +66,7 @@ module.exports = {
 		const { type } = req.params;
 		const student_id = req.userData.id;
 
-		const data = await Material_Enrolled.findAll({
+		const data = await MaterialEnrolled.findAll({
 			where: {
 				student_id,
 				type,

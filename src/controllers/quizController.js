@@ -1,4 +1,4 @@
-const { Material_Enrolled, Quiz, Material, Session } = require("../models");
+const { MaterialEnrolled, Quiz, Material, Session } = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -16,6 +16,7 @@ const {
 	INVALID,
 
 	KKM,
+	MAX_ATTEMPT,
 
 	QUIZ,
 } = process.env;
@@ -84,12 +85,16 @@ module.exports = {
 			return res.sendJson(404, false, "no quiz found", result);
 		}
 
-		const summary = await Material_Enrolled.findOne({
+		let summary = await MaterialEnrolled.findAll({
 			where: {
 				student_id,
 				id_referrer: quizDesc.id,
+				[Op.not]: {
+					status: ONGOING,
+				},
 			},
 			attributes: [
+				"id",
 				"activity_detail",
 				"score",
 				"subject_id",
@@ -97,6 +102,20 @@ module.exports = {
 				"status",
 			],
 		});
+
+		const checkIfCurrentlyTaking = await MaterialEnrolled.findOne({
+			where: {
+				student_id: student_id,
+				session_id: session_id,
+				id_referrer: quizDesc.id,
+				status: ONGOING,
+			},
+			attributes: ["id"],
+		});
+
+		if (checkIfCurrentlyTaking !== null) {
+			summary = [];
+		}
 
 		result = {
 			quiz: quizDesc,
@@ -199,6 +218,8 @@ module.exports = {
 	takeQuiz: asyncHandler(async (req, res) => {
 		const { quiz_id } = req.params;
 		const student_id = req.student_id;
+		const max_attempt = parseInt(MAX_ATTEMPT);
+
 		const quizQuestions = await Quiz.findOne({
 			where: {
 				id: quiz_id,
@@ -216,7 +237,7 @@ module.exports = {
 				id: session_id,
 			},
 		});
-		const checkIfCurrentlyTaking = await Material_Enrolled.findOne({
+		const checkIfCurrentlyTaking = await MaterialEnrolled.findOne({
 			where: {
 				student_id: student_id,
 				session_id: session_id,
@@ -227,17 +248,47 @@ module.exports = {
 			},
 			attributes: ["id"],
 		});
-		if (checkIfCurrentlyTaking == null) {
-			await Material_Enrolled.create({
+
+		const checkHowManyTries = await MaterialEnrolled.findAll({
+			where: {
+				student_id: student_id,
+				session_id: session_id,
+				material_id: material.id,
+				subject_id: session.subject_id,
+				id_referrer: quiz_id,
+				[Op.not]: { status: ONGOING },
+			},
+			attributes: ["id"],
+		});
+
+		let this_material_enrolled;
+
+		if (checkIfCurrentlyTaking != null) {
+			// TODO: CHECK THAT THIS IS ERROR BUT RETURNS TRUE TO ACCOMODATE APPS
+			return res.sendJson(200, true, "user is currenty having an attempt", {
+				quiz: quizQuestions,
+				material_enrolled_id: checkIfCurrentlyTaking.id,
+			});
+		} else if (checkHowManyTries.length >= max_attempt) {
+			return res.sendJson(400, false, "user have exceeded maximum attempts", {
+				total_attempts: checkHowManyTries.length,
+			});
+		} else {
+			this_material_enrolled = await MaterialEnrolled.create({
 				student_id: student_id,
 				session_id: session_id,
 				material_id: material.id,
 				subject_id: session.subject_id,
 				id_referrer: quiz_id,
 				type: QUIZ,
+				status: ONGOING,
 			});
 		}
-		return res.sendJson(200, true, "Success", quizQuestions);
+
+		return res.sendJson(200, true, "Success", {
+			quiz: quizQuestions,
+			material_enrolled_id: this_material_enrolled.id,
+		});
 	}),
 	/**
 	 * @desc      submit quiz
@@ -245,12 +296,15 @@ module.exports = {
 	 * @access    Private
 	 */
 	postQuizAnswer: asyncHandler(async (req, res) => {
-		const { answer, quiz_id, duration_taken } = req.body;
+		const { answer, quiz_id, material_enrolled_id, duration_taken } = req.body;
 		const userAnswer = answer;
 		const student_id = req.student_id;
+
 		const kkm = parseInt(KKM);
 		let status;
 		let correct = 0;
+		date_submitted = moment().format("MMMM Do YYYY, h:mm:ss a");
+
 		const quiz = await Quiz.findOne({
 			where: {
 				id: quiz_id,
@@ -272,14 +326,17 @@ module.exports = {
 				correct++;
 			}
 		}
-		const score = (correct / quizAns.length) * 100;
+
+		let score = (correct / quizAns.length) * 100;
+		score = parseFloat(score.toFixed(2));
 		const quizResultDetail = {
-			date_submit: moment().format("MMMM Do YYYY, h:mm:ss a"),
+			date_submit: date_submitted,
 			number_of_questions: quizAns.length,
 			correct_answers: correct,
 			duration_taken: duration_taken,
 			answer: answer,
 		};
+
 		if (score >= kkm) {
 			status = PASSED;
 		}
@@ -290,7 +347,21 @@ module.exports = {
 			status = INVALID;
 		}
 
-		const result = await Material_Enrolled.update(
+		const material_enrolled_data = await MaterialEnrolled.findOne({
+			where: {
+				id: material_enrolled_id,
+			},
+		});
+
+		if (student_id !== material_enrolled_data.student_id) {
+			return res.sendJson(
+				400,
+				false,
+				"user who submitted is not the student taking the quiz"
+			);
+		}
+
+		const result = await MaterialEnrolled.update(
 			{
 				score: score,
 				status: status,
@@ -299,17 +370,21 @@ module.exports = {
 			},
 			{
 				where: {
-					student_id: student_id,
-					subject_id: quiz_session.subject_id,
+					id: material_enrolled_id,
 					id_referrer: quiz_id,
-					session_id: session_id,
 				},
-			},
-			{
-				returning: true,
 			}
 		);
-		return res.sendJson(200, true, "Success", result);
+
+		let summary = {
+			score: score,
+			status: status,
+			date_submitted: date_submitted,
+			number_of_questions: quizAns.length,
+			correct_answers: correct,
+			duration_taken: duration_taken,
+		};
+		return res.sendJson(200, true, "Success", summary);
 	}),
 
 	/**
@@ -318,17 +393,28 @@ module.exports = {
 	 * @access    Private
 	 */
 	getQuizReview: asyncHandler(async (req, res) => {
-		const { quiz_id } = req.params;
+		const { material_enrolled_id } = req.params;
 		const student_id = req.student_id;
 
-		let user_enroll_data = await Material_Enrolled.findOne({
+		let user_enroll_data = await MaterialEnrolled.findOne({
 			where: {
 				student_id,
-				id_referrer: quiz_id,
-				status: [GRADING, FINISHED, PASSED, FAILED],
+				id: material_enrolled_id,
 			},
-			attributes: ["activity_detail", "score", "status"],
+			attributes: ["activity_detail", "score", "status", "type", "id_referrer"],
 		});
+
+		if (!user_enroll_data) {
+			return res.sendJson(404, false, `material enrolled data not found`);
+		}
+
+		if (user_enroll_data.type !== QUIZ) {
+			return res.sendJson(
+				400,
+				false,
+				`material enrolled id entered is not of a QUIZ but of a ${user_enroll_data.type}`
+			);
+		}
 
 		if (!user_enroll_data) {
 			return res.sendJson(
@@ -340,7 +426,7 @@ module.exports = {
 
 		const quiz = await Quiz.findOne({
 			where: {
-				id: quiz_id,
+				id: user_enroll_data.id_referrer,
 			},
 			attributes: ["answer", "questions"],
 		});
