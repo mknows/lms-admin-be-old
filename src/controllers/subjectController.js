@@ -623,16 +623,17 @@ module.exports = {
 	}),
 	/**
 	 * @desc      enroll in a subject
-	 * @route     DELETE /api/v1/subject/deleteDraft/:student_subject_id
+	 * @route     DELETE /api/v1/subject/deleteDraft/:subject_id
 	 * @access    Private
 	 */
 	deleteDraft: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
-		const { student_subject_id } = req.params;
+		const {	subject_id } = req.params;
 
 		const exists = StudentSubject.findOne({
 			where: {
-				id: student_subject_id,
+				subject_id,
+				student_id
 			},
 		});
 		if (!exists) {
@@ -641,7 +642,7 @@ module.exports = {
 		await StudentSubject.destroy({
 			where: {
 				student_id: student_id,
-				id: student_subject_id,
+				subject_id: subject_id,
 				status: DRAFT,
 			},
 			force: true,
