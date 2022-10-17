@@ -16,6 +16,9 @@ module.exports = (sequelize, DataTypes) => {
 				through: models.StudentSession,
 				foreignKey: "session_id",
 			});
+			this.hasMany(models.MaterialEnrolled,{
+				foreignKey:"session_id",
+			})
 		}
 	}
 	Session.init(

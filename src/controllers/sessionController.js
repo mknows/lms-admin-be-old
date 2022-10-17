@@ -1,9 +1,16 @@
-const { Session, StudentSession } = require("../models");
+const { Session, StudentSession , Subject, MaterialEnrolled} = require("../models");
+const {
+	MODULE,
+	QUIZ,
+	ASSIGNMENT,
+	FINISHED
+} = process.env;
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const { redisClient } = require("../helpers/redis");
+const checkExistence = require("../helpers/checkExistence");
 
 module.exports = {
 	/**
@@ -53,12 +60,50 @@ module.exports = {
 	 * @access    Public
 	 */
 	getAllSessionInSubject: asyncHandler(async (req, res) => {
-		const subject_id = req.params.subject_id;
+		const {subject_id} = req.params;
+		const student_id = req.student_id;
+
+		if(!await checkExistence(Subject,subject_id)){
+			return res.status(404).json({
+				success: false,
+				message: "Invalid Subject ID.",
+				data: {},
+			});
+		}
+		
 		const data = await Session.findAll({
 			where: {
 				subject_id: subject_id,
-			},
+			}
 		});
+		for(i=0;i<data.length;i++){
+			const module_watched = await MaterialEnrolled.findAll({
+				attributes:[
+					'status'
+				],
+				where:{
+					student_id,
+					subject_id,
+					session_id: data[i].id,
+					type: MODULE
+				}
+			})
+			if(module_watched[i]){
+				for(j=0;j<module_watched.length;j++){
+					if(module_watched[j].status === 'ONGOING'||module_watched[j].status === ''){
+						data[i].dataValues.is_locked = true;
+						j = module_watched.length;
+					}
+					else{
+						data[i].dataValues.is_locked = false;
+					}
+				}
+			}
+			if(!module_watched[i]){
+				data[i].dataValues.is_locked = true;
+			}
+			
+		}
 		return res.sendJson(200, true, "success get all session in sub", data);
 	}),
 	/**
