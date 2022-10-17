@@ -11,7 +11,7 @@ const { Op, Sequelize } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const scoringController = require("./scoringController");
-const { SessionFlusher } = require("@sentry/hub");
+
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	DRAFT,
