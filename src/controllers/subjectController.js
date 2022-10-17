@@ -4,8 +4,10 @@ const {
 	StudentSubject,
 	Major,
 	Lecturer,
-	User,
+	User
 } = require("../models");
+const prerequisiteChecker = require("../helpers/prerequsitieChecker")
+const checkExistence = require('../helpers/checkExistence')
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -496,8 +498,9 @@ module.exports = {
 	 * @access    Private
 	 */
 	takeSubject: asyncHandler(async (req, res) => {
-		const { subject_id } = req.params;
+		const {subject_id} = req.params;
 		const student_id = req.student_id;
+		
 		const credit_thresh = 24;
 		let subjectsEnrolled = await getPlan(student_id);
 		subjectsEnrolled = subjectsEnrolled[0]
@@ -505,6 +508,12 @@ module.exports = {
 			.concat(subjectsEnrolled[2]);
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
+		if(!checkExistence(Subject,subject_id)) return 
+			res.sendJson(
+				400,
+				false,
+				"Subject doesnt exist"
+			);
 
 		const students_major = await Student.findOne({
 			where: {
@@ -614,16 +623,17 @@ module.exports = {
 	}),
 	/**
 	 * @desc      enroll in a subject
-	 * @route     DELETE /api/v1/subject/deleteDraft/:student_subject_id
+	 * @route     DELETE /api/v1/subject/deleteDraft/:subject_id
 	 * @access    Private
 	 */
 	deleteDraft: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
-		const { student_subject_id } = req.params;
+		const {	subject_id } = req.params;
 
 		const exists = StudentSubject.findOne({
 			where: {
-				id: student_subject_id,
+				subject_id,
+				student_id
 			},
 		});
 		if (!exists) {
@@ -632,7 +642,7 @@ module.exports = {
 		await StudentSubject.destroy({
 			where: {
 				student_id: student_id,
-				id: student_subject_id,
+				subject_id: subject_id,
 				status: DRAFT,
 			},
 			force: true,

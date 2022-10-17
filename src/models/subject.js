@@ -20,6 +20,16 @@ module.exports = (sequelize, DataTypes) => {
 				sourceKey: "lecturer",
 				foreignKey: "id",
 			});
+			this.belongsToMany(models.Subject,{
+				through: models.Prerequisite,
+				foreignKey: "subject_id",
+				as:'subject'
+			});
+			this.belongsToMany(models.Subject,{
+				through: models.Prerequisite,
+				foreignKey: "subject_id",
+				as:'prerequisite_subject'
+			});
 		}
 	}
 	Subject.init(

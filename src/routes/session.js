@@ -10,6 +10,7 @@ route.get("/:session_id", protection, sessionController.getSession);
 route.get(
 	"/getfromsub/:subject_id",
 	protection,
+	authorize("student","user"),
 	sessionController.getAllSessionInSubject
 );
 route.put("/edit/:session_id", protection, sessionController.updateSession);
