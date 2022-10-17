@@ -7,6 +7,7 @@ const {
 	User
 } = require("../models");
 const prerequisiteChecker = require("../helpers/prerequsitieChecker")
+const checkExistence = require('../helpers/checkExistence')
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -499,103 +500,105 @@ module.exports = {
 	takeSubject: asyncHandler(async (req, res) => {
 		const {subject_id} = req.params;
 		const student_id = req.student_id;
-
-		const test = prerequisiteChecker(subject_id,student_id);
 		
-		// const { subject_id } = req.params;
-		// const student_id = req.student_id;
-		// const credit_thresh = 24;
-		// let subjectsEnrolled = await getPlan(student_id);
-		// subjectsEnrolled = subjectsEnrolled[0]
-		// 	.concat(subjectsEnrolled[1])
-		// 	.concat(subjectsEnrolled[2]);
+		const credit_thresh = 24;
+		let subjectsEnrolled = await getPlan(student_id);
+		subjectsEnrolled = subjectsEnrolled[0]
+			.concat(subjectsEnrolled[1])
+			.concat(subjectsEnrolled[2]);
 
-		// const sub = await Subject.findOne({ where: { id: subject_id } });
+		const sub = await Subject.findOne({ where: { id: subject_id } });
+		if(!checkExistence(Subject,subject_id)) return 
+			res.sendJson(
+				400,
+				false,
+				"Subject doesnt exist"
+			);
 
-		// const students_major = await Student.findOne({
-		// 	where: {
-		// 		id: student_id,
-		// 	},
-		// 	include: {
-		// 		model: Major,
-		// 		attributes: ["id"],
-		// 		include: {
-		// 			model: Subject,
-		// 			attributes: ["id"],
-		// 			where: {
-		// 				id: sub.id,
-		// 			},
-		// 		},
-		// 	},
-		// });
-		// if (students_major.Majors.length === 0) {
-		// 	return res.sendJson(
-		// 		400,
-		// 		false,
-		// 		"Student's major doesn't have that subject"
-		// 	);
-		// }
-		// let credit = 0;
-		// let enrolled = false;
+		const students_major = await Student.findOne({
+			where: {
+				id: student_id,
+			},
+			include: {
+				model: Major,
+				attributes: ["id"],
+				include: {
+					model: Subject,
+					attributes: ["id"],
+					where: {
+						id: sub.id,
+					},
+				},
+			},
+		});
+		if (students_major.Majors.length === 0) {
+			return res.sendJson(
+				400,
+				false,
+				"Student's major doesn't have that subject"
+			);
+		}
+		let credit = 0;
+		let enrolled = false;
 
-		// if (subjectsEnrolled !== null) {
-		// 	credit = await totalCredit(subjectsEnrolled);
-		// 	enrolled = await isEnrolled(subjectsEnrolled, sub.id);
-		// }
+		if (subjectsEnrolled !== null) {
+			credit = await totalCredit(subjectsEnrolled);
+			enrolled = await isEnrolled(subjectsEnrolled, sub.id);
+		}
 
-		// if (sub !== null) {
-		// 	credit += sub.credit;
-		// }
+		if (sub !== null) {
+			credit += sub.credit;
+		}
 
-		// let result;
+		let result;
 
-		// if (enrolled === false && credit <= credit_thresh) {
-		// 	await StudentSubject.create({
-		// 		subject_id: subject_id,
-		// 		student_id: student_id,
-		// 		status: DRAFT,
-		// 	});
+		if (enrolled === false && credit <= credit_thresh) {
+			await StudentSubject.create({
+				subject_id: subject_id,
+				student_id: student_id,
+				status: DRAFT,
+			});
 
-		// 	result = await getParsedPlan(student_id);
-		// 	return res.sendJson(
-		// 		200,
-		// 		true,
-		// 		`successfully enrolled in ${sub.name}`,
-		// 		result
-		// 	);
-		// } else if (credit > credit_thresh) {
-		// 	return res.sendJson(400, false, "Exceeded maximum credit", {
-		// 		credit: credit,
-		// 	});
-		// } else if (enrolled) {
-		// 	return res.sendJson(400, false, `already enrolled in ${sub.name}`, {
-		// 		enrolled_in: subject_id,
-		// 	});
-		// }
+			result = await getParsedPlan(student_id);
+			return res.sendJson(
+				200,
+				true,
+				`successfully enrolled in ${sub.name}`,
+				result
+			);
+		} else if (credit > credit_thresh) {
+			return res.sendJson(400, false, "Exceeded maximum credit", {
+				credit: credit,
+			});
+		} else if (enrolled) {
+			return res.sendJson(400, false, `already enrolled in ${sub.name}`, {
+				enrolled_in: subject_id,
+			});
+		}
 
-		// if (credit > credit_thresh) {
-		// 	return res.sendJson(400, false, "Exceeded maximum credit", {
-		// 		credit: credit,
-		// 	});
-		// } else if (enrolled) {
-		// 	return res.sendJson(400, false, `already enrolled in ${sub.name}`, {
-		// 		enrolled_in: subject_id,
-		// 	});
-		// } else if (enrolled === false && credit <= credit_thresh) {
-		// 	await StudentSubject.create({
-		// 		subject_id: subject_id,
-		// 		student_id: student_id,
-		// 		status: DRAFT,
-		// 	});
+		if (credit > credit_thresh) {
+			return res.sendJson(400, false, "Exceeded maximum credit", {
+				credit: credit,
+			});
+		} else if (enrolled) {
+			return res.sendJson(400, false, `already enrolled in ${sub.name}`, {
+				enrolled_in: subject_id,
+			});
+		} else if (enrolled === false && credit <= credit_thresh) {
+			await StudentSubject.create({
+				subject_id: subject_id,
+				student_id: student_id,
+				status: DRAFT,
+			});
 
-		// 	result = await getParsedPlan(student_id);
-		// 	return res.sendJson(
-		// 		200,
-		// 		true,
-		// 		`successfully enrolled in ${sub.name}`,
-		// 		result
-		// 	);
-		// }
+			result = await getParsedPlan(student_id);
+			return res.sendJson(
+				200,
+				true,
+				`successfully enrolled in ${sub.name}`,
+				result
+			);
+		}
 	}),
 	/**
 	 * @desc      enroll in a subject
