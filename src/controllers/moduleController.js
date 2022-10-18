@@ -496,7 +496,7 @@ module.exports = {
 
 		const material_enrolled = await MaterialEnrolled.findOne({
 			where: {
-				module_id,
+				id_referrer: module_id,
 				student_id,
 			},
 		});
@@ -516,7 +516,7 @@ module.exports = {
 			},
 			{
 				where: {
-					module_id,
+					id_referrer: module_id,
 					student_id,
 				},
 			}
