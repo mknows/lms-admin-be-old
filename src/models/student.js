@@ -40,6 +40,7 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			user_id: DataTypes.UUID,
 			supervisor_id: DataTypes.UUID,
+			semester: DataTypes.UUID,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
 			deleted_at: DataTypes.DATE,
