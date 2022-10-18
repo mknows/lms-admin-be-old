@@ -287,10 +287,10 @@ module.exports = {
 			});
 		}
 
-		// return res.sendJson(200, true, "Success", {
-		// 	quiz: quizQuestions,
-		// 	material_enrolled_id: this_material_enrolled.id,
-		// });
+		return res.sendJson(200, true, "Success", {
+			quiz: quizQuestions,
+			material_enrolled_id: this_material_enrolled.id,
+		});
 	}),
 	/**
 	 * @desc      submit quiz
