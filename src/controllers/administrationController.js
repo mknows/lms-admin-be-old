@@ -597,7 +597,6 @@ module.exports = {
 	 */
 	deleteAdministration: asyncHandler(async (req, res) => {
 		const { id } = req.params;
-		const storage = getStorage();
 
 		const findAdministration = await Administration.findOne({
 			where: {
@@ -624,11 +623,13 @@ module.exports = {
 			],
 		});
 
-		let arrFile = Object.values(getFiles.dataValues);
-
-		arrFile.map((file) => {
-			deleteObject(ref(storage, file));
-		});
+		checkIfExistFirebase(getFiles.integrity_pact);
+		checkIfExistFirebase(getFiles.nin_card);
+		checkIfExistFirebase(getFiles.family_card);
+		checkIfExistFirebase(getFiles.certificate);
+		checkIfExistFirebase(getFiles.photo);
+		checkIfExistFirebase(getFiles.transcript);
+		checkIfExistFirebase(getFiles.recommendation_letter);
 
 		await Administration.destroy({
 			where: {
@@ -815,7 +816,7 @@ const checkIfExistFirebase = async (res, data) => {
 				console.log("success deleteObject");
 			})
 			.catch(err, () => {
-				return res.sendJson(400, false, "failed upload", err);
+				return res.sendJson(400, false, "failed deleteObject", err);
 			});
 	}
 };
