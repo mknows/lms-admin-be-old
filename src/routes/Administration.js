@@ -76,6 +76,11 @@ route.put(
 	administrationController.degreeAdministration
 );
 
-route.delete("/delete/:id", administrationController.deleteAdministration);
+route.delete(
+	"/delete/:id",
+	protection,
+	authorize("user"),
+	administrationController.deleteAdministration
+);
 
 module.exports = route;
