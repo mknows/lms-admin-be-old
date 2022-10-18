@@ -4,6 +4,8 @@ const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const moduleTaken = require("../helpers/moduleTaken");
+const getSession = require("../helpers/getSession");
+const checkExistence = require("../helpers/checkExistence");
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	DRAFT,
@@ -219,6 +221,18 @@ module.exports = {
 	takeQuiz: asyncHandler(async (req, res) => {
 		const { quiz_id } = req.params;
 		const student_id = req.student_id;
+		const exist = await checkExistence(Quiz,quiz_id);
+
+		if(!exist) {
+			return res.sendJson(400, false, "Quiz doesn't exist");
+		}
+		const session_id = await getSession(Quiz,quiz_id);
+		const module_taken = await moduleTaken(student_id,session_id)
+
+		if(!module_taken.allowed) {
+			return res.sendJson(400, false, "Student hasn't watched the module");
+		}
+
 		const max_attempt = parseInt(MAX_ATTEMPT);
 		
 		const quizQuestions = await Quiz.findOne({
@@ -227,7 +241,7 @@ module.exports = {
 			},
 			attributes: ["duration", "questions", "description", "session_id"],
 		});
-		const session_id = quizQuestions.dataValues.session_id;
+		
 		const material = await Material.findOne({
 			where: {
 				id_referrer: quiz_id,
@@ -286,7 +300,6 @@ module.exports = {
 				status: ONGOING,
 			});
 		}
-
 		return res.sendJson(200, true, "Success", {
 			quiz: quizQuestions,
 			material_enrolled_id: this_material_enrolled.id,
