@@ -97,7 +97,7 @@ module.exports = {
 		const student_id = req.student_id
 		const assign = await Assignment.findOne({
 			attributes:[
-				'id','content','description','file_assignment','file_assignment_link'
+				'id','content','description','file_assignment','file_assignment_link','duration'
 			],
 			where: {
 				session_id: session_id,
