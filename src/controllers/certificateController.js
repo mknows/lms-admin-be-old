@@ -16,6 +16,7 @@ const pdfDocument = new pdfKit({
 	size: [2481, 3508],
 	margin: 0,
 });
+const qr = require("qr-image");
 const { Buffer } = require("buffer");
 const randomString = require("randomstring");
 
@@ -42,22 +43,37 @@ module.exports = {
 			},
 		});
 
-		const name = user.full_name;
-		const subjectName = subject.name;
-		const time = "12 Desember 2022";
-		const getCertificateCode = randomString.generate({
-			length: 12,
+		const generateRandomCert = randomString.generate({
 			capitalization: "uppercase",
+			length: 12,
 			charset: "alphanumeric",
 		});
 
-		const output = `${uuidv4()}-${name}-certificat.pdf`;
-		pdfDocument.pipe(fs.createWriteStream(output));
+		const certificateLink =
+			"www.kampusgratis.com/certificate/" + generateRandomCert;
+		console.log("certificateLink => ", certificateLink);
+
+		const outputQr = `${generateRandomCert}.png`;
+
+		var qr_svg = qr.image(certificateLink, {
+			type: "png",
+			size: 8,
+			margin: 1,
+		});
+		qr_svg.pipe(fs.createWriteStream(outputQr));
+
+		const name = user.full_name;
+		const subjectName = subject.name;
+		const time = "12 Desember 2022";
+
+		const outputPdf = `${generateRandomCert}-${name}-certificat.pdf`;
+		pdfDocument.pipe(fs.createWriteStream(outputPdf));
 		pdfDocument.image("public/images/cert.png", {
 			fit: [3508, 2481],
 			align: "center",
 		});
 
+		await sleep(2000);
 		pdfDocument
 			.font("public/fonts/Poppins-Medium.otf")
 			.fillColor("black")
@@ -75,18 +91,19 @@ module.exports = {
 			.text(time, 1610, 1624);
 		pdfDocument
 			.font("public/fonts/Poppins-Medium.otf")
-			.fillColor("#ddd")
-			.fontSize(70)
-			.text(getCertificateCode, 1500, 2300);
+			.fillColor("#3C4048")
+			.fontSize(40)
+			.text(certificateLink, 2375, 2360);
+		pdfDocument.image(outputQr, 65, 2130);
 
 		pdfDocument.end();
 
 		const stream = pdfDocument.pipe(blobStream());
 		stream.on("finish", async () => {
 			await sleep(2000);
-
-			const file = fs.readFileSync(output);
-			const nameFile = "documents/certificate/" + output;
+			// upload to firebase storage
+			const file = fs.readFileSync(outputPdf);
+			const nameFile = "documents/certificate/" + outputPdf;
 			const buffer = Buffer.from(file, "utf-8");
 
 			bucket
@@ -101,8 +118,9 @@ module.exports = {
 					return res.sendJson(201, true, "success upload new certificate");
 				});
 
-			await sleep(10000);
-			fs.unlinkSync(output);
+			await sleep(2000);
+			fs.unlinkSync(outputPdf);
+			fs.unlinkSync(outputQr);
 		});
 	}),
 
