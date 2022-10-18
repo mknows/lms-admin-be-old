@@ -24,7 +24,6 @@ module.exports = {
 				id: df_id,
 			},
 			attributes: { include: ["created_at", "updated_at"] },
-			order: ["created_at"],
 			include: [
 				{
 					model: User,
@@ -33,7 +32,6 @@ module.exports = {
 				{
 					model: Comment,
 					attributes: { include: ["created_at", "updated_at"] },
-					order: ["created_at"],
 					include: [
 						{
 							model: User,
@@ -42,7 +40,6 @@ module.exports = {
 						{
 							model: Reply,
 							attributes: { include: ["created_at", "updated_at"] },
-							order: ["created_at"],
 							include: {
 								model: User,
 								attributes: ["full_name"],
@@ -50,6 +47,10 @@ module.exports = {
 						},
 					],
 				},
+			],
+			order: [
+				[Comment, "created_at", "DESC"],
+				[Comment, Reply, "content", "DESC"],
 			],
 		});
 		return res.sendJson(200, true, "sucess get all discussion forums", data);
