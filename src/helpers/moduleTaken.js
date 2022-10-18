@@ -12,7 +12,10 @@ async function moduleTaken(student_id,session_id) {
             type:MODULE
         }
     });
-    console.log(module_in_session.status)
+    console.log(module_in_session)
+    for(i=0;i<module_in_session.length;i++){
+        console.log(module_in_session[i]);
+    }
 }
 
 module.exports = moduleTaken;
