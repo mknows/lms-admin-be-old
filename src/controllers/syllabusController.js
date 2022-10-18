@@ -599,6 +599,9 @@ module.exports = {
 				},
 			});
 			const students_information = await Student.findOne({
+				attributes:[
+					'semester'	
+				],
 				where: {
 					id: student_id,
 				},
@@ -622,12 +625,12 @@ module.exports = {
 					},
 				],
 			});
+			// students_information.created_at = students_information.created_at.slice(4);
 			result = {
 				students_information: students_information,
 				major: maj,
 				result: fin_res,
 			};
-
 			await redisClient.set(key, JSON.stringify(result), {
 				EX: 120,
 			});
@@ -636,7 +639,6 @@ module.exports = {
 				return res.sendJson(400, false, "Major ID not found", null);
 			}
 		}
-
 		return res.sendJson(200, true, "Success", result);
 	}),
 };

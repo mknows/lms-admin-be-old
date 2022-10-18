@@ -11,10 +11,6 @@ const { Op, Sequelize } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const scoringController = require("./scoringController");
-<<<<<<< HEAD
-=======
-
->>>>>>> 156fc49c66b87600ea8d147567376263edf02efd
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	DRAFT,
