@@ -361,7 +361,7 @@ module.exports = {
 			}
 		);
 
-		res.sendJson(200, true, "Success", data);
+		return res.sendJson(200, true, "Success", data);
 	}),
 	/**
 	 * @desc      delete module
@@ -487,5 +487,45 @@ module.exports = {
 			type: MODULE,
 		});
 		return res.sendJson(200, true, "Success", enrolldata);
+	}),
+
+	/**
+	 * @desc      post finish module
+	 * @route     PUT /api/v1/module/finish/
+	 * @access    Private
+	 */
+	finishModule: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
+		const { module_id, takeaway } = req.body;
+
+		const material_enrolled = await MaterialEnrolled.findOne({
+			where: {
+				module_id,
+				student_id,
+			},
+		});
+
+		if (!material_enrolled) {
+			return res.sendJson(404, false, "no material enrolled found", {});
+		}
+
+		let detail = {
+			takeaway: takeaway,
+		};
+
+		let material_enrolled_data = await MaterialEnrolled.update(
+			{
+				activity_detail: detail,
+				status: FINISHED,
+			},
+			{
+				where: {
+					module_id,
+					student_id,
+				},
+			}
+		);
+
+		return res.sendJson(200, true, "Success", material_enrolled_data);
 	}),
 };
