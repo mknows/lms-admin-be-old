@@ -1,6 +1,5 @@
-const { Assignment, Material , MaterialEnrolled, Sequelize} = require("../models");
-const moment = require("moment");
-const { Op,sequelize } = require("sequelize");
+const { Assignment, Material , MaterialEnrolled, sequelize} = require("../models");
+const { Op} = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const {
@@ -11,6 +10,7 @@ const {
 } = require("firebase/storage");
 const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
+const moment = require("moment");
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	ONGOING,
@@ -97,13 +97,19 @@ module.exports = {
 		const student_id = req.student_id
 		const assign = await Assignment.findOne({
 			attributes:[
-				'id','content','description','file_assignment','file_assignment_link','duration'
+				'id','content','description',
+				'file_assignment','file_assignment_link',
+				'duration',
+				'created_at'
 			],
 			where: {
 				session_id: session_id,
 			},
 		});
 
+		const deadline = new Date(new Date(assign.created_at).getTime()+(assign.duration*1000));
+		assign.dataValues.deadline = moment(deadline).format('DD/MM/YYYY hh:mm:ss');
+		
 		if(!assign){
 			return res.sendJson(400, false, "No assignment was assigned");
 		}
