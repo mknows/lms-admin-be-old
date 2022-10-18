@@ -1,4 +1,4 @@
-const { StudentSubject, Certificate } = require("../models");
+const { StudentSubject, Certificate, User, Subject } = require("../models");
 const asyncHandler = require("express-async-handler");
 const {
 	getStorage,
@@ -8,6 +8,16 @@ const {
 } = require("firebase/storage");
 const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
+const pdfKit = require("pdfkit");
+const fs = require("fs");
+const blobStream = require("blob-stream");
+const pdfDocument = new pdfKit({
+	layout: "landscape",
+	size: [2481, 3508],
+	margin: 0,
+});
+const { Buffer } = require("buffer");
+const randomString = require("randomstring");
 
 module.exports = {
 	/**
@@ -20,31 +30,80 @@ module.exports = {
 		const storage = getStorage();
 		const bucket = admin.storage().bucket();
 
-		const nameFile =
-			"documents/certificate/" +
-			uuidv4() +
-			"-" +
-			req.file.originalname.split(" ").join("-");
-		const bufferFile = req.file.buffer;
+		const user = await User.findOne({
+			where: {
+				id: user_id,
+			},
+		});
 
-		bucket
-			.file(nameFile)
-			.createWriteStream()
-			.end(bufferFile)
-			.on("finish", () => {
-				getDownloadURL(ref(storage, nameFile)).then(async (fileLink) => {
-					await Certificate.create({
-						user_id,
-						student_id,
-						subject_id,
-						id_certificate,
-						file: nameFile,
-						link: fileLink,
+		const subject = await Subject.findOne({
+			where: {
+				id: subject_id,
+			},
+		});
+
+		const name = user.full_name;
+		const subjectName = subject.name;
+		const time = "12 Desember 2022";
+		const getCertificateCode = randomString.generate({
+			length: 12,
+			capitalization: "uppercase",
+			charset: "alphanumeric",
+		});
+
+		const output = `${uuidv4()}-${name}-certificat.pdf`;
+		pdfDocument.pipe(fs.createWriteStream(output));
+		pdfDocument.image("public/images/cert.png", {
+			fit: [3508, 2481],
+			align: "center",
+		});
+
+		pdfDocument
+			.font("public/fonts/Poppins-Medium.otf")
+			.fillColor("black")
+			.fontSize(100)
+			.text(name, 1250, 1000);
+		pdfDocument
+			.font("public/fonts/Poppins-LightItalic.otf")
+			.fillColor("black")
+			.fontSize(85)
+			.text(subjectName, 1200, 1375);
+		pdfDocument
+			.font("public/fonts/Poppins-Medium.otf")
+			.fillColor("black")
+			.fontSize(70)
+			.text(time, 1610, 1624);
+		pdfDocument
+			.font("public/fonts/Poppins-Medium.otf")
+			.fillColor("#ddd")
+			.fontSize(70)
+			.text(getCertificateCode, 1500, 2300);
+
+		pdfDocument.end();
+
+		const stream = pdfDocument.pipe(blobStream());
+		stream.on("finish", async () => {
+			await sleep(2000);
+
+			const file = fs.readFileSync(output);
+			const nameFile = "documents/certificate/" + output;
+			const buffer = Buffer.from(file, "utf-8");
+
+			bucket
+				.file(nameFile)
+				.createWriteStream()
+				.end(buffer)
+				.on("finish", () => {
+					getDownloadURL(ref(storage, nameFile)).then((fileLink) => {
+						console.log("link in firebase => ", fileLink);
 					});
 
 					return res.sendJson(201, true, "success upload new certificate");
 				});
-			});
+
+			await sleep(10000);
+			// fs.unlinkSync(output);
+		});
 	}),
 
 	/**
@@ -68,3 +127,7 @@ module.exports = {
 		return res.sendJson(200, true, "success get certificate", search.link);
 	}),
 };
+
+function sleep(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
