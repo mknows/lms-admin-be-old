@@ -27,7 +27,7 @@ const {
 module.exports = {
 	/**
 	 * @desc      POST submit Assignment
-	 * @route     GET /api/v1/assignment/submit/:session_id
+	 * @route     POST /api/v1/assignment/submit/:session_id
 	 * @access    Private
 	 */
 	submitAssignment: asyncHandler(async (req, res) => {
@@ -36,9 +36,6 @@ module.exports = {
 		const storage = getStorage();
 
 		const assign = await Assignment.findOne({
-			attributes:[
-				'id','content','description','file_assignment','file_assignment_link'
-			],
 			where: {
 				session_id: session_id,
 			},
