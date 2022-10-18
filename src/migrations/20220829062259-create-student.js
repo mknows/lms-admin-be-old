@@ -14,6 +14,10 @@ module.exports = {
 				allowNull: false,
 				type: Sequelize.ARRAY(Sequelize.STRING),
 			},
+			semester: {
+				allowNull: false,
+				type: Sequelize.INT,
+			},
 			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
