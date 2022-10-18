@@ -148,18 +148,15 @@ module.exports = {
 				stat = met_enr.status;
 			}
 
-			let progress = 0;
-
 			let datval = {
-				modul: currmod,
+				...currmod.dataValues,
 				status: stat,
-				progress: progress,
 			};
 
 			result.push(datval);
 		}
 
-		return res.sendJson(200, true, "Success", mods);
+		return res.sendJson(200, true, "Success", result);
 	}),
 	/**
 	 * @desc      Get Module
