@@ -48,7 +48,6 @@ const {
 	ASSIGNMENT,
 } = process.env;
 const asyncHandler = require("express-async-handler");
-const { getCurrentHub } = require("@sentry/hub");
 
 module.exports = {
 	/**
