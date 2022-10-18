@@ -110,7 +110,7 @@ module.exports = {
 				id_referrer: quizDesc.id,
 				status: ONGOING,
 			},
-			attributes: ["id"],
+		attributes: ["id"],
 		});
 
 		if (checkIfCurrentlyTaking !== null) {
