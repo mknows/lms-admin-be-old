@@ -102,7 +102,7 @@ module.exports = {
 				});
 
 			await sleep(10000);
-			// fs.unlinkSync(output);
+			fs.unlinkSync(output);
 		});
 	}),
 
