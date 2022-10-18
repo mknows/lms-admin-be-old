@@ -93,8 +93,22 @@ async function completedSession(student_id, session_id) {
 		}
 	}
 
+	let student_session;
+
 	if (module_fin && quiz_fin && assignment_fin) {
 		present = true;
+
+		student_session = await StudentSession.update(
+			{
+				status: GRADING,
+			},
+			{
+				where: {
+					student_id,
+					session_id,
+				},
+			}
+		);
 	}
 	return present;
 }
