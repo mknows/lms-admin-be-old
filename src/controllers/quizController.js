@@ -221,50 +221,48 @@ module.exports = {
 		const student_id = req.student_id;
 		const max_attempt = parseInt(MAX_ATTEMPT);
 		
-		moduleTaken(student_id,'00cb00d1-0dee-482d-b899-8b6c9570a565')
-		
-		// const quizQuestions = await Quiz.findOne({
-		// 	where: {
-		// 		id: quiz_id,
-		// 	},
-		// 	attributes: ["duration", "questions", "description", "session_id"],
-		// });
-		// const session_id = quizQuestions.dataValues.session_id;
-		// const material = await Material.findOne({
-		// 	where: {
-		// 		id_referrer: quiz_id,
-		// 	},
-		// });
-		// const session = await Session.findOne({
-		// 	where: {
-		// 		id: session_id,
-		// 	},
-		// });
-		// const checkIfCurrentlyTaking = await MaterialEnrolled.findOne({
-		// 	where: {
-		// 		student_id: student_id,
-		// 		session_id: session_id,
-		// 		material_id: material.id,
-		// 		subject_id: session.subject_id,
-		// 		id_referrer: quiz_id,
-		// 		status: ONGOING,
-		// 	},
-		// 	attributes: ["id"],
-		// });
+		const quizQuestions = await Quiz.findOne({
+			where: {
+				id: quiz_id,
+			},
+			attributes: ["duration", "questions", "description", "session_id"],
+		});
+		const session_id = quizQuestions.dataValues.session_id;
+		const material = await Material.findOne({
+			where: {
+				id_referrer: quiz_id,
+			},
+		});
+		const session = await Session.findOne({
+			where: {
+				id: session_id,
+			},
+		});
+		const checkIfCurrentlyTaking = await MaterialEnrolled.findOne({
+			where: {
+				student_id: student_id,
+				session_id: session_id,
+				material_id: material.id,
+				subject_id: session.subject_id,
+				id_referrer: quiz_id,
+				status: ONGOING,
+			},
+			attributes: ["id"],
+		});
 
-		// const checkHowManyTries = await MaterialEnrolled.findAll({
-		// 	where: {
-		// 		student_id: student_id,
-		// 		session_id: session_id,
-		// 		material_id: material.id,
-		// 		subject_id: session.subject_id,
-		// 		id_referrer: quiz_id,
-		// 		[Op.not]: { status: ONGOING },
-		// 	},
-		// 	attributes: ["id"],
-		// });
+		const checkHowManyTries = await MaterialEnrolled.findAll({
+			where: {
+				student_id: student_id,
+				session_id: session_id,
+				material_id: material.id,
+				subject_id: session.subject_id,
+				id_referrer: quiz_id,
+				[Op.not]: { status: ONGOING },
+			},
+			attributes: ["id"],
+		});
 
-		// let this_material_enrolled;
+		let this_material_enrolled;
 
 		if (checkIfCurrentlyTaking != null) {
 			// TODO: CHECK THAT THIS IS ERROR BUT RETURNS TRUE TO ACCOMODATE APPS
