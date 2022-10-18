@@ -460,14 +460,21 @@ module.exports = {
 
 	/**
 	 * @desc      like thing
-	 * @route     PUT /api/v1/forum/like?type=<df/comment/reply>&id=<idnum>
+	 * @route     PUT /api/v1/forum/like?type=<df|comment|reply>&id=<idnum>&unlike=<true/false>
 	 * @access    Private
 	 */
 	likePost: asyncHandler(async (req, res) => {
-		const { type, id } = req.query;
+		let { type, id, unlike } = req.query;
 		const user_role = req.role;
 		const user_id = req.userData.id;
 
+		if (unlike == null || unlike === "false") {
+			unlike = false;
+		} else if (unlike === "true") {
+			unlike = true;
+		}
+
+		let index;
 		let data;
 		let liker_id;
 		let likes;
@@ -484,12 +491,26 @@ module.exports = {
 				}
 
 				if (user_role === "student") {
-					liker_id = await getLikerId(data.student_like, user_id, user_role);
+					liker_id = await getLikerId(
+						data.student_like,
+						user_id,
+						user_role,
+						unlike
+					);
 					if (liker_id.status === false) {
 						return res.sendJson(404, false, liker_id.msg, data);
 					}
 					likes = data.student_like;
-					await likes.push(liker_id.msg);
+
+					if (unlike) {
+						index = likes.indexOf(liker_id.msg);
+						if (index > -1) {
+							likes.splice(index, 1);
+						}
+					} else {
+						await likes.push(liker_id.msg);
+					}
+
 					data = await Reply.update(
 						{
 							student_like: likes,
@@ -503,12 +524,26 @@ module.exports = {
 						}
 					);
 				} else if (user_role === "lecturer") {
-					liker_id = await getLikerId(data.lecturer_like, user_id, user_role);
+					liker_id = await getLikerId(
+						data.lecturer_like,
+						user_id,
+						user_role,
+						unlike
+					);
 					if (liker_id.status === false) {
 						return res.sendJson(404, false, liker_id.msg, data);
 					}
 					likes = data.lecturer_like;
-					await likes.push(liker_id.msg);
+
+					if (unlike) {
+						index = likes.indexOf(liker_id.msg);
+						if (index > -1) {
+							likes.splice(index, 1);
+						}
+					} else {
+						await likes.push(liker_id.msg);
+					}
+
 					data = await Reply.update(
 						{
 							lecturer_like: likes,
@@ -536,12 +571,26 @@ module.exports = {
 				}
 
 				if (user_role === "student") {
-					liker_id = await getLikerId(data.student_like, user_id, user_role);
+					liker_id = await getLikerId(
+						data.student_like,
+						user_id,
+						user_role,
+						unlike
+					);
 					if (liker_id.status === false) {
 						return res.sendJson(404, false, liker_id.msg, data);
 					}
 					likes = data.student_like;
-					await likes.push(liker_id.msg);
+
+					if (unlike) {
+						index = likes.indexOf(liker_id.msg);
+						if (index > -1) {
+							likes.splice(index, 1);
+						}
+					} else {
+						await likes.push(liker_id.msg);
+					}
+
 					data = await Comment.update(
 						{
 							student_like: likes,
@@ -555,12 +604,26 @@ module.exports = {
 						}
 					);
 				} else if (user_role === "lecturer") {
-					liker_id = await getLikerId(data.lecturer_like, user_id, user_role);
+					liker_id = await getLikerId(
+						data.lecturer_like,
+						user_id,
+						user_role,
+						unlike
+					);
 					if (liker_id.status === false) {
 						return res.sendJson(404, false, liker_id.msg, data);
 					}
 					likes = data.lecturer_like;
-					await likes.push(liker_id.msg);
+
+					if (unlike) {
+						index = likes.indexOf(liker_id.msg);
+						if (index > -1) {
+							likes.splice(index, 1);
+						}
+					} else {
+						await likes.push(liker_id.msg);
+					}
+
 					data = await Comment.update(
 						{
 							lecturer_like: likes,
@@ -588,12 +651,26 @@ module.exports = {
 				}
 
 				if (user_role === "student") {
-					liker_id = await getLikerId(data.student_like, user_id, user_role);
+					liker_id = await getLikerId(
+						data.student_like,
+						user_id,
+						user_role,
+						unlike
+					);
 					if (liker_id.status === false) {
 						return res.sendJson(404, false, liker_id.msg, data);
 					}
 					likes = data.student_like;
-					await likes.push(liker_id.msg);
+
+					if (unlike) {
+						index = likes.indexOf(liker_id.msg);
+						if (index > -1) {
+							likes.splice(index, 1);
+						}
+					} else {
+						await likes.push(liker_id.msg);
+					}
+
 					data = await DiscussionForum.update(
 						{
 							student_like: likes,
@@ -607,12 +684,26 @@ module.exports = {
 						}
 					);
 				} else if (user_role === "lecturer") {
-					liker_id = await getLikerId(data.lecturer_like, user_id, user_role);
+					liker_id = await getLikerId(
+						data.lecturer_like,
+						user_id,
+						user_role,
+						unlike
+					);
 					if (liker_id.status === false) {
 						return res.sendJson(404, false, liker_id.msg, data);
 					}
 					likes = data.lecturer_like;
-					await likes.push(liker_id.msg);
+
+					if (unlike) {
+						index = likes.indexOf(liker_id.msg);
+						if (index > -1) {
+							likes.splice(index, 1);
+						}
+					} else {
+						await likes.push(liker_id.msg);
+					}
+
 					data = await DiscussionForum.update(
 						{
 							lecturer_like: likes,
@@ -634,7 +725,7 @@ module.exports = {
 	}),
 };
 
-async function getLikerId(like_data, user_id, user_role) {
+async function getLikerId(like_data, user_id, user_role, unlike) {
 	let liker;
 	switch (user_role) {
 		case "student":
@@ -651,12 +742,22 @@ async function getLikerId(like_data, user_id, user_role) {
 				};
 			}
 
-			if (like_data.includes(liker.id)) {
-				return {
-					msg: "student already liked",
-					status: false,
-				};
+			if (!unlike) {
+				if (like_data.includes(liker.id)) {
+					return {
+						msg: "student already liked",
+						status: false,
+					};
+				}
+			} else {
+				if (!like_data.includes(liker.id)) {
+					return {
+						msg: "student haven't liked",
+						status: false,
+					};
+				}
 			}
+
 			liker = liker.id;
 			break;
 
@@ -673,11 +774,21 @@ async function getLikerId(like_data, user_id, user_role) {
 					status: false,
 				};
 			}
-			if (like_data.includes(liker.id)) {
-				return {
-					msg: "lecturer already liked",
-					status: false,
-				};
+
+			if (!unlike) {
+				if (like_data.includes(liker.id)) {
+					return {
+						msg: "lecturer already liked",
+						status: false,
+					};
+				}
+			} else {
+				if (!like_data.includes(liker.id)) {
+					return {
+						msg: "lecturer haven't liked",
+						status: false,
+					};
+				}
 			}
 			liker = liker.id;
 			break;
