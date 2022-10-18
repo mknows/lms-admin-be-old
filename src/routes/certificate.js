@@ -23,11 +23,11 @@ const upload = multer({
 
 route.post(
 	"/create",
-	protection,
+	// protection,
 	// authorize("admin"),
-	upload.single("certificate"),
-	validate("createCertificate"),
-	validatorMessage,
+	// upload.single("certificate"),
+	// validate("createCertificate"),
+	// validatorMessage,
 	certificateController.createCertificate
 );
 

@@ -3,6 +3,7 @@ const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
+const moduleTaken = require("../helpers/moduleTaken");
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	DRAFT,
@@ -110,7 +111,7 @@ module.exports = {
 				id_referrer: quizDesc.id,
 				status: ONGOING,
 			},
-			attributes: ["id"],
+		attributes: ["id"],
 		});
 
 		if (checkIfCurrentlyTaking !== null) {
@@ -219,7 +220,7 @@ module.exports = {
 		const { quiz_id } = req.params;
 		const student_id = req.student_id;
 		const max_attempt = parseInt(MAX_ATTEMPT);
-
+		
 		const quizQuestions = await Quiz.findOne({
 			where: {
 				id: quiz_id,
