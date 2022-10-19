@@ -625,7 +625,7 @@ module.exports = {
 					},
 				],
 			});
-			// students_information.created_at = students_information.created_at.slice(4);
+			
 			result = {
 				students_information: students_information,
 				major: maj,
