@@ -169,6 +169,7 @@ module.exports = {
 				id: module_id,
 			},
 		});
+		if(!mod) return res.sendJson(404, true, "Not Found",{});
 
 		const vids = await Video.findAll({
 			where: {
@@ -177,7 +178,6 @@ module.exports = {
 				},
 			},
 		});
-
 		const docs = await Document.findAll({
 			where: {
 				id: {
