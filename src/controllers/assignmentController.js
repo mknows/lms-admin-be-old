@@ -1,5 +1,11 @@
-const { Assignment, Material , MaterialEnrolled, sequelize} = require("../models");
-const { Op} = require("sequelize");
+const {
+	Assignment,
+	Material,
+	MaterialEnrolled,
+	sequelize,
+	Session,
+} = require("../models");
+const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const {
@@ -11,6 +17,7 @@ const {
 const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
 const moment = require("moment");
+const checkDoneSession = require("../helpers/checkDoneSession");
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	ONGOING,
@@ -20,8 +27,8 @@ const {
 	FINISHED,
 	ABANDONED,
 	MODULE,
-	QUIZ ,
-	ASSIGNMENT ,
+	QUIZ,
+	ASSIGNMENT,
 } = process.env;
 
 module.exports = {
@@ -31,9 +38,10 @@ module.exports = {
 	 * @access    Private
 	 */
 	submitAssignment: asyncHandler(async (req, res) => {
-		const {session_id} = req.params;
+		const { session_id } = req.params;
 		const bucket = admin.storage().bucket();
 		const storage = getStorage();
+		const student_id = req.student_id;
 
 		const assign = await Assignment.findOne({
 			where: {
@@ -41,8 +49,19 @@ module.exports = {
 			},
 		});
 
-		if(!assign){
+		if (!assign) {
 			return res.sendJson(400, false, "Assignment not found");
+		}
+
+		let material_data = await MaterialEnrolled.findOne({
+			where: {
+				id_referrer: assign.id,
+				student_id,
+			},
+		});
+
+		if (!material_data) {
+			return res.sendJson(400, false, "student havent taken assignment");
 		}
 
 		const file_assignment =
@@ -59,21 +78,29 @@ module.exports = {
 			.on("finish", () => {
 				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
 					const activity_detail = {
-						"date_submit": moment.now(),
-						"file_assignment": file_assignment,
-						"file_assignment_link": linkFile,
-					}
+						date_submit: moment.now(),
+						file_assignment: file_assignment,
+						file_assignment_link: linkFile,
+					};
 					await MaterialEnrolled.update(
 						{
 							activity_detail: activity_detail,
-							status: GRADING
+							status: GRADING,
 						},
 						{
 							where: {
 								id_referrer: assign.id,
+								student_id,
 							},
 						}
 					);
+					material_data = await MaterialEnrolled.findOne({
+						where: {
+							id_referrer: assign.id,
+							student_id,
+						},
+					});
+					checkDoneSession(student_id, material_data.session_id);
 					return res.sendJson(200, true, "Successfully Submitted");
 				});
 			});
@@ -94,46 +121,58 @@ module.exports = {
 	 */
 	getAssignmentInSession: asyncHandler(async (req, res) => {
 		const { session_id } = req.params;
-		const student_id = req.student_id
+		const student_id = req.student_id;
 		const assign = await Assignment.findOne({
-			attributes:[
-				'id','content','description',
-				'file_assignment','file_assignment_link',
-				'duration',
-				'created_at'
+			attributes: [
+				"id",
+				"content",
+				"description",
+				"file_assignment",
+				"file_assignment_link",
+				"duration",
+				"created_at",
 			],
 			where: {
 				session_id: session_id,
 			},
 		});
 
-		const deadline = new Date(new Date(assign.created_at).getTime()+(assign.duration*1000));
-		assign.dataValues.deadline = moment(deadline).format('DD/MM/YYYY hh:mm:ss');
-		
-		if(!assign){
+		const session = await Session.findOne({
+			where: {
+				id: session_id,
+			},
+		});
+
+		const deadline = new Date(
+			new Date(assign.created_at).getTime() + assign.duration * 1000
+		);
+		assign.dataValues.deadline = moment(deadline).format("DD/MM/YYYY hh:mm:ss");
+
+		if (!assign) {
 			return res.sendJson(400, false, "No assignment was assigned");
 		}
 
 		const student_taken_assignment = await MaterialEnrolled.findOne({
-			where:{
-				student_id:student_id,
-				session_id:session_id,
-				id_referrer: assign.id
-			}
-		})
-		if(!student_taken_assignment){
+			where: {
+				student_id: student_id,
+				session_id: session_id,
+				id_referrer: assign.id,
+			},
+		});
+		if (!student_taken_assignment) {
 			await MaterialEnrolled.create({
 				student_id,
 				session_id,
-				description:"Assignment",
-				status:ONGOING,
-				id_referrer:assign.id,
+				subject_id: session.subject_id,
+				description: "Assignment",
+				status: ONGOING,
+				id_referrer: assign.id,
 				type: ASSIGNMENT,
-			})
+			});
 		}
 		let result = {
-			"assignment":assign,
-			"students_work":student_taken_assignment
+			assignment: assign,
+			students_work: student_taken_assignment,
 		};
 		return res.sendJson(200, true, "Success", result);
 	}),
@@ -165,7 +204,7 @@ module.exports = {
 		const exist = await MaterialEnrolled.findOne({
 			where: {
 				student_id: student_id,
-				session_id: session_id
+				session_id: session_id,
 			},
 		});
 
@@ -197,14 +236,14 @@ module.exports = {
 				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
 					await MaterialEnrolled.update(
 						{
-							activity_detail:null,
-							status:ONGOING
+							activity_detail: null,
+							status: ONGOING,
 						},
 						{
-							where:{
-								session_id:session_id,
-								student_id:student_id
-							}
+							where: {
+								session_id: session_id,
+								student_id: student_id,
+							},
 						}
 					);
 				});
@@ -222,12 +261,10 @@ module.exports = {
 		const storage = getStorage();
 
 		const exist = await MaterialEnrolled.findOne({
-			attributes:[
-				'activity_detail'
-			],
+			attributes: ["activity_detail"],
 			where: {
 				student_id: student_id,
-				session_id: session_id
+				session_id: session_id,
 			},
 		});
 
@@ -240,26 +277,29 @@ module.exports = {
 		}
 		if (exist.activity_detail) {
 			deleteObject(
-				ref(storage, `document_assignment/${exist.activity_detail.file_assignment}`)
+				ref(
+					storage,
+					`document_assignment/${exist.activity_detail.file_assignment}`
+				)
 			);
 		}
 
 		await MaterialEnrolled.update(
 			{
-				activity_detail:null,
-				status: ONGOING
+				activity_detail: null,
+				status: ONGOING,
 			},
 			{
-				where:{
-					session_id:session_id,
-					student_id:student_id
-				}
+				where: {
+					session_id: session_id,
+					student_id: student_id,
+				},
 			}
-		)
+		);
 
 		return res.status(200).json({
 			success: true,
-			message: 'Submission Removed'
+			message: "Submission Removed",
 		});
 	}),
 };

@@ -13,7 +13,10 @@ const {
 	MaterialEnrolled,
 	User,
 } = require("../models");
-require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
+const moment = require("moment");
+require("dotenv").config({
+	path: __dirname + "../controllers/controllerconfig.env",
+});
 const {
 	DRAFT,
 	PENDING,
@@ -24,6 +27,7 @@ const {
 	FINISHED,
 	ABANDONED,
 	INVALID,
+	NOT_ENROLLED,
 
 	QUIZ,
 	MODULE,
@@ -32,84 +36,85 @@ const {
 async function completedSession(student_id, session_id) {
 	let present = false;
 
-	let quiz_in_session = await Quiz.findAll({
-		where: { session_id: session_id },
-		attributes: ["id"],
+	let student_session_data = await StudentSession.findOne({
+		where: {
+			student_id,
+			session_id,
+		},
 	});
 
-	let module_in_session = await Module.findAll({
-		where: { session_id: session_id },
-		attributes: ["id"],
-	});
-
-	let assignment_in_session = await Assignment.findAll({
-		where: { session_id: session_id },
-		attributes: ["id"],
-	});
-
-	let df_in_session = await DisscussionForum.findAll({
-		where: { session_id: session_id },
-	});
-
-	let module_fin = true;
-	for (let i = 0; i < module_in_session.length; i++) {
-		let material_enrolled_data = await MaterialEnrolled.findOne({
-			where: {
-				id_referrer: module_in_session[i].id,
-				student_id,
-				status: FINISHED,
-			},
-		});
-		if (!material_enrolled_data) {
-			module_fin = false;
-		}
+	if (!student_session_data) {
+		return present;
 	}
 
-	let quiz_fin = true;
-	for (let i = 0; i < quiz_in_session.length; i++) {
-		let material_enrolled_data = await MaterialEnrolled.findOne({
-			where: {
-				id_referrer: quiz_in_session[i].id,
-				student_id,
-				status: FINISHED,
-			},
-		});
-		if (!material_enrolled_data) {
-			quiz_fin = false;
-		}
+	let all_task = await Promise.all([
+		Quiz.findAll({
+			where: { session_id: session_id },
+			attributes: ["id"],
+		}),
+		Module.findAll({
+			where: { session_id: session_id },
+			attributes: ["id"],
+		}),
+		Assignment.findAll({
+			where: { session_id: session_id },
+			attributes: ["id"],
+		}),
+	]);
+
+	all_task = [...all_task[0], ...all_task[1], ...all_task[2]];
+
+	const materials_done = [];
+	for (let i = 0; i < all_task.length; i++) {
+		materials_done.push(
+			MaterialEnrolled.findOne({
+				where: {
+					student_id,
+					id_referrer: all_task[i].dataValues.id,
+				},
+				attributes: ["status"],
+			})
+		);
 	}
 
-	let assignment_fin = true;
-	for (let i = 0; i < assignment_in_session.length; i++) {
-		let material_enrolled_data = await MaterialEnrolled.findOne({
-			where: {
-				id_referrer: assignment_in_session[i].id,
-				student_id,
-				status: FINISHED,
-			},
-		});
-		if (!material_enrolled_data) {
-			assignment_fin = false;
+	const enroll_data_list = await Promise.all(materials_done);
+
+	let finish_status_list = [];
+
+	for (let i = 0; i < enroll_data_list.length; i++) {
+		let enroll_data = enroll_data_list[i];
+
+		let status = NOT_ENROLLED;
+
+		if (enroll_data !== null) {
+			status = enroll_data.status;
 		}
+		finish_status_list.push(status);
 	}
 
-	let student_session;
+	let status_not_finished = [NOT_ENROLLED, ONGOING];
 
-	if (module_fin && quiz_fin && assignment_fin) {
-		present = true;
+	let intersection = finish_status_list.filter((x) =>
+		status_not_finished.includes(x)
+	);
 
-		student_session = await StudentSession.update(
+	if (intersection === undefined || intersection.length == 0) {
+		// array does not exist or is empty (present)
+		await StudentSession.update(
 			{
-				status: GRADING,
+				status: FINISHED,
+				present: true,
+				date_present: moment().format("YYYY-MM-DD HH:mm:ss"),
 			},
 			{
 				where: {
-					student_id,
-					session_id,
+					id: student_session_data.id,
 				},
 			}
 		);
+		present = true;
 	}
+
 	return present;
 }
 

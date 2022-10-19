@@ -11,6 +11,7 @@ const { Op, Sequelize } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const scoringController = require("./scoringController");
+const checkDoneSession = require("../helpers/checkDoneSession");
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	DRAFT,
@@ -456,12 +457,6 @@ module.exports = {
 		const student_id = req.student_id;
 		const { module_id } = req.params;
 
-		// const material = await Material.findOne({
-		// 	where: {
-		// 		id_referrer: module_id,
-		// 	},
-		// });
-
 		let mod = await Module.findOne({
 			where: {
 				id: module_id,
@@ -483,6 +478,7 @@ module.exports = {
 			status: ONGOING,
 			type: MODULE,
 		});
+
 		return res.sendJson(200, true, "Success", enrolldata);
 	}),
 
@@ -522,6 +518,8 @@ module.exports = {
 				},
 			}
 		);
+
+		checkDoneSession(student_id, material_enrolled.session_id);
 
 		return res.sendJson(200, true, "Success", material_enrolled_data);
 	}),
