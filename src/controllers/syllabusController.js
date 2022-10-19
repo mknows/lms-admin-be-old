@@ -613,9 +613,13 @@ module.exports = {
 					{
 						model: Major,
 						attributes: ["name"],
+						through:{
+							attributes:[]
+						}
 					},
 					{
 						model: Lecturer,
+						attributes:['id'],
 						include: [
 							{
 								model: User,
@@ -625,7 +629,6 @@ module.exports = {
 					},
 				],
 			});
-			
 			result = {
 				students_information: students_information,
 				major: maj,
