@@ -512,29 +512,23 @@ module.exports = {
 			.concat(subjectsEnrolled[2]);
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
-		if(!checkExistence(Subject,subject_id)) return 
-			res.sendJson(
+
+		if(!checkExistence(Subject,subject_id)){
+			return res.sendJson(
 				400,
 				false,
 				"Subject doesnt exist"
 			);
-
+		}
 		const students_major = await Student.findOne({
 			where: {
 				id: student_id,
 			},
 			include: {
 				model: Major,
-				attributes: ["id"],
-				include: {
-					model: Subject,
-					attributes: ["id"],
-					where: {
-						id: sub.id,
-					},
-				},
 			},
 		});
+		console.log(students_major)
 		if (students_major.Majors.length === 0) {
 			return res.sendJson(
 				400,
