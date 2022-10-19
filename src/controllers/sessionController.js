@@ -1,4 +1,4 @@
-const { Session, StudentSession , Subject, MaterialEnrolled} = require("../models");
+const { Session, StudentSession , Subject, MaterialEnrolled, Student} = require("../models");
 const {
 	MODULE,
 	QUIZ,
@@ -71,6 +71,28 @@ module.exports = {
 			});
 		}
 		
+		const student_subject = await Student.findOne({
+			where:{
+				id:student_id
+			},
+			attributes:['id'],
+			include:{
+				model: Subject,
+				attributes:['id'],
+				where:{
+					id:subject_id
+				}
+			}
+		})
+
+		if(!student_subject){
+			return res.status(404).json({
+				success: false,
+				message: "Student is not enrolled in this subject.",
+				data: {},
+			});
+		}
+
 		const data = await Session.findAll({
 			where: {
 				subject_id: subject_id,
