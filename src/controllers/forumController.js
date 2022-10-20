@@ -84,7 +84,7 @@ module.exports = {
 			},
 			include: {
 				model: User,
-				attributes: ["full_name"],
+				attributes: ["full_name", "display_picture_link"],
 			},
 		});
 		return res.sendJson(200, true, "sucess get all df in session", data);
