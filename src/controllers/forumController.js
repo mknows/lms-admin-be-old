@@ -27,7 +27,7 @@ module.exports = {
 			include: [
 				{
 					model: User,
-					attributes: ["full_name"],
+					attributes: ["full_name", "display_picture_link"],
 				},
 				{
 					model: Comment,
@@ -35,14 +35,14 @@ module.exports = {
 					include: [
 						{
 							model: User,
-							attributes: ["full_name"],
+							attributes: ["full_name", "display_picture_link"],
 						},
 						{
 							model: Reply,
 							attributes: { include: ["created_at", "updated_at"] },
 							include: {
 								model: User,
-								attributes: ["full_name"],
+								attributes: ["full_name", "display_picture_link"],
 							},
 						},
 					],
