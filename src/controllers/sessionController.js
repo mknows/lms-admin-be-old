@@ -110,7 +110,7 @@ module.exports = {
 					type: MODULE
 				}
 			})
-			if(module_watched[i]){
+			if(module_watched){
 				for(j=0;j<module_watched.length;j++){
 					if(module_watched[j].status == 'FINISHED'){
 						data[i].dataValues.is_locked = false;
@@ -121,7 +121,7 @@ module.exports = {
 					}
 				}
 			}
-			if(!module_watched[i]){
+			if(!module_watched){
 				data[i].dataValues.is_locked = true;
 			}
 			

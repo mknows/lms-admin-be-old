@@ -428,6 +428,21 @@ module.exports = {
 			);
 		}
 
+		const subjectEnrolled = await StudentSubject.findOne({
+			where:{
+				subject_id,
+				student_id
+			}
+		})
+		
+		if(subjectEnrolled){
+			return res.sendJson(
+				400,
+				false,
+				"Student has already enrolled in that subject"
+			);
+		}
+
 		let credit = 0;
 		let enrolled = false;
 
@@ -528,7 +543,6 @@ module.exports = {
 				model: Major,
 			},
 		});
-		console.log(students_major)
 		if (students_major.Majors.length === 0) {
 			return res.sendJson(
 				400,
