@@ -472,6 +472,13 @@ module.exports = {
 			unlike = false;
 		} else if (unlike === "true") {
 			unlike = true;
+		} else {
+			return req.sendJason(
+				400,
+				false,
+				"invalid unlike parameter value",
+				unlike
+			);
 		}
 
 		let index;

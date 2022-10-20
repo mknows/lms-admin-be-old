@@ -1,4 +1,4 @@
-const { Session, StudentSession , Subject, MaterialEnrolled} = require("../models");
+const { Session, StudentSession , Subject, MaterialEnrolled, Student} = require("../models");
 const {
 	MODULE,
 	QUIZ,
@@ -71,6 +71,28 @@ module.exports = {
 			});
 		}
 		
+		const student_subject = await Student.findOne({
+			where:{
+				id:student_id
+			},
+			attributes:['id'],
+			include:{
+				model: Subject,
+				attributes:['id'],
+				where:{
+					id:subject_id
+				}
+			}
+		})
+
+		if(!student_subject){
+			return res.status(404).json({
+				success: false,
+				message: "Student is not enrolled in this subject.",
+				data: {},
+			});
+		}
+
 		const data = await Session.findAll({
 			where: {
 				subject_id: subject_id,
@@ -79,7 +101,7 @@ module.exports = {
 		for(i=0;i<data.length;i++){
 			const module_watched = await MaterialEnrolled.findAll({
 				attributes:[
-					'status'
+					'status','id'
 				],
 				where:{
 					student_id,
@@ -88,18 +110,18 @@ module.exports = {
 					type: MODULE
 				}
 			})
-			if(module_watched[i]){
+			if(module_watched){
 				for(j=0;j<module_watched.length;j++){
-					if(module_watched[j].status === 'ONGOING'||module_watched[j].status === ''){
+					if(module_watched[j].status == 'FINISHED'){
+						data[i].dataValues.is_locked = false;
+					}
+					else{
 						data[i].dataValues.is_locked = true;
 						j = module_watched.length;
 					}
-					else{
-						data[i].dataValues.is_locked = false;
-					}
 				}
 			}
-			if(!module_watched[i]){
+			if(!module_watched){
 				data[i].dataValues.is_locked = true;
 			}
 			
