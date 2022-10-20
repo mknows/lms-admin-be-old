@@ -101,7 +101,7 @@ module.exports = {
 		for(i=0;i<data.length;i++){
 			const module_watched = await MaterialEnrolled.findAll({
 				attributes:[
-					'status'
+					'status','id'
 				],
 				where:{
 					student_id,
@@ -110,18 +110,18 @@ module.exports = {
 					type: MODULE
 				}
 			})
-			if(module_watched[i]){
+			if(module_watched){
 				for(j=0;j<module_watched.length;j++){
-					if(module_watched[j].status === 'ONGOING'||module_watched[j].status === ''){
+					if(module_watched[j].status == 'FINISHED'){
+						data[i].dataValues.is_locked = false;
+					}
+					else{
 						data[i].dataValues.is_locked = true;
 						j = module_watched.length;
 					}
-					else{
-						data[i].dataValues.is_locked = false;
-					}
 				}
 			}
-			if(!module_watched[i]){
+			if(!module_watched){
 				data[i].dataValues.is_locked = true;
 			}
 			
