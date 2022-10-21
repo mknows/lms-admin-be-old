@@ -5,6 +5,7 @@ const {
 	Material,
 	MaterialEnrolled,
 	Session,
+	StudentSession,
 } = require("../models");
 const moment = require("moment");
 const { Op, Sequelize } = require("sequelize");
