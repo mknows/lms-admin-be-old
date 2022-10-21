@@ -3,7 +3,9 @@ const route = express.Router();
 const multer = require("multer");
 
 const subjectController = require("../controllers/subjectController");
-const { protection, authorize } = require("../middlewares/Authentication");
+const { protection, authorize, enrolled, existence} = require("../middlewares/Authentication");
+
+const { Subject, StudentSubject,Major } = require("../models");
 
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -43,12 +45,16 @@ route.post(
 	"/enroll/:subject_id",
 	protection,
 	authorize("student"),
+	existence(Subject),
+	enrolled(Major),
 	subjectController.takeSubject
 );
 route.post(
 	"/uploadkhs/:subject_id",
 	protection,
 	authorize("student"),
+	existence(Subject),
+	enrolled(Major),
 	upload.single("proof"),
 	subjectController.existKhsUpload
 );
@@ -83,9 +89,11 @@ route.delete(
 );
 
 route.delete(
-	"/deleteDraft/:student_subject_id",
+	"/deleteDraft/:subject_id",
 	protection,
 	authorize("student"),
+	existence(StudentSubject),
+	enrolled(Subject),
 	subjectController.deleteDraft
 );
 route.put(

@@ -27,7 +27,9 @@ route.get(
 	protection,
 	syllabusController.subjectByMajor
 );
-route.get("/subject/:subject_id", protection, syllabusController.getSubject);
+route.get("/subject/:subject_id", 
+	protection, 
+	syllabusController.getSubject);
 route.get("/getCurrentKRS", protection, syllabusController.getKRS);
 
 module.exports = route;

@@ -404,30 +404,6 @@ module.exports = {
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
-		const students_major = await Student.findOne({
-			where: {
-				id: student_id,
-			},
-			include: {
-				model: Major,
-				attributes: ["id"],
-				include: {
-					model: Subject,
-					attributes: ["id"],
-					where: {
-						id: sub.id,
-					},
-				},
-			},
-		});
-		if (students_major.Majors.length === 0) {
-			return res.sendJson(
-				400,
-				false,
-				"Student's major doesn't have that subject"
-			);
-		}
-
 		const subjectEnrolled = await StudentSubject.findOne({
 			where:{
 				subject_id,
@@ -528,13 +504,6 @@ module.exports = {
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
-		if(!checkExistence(Subject,subject_id)){
-			return res.sendJson(
-				400,
-				false,
-				"Subject doesnt exist"
-			);
-		}
 		const students_major = await Student.findOne({
 			where: {
 				id: student_id,
@@ -642,15 +611,6 @@ module.exports = {
 		const student_id = req.student_id;
 		const {	subject_id } = req.params;
 
-		const exists = StudentSubject.findOne({
-			where: {
-				subject_id,
-				student_id
-			},
-		});
-		if (!exists) {
-			return res.sendJson(400, false, "Draft doesn't exist");
-		}
 		await StudentSubject.destroy({
 			where: {
 				student_id: student_id,

@@ -1,4 +1,4 @@
-const { Session, StudentSession , Subject, MaterialEnrolled, Student} = require("../models");
+const { Session, StudentSession , Subject, MaterialEnrolled, Student, Module, Sequelize, sequelize} = require("../models");
 const {
 	MODULE,
 	QUIZ,
@@ -11,6 +11,7 @@ const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const { redisClient } = require("../helpers/redis");
 const checkExistence = require("../helpers/checkExistence");
+const { testTablet } = require("express-useragent");
 
 module.exports = {
 	/**
@@ -62,71 +63,38 @@ module.exports = {
 	getAllSessionInSubject: asyncHandler(async (req, res) => {
 		const {subject_id} = req.params;
 		const student_id = req.student_id;
-
-		if(!await checkExistence(Subject,subject_id)){
-			return res.status(404).json({
-				success: false,
-				message: "Invalid Subject ID.",
-				data: {},
-			});
-		}
-		
-		const student_subject = await Student.findOne({
-			where:{
-				id:student_id
-			},
-			attributes:['id'],
-			include:{
-				model: Subject,
-				attributes:['id'],
-				where:{
-					id:subject_id
-				}
-			}
-		})
-
-		if(!student_subject){
-			return res.status(404).json({
-				success: false,
-				message: "Student is not enrolled in this subject.",
-				data: {},
-			});
-		}
+		let test = [];
 
 		const data = await Session.findAll({
+			attributes:['id','session_no'],
 			where: {
 				subject_id: subject_id,
-			}
+			},
+			order:['session_no']
 		});
+		
 		for(i=0;i<data.length;i++){
-			const module_watched = await MaterialEnrolled.findAll({
-				attributes:[
-					'status','id'
-				],
+			const module = await Module.findAll({
 				where:{
-					student_id,
-					subject_id,
-					session_id: data[i].id,
-					type: MODULE
-				}
+					session_id: data[i].id
+				},
+				attributes:['id'],
+				include:[{
+					attributes:['status','session_id','id_referrer'],
+					model: MaterialEnrolled,
+					where:{
+						student_id,
+						type:MODULE,
+					},
+					required: false
+				}],
 			})
-			if(module_watched){
-				for(j=0;j<module_watched.length;j++){
-					if(module_watched[j].status == 'FINISHED'){
-						data[i].dataValues.is_locked = false;
-					}
-					else{
-						data[i].dataValues.is_locked = true;
-						j = module_watched.length;
-					}
-				}
+			for(j=0;j<module.length;j++){
+				console.log(module[j].MaterialEnrolled)
+				test.push(module[j])
 			}
-			if(!module_watched){
-				data[i].dataValues.is_locked = true;
-			}
-			
 		}
-		return res.sendJson(200, true, "success get all session in sub", data);
+		return res.sendJson(200, true, "success get all session in sub",test);
 	}),
 	/**
 	 * @desc      Get Session
@@ -241,12 +209,6 @@ module.exports = {
 	 */
 	takeSession: asyncHandler(async (req, res) => {
 		const { session_id } = req.params;
-
-		const data = await Session.findOne({
-			where: {
-				id: session_id,
-			},
-		});
 
 		let studSess = await StudentSession.create({
 			session_id,

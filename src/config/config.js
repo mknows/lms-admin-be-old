@@ -111,7 +111,7 @@ module.exports = {
 				},
 			},
 		},
-		logging: false,
+		logging: true,
 	},
 
 	production: {

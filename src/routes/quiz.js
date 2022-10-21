@@ -2,13 +2,17 @@ const express = require("express");
 const route = express.Router();
 
 const quizController = require("../controllers/quizController");
-const { protection, authorize } = require("../middlewares/Authentication");
+const { protection, authorize, enrolled, existence } = require("../middlewares/Authentication");
+
+const { Subject, Session, Quiz } = require("../models");
 
 route.post("/create", protection, quizController.createQuiz);
 route.get(
 	"/desc/session/:session_id",
 	protection,
 	authorize("student"),
+	existence(Session),
+	enrolled(Session),
 	quizController.getQuizDescBySession
 );
 
