@@ -523,22 +523,15 @@ module.exports = {
 			});
 		}
 
-		let material_enrolled_data = await MaterialEnrolled.create(
-			{
-				session_id: mod.session_id,
-				student_id: student_id,
-				subject_id: sesh.subject_id,
-				id_referrer: module_id,
-				type: MODULE,
-				activity_detail: detail,
-				status: FINISHED,
-			},
-			{
-				where: {
-					id: enrolldata.id,
-				},
-			}
-		);
+		let material_enrolled_data = await MaterialEnrolled.create({
+			session_id: mod.session_id,
+			student_id: student_id,
+			subject_id: sesh.subject_id,
+			id_referrer: module_id,
+			type: MODULE,
+			activity_detail: detail,
+			status: FINISHED,
+		});
 
 		checkDoneSession(student_id, material_enrolled_data.session_id);
 
