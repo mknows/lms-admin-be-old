@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const userController = require("../controllers/authController");
 const { validate, validatorMessage } = require("../middlewares/Validator");
 const { protection, authorize } = require("../middlewares/Authentication");
+const { parseForm } = require("../middlewares/csrf");
 
 route.post(
 	"/login",
