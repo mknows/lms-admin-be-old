@@ -683,7 +683,7 @@ module.exports = {
 
 		data = data[1];
 
-		return res.sendJson(200, true, "Success", data);
+		return res.sendJson(200, true, "Success", ...data);
 	}),
 };
 
