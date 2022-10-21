@@ -27,7 +27,7 @@ module.exports = {
 			include: [
 				{
 					model: User,
-					attributes: ["full_name"],
+					attributes: ["full_name", "display_picture_link"],
 				},
 				{
 					model: Comment,
@@ -35,14 +35,14 @@ module.exports = {
 					include: [
 						{
 							model: User,
-							attributes: ["full_name"],
+							attributes: ["full_name", "display_picture_link"],
 						},
 						{
 							model: Reply,
 							attributes: { include: ["created_at", "updated_at"] },
 							include: {
 								model: User,
-								attributes: ["full_name"],
+								attributes: ["full_name", "display_picture_link"],
 							},
 						},
 					],
@@ -84,7 +84,7 @@ module.exports = {
 			},
 			include: {
 				model: User,
-				attributes: ["full_name"],
+				attributes: ["full_name", "display_picture_link"],
 			},
 		});
 		return res.sendJson(200, true, "sucess get all df in session", data);
@@ -460,31 +460,19 @@ module.exports = {
 
 	/**
 	 * @desc      like thing
-	 * @route     PUT /api/v1/forum/like?type=<df|comment|reply>&id=<idnum>&unlike=<true/false>
+	 * @route     PUT /api/v1/forum/like?type=<df|comment|reply>&id=<idnum>
 	 * @access    Private
 	 */
 	likePost: asyncHandler(async (req, res) => {
-		let { type, id, unlike } = req.query;
+		let { type, id } = req.query;
 		const user_role = req.role;
 		const user_id = req.userData.id;
-
-		if (unlike == null || unlike === "false") {
-			unlike = false;
-		} else if (unlike === "true") {
-			unlike = true;
-		} else {
-			return req.sendJason(
-				400,
-				false,
-				"invalid unlike parameter value",
-				unlike
-			);
-		}
 
 		let index;
 		let data;
 		let liker_id;
 		let likes;
+		let unlike;
 		switch (type) {
 			case "reply":
 				data = await Reply.findOne({
@@ -498,12 +486,10 @@ module.exports = {
 				}
 
 				if (user_role === "student") {
-					liker_id = await getLikerId(
-						data.student_like,
-						user_id,
-						user_role,
-						unlike
-					);
+					liker_id = await getLikerId(data.student_like, user_id, user_role);
+
+					unlike = liker_id.unlike;
+
 					if (liker_id.status === false) {
 						return res.sendJson(404, false, liker_id.msg, data);
 					}
@@ -531,16 +517,13 @@ module.exports = {
 						}
 					);
 				} else if (user_role === "lecturer") {
-					liker_id = await getLikerId(
-						data.lecturer_like,
-						user_id,
-						user_role,
-						unlike
-					);
+					liker_id = await getLikerId(data.lecturer_like, user_id, user_role);
 					if (liker_id.status === false) {
 						return res.sendJson(404, false, liker_id.msg, data);
 					}
 					likes = data.lecturer_like;
+
+					unlike = liker_id.unlike;
 
 					if (unlike) {
 						index = likes.indexOf(liker_id.msg);
@@ -578,16 +561,13 @@ module.exports = {
 				}
 
 				if (user_role === "student") {
-					liker_id = await getLikerId(
-						data.student_like,
-						user_id,
-						user_role,
-						unlike
-					);
+					liker_id = await getLikerId(data.student_like, user_id, user_role);
 					if (liker_id.status === false) {
 						return res.sendJson(404, false, liker_id.msg, data);
 					}
 					likes = data.student_like;
+
+					unlike = liker_id.unlike;
 
 					if (unlike) {
 						index = likes.indexOf(liker_id.msg);
@@ -611,16 +591,13 @@ module.exports = {
 						}
 					);
 				} else if (user_role === "lecturer") {
-					liker_id = await getLikerId(
-						data.lecturer_like,
-						user_id,
-						user_role,
-						unlike
-					);
+					liker_id = await getLikerId(data.lecturer_like, user_id, user_role);
 					if (liker_id.status === false) {
 						return res.sendJson(404, false, liker_id.msg, data);
 					}
 					likes = data.lecturer_like;
+
+					unlike = liker_id.unlike;
 
 					if (unlike) {
 						index = likes.indexOf(liker_id.msg);
@@ -658,16 +635,13 @@ module.exports = {
 				}
 
 				if (user_role === "student") {
-					liker_id = await getLikerId(
-						data.student_like,
-						user_id,
-						user_role,
-						unlike
-					);
+					liker_id = await getLikerId(data.student_like, user_id, user_role);
 					if (liker_id.status === false) {
 						return res.sendJson(404, false, liker_id.msg, data);
 					}
 					likes = data.student_like;
+
+					unlike = liker_id.unlike;
 
 					if (unlike) {
 						index = likes.indexOf(liker_id.msg);
@@ -691,16 +665,13 @@ module.exports = {
 						}
 					);
 				} else if (user_role === "lecturer") {
-					liker_id = await getLikerId(
-						data.lecturer_like,
-						user_id,
-						user_role,
-						unlike
-					);
+					liker_id = await getLikerId(data.lecturer_like, user_id, user_role);
 					if (liker_id.status === false) {
 						return res.sendJson(404, false, liker_id.msg, data);
 					}
 					likes = data.lecturer_like;
+
+					unlike = liker_id.unlike;
 
 					if (unlike) {
 						index = likes.indexOf(liker_id.msg);
@@ -732,8 +703,10 @@ module.exports = {
 	}),
 };
 
-async function getLikerId(like_data, user_id, user_role, unlike) {
+async function getLikerId(like_data, user_id, user_role) {
 	let liker;
+	let unlike = false;
+
 	switch (user_role) {
 		case "student":
 			liker = await Student.findOne({
@@ -749,20 +722,8 @@ async function getLikerId(like_data, user_id, user_role, unlike) {
 				};
 			}
 
-			if (!unlike) {
-				if (like_data.includes(liker.id)) {
-					return {
-						msg: "student already liked",
-						status: false,
-					};
-				}
-			} else {
-				if (!like_data.includes(liker.id)) {
-					return {
-						msg: "student haven't liked",
-						status: false,
-					};
-				}
+			if (like_data.includes(liker.id)) {
+				unlike = true;
 			}
 
 			liker = liker.id;
@@ -782,26 +743,16 @@ async function getLikerId(like_data, user_id, user_role, unlike) {
 				};
 			}
 
-			if (!unlike) {
-				if (like_data.includes(liker.id)) {
-					return {
-						msg: "lecturer already liked",
-						status: false,
-					};
-				}
-			} else {
-				if (!like_data.includes(liker.id)) {
-					return {
-						msg: "lecturer haven't liked",
-						status: false,
-					};
-				}
+			if (like_data.includes(liker.id)) {
+				unlike = true;
 			}
+
 			liker = liker.id;
 			break;
 	}
 	return {
 		msg: liker,
 		status: true,
+		unlike,
 	};
 }
