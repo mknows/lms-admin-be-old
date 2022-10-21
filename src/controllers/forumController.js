@@ -510,10 +510,7 @@ module.exports = {
 						},
 						{
 							where: { id: id },
-						},
-						{
 							returning: true,
-							raw: true,
 						}
 					);
 				} else if (user_role === "lecturer") {
@@ -540,10 +537,7 @@ module.exports = {
 						},
 						{
 							where: { id: id },
-						},
-						{
 							returning: true,
-							raw: true,
 						}
 					);
 				}
@@ -584,10 +578,7 @@ module.exports = {
 						},
 						{
 							where: { id: id },
-						},
-						{
 							returning: true,
-							raw: true,
 						}
 					);
 				} else if (user_role === "lecturer") {
@@ -614,10 +605,7 @@ module.exports = {
 						},
 						{
 							where: { id: id },
-						},
-						{
 							returning: true,
-							raw: true,
 						}
 					);
 				}
@@ -658,10 +646,7 @@ module.exports = {
 						},
 						{
 							where: { id: id },
-						},
-						{
 							returning: true,
-							raw: true,
 						}
 					);
 				} else if (user_role === "lecturer") {
@@ -688,16 +673,15 @@ module.exports = {
 						},
 						{
 							where: { id: id },
-						},
-						{
 							returning: true,
-							raw: true,
 						}
 					);
 				}
 
 				break;
 		}
+
+		data = data[1];
 
 		return res.sendJson(200, true, "Success", data);
 	}),
