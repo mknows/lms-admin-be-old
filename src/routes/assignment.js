@@ -3,7 +3,7 @@ const route = express.Router();
 const multer = require("multer");
 
 const assignmentController = require("../controllers/assignmentController");
-const { protection,authorize } = require("../middlewares/Authentication");
+const { protection, authorize } = require("../middlewares/Authentication");
 
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -13,7 +13,10 @@ const upload = multer({
 			file.mimetype == "application/pdf" ||
 			file.mimetype == "application/msword" ||
 			file.mimetype ==
-				"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+				"application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+			file.mimetype == "image/png" ||
+			file.mimetype == "image/jpg" ||
+			file.mimetype == "image/jpeg"
 		) {
 			return cb(null, true);
 		} else {
@@ -31,7 +34,7 @@ const upload = multer({
 route.post(
 	"/submit/:session_id",
 	protection,
-	authorize("student","user"),
+	authorize("student", "user"),
 	upload.single("file_assignment"),
 	assignmentController.submitAssignment
 );
@@ -40,7 +43,7 @@ route.get("/", protection, assignmentController.getAllAssignment);
 route.get(
 	"/session/:session_id",
 	protection,
-	authorize("student","user"),
+	authorize("student", "user"),
 	assignmentController.getAssignmentInSession
 );
 route.get("/:assignment_id", protection, assignmentController.getAssignment);
@@ -54,7 +57,7 @@ route.put(
 route.delete(
 	"/delete/:session_id",
 	protection,
-	authorize("user","student"),
+	authorize("user", "student"),
 	assignmentController.removeSubmission
 );
 
