@@ -77,7 +77,7 @@ module.exports = {
 			.on("finish", () => {
 				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
 					const activity_detail = {
-						date_submit: moment.now(),
+						date_submit: moment().format("DD/MM/YYYY"),
 						file_assignment: file_assignment,
 						file_assignment_link: linkFile,
 					};

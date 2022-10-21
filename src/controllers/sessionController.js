@@ -85,14 +85,9 @@ module.exports = {
 					where:{
 						student_id,
 						type:MODULE,
-					},
-					required: false
+					}
 				}],
 			})
-			for(j=0;j<module.length;j++){
-				console.log(module[j].MaterialEnrolled)
-				test.push(module[j])
-			}
 		}
 		return res.sendJson(200, true, "success get all session in sub",test);
 	}),
