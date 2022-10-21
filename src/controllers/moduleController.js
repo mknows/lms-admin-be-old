@@ -484,7 +484,7 @@ module.exports = {
 
 	/**
 	 * @desc      post finish module
-	 * @route     PUT /api/v1/module/finish/
+	 * @route     POST /api/v1/module/finish/
 	 * @access    Private
 	 */
 	finishModule: asyncHandler(async (req, res) => {

@@ -49,7 +49,7 @@ route.post(
 	authorize("student"),
 	moduleController.takeModule
 );
-route.put(
+route.post(
 	"/finish",
 	protection,
 	authorize("student"),
