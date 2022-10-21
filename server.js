@@ -8,6 +8,8 @@ const useragent = require("express-useragent");
 const path = require("path");
 const cors = require("cors");
 const helmet = require("helmet");
+const csrf = require("csurf");
+const csrfMiddleware = require("./src/middlewares/csrf");
 
 dotenv.config({ path: "./src/config/config.env" });
 
@@ -41,10 +43,33 @@ app.use(cookieParser());
 app.use(cors());
 app.use(helmet());
 app.use(helmet.hidePoweredBy());
+// * ntar belakangan menggunakan CSRF ini
+// app.use(
+// 	csrf({
+// 		cookie: {
+// 			// key: "kampusgratis",
+// 			// httpOnly: true,
+// 			maxAge: 600,
+// 			// secure: true,
+// 			// domain: "google.com",
+// 		},
+// 	})
+// );
+// app.use(csrfMiddleware);
 
 const PORT = process.env.PORT || 8080;
 
-app.use("/api/v1", allRoutes);
+app.use(
+	"/api/v1",
+	// csrfMiddleware,
+	allRoutes
+);
+
+// app.get("/", (req, res) => {
+// 	res.cookie("csrf-token", req.csrfToken());
+
+// 	res.send(req.csrfToken());
+// });
 
 app.use(errorHandler);
 

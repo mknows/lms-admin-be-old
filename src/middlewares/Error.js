@@ -56,6 +56,11 @@ const errorHandler = (err, req, res, next) => {
 			errors = new ErrorResponse(message, 500);
 			break;
 		}
+    case "EBADCSRFTOKEN": {
+			const message = errors.message;
+			errors = new ErrorResponse(message, 500);
+			break;
+		}
   }
 
   // ==========================
