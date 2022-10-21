@@ -4,10 +4,10 @@ const {
 	StudentSubject,
 	Major,
 	Lecturer,
-	User
+	User,
 } = require("../models");
-const prerequisiteChecker = require("../helpers/prerequsitieChecker")
-const checkExistence = require('../helpers/checkExistence')
+const prerequisiteChecker = require("../helpers/prerequsitieChecker");
+const checkExistence = require("../helpers/checkExistence");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -429,13 +429,13 @@ module.exports = {
 		}
 
 		const subjectEnrolled = await StudentSubject.findOne({
-			where:{
+			where: {
 				subject_id,
-				student_id
-			}
-		})
-		
-		if(subjectEnrolled){
+				student_id,
+			},
+		});
+
+		if (subjectEnrolled) {
 			return res.sendJson(
 				400,
 				false,
@@ -517,9 +517,9 @@ module.exports = {
 	 * @access    Private
 	 */
 	takeSubject: asyncHandler(async (req, res) => {
-		const {subject_id} = req.params;
+		const { subject_id } = req.params;
 		const student_id = req.student_id;
-		
+
 		const credit_thresh = 24;
 		let subjectsEnrolled = await getPlan(student_id);
 		subjectsEnrolled = subjectsEnrolled[0]
@@ -528,12 +528,8 @@ module.exports = {
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
-		if(!checkExistence(Subject,subject_id)){
-			return res.sendJson(
-				400,
-				false,
-				"Subject doesnt exist"
-			);
+		if (!checkExistence(Subject, subject_id)) {
+			return res.sendJson(400, false, "Subject doesnt exist");
 		}
 		const students_major = await Student.findOne({
 			where: {
@@ -640,12 +636,12 @@ module.exports = {
 	 */
 	deleteDraft: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
-		const {	subject_id } = req.params;
+		const { subject_id } = req.params;
 
 		const exists = StudentSubject.findOne({
 			where: {
 				subject_id,
-				student_id
+				student_id,
 			},
 		});
 		if (!exists) {
@@ -760,12 +756,12 @@ async function getParsedPlan(student_id) {
 			},
 		});
 
-		pendingcred += currSub.credit;
+		pendingcred += currSub?.credit;
 
 		let dataval = {
-			name: currSub.name,
-			credit: currSub.credit,
-			subject_id: currSub.id,
+			name: currSub?.name,
+			credit: currSub?.credit,
+			subject_id: currSub?.id,
 			student_subject_id: currStudSub.id,
 		};
 
@@ -781,12 +777,12 @@ async function getParsedPlan(student_id) {
 			},
 		});
 
-		ongoingcred += currSub.credit;
+		ongoingcred += currSub?.credit;
 
 		let dataval = {
-			name: currSub.name,
-			credit: currSub.credit,
-			subject_id: currSub.id,
+			name: currSub?.name,
+			credit: currSub?.credit,
+			subject_id: currSub?.id,
 			student_subject_id: currStudSub.id,
 		};
 
@@ -802,12 +798,12 @@ async function getParsedPlan(student_id) {
 			},
 		});
 
-		draftcred += currSub.credit;
+		draftcred += currSub?.credit;
 
 		let dataval = {
-			name: currSub.name,
-			credit: currSub.credit,
-			subject_id: currSub.id,
+			name: currSub?.name,
+			credit: currSub?.credit,
+			subject_id: currSub?.id,
 			student_subject_id: currStudSub.id,
 		};
 

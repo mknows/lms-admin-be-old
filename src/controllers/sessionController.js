@@ -1,16 +1,18 @@
-const { Session, StudentSession , Subject, MaterialEnrolled, Student} = require("../models");
 const {
-	MODULE,
-	QUIZ,
-	ASSIGNMENT,
-	FINISHED
-} = process.env;
+	Session,
+	StudentSession,
+	Subject,
+	MaterialEnrolled,
+	Student,
+} = require("../models");
+const { MODULE, QUIZ, ASSIGNMENT, FINISHED } = process.env;
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const { redisClient } = require("../helpers/redis");
 const checkExistence = require("../helpers/checkExistence");
+const lockUpdate = require("../helpers/lockHelp");
 
 module.exports = {
 	/**
@@ -60,32 +62,32 @@ module.exports = {
 	 * @access    Public
 	 */
 	getAllSessionInSubject: asyncHandler(async (req, res) => {
-		const {subject_id} = req.params;
+		const { subject_id } = req.params;
 		const student_id = req.student_id;
 
-		if(!await checkExistence(Subject,subject_id)){
+		if (!(await checkExistence(Subject, subject_id))) {
 			return res.status(404).json({
 				success: false,
 				message: "Invalid Subject ID.",
 				data: {},
 			});
 		}
-		
-		const student_subject = await Student.findOne({
-			where:{
-				id:student_id
-			},
-			attributes:['id'],
-			include:{
-				model: Subject,
-				attributes:['id'],
-				where:{
-					id:subject_id
-				}
-			}
-		})
 
-		if(!student_subject){
+		const student_subject = await Student.findOne({
+			where: {
+				id: student_id,
+			},
+			attributes: ["id"],
+			include: {
+				model: Subject,
+				attributes: ["id"],
+				where: {
+					id: subject_id,
+				},
+			},
+		});
+
+		if (!student_subject) {
 			return res.status(404).json({
 				success: false,
 				message: "Student is not enrolled in this subject.",
@@ -96,35 +98,12 @@ module.exports = {
 		const data = await Session.findAll({
 			where: {
 				subject_id: subject_id,
-			}
+			},
 		});
-		for(i=0;i<data.length;i++){
-			const module_watched = await MaterialEnrolled.findAll({
-				attributes:[
-					'status','id'
-				],
-				where:{
-					student_id,
-					subject_id,
-					session_id: data[i].id,
-					type: MODULE
-				}
-			})
-			if(module_watched){
-				for(j=0;j<module_watched.length;j++){
-					if(module_watched[j].status == 'FINISHED'){
-						data[i].dataValues.is_locked = false;
-					}
-					else{
-						data[i].dataValues.is_locked = true;
-						j = module_watched.length;
-					}
-				}
-			}
-			if(!module_watched){
-				data[i].dataValues.is_locked = true;
-			}
-			
+
+		let sessions = [];
+		for (i = 0; i < data.length; i++) {
+			data[i].dataValues.is_locked = await lockUpdate(student_id, data[i].id);
 		}
 		return res.sendJson(200, true, "success get all session in sub", data);
 	}),
