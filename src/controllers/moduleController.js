@@ -170,7 +170,7 @@ module.exports = {
 				id: module_id,
 			},
 		});
-		if(!mod) return res.sendJson(404, false, "Not Found",{});
+		if (!mod) return res.sendJson(404, false, "Not Found", {});
 		const vids = await Video.findAll({
 			where: {
 				id: {
@@ -203,7 +203,7 @@ module.exports = {
 				id: videoID,
 			},
 		});
-		if(!vid) return res.sendJson(404, false, "Not Found",{});
+		if (!vid) return res.sendJson(404, false, "Not Found", {});
 		return res.sendJson(200, true, "Success", vid);
 	}),
 	/**
@@ -218,7 +218,7 @@ module.exports = {
 				id: documentID,
 			},
 		});
-		if(!doc) return res.sendJson(404, false, "Not Found",{});
+		if (!doc) return res.sendJson(404, false, "Not Found", {});
 		return res.sendJson(200, true, "Success", doc);
 	}),
 	/**

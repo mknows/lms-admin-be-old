@@ -4,10 +4,10 @@ const {
 	StudentSubject,
 	Major,
 	Lecturer,
-	User
+	User,
 } = require("../models");
-const prerequisiteChecker = require("../helpers/prerequsitieChecker")
-const checkExistence = require('../helpers/checkExistence')
+const prerequisiteChecker = require("../helpers/prerequsitieChecker");
+const checkExistence = require("../helpers/checkExistence");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -493,9 +493,9 @@ module.exports = {
 	 * @access    Private
 	 */
 	takeSubject: asyncHandler(async (req, res) => {
-		const {subject_id} = req.params;
+		const { subject_id } = req.params;
 		const student_id = req.student_id;
-		
+
 		const credit_thresh = 24;
 		let subjectsEnrolled = await getPlan(student_id);
 		subjectsEnrolled = subjectsEnrolled[0]
@@ -609,7 +609,7 @@ module.exports = {
 	 */
 	deleteDraft: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
-		const {	subject_id } = req.params;
+		const { subject_id } = req.params;
 
 		await StudentSubject.destroy({
 			where: {
@@ -720,12 +720,12 @@ async function getParsedPlan(student_id) {
 			},
 		});
 
-		pendingcred += currSub.credit;
+		pendingcred += currSub?.credit;
 
 		let dataval = {
-			name: currSub.name,
-			credit: currSub.credit,
-			subject_id: currSub.id,
+			name: currSub?.name,
+			credit: currSub?.credit,
+			subject_id: currSub?.id,
 			student_subject_id: currStudSub.id,
 		};
 
@@ -741,12 +741,12 @@ async function getParsedPlan(student_id) {
 			},
 		});
 
-		ongoingcred += currSub.credit;
+		ongoingcred += currSub?.credit;
 
 		let dataval = {
-			name: currSub.name,
-			credit: currSub.credit,
-			subject_id: currSub.id,
+			name: currSub?.name,
+			credit: currSub?.credit,
+			subject_id: currSub?.id,
 			student_subject_id: currStudSub.id,
 		};
 
@@ -762,12 +762,12 @@ async function getParsedPlan(student_id) {
 			},
 		});
 
-		draftcred += currSub.credit;
+		draftcred += currSub?.credit;
 
 		let dataval = {
-			name: currSub.name,
-			credit: currSub.credit,
-			subject_id: currSub.id,
+			name: currSub?.name,
+			credit: currSub?.credit,
+			subject_id: currSub?.id,
 			student_subject_id: currStudSub.id,
 		};
 

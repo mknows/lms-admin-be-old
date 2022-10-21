@@ -1,17 +1,18 @@
-const { Session, StudentSession , Subject, MaterialEnrolled, Student, Module, Sequelize, sequelize} = require("../models");
 const {
-	MODULE,
-	QUIZ,
-	ASSIGNMENT,
-	FINISHED
-} = process.env;
+	Session,
+	StudentSession,
+	Subject,
+	MaterialEnrolled,
+	Student,
+} = require("../models");
+const { MODULE, QUIZ, ASSIGNMENT, FINISHED } = process.env;
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const { redisClient } = require("../helpers/redis");
 const checkExistence = require("../helpers/checkExistence");
-const { testTablet } = require("express-useragent");
+const lockUpdate = require("../helpers/lockHelp");
 
 module.exports = {
 	/**
@@ -61,35 +62,51 @@ module.exports = {
 	 * @access    Public
 	 */
 	getAllSessionInSubject: asyncHandler(async (req, res) => {
-		const {subject_id} = req.params;
+		const { subject_id } = req.params;
 		const student_id = req.student_id;
 		let test = [];
 
+		if (!(await checkExistence(Subject, subject_id))) {
+			return res.status(404).json({
+				success: false,
+				message: "Invalid Subject ID.",
+				data: {},
+			});
+		}
+
+		const student_subject = await Student.findOne({
+			where: {
+				id: student_id,
+			},
+			attributes: ["id"],
+			include: {
+				model: Subject,
+				attributes: ["id"],
+				where: {
+					id: subject_id,
+				},
+			},
+		});
+
+		if (!student_subject) {
+			return res.status(404).json({
+				success: false,
+				message: "Student is not enrolled in this subject.",
+				data: {},
+			});
+		}
+
 		const data = await Session.findAll({
-			attributes:['id','session_no'],
 			where: {
 				subject_id: subject_id,
 			},
-			order:['session_no']
 		});
-		
-		for(i=0;i<data.length;i++){
-			const module = await Module.findAll({
-				where:{
-					session_id: data[i].id
-				},
-				attributes:['id'],
-				include:[{
-					attributes:['status','session_id','id_referrer'],
-					model: MaterialEnrolled,
-					where:{
-						student_id,
-						type:MODULE,
-					}
-				}],
-			})
+
+		let sessions = [];
+		for (i = 0; i < data.length; i++) {
+			data[i].dataValues.is_locked = await lockUpdate(student_id, data[i].id);
 		}
-		return res.sendJson(200, true, "success get all session in sub",test);
+		return res.sendJson(200, true, "success get all session in sub", data);
 	}),
 	/**
 	 * @desc      Get Session

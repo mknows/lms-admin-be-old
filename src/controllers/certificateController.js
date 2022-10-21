@@ -51,7 +51,6 @@ module.exports = {
 
 		const certificateLink =
 			"www.kampusgratis.com/certificate/" + generateRandomCert;
-		console.log("certificateLink => ", certificateLink);
 
 		const outputQr = `${generateRandomCert}.png`;
 
