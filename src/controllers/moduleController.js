@@ -25,6 +25,7 @@ const {
 
 	MODULE,
 } = process.env;
+const sessionController = require("./sessionController");
 
 module.exports = {
 	/**
@@ -449,7 +450,7 @@ module.exports = {
 		res.sendJson(200, true, "Success", {});
 	}),
 	/**
-	 * @desc      post make module
+	 * @desc      post make module <DEPRICATED>
 	 * @route     POST /api/v1/module/enroll/:module_id
 	 * @access    Private
 	 */
@@ -472,7 +473,6 @@ module.exports = {
 		const enrolldata = await MaterialEnrolled.create({
 			session_id: mod.session_id,
 			student_id: student_id,
-			// material_id: material.id,
 			subject_id: sesh.subject_id,
 			id_referrer: module_id,
 			status: ONGOING,
@@ -491,35 +491,55 @@ module.exports = {
 		const student_id = req.student_id;
 		const { module_id, takeaway } = req.body;
 
-		const material_enrolled = await MaterialEnrolled.findOne({
+		let mod = await Module.findOne({
 			where: {
-				id_referrer: module_id,
-				student_id,
+				id: module_id,
 			},
 		});
 
-		if (!material_enrolled) {
-			return res.sendJson(404, false, "no material enrolled found", {});
-		}
+		let sesh = await Session.findOne({
+			where: {
+				id: mod.session_id,
+			},
+		});
 
 		let detail = {
 			takeaway: takeaway,
 		};
 
-		let material_enrolled_data = await MaterialEnrolled.update(
+		let material_enrolled_data = await MaterialEnrolled.create(
 			{
+				session_id: mod.session_id,
+				student_id: student_id,
+				subject_id: sesh.subject_id,
+				id_referrer: module_id,
+				type: MODULE,
 				activity_detail: detail,
 				status: FINISHED,
 			},
 			{
 				where: {
-					id_referrer: module_id,
-					student_id,
+					id: enrolldata.id,
 				},
 			}
 		);
 
-		checkDoneSession(student_id, material_enrolled.session_id);
+		let student_sesh = await StudentSession.findOne({
+			where: {
+				student_id,
+				session_id: mod.session_id,
+			},
+		});
+
+		if (!student_sesh) {
+			student_sesh = await StudentSession.create({
+				session_id: mod.session_id,
+				student_id: student_id,
+				present: false,
+			});
+		}
+
+		checkDoneSession(student_id, material_enrolled_data.session_id);
 
 		return res.sendJson(200, true, "Success", material_enrolled_data);
 	}),

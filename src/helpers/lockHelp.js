@@ -51,6 +51,7 @@ async function lockUpdate(student_id, session_id) {
 	let enroll_data = await MaterialEnrolled.findAll({
 		where: {
 			id_referrer: mod_status_list,
+			student_id,
 		},
 		attributes: ["status"],
 	});
