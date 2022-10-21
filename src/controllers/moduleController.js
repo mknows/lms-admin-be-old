@@ -507,6 +507,21 @@ module.exports = {
 			takeaway: takeaway,
 		};
 
+		let student_sesh = await StudentSession.findOne({
+			where: {
+				student_id,
+				session_id: mod.session_id,
+			},
+		});
+
+		if (!student_sesh) {
+			student_sesh = await StudentSession.create({
+				session_id: mod.session_id,
+				student_id: student_id,
+				present: false,
+			});
+		}
+
 		let material_enrolled_data = await MaterialEnrolled.create(
 			{
 				session_id: mod.session_id,
@@ -523,21 +538,6 @@ module.exports = {
 				},
 			}
 		);
-
-		let student_sesh = await StudentSession.findOne({
-			where: {
-				student_id,
-				session_id: mod.session_id,
-			},
-		});
-
-		if (!student_sesh) {
-			student_sesh = await StudentSession.create({
-				session_id: mod.session_id,
-				student_id: student_id,
-				present: false,
-			});
-		}
 
 		checkDoneSession(student_id, material_enrolled_data.session_id);
 
