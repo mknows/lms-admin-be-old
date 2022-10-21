@@ -144,15 +144,18 @@ module.exports = {
 			});
 
 			let stat;
+			let takeaway = null;
 			if (!met_enr) {
 				stat = NOT_ENROLLED;
 			} else {
 				stat = met_enr.status;
+				takeaway = met_enr.activity_detail.takeaway;
 			}
 
 			let datval = {
 				...currmod.dataValues,
 				status: stat,
+				takeaway: takeaway,
 			};
 
 			result.push(datval);
