@@ -32,10 +32,11 @@ const {
 	FAILED,
 	FINISHED,
 	ABANDONED,
+
+	MAX_CREDIT,
 } = process.env;
 
 module.exports = {
-	// this should make it
 	/**
 	 * @desc      create subjects
 	 * @route     POST /api/v1/subject/create
@@ -395,12 +396,12 @@ module.exports = {
 
 		const nameFile = uuidv4() + req.file.originalname.split(" ").join("-");
 		const fileBuffer = req.file.buffer;
-		const credit_thresh = 24;
+		const credit_thresh = parseInt(MAX_CREDIT);
 
 		let subjectsEnrolled = await getPlan(student_id);
-		subjectsEnrolled = subjectsEnrolled[0]
-			.concat(subjectsEnrolled[1])
-			.concat(subjectsEnrolled[2]);
+		subjectsEnrolled = subjectsEnrolled.datapending
+			.concat(subjectsEnrolled.dataongoing)
+			.concat(subjectsEnrolled.datadraft);
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
@@ -520,11 +521,11 @@ module.exports = {
 		const { subject_id } = req.params;
 		const student_id = req.student_id;
 
-		const credit_thresh = 24;
+		const credit_thresh = parseInt(MAX_CREDIT);
 		let subjectsEnrolled = await getPlan(student_id);
-		subjectsEnrolled = subjectsEnrolled[0]
-			.concat(subjectsEnrolled[1])
-			.concat(subjectsEnrolled[2]);
+		subjectsEnrolled = subjectsEnrolled.datapending
+			.concat(subjectsEnrolled.dataongoing)
+			.concat(subjectsEnrolled.datadraft);
 
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
@@ -702,41 +703,47 @@ module.exports = {
 };
 
 async function getPlan(student_id) {
-	const datapending = await StudentSubject.findAll({
-		attributes: ["subject_id"],
-		where: {
-			student_id: student_id,
-			status: PENDING,
-		},
-		order: ["created_at"],
-	});
-	const dataongoing = await StudentSubject.findAll({
-		attributes: ["subject_id"],
-		where: {
-			student_id: student_id,
-			status: ONGOING,
-		},
-		order: ["created_at"],
-	});
-	const datadraft = await StudentSubject.findAll({
-		attributes: ["subject_id"],
-		where: {
-			student_id: student_id,
-			status: DRAFT,
-		},
-		order: ["created_at"],
-	});
+	const all_dat = await Promise.all([
+		await StudentSubject.findAll({
+			attributes: ["subject_id"],
+			where: {
+				student_id: student_id,
+				status: PENDING,
+			},
+			order: ["created_at"],
+		}),
+		await StudentSubject.findAll({
+			attributes: ["subject_id"],
+			where: {
+				student_id: student_id,
+				status: ONGOING,
+			},
+			order: ["created_at"],
+		}),
+		await StudentSubject.findAll({
+			attributes: ["subject_id"],
+			where: {
+				student_id: student_id,
+				status: DRAFT,
+			},
+			order: ["created_at"],
+		}),
+	]);
 
-	let plan = [datapending, dataongoing, datadraft];
+	let plan = {
+		datapending: all_dat[0],
+		dataongoing: all_dat[1],
+		datadraft: all_dat[2],
+	};
 	return plan;
 }
 
 async function getParsedPlan(student_id) {
 	const subjectsEnrolled = await getPlan(student_id);
 
-	const datapending = subjectsEnrolled[0];
-	const dataongoing = subjectsEnrolled[1];
-	const datadraft = subjectsEnrolled[2];
+	const datapending = subjectsEnrolled.datapending;
+	const dataongoing = subjectsEnrolled.dataongoing;
+	const datadraft = subjectsEnrolled.datadraft;
 
 	let draftres = [];
 	let draftcred = 0;
