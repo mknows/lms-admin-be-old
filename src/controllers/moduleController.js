@@ -191,9 +191,11 @@ module.exports = {
 			},
 		});
 
-		if (mat_enr.activity_detail != null) {
-			takeaway = mat_enr.activity_detail.takeaway;
-			date_submitted = mat_enr.updated_at;
+		if (mat_enr != null) {
+			if (mat_enr.activity_detail != null) {
+				takeaway = mat_enr.activity_detail.takeaway;
+				date_submitted = mat_enr.updated_at;
+			}
 		}
 
 		const vids = await Video.findAll({
