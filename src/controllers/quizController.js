@@ -243,11 +243,12 @@ module.exports = {
 			attributes: ["duration", "questions", "description", "session_id"],
 		});
 
-		const material = await Material.findOne({
-			where: {
-				id_referrer: quiz_id,
-			},
-		});
+		// const material = await Material.findOne({
+		// 	where: {
+		// 		id_referrer: quiz_id,
+		// 	},
+		// });
+
 		const session = await Session.findOne({
 			where: {
 				id: session_id,
@@ -257,7 +258,7 @@ module.exports = {
 			where: {
 				student_id: student_id,
 				session_id: session_id,
-				material_id: material.id,
+				// material_id: material.id,
 				subject_id: session.subject_id,
 				id_referrer: quiz_id,
 				status: ONGOING,
@@ -269,7 +270,7 @@ module.exports = {
 			where: {
 				student_id: student_id,
 				session_id: session_id,
-				material_id: material.id,
+				// material_id: material.id,
 				subject_id: session.subject_id,
 				id_referrer: quiz_id,
 				[Op.not]: { status: ONGOING },
@@ -293,7 +294,7 @@ module.exports = {
 			this_material_enrolled = await MaterialEnrolled.create({
 				student_id: student_id,
 				session_id: session_id,
-				material_id: material.id,
+				// material_id: material.id,
 				subject_id: session.subject_id,
 				id_referrer: quiz_id,
 				status: ONGOING,
