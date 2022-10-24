@@ -186,10 +186,12 @@ module.exports = {
 				student_id,
 				id_referrer: mod.id,
 			},
-			attribute: ["activity_detail", "updated_at"],
+			attributes: {
+				include: ["updated_at"],
+			},
 		});
 
-		if (mat_enr.takeaway != null) {
+		if (mat_enr.activity_detail != null) {
 			takeaway = mat_enr.activity_detail.takeaway;
 			date_submitted = mat_enr.updated_at;
 		}
@@ -547,15 +549,40 @@ module.exports = {
 			});
 		}
 
-		let material_enrolled_data = await MaterialEnrolled.create({
-			session_id: mod.session_id,
-			student_id: student_id,
-			subject_id: sesh.subject_id,
-			id_referrer: module_id,
-			type: MODULE,
-			activity_detail: detail,
-			status: FINISHED,
+		let material_enrolled_data = await MaterialEnrolled.findOne({
+			where: {
+				student_id,
+				id_referrer: module_id,
+			},
 		});
+
+		if (!material_enrolled_data) {
+			material_enrolled_data = await MaterialEnrolled.create({
+				session_id: mod.session_id,
+				student_id: student_id,
+				subject_id: sesh.subject_id,
+				id_referrer: module_id,
+				type: MODULE,
+				activity_detail: detail,
+				status: FINISHED,
+			});
+		} else {
+			material_enrolled_data = await MaterialEnrolled.update(
+				{
+					activity_detail: detail,
+					status: FINISHED,
+				},
+				{
+					where: {
+						student_id,
+						id_referrer: module_id,
+					},
+					returning: true,
+				}
+			);
+		}
+
+		material_enrolled_data = material_enrolled_data[1][0];
 
 		checkDoneSession(student_id, material_enrolled_data.session_id);
 
