@@ -104,7 +104,7 @@ module.exports = {
 							returning: true,
 						}
 					);
-
+					material_data = material_data[1][0];
 					checkDoneSession(student_id, material_data[1][0].session_id);
 					return res.sendJson(
 						200,

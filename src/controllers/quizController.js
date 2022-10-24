@@ -234,11 +234,12 @@ module.exports = {
 			attributes: ["duration", "questions", "description", "session_id"],
 		});
 
-		const material = await Material.findOne({
-			where: {
-				id_referrer: quiz_id,
-			},
-		});
+		// const material = await Material.findOne({
+		// 	where: {
+		// 		id_referrer: quiz_id,
+		// 	},
+		// });
+
 		const session = await Session.findOne({
 			where: {
 				id: session_id,
@@ -248,7 +249,7 @@ module.exports = {
 			where: {
 				student_id: student_id,
 				session_id: session_id,
-				material_id: material.id,
+				// material_id: material.id,
 				subject_id: session.subject_id,
 				id_referrer: quiz_id,
 				status: ONGOING,
@@ -260,7 +261,7 @@ module.exports = {
 			where: {
 				student_id: student_id,
 				session_id: session_id,
-				material_id: material.id,
+				// material_id: material.id,
 				subject_id: session.subject_id,
 				id_referrer: quiz_id,
 				[Op.not]: { status: ONGOING },
@@ -271,7 +272,7 @@ module.exports = {
 		let this_material_enrolled;
 
 		if (checkIfCurrentlyTaking != null) {
-			// TODO: CHECK THAT THIS IS ERROR BUT RETURNS TRUE TO ACCOMODATE APPS
+			// TODO: NOTE THAT THIS IS ERROR BUT RETURNS TRUE TO ACCOMODATE APPS
 			return res.sendJson(200, true, "user is currenty having an attempt", {
 				quiz: quizQuestions,
 				material_enrolled_id: checkIfCurrentlyTaking.id,
@@ -284,17 +285,17 @@ module.exports = {
 			this_material_enrolled = await MaterialEnrolled.create({
 				student_id: student_id,
 				session_id: session_id,
-				material_id: material.id,
+				// material_id: material.id,
 				subject_id: session.subject_id,
 				id_referrer: quiz_id,
 				status: ONGOING,
 				type: QUIZ,
-				status: ONGOING,
 			});
 		}
 		return res.sendJson(200, true, "Success", {
 			quiz: quizQuestions,
 			material_enrolled_id: this_material_enrolled.id,
+			start_time: this_material_enrolled.created_at,
 		});
 	}),
 	/**
