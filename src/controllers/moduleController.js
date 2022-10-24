@@ -179,17 +179,19 @@ module.exports = {
 		if (!mod) return res.sendJson(404, false, "Not Found", {});
 
 		let takeaway;
+		let date_submitted;
 
 		const mat_enr = await MaterialEnrolled.findOne({
 			where: {
 				student_id,
 				id_referrer: mod.id,
 			},
-			attribute: ["activity_detail"],
+			attribute: ["activity_detail", "updated_at"],
 		});
 
 		if (mat_enr) {
 			takeaway = mat_enr.activity_detail.takeaway;
+			date_submitted = mat_enr.updated_at;
 		}
 
 		const vids = await Video.findAll({
@@ -209,6 +211,7 @@ module.exports = {
 		return res.sendJson(200, true, "Success", {
 			module: mod,
 			takeaway: takeaway,
+			date_submitted: date_submitted,
 			videos: vids,
 			documents: docs,
 		});
@@ -525,6 +528,7 @@ module.exports = {
 		});
 
 		let detail = {
+			date_submitted: moment().format("MMMM Do YYYY, h:mm:ss a"),
 			takeaway: takeaway,
 		};
 
