@@ -3,9 +3,14 @@ const route = express.Router();
 const multer = require("multer");
 
 const subjectController = require("../controllers/subjectController");
-const { protection, authorize, enrolled, existence} = require("../middlewares/Authentication");
+const {
+	protection,
+	authorize,
+	enrolled,
+	existence,
+} = require("../middlewares/Authentication");
 
-const { Subject, StudentSubject,Major } = require("../models");
+const { Subject, StudentSubject, Major } = require("../models");
 
 const upload = multer({
 	storage: multer.memoryStorage(),

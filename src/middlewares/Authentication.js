@@ -2,7 +2,6 @@ const {
 	User,
 	Lecturer,
 	Student,
-	Admin,
 	Subject,
 	Session,
 	StudentSubject,
@@ -192,7 +191,8 @@ exports.existence = (Model) => {
 		let id;
 		switch (Model) {
 			case Quiz: {
-				id = req.params.session_id;
+				id = req.params.quiz_id;
+				break;
 			}
 			case Session: {
 				id = req.params.session_id;
@@ -204,22 +204,21 @@ exports.existence = (Model) => {
 			}
 			case StudentSubject: {
 				id = req.params.subject_id;
+				console.log(id);
 				const student_id = req.student_id;
-
 				const existence = await Model.findOne({
 					where: {
 						subject_id: id,
-						student_id,
+						student_id: student_id,
 					},
 				});
-
+				console.log(existence);
 				if (!existence) {
 					return next(new ErrorResponse(`ID not found`, 404));
 				}
-				next();
+				return next();
 			}
 		}
-
 		const existence = await Model.findOne({
 			where: {
 				id,

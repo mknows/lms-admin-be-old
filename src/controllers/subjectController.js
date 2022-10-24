@@ -406,13 +406,13 @@ module.exports = {
 		const sub = await Subject.findOne({ where: { id: subject_id } });
 
 		const subjectEnrolled = await StudentSubject.findOne({
-			where:{
+			where: {
 				subject_id,
-				student_id
-			}
-		})
-		
-		if(subjectEnrolled){
+				student_id,
+			},
+		});
+
+		if (subjectEnrolled) {
 			return res.sendJson(
 				400,
 				false,
@@ -762,19 +762,19 @@ async function getParsedPlan(student_id) {
 
 	for (let i = 0; i < datadraft.length; i++) {
 		let currStudSub = datadraft[i];
-
+		console.log(currStudSub.subject_id);
 		let currSub = await Subject.findOne({
 			where: {
 				id: currStudSub.subject_id,
 			},
 		});
-
-		draftcred += currSub?.credit;
+		console.log(currSub);
+		draftcred += currSub.credit;
 
 		let dataval = {
-			name: currSub?.name,
-			credit: currSub?.credit,
-			subject_id: currSub?.id,
+			name: currSub.name,
+			credit: currSub.credit,
+			subject_id: currSub.id,
 			student_subject_id: currStudSub.id,
 		};
 
