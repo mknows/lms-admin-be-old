@@ -178,8 +178,8 @@ module.exports = {
 		});
 		if (!mod) return res.sendJson(404, false, "Not Found", {});
 
-		let takeaway;
-		let date_submitted;
+		let takeaway = null;
+		let date_submitted = null;
 
 		const mat_enr = await MaterialEnrolled.findOne({
 			where: {
@@ -189,7 +189,7 @@ module.exports = {
 			attribute: ["activity_detail", "updated_at"],
 		});
 
-		if (mat_enr) {
+		if (mat_enr.takeaway != null) {
 			takeaway = mat_enr.activity_detail.takeaway;
 			date_submitted = mat_enr.updated_at;
 		}
