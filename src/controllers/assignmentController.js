@@ -100,7 +100,7 @@ module.exports = {
 						},
 					});
 					checkDoneSession(student_id, material_data.session_id);
-					return res.sendJson(200, true, "Successfully Submitted");
+					return res.sendJson(200, true, "Successfully Submitted", activity_detail);
 				});
 			});
 	}),

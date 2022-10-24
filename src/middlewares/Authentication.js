@@ -5,6 +5,7 @@ const {
 const { getAuth } = require("firebase-admin/auth");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("express-async-handler");
+const lockUpdate = require("../helpers/lockHelp");
 
 /**
  * @desc      Middleware for user authentication
@@ -100,7 +101,7 @@ exports.enrolled = (Model) => {
 				let {session_id} = req.params;
 				const subject_id = await Session.findOne({
 					attributes:[
-						'id'
+						'subject_id'
 					],
 					where:{
 						id : session_id
@@ -115,10 +116,10 @@ exports.enrolled = (Model) => {
 						model: Subject,
 						attributes:['id'],
 						where:{
-							id: subject_id.id
+							id : subject_id.subject_id
 						}
 					}
-				})	
+				})
 				break;
 			}
 			case Subject:{
@@ -173,7 +174,6 @@ exports.enrolled = (Model) => {
 				break;
 			}
 		}
-
 		if(!enrolled){
 			return next(
 				new ErrorResponse(`Student is not authorized`, 401)
@@ -210,11 +210,10 @@ exports.existence = (Model) => {
 		
 				if(!existence){
 					return next(
-						new ErrorResponse(`Subject not found`, 404)
+						new ErrorResponse(`ID not found`, 404)
 					);
 				}
 				next();
-				break;
 			}
 		}
 		
@@ -226,7 +225,7 @@ exports.existence = (Model) => {
 
 		if(!existence){
 			return next(
-				new ErrorResponse(`Subject not found`, 404)
+				new ErrorResponse(`ID not found`, 404)
 			);
 		}
 
@@ -236,58 +235,18 @@ exports.existence = (Model) => {
 
 exports.moduleTaken = (Model) => {
 	return asyncHandler(async (req, res, next) => {	
-		let id;
+		let id,allowed;
 		switch(Model) {
 			case Session:{
 				id = req.params.session_id;
-				const module = await MaterialEnrolled.findAll({
-					attributes:['status'],
-					where:{
-						session_id: id,
-						student_id: req.student_id,
-						type:  MODULE
-					}
-				}) 
-				for(i=0;i<module.length;i++){
-					
-				}
-
-				break;
-			}
-			case Subject:{
-				id = req.params.subject_id;
-				break;
-			}
-			case StudentSubject:{
-				id = req.params.subject_id;
-				const student_id = req.student_id;
-
-				const existence = await Model.findOne({
-					where:{
-						subject_id : id,
-						student_id
-					}
-				})
-		
-				if(!existence){
-					return next(
-						new ErrorResponse(`Subject not found`, 404)
-					);
-				}
-				next();
+				allowed =  await lockUpdate(req.student_id,id);
+				console.log(allowed)
 				break;
 			}
 		}
-		
-		const existence = await Model.findOne({
-			where:{
-				id
-			}
-		})
-
-		if(!existence){
+		if(allowed){
 			return next(
-				new ErrorResponse(`Subject not found`, 404)
+				new ErrorResponse(`Module not taken`, 404)
 			);
 		}
 

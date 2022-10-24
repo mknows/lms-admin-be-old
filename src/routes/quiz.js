@@ -2,7 +2,7 @@ const express = require("express");
 const route = express.Router();
 
 const quizController = require("../controllers/quizController");
-const { protection, authorize, enrolled, existence } = require("../middlewares/Authentication");
+const { protection, authorize, enrolled, existence, moduleTaken} = require("../middlewares/Authentication");
 
 const { Subject, Session, Quiz } = require("../models");
 
@@ -13,6 +13,7 @@ route.get(
 	authorize("student"),
 	existence(Session),
 	enrolled(Session),
+	moduleTaken(Session),
 	quizController.getQuizDescBySession
 );
 
@@ -31,6 +32,7 @@ route.post(
 	"/take/:quiz_id",
 	protection,
 	authorize("student"),
+
 	quizController.takeQuiz
 );
 route.post(
