@@ -1,7 +1,16 @@
-const { User, Lecturer, Student, Admin, Subject, Session, StudentSubject, Major, Quiz, MaterialEnrolled } = require("../models");
 const {
-	MODULE
-} = process.env;
+	User,
+	Lecturer,
+	Student,
+	Admin,
+	Subject,
+	Session,
+	StudentSubject,
+	Major,
+	Quiz,
+	MaterialEnrolled,
+} = require("../models");
+const { MODULE } = process.env;
 const { getAuth } = require("firebase-admin/auth");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("express-async-handler");
@@ -94,139 +103,131 @@ exports.authorize = (...roles) => {
 };
 
 exports.enrolled = (Model) => {
-	return asyncHandler(async (req, res, next) => {	
+	return asyncHandler(async (req, res, next) => {
 		let enrolled;
-		switch(Model) {
-			case Session:{
-				let {session_id} = req.params;
+		switch (Model) {
+			case Session: {
+				let { session_id } = req.params;
 				const subject_id = await Session.findOne({
-					attributes:[
-						'subject_id'
-					],
-					where:{
-						id : session_id
-					}
+					attributes: ["subject_id"],
+					where: {
+						id: session_id,
+					},
 				});
 				enrolled = await Student.findOne({
-					attributes:['id'],
-					where:{
-						id : req.student_id
+					attributes: ["id"],
+					where: {
+						id: req.student_id,
 					},
-					include:{
+					include: {
 						model: Subject,
-						attributes:['id'],
-						where:{
-							id : subject_id.subject_id
-						}
-					}
-				})
+						attributes: ["id"],
+						where: {
+							id: subject_id.subject_id,
+						},
+					},
+				});
 				break;
 			}
-			case Subject:{
-				let {subject_id} = req.params;
+			case Subject: {
+				let { subject_id } = req.params;
 				enrolled = await Student.findOne({
-					attributes:['id'],
-					where:{
-						id : req.student_id
+					attributes: ["id"],
+					where: {
+						id: req.student_id,
 					},
-					include:{
+					include: {
 						model: Subject,
-						attributes:['id'],
-						where:{
-							id: subject_id
-						}
-					}
-				})
+						attributes: ["id"],
+						where: {
+							id: subject_id,
+						},
+					},
+				});
 				break;
 			}
-			case Major:{
-				let {subject_id} = req.params;
+			case Major: {
+				let { subject_id } = req.params;
 
 				enrolled = await Student.findOne({
-					attributes:['id'],
-					where:{
-						id : req.student_id
+					attributes: ["id"],
+					where: {
+						id: req.student_id,
 					},
-					include:{
+					include: {
 						model: Major,
-						attributes:['id'],
-						through:{
-							attributes:[]
+						attributes: ["id"],
+						through: {
+							attributes: [],
 						},
 						include: {
-							model:Subject,
-							attributes:['id'],
-							through:{
-								attributes:[]
+							model: Subject,
+							attributes: ["id"],
+							through: {
+								attributes: [],
 							},
-							where:{
-								id : subject_id
-							}
-						}
-					}
-				})
-				enrolled = enrolled.Majors.length===0?false:true;
+							where: {
+								id: subject_id,
+							},
+						},
+					},
+				});
+				enrolled = enrolled.Majors.length === 0 ? false : true;
 				break;
 			}
-			case Quiz:{
-				
-				
+			case Quiz: {
 				break;
 			}
 		}
-		if(!enrolled){
-			return next(
-				new ErrorResponse(`Student is not authorized`, 401)
-			);
+		if (!enrolled) {
+			return next(new ErrorResponse(`Student is not authorized`, 401));
 		}
 
 		next();
-
 	});
 };
 
 exports.existence = (Model) => {
-	return asyncHandler(async (req, res, next) => {	
+	return asyncHandler(async (req, res, next) => {
 		let id;
-		switch(Model) {
-			case Session:{
+		switch (Model) {
+			case Quiz: {
+				id = req.params.session_id;
+			}
+			case Session: {
 				id = req.params.session_id;
 				break;
 			}
-			case Subject:{
+			case Subject: {
 				id = req.params.subject_id;
 				break;
 			}
-			case StudentSubject:{
+			case StudentSubject: {
 				id = req.params.subject_id;
 				const student_id = req.student_id;
 
 				const existence = await Model.findOne({
-					where:{
-						subject_id : id,
-						student_id
-					}
-				})
-		
-				if(!existence){
-					return next(
-						new ErrorResponse(`ID not found`, 404)
-					);
+					where: {
+						subject_id: id,
+						student_id,
+					},
+				});
+
+				if (!existence) {
+					return next(new ErrorResponse(`ID not found`, 404));
 				}
 				next();
 			}
 		}
-		
-		const existence = await Model.findOne({
-			where:{
-				id
-			}
-		})
 
-		if(!existence){
-			return next(
-				new ErrorResponse(`ID not found`, 404)
-			);
+		const existence = await Model.findOne({
+			where: {
+				id,
+			},
+		});
+
+		if (!existence) {
+			return next(new ErrorResponse(`ID not found`, 404));
 		}
 
 		next();
@@ -234,22 +235,18 @@ exports.existence = (Model) => {
 };
 
 exports.moduleTaken = (Model) => {
-	return asyncHandler(async (req, res, next) => {	
-		let id,allowed;
-		switch(Model) {
-			case Session:{
+	return asyncHandler(async (req, res, next) => {
+		let id, allowed;
+		switch (Model) {
+			case Session: {
 				id = req.params.session_id;
-				allowed =  await lockUpdate(req.student_id,id);
-				console.log(allowed)
+				allowed = await lockUpdate(req.student_id, id);
 				break;
 			}
 		}
-		if(allowed){
-			return next(
-				new ErrorResponse(`Module not taken`, 404)
-			);
+		if (allowed) {
+			return next(new ErrorResponse(`Module not taken`, 404));
 		}
-
 		next();
 	});
 };

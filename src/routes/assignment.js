@@ -3,7 +3,13 @@ const route = express.Router();
 const multer = require("multer");
 
 const assignmentController = require("../controllers/assignmentController");
-const { protection, authorize } = require("../middlewares/Authentication");
+const {
+	protection,
+	authorize,
+	existence,
+} = require("../middlewares/Authentication");
+
+const { Session } = require("../models");
 
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -36,6 +42,7 @@ route.post(
 	protection,
 	authorize("student", "user"),
 	upload.single("file_assignment"),
+	existence(Session),
 	assignmentController.submitAssignment
 );
 
