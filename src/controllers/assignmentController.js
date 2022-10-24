@@ -94,14 +94,12 @@ module.exports = {
 							returning: true,
 						}
 					);
+					material_data = material_data[1][0];
 
 					checkDoneSession(student_id, material_data.session_id);
-					return res.sendJson(
-						200,
-						true,
-						"Successfully Submitted",
-						material_data.activity_detail
-					);
+					return res.sendJson(200, true, "Successfully Submitted", {
+						summary: material_data.activity_detail,
+					});
 				});
 			});
 	}),
