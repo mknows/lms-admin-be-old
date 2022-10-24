@@ -222,17 +222,8 @@ module.exports = {
 	takeQuiz: asyncHandler(async (req, res) => {
 		const { quiz_id } = req.params;
 		const student_id = req.student_id;
-		const exist = await checkExistence(Quiz, quiz_id);
 
-		if (!exist) {
-			return res.sendJson(400, false, "Quiz doesn't exist");
-		}
 		const session_id = await getSession(Quiz, quiz_id);
-		const module_taken = await moduleTaken(student_id, session_id);
-
-		if (!module_taken.allowed) {
-			return res.sendJson(400, false, "Student hasn't watched the module");
-		}
 
 		const max_attempt = parseInt(MAX_ATTEMPT);
 

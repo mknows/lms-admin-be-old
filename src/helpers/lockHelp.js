@@ -34,7 +34,6 @@ const {
 } = process.env;
 
 async function lockUpdate(student_id, session_id) {
-	let stat = true;
 	let modules = await Module.findAll({
 		where: {
 			session_id,
@@ -56,18 +55,17 @@ async function lockUpdate(student_id, session_id) {
 		attributes: ["status"],
 	});
 
-	let stats_not_acc = [ONGOING, FAILED];
+	let stats_not_acc = ["ONGOING", "FAILED"];
 
-	enroll_data.forEach((dat) => {
-		if (dat.length === mod_status_list.length) {
-			stat = false;
+	if (enroll_data.length < mod_status_list.length) {
+		return true;
+	}
+	for (j = 0; j < enroll_data.length; j++) {
+		if (stats_not_acc.includes(enroll_data[j].status)) {
+			return true;
 		}
-		if (!stats_not_acc.includes(dat.status)) {
-			stat = false;
-		}
-	});
-
-	return stat;
+	}
+	return false;
 }
 
 module.exports = lockUpdate;

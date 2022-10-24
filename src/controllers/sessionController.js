@@ -65,43 +65,12 @@ module.exports = {
 		const { subject_id } = req.params;
 		const student_id = req.student_id;
 
-		if (!(await checkExistence(Subject, subject_id))) {
-			return res.status(404).json({
-				success: false,
-				message: "Invalid Subject ID.",
-				data: {},
-			});
-		}
-
-		const student_subject = await Student.findOne({
-			where: {
-				id: student_id,
-			},
-			attributes: ["id"],
-			include: {
-				model: Subject,
-				attributes: ["id"],
-				where: {
-					id: subject_id,
-				},
-			},
-		});
-
-		if (!student_subject) {
-			return res.status(404).json({
-				success: false,
-				message: "Student is not enrolled in this subject.",
-				data: {},
-			});
-		}
-
 		const data = await Session.findAll({
 			where: {
 				subject_id: subject_id,
 			},
 		});
 
-		let sessions = [];
 		for (i = 0; i < data.length; i++) {
 			data[i].dataValues.is_locked = await lockUpdate(student_id, data[i].id);
 		}
@@ -220,12 +189,6 @@ module.exports = {
 	 */
 	takeSession: asyncHandler(async (req, res) => {
 		const { session_id } = req.params;
-
-		const data = await Session.findOne({
-			where: {
-				id: session_id,
-			},
-		});
 
 		let studSess = await StudentSession.create({
 			session_id,

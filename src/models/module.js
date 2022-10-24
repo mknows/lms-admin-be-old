@@ -14,7 +14,13 @@ module.exports = (sequelize, DataTypes) => {
 			this.hasMany(models.Document, {
 				foreignKey: "id",
 			});
-			// this.belongsTo(models.Session);
+			this.belongsTo(models.MaterialEnrolled, {
+				foreignKey: "id",
+				targetKey: "id_referrer"
+			});
+			this.belongsTo(models.Session,{
+				foreignKey:"session_id"
+			});
 		}
 	}
 	Module.init(

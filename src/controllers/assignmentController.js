@@ -26,6 +26,7 @@ const {
 	FAILED,
 	FINISHED,
 	ABANDONED,
+	LATE,
 	MODULE,
 	QUIZ,
 	ASSIGNMENT,
@@ -44,6 +45,7 @@ module.exports = {
 		const student_id = req.student_id;
 
 		const assign = await Assignment.findOne({
+			attributes: ["created_at", "id", "duration"],
 			where: {
 				session_id: session_id,
 			},
@@ -76,15 +78,23 @@ module.exports = {
 			.end(file_assignment_buffer)
 			.on("finish", () => {
 				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
+					const deadline = moment(
+						new Date(
+							new Date(assign.created_at).getTime() + assign.duration * 1000
+						)
+					);
+					const date_submit = moment();
+
 					const activity_detail = {
-						date_submit: moment().format("MMMM Do YYYY, h:mm:ss a"),
+						date_submit: moment(deadline).format("DD/MM/YYYY hh:mm:ss"),
 						file_assignment: file_assignment,
 						file_assignment_link: linkFile,
 					};
+
 					material_data = await MaterialEnrolled.update(
 						{
 							activity_detail: activity_detail,
-							status: GRADING,
+							status: moment(date_submit).isAfter(deadline) ? LATE : GRADING,
 						},
 						{
 							where: {
@@ -95,11 +105,13 @@ module.exports = {
 						}
 					);
 					material_data = material_data[1][0];
-
-					checkDoneSession(student_id, material_data.session_id);
-					return res.sendJson(200, true, "Successfully Submitted", {
-						summary: material_data.activity_detail,
-					});
+					checkDoneSession(student_id, material_data[1][0].session_id);
+					return res.sendJson(
+						200,
+						true,
+						"Successfully Submitted",
+						activity_detail
+					);
 				});
 			});
 	}),
