@@ -525,11 +525,19 @@ module.exports = {
 			},
 		});
 
+		if (!mod) {
+			return res.sendJson(404, false, "Module Not Found", {});
+		}
+
 		let sesh = await Session.findOne({
 			where: {
 				id: mod.session_id,
 			},
 		});
+
+		if (!sesh) {
+			return res.sendJson(404, false, "Session Not Found", {});
+		}
 
 		let detail = {
 			date_submitted: moment().format("MMMM Do YYYY, h:mm:ss a"),
@@ -582,9 +590,8 @@ module.exports = {
 					returning: true,
 				}
 			);
+			material_enrolled_data = material_enrolled_data[1][0];
 		}
-
-		material_enrolled_data = material_enrolled_data[1][0];
 
 		checkDoneSession(student_id, material_enrolled_data.session_id);
 
