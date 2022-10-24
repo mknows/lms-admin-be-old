@@ -5,6 +5,7 @@ const {
 	Material,
 	MaterialEnrolled,
 	Session,
+	StudentSession,
 } = require("../models");
 const moment = require("moment");
 const { Op, Sequelize } = require("sequelize");
@@ -25,6 +26,7 @@ const {
 
 	MODULE,
 } = process.env;
+const sessionController = require("./sessionController");
 
 module.exports = {
 	/**
@@ -142,15 +144,18 @@ module.exports = {
 			});
 
 			let stat;
+			let takeaway = null;
 			if (!met_enr) {
 				stat = NOT_ENROLLED;
 			} else {
 				stat = met_enr.status;
+				takeaway = met_enr.activity_detail.takeaway;
 			}
 
 			let datval = {
 				...currmod.dataValues,
 				status: stat,
+				takeaway: takeaway,
 			};
 
 			result.push(datval);
@@ -165,12 +170,30 @@ module.exports = {
 	 */
 	getModule: asyncHandler(async (req, res) => {
 		const module_id = req.params.id;
+		const student_id = req.student_id;
 		const mod = await Module.findOne({
 			where: {
 				id: module_id,
 			},
 		});
 		if (!mod) return res.sendJson(404, false, "Not Found", {});
+
+		let takeaway = null;
+		let date_submitted = null;
+
+		const mat_enr = await MaterialEnrolled.findOne({
+			where: {
+				student_id,
+				id_referrer: mod.id,
+			},
+			attribute: ["activity_detail", "updated_at"],
+		});
+
+		if (mat_enr.takeaway != null) {
+			takeaway = mat_enr.activity_detail.takeaway;
+			date_submitted = mat_enr.updated_at;
+		}
+
 		const vids = await Video.findAll({
 			where: {
 				id: {
@@ -187,6 +210,8 @@ module.exports = {
 		});
 		return res.sendJson(200, true, "Success", {
 			module: mod,
+			takeaway: takeaway,
+			date_submitted: date_submitted,
 			videos: vids,
 			documents: docs,
 		});
@@ -449,7 +474,7 @@ module.exports = {
 		res.sendJson(200, true, "Success", {});
 	}),
 	/**
-	 * @desc      post make module
+	 * @desc      post make module <DEPRICATED>
 	 * @route     POST /api/v1/module/enroll/:module_id
 	 * @access    Private
 	 */
@@ -472,7 +497,6 @@ module.exports = {
 		const enrolldata = await MaterialEnrolled.create({
 			session_id: mod.session_id,
 			student_id: student_id,
-			// material_id: material.id,
 			subject_id: sesh.subject_id,
 			id_referrer: module_id,
 			status: ONGOING,
@@ -484,42 +508,56 @@ module.exports = {
 
 	/**
 	 * @desc      post finish module
-	 * @route     PUT /api/v1/module/finish/
+	 * @route     POST /api/v1/module/finish/
 	 * @access    Private
 	 */
 	finishModule: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
 		const { module_id, takeaway } = req.body;
 
-		const material_enrolled = await MaterialEnrolled.findOne({
+		let mod = await Module.findOne({
 			where: {
-				id_referrer: module_id,
-				student_id,
+				id: module_id,
 			},
 		});
 
-		if (!material_enrolled) {
-			return res.sendJson(404, false, "no material enrolled found", {});
-		}
+		let sesh = await Session.findOne({
+			where: {
+				id: mod.session_id,
+			},
+		});
 
 		let detail = {
+			date_submitted: moment().format("MMMM Do YYYY, h:mm:ss a"),
 			takeaway: takeaway,
 		};
 
-		let material_enrolled_data = await MaterialEnrolled.update(
-			{
-				activity_detail: detail,
-				status: FINISHED,
+		let student_sesh = await StudentSession.findOne({
+			where: {
+				student_id,
+				session_id: mod.session_id,
 			},
-			{
-				where: {
-					id_referrer: module_id,
-					student_id,
-				},
-			}
-		);
+		});
 
-		checkDoneSession(student_id, material_enrolled.session_id);
+		if (!student_sesh) {
+			student_sesh = await StudentSession.create({
+				session_id: mod.session_id,
+				student_id: student_id,
+				present: false,
+			});
+		}
+
+		let material_enrolled_data = await MaterialEnrolled.create({
+			session_id: mod.session_id,
+			student_id: student_id,
+			subject_id: sesh.subject_id,
+			id_referrer: module_id,
+			type: MODULE,
+			activity_detail: detail,
+			status: FINISHED,
+		});
+
+		checkDoneSession(student_id, material_enrolled_data.session_id);
 
 		return res.sendJson(200, true, "Success", material_enrolled_data);
 	}),

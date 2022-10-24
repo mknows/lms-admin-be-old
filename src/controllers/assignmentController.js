@@ -77,11 +77,11 @@ module.exports = {
 			.on("finish", () => {
 				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
 					const activity_detail = {
-						date_submit: moment().format("DD/MM/YYYY"),
+						date_submit: moment.now(),
 						file_assignment: file_assignment,
 						file_assignment_link: linkFile,
 					};
-					await MaterialEnrolled.update(
+					material_data = await MaterialEnrolled.update(
 						{
 							activity_detail: activity_detail,
 							status: GRADING,
@@ -91,16 +91,12 @@ module.exports = {
 								id_referrer: assign.id,
 								student_id,
 							},
+							returning: true,
 						}
 					);
-					material_data = await MaterialEnrolled.findOne({
-						where: {
-							id_referrer: assign.id,
-							student_id,
-						},
-					});
+
 					checkDoneSession(student_id, material_data.session_id);
-					return res.sendJson(200, true, "Successfully Submitted", activity_detail);
+					return res.sendJson(200, true, "Successfully Submitted");
 				});
 			});
 	}),
