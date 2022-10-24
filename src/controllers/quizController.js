@@ -281,7 +281,7 @@ module.exports = {
 		let this_material_enrolled;
 
 		if (checkIfCurrentlyTaking != null) {
-			// TODO: CHECK THAT THIS IS ERROR BUT RETURNS TRUE TO ACCOMODATE APPS
+			// TODO: NOTE THAT THIS IS ERROR BUT RETURNS TRUE TO ACCOMODATE APPS
 			return res.sendJson(200, true, "user is currenty having an attempt", {
 				quiz: quizQuestions,
 				material_enrolled_id: checkIfCurrentlyTaking.id,
@@ -299,12 +299,12 @@ module.exports = {
 				id_referrer: quiz_id,
 				status: ONGOING,
 				type: QUIZ,
-				status: ONGOING,
 			});
 		}
 		return res.sendJson(200, true, "Success", {
 			quiz: quizQuestions,
 			material_enrolled_id: this_material_enrolled.id,
+			start_time: this_material_enrolled.created_at,
 		});
 	}),
 	/**
