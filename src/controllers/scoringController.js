@@ -2,7 +2,7 @@ const {
 	Student,
 	MajorSubject,
 	StudentSubject,
-	Materials_Enrolled,
+	MaterialEnrolled,
 	Subject,
 	StudentSession,
 	Session,
@@ -171,7 +171,11 @@ module.exports = {
 	}),
 
 	/**
+<<<<<<< HEAD
 	 * @desc      calculate Session Score
+=======
+	 * @desc      calculate Session Score score
+>>>>>>> 9a4ac3e (session scoring try 1)
 	 * @access    Private
 	 */
 	getSessionScore: asyncHandler(async (student_id, session_id) => {
@@ -218,8 +222,11 @@ module.exports = {
 			material_score.push(dat_val / amount);
 		}
 
+<<<<<<< HEAD
 		console.log(material_score);
 
+=======
+>>>>>>> 9a4ac3e (session scoring try 1)
 		return score;
 	}),
 };
