@@ -808,9 +808,9 @@ async function getParsedPlan(student_id) {
 		draftcred += currSub.credit;
 
 		let dataval = {
-			name: currSub?.name,
-			credit: currSub?.credit,
-			subject_id: currSub?.id,
+			name: currSub.name,
+			credit: currSub.credit,
+			subject_id: currSub.id,
 			student_subject_id: currStudSub.id,
 		};
 
