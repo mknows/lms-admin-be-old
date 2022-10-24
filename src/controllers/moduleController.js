@@ -170,12 +170,28 @@ module.exports = {
 	 */
 	getModule: asyncHandler(async (req, res) => {
 		const module_id = req.params.id;
+		const student_id = req.student_id;
 		const mod = await Module.findOne({
 			where: {
 				id: module_id,
 			},
 		});
 		if (!mod) return res.sendJson(404, false, "Not Found", {});
+
+		let takeaway;
+
+		const mat_enr = await MaterialEnrolled.findOne({
+			where: {
+				student_id,
+				id_referrer: mod.id,
+			},
+			attribute: ["activity_detail"],
+		});
+
+		if (mat_enr) {
+			takeaway = mat_enr.activity_detail.takeaway;
+		}
+
 		const vids = await Video.findAll({
 			where: {
 				id: {
@@ -192,6 +208,7 @@ module.exports = {
 		});
 		return res.sendJson(200, true, "Success", {
 			module: mod,
+			takeaway: takeaway,
 			videos: vids,
 			documents: docs,
 		});
