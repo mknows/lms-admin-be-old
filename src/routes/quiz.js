@@ -39,7 +39,7 @@ route.post(
 	protection,
 	authorize("student"),
 	existence(Quiz),
-	enrolled(Session),
+	enrolled(Quiz),
 	// moduleTaken(Session),
 	quizController.takeQuiz
 );
