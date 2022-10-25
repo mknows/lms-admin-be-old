@@ -14,6 +14,7 @@ const { getAuth } = require("firebase-admin/auth");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("express-async-handler");
 const lockUpdate = require("../helpers/lockHelp");
+const getSession = require("../helpers/getSession");
 
 /**
  * @desc      Middleware for user authentication
@@ -175,6 +176,7 @@ exports.enrolled = (Model) => {
 				break;
 			}
 			case Quiz: {
+				enrolled = getSession(Quiz, req.params.quiz_id);
 				break;
 			}
 		}
