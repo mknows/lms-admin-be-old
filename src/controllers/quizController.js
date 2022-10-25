@@ -510,11 +510,35 @@ module.exports = {
 			);
 		}
 
+		let result = [];
+
+		for (let i = 0; i < mat_enr_get.length; i++) {
+			let quiz = await Quiz.findOne({
+				where: { id: mat_enr_get.id_referrer },
+				attributes: ["duration", "questions", "description", "session_id"],
+			});
+
+			let deadline = moment(
+				new Date(
+					new Date(mat_enr_get.created_at).getTime() + quiz.duration * 1000
+				)
+			);
+
+			let datval = {
+				quiz_id: mat_enr_get.id_referrer,
+				material_enrolled_id: mat_enr_get[i].id,
+				original_start_time: mat_enr_get.created_at,
+				deadline: deadline,
+			};
+
+			result.push(datval);
+		}
+
 		return res.sendJson(
 			200,
 			true,
 			"User is currently taking these quizzes",
-			mat_enr_get
+			result
 		);
 	}),
 };
