@@ -68,6 +68,36 @@ module.exports = {
 		return res.sendJson(200, true, "Success", quizzDesc);
 	}),
 	/**
+	 * @desc      continue quiz
+	 * @route     GET /api/v1/quiz/continue/:material_enrolled_id
+	 * @access    Private
+	 */
+	continueQuiz: asyncHandler(async (req, res) => {
+		const { material_enrolled_id } = req.params;
+		let mat_enr = await MaterialEnrolled.findOne({
+			where: {
+				id: material_enrolled_id,
+				type: QUIZ,
+			},
+		});
+
+		if (!mat_enr) {
+			return res.sendJson(404, false, "no material enrolled found", {});
+		}
+
+		let quiz = await Quiz.findOne({
+			where: {
+				id: mat_enr.id_referrer,
+			},
+			attributes: ["duration", "questions", "description", "session_id"],
+		});
+
+		return res.sendJson(200, true, "Success", {
+			quiz: quiz,
+			material_enrolled_id: material_enrolled_id,
+		});
+	}),
+	/**
 	 * @desc      Get quiz
 	 * @route     GET /api/v1/quiz/desc/session/:session_id
 	 * @access    Private

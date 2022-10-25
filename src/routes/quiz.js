@@ -64,4 +64,11 @@ route.get(
 	quizController.getCurrentQuiz
 );
 
+route.get(
+	"/continue/:material_enrolled_id",
+	protection,
+	authorize("student"),
+	quizController.continueQuiz
+);
+
 module.exports = route;
