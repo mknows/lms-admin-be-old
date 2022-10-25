@@ -94,7 +94,7 @@ route.delete(
 );
 
 route.delete(
-	"/deleteDraft/:subject_id",
+	"/deletedraft/:subject_id",
 	protection,
 	authorize("student"),
 	existence(StudentSubject),
@@ -102,7 +102,7 @@ route.delete(
 	subjectController.deleteDraft
 );
 route.put(
-	"/sendDraft",
+	"/senddraft",
 	protection,
 	authorize("student"),
 	subjectController.sendDraft
