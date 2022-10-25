@@ -149,7 +149,7 @@ module.exports = {
 				stat = NOT_ENROLLED;
 			} else {
 				stat = met_enr.status;
-				takeaway = met_enr.activity_detail.takeaway;
+				takeaway = met_enr.activity_detail?.takeaway;
 			}
 
 			let datval = {

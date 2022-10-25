@@ -169,6 +169,59 @@ module.exports = {
 
 		return score;
 	}),
+
+	/**
+	 * @desc      calculate Session Score
+	 * @access    Private
+	 */
+	getSessionScore: asyncHandler(async (student_id, session_id) => {
+		let score = 0;
+
+		let sesh = await Session.findOne({
+			where: {
+				id: session_id,
+			},
+		});
+
+		let materials = await Promise.all([
+			await MaterialEnrolled.findAll({
+				student_id,
+				session_id,
+				type: MODULE,
+			}),
+			await MaterialEnrolled.findAll({
+				student_id,
+				session_id,
+				type: QUIZ,
+			}),
+			await MaterialEnrolled.findAll({
+				student_id,
+				session_id,
+				type: ASSIGNMENT,
+			}),
+		]);
+
+		let material_score = [];
+
+		for (let i = 0; i < materials.length; i++) {
+			let dat_val = 0;
+			let amount = 0;
+			for (let j = 0; j < materials[i].length; j++) {
+				let curr_score = materials[i][j].score;
+
+				if (curr_score == null) {
+					curr_score = 0;
+				}
+				dat_val += curr_score;
+				amount += 1;
+			}
+			material_score.push(dat_val / amount);
+		}
+
+		console.log(material_score);
+
+		return score;
+	}),
 };
 
 function letterByPercent(percent) {
