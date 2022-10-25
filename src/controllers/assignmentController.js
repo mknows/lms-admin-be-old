@@ -431,6 +431,7 @@ module.exports = {
 				where: {
 					session_id: session_id,
 					student_id: student_id,
+					type: ASSIGNMENT,
 				},
 			}
 		);
