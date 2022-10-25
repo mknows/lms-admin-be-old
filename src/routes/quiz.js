@@ -39,7 +39,7 @@ route.post(
 	protection,
 	authorize("student"),
 	existence(Quiz),
-	enrolled(Session),
+	// enrolled(Session),
 	// moduleTaken(Session),
 	quizController.takeQuiz
 );
@@ -55,6 +55,13 @@ route.get(
 	protection,
 	authorize("student"),
 	quizController.getQuizReview
+);
+
+route.get(
+	"/current",
+	protection,
+	authorize("student"),
+	quizController.getCurrentQuiz
 );
 
 module.exports = route;

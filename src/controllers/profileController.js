@@ -1,5 +1,6 @@
 const { User } = require("../models");
 const { getAuth: getClientAuth, updateProfile } = require("firebase/auth");
+const Sequelize = require("sequelize");
 
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("express-async-handler");
@@ -41,6 +42,24 @@ module.exports = {
 			success: true,
 			message: "Account connected.",
 			data: { ...data.dataValues, role: req.role, student_id: student_id },
+		});
+	}),
+
+	/**
+	 * @desc      Get User's Achievements
+	 * @route     GET /api/v1/profile/achievement
+	 * @access    Private
+	 */
+	achievements: asyncHandler(async (req, res) => {
+		let student_id = req.student_id;
+		const subject_count = await Student.findOne({
+			where: {
+				id: student_id,
+			},
+			include: {
+				model: Subject,
+				attributes: [Sequelize.fn("COUNT", Sequelize.col("id")), ""],
+			},
 		});
 	}),
 

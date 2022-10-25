@@ -14,6 +14,7 @@ const { getAuth } = require("firebase-admin/auth");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("express-async-handler");
 const lockUpdate = require("../helpers/lockHelp");
+const getSession = require("../helpers/getSession");
 
 /**
  * @desc      Middleware for user authentication
@@ -175,6 +176,7 @@ exports.enrolled = (Model) => {
 				break;
 			}
 			case Quiz: {
+				enrolled = getSession(Quiz, req.params.quiz_id);
 				break;
 			}
 		}
@@ -204,7 +206,6 @@ exports.existence = (Model) => {
 			}
 			case StudentSubject: {
 				id = req.params.subject_id;
-				console.log(id);
 				const student_id = req.student_id;
 				const existence = await Model.findOne({
 					where: {
@@ -212,7 +213,6 @@ exports.existence = (Model) => {
 						student_id: student_id,
 					},
 				});
-				console.log(existence);
 				if (!existence) {
 					return next(new ErrorResponse(`ID not found`, 404));
 				}

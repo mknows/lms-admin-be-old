@@ -47,6 +47,13 @@ route.post(
 	existence(Session),
 	assignmentController.submitAssignment
 );
+route.put(
+	"/edit/:session_id",
+	protection,
+	authorize("student", "user"),
+	upload.single("file_assignment"),
+	assignmentController.updateAssignment
+);
 
 route.get("/", protection, assignmentController.getAllAssignment);
 route.get(
@@ -55,19 +62,25 @@ route.get(
 	authorize("student", "user"),
 	assignmentController.getAssignmentInSession
 );
-route.get("/:assignment_id", protection, assignmentController.getAssignment);
 
-route.put(
-	"/edit/:assignment_id",
-	protection,
-	upload.single("file_assignment"),
-	assignmentController.updateAssignment
-);
+// route.put(
+// 	"/edit/:assignment_id",
+// 	protection,
+// 	upload.single("file_assignment"),
+// 	assignmentController.updateAssignment
+// );
 route.delete(
 	"/delete/:session_id",
 	protection,
 	authorize("user", "student"),
 	assignmentController.removeSubmission
 );
+route.get(
+	"/ongoing/",
+	protection,
+	authorize("student"),
+	assignmentController.getAssignmentOngoing
+);
+route.get("/:assignment_id", protection, assignmentController.getAssignment);
 
 module.exports = route;

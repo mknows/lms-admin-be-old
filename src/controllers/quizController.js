@@ -106,7 +106,6 @@ module.exports = {
 				"status",
 			],
 		});
-
 		const checkIfCurrentlyTaking = await MaterialEnrolled.findOne({
 			where: {
 				student_id: student_id,
@@ -484,5 +483,62 @@ module.exports = {
 		};
 
 		return res.sendJson(200, true, "Success", result);
+	}),
+
+	/**
+	 * @desc      Get current quiz
+	 * @route     GET /api/v1/quiz/current/
+	 * @access    Private (Admin)
+	 */
+	getCurrentQuiz: asyncHandler(async (req, res, next) => {
+		const student_id = req.student_id;
+
+		let mat_enr_get = await MaterialEnrolled.findAll({
+			where: {
+				student_id,
+				type: QUIZ,
+				status: ONGOING,
+			},
+		});
+
+		if (!mat_enr_get) {
+			return res.sendJson(
+				200,
+				true,
+				"User is not currently taking any quizzes",
+				{}
+			);
+		}
+
+		let result = [];
+
+		for (let i = 0; i < mat_enr_get.length; i++) {
+			let quiz = await Quiz.findOne({
+				where: { id: mat_enr_get.id_referrer },
+				attributes: ["duration", "questions", "description", "session_id"],
+			});
+
+			let deadline = moment(
+				new Date(
+					new Date(mat_enr_get.created_at).getTime() + quiz.duration * 1000
+				)
+			);
+
+			let datval = {
+				quiz_id: mat_enr_get.id_referrer,
+				material_enrolled_id: mat_enr_get[i].id,
+				original_start_time: mat_enr_get.created_at,
+				deadline: deadline,
+			};
+
+			result.push(datval);
+		}
+
+		return res.sendJson(
+			200,
+			true,
+			"User is currently taking these quizzes",
+			result
+		);
 	}),
 };

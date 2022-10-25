@@ -21,7 +21,7 @@ module.exports = {
 				type: Sequelize.DATE,
 			},
 			final_score: {
-				type: Sequelize.INTEGER,
+				type: Sequelize.FLOAT,
 			},
 			present: {
 				type: Sequelize.BOOLEAN,

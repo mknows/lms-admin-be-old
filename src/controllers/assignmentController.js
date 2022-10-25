@@ -70,8 +70,8 @@ module.exports = {
 			uuidv4() +
 			"-" +
 			req.file.originalname.split(" ").join("-");
-		const file_assignment_buffer = req.file.buffer;
 
+		const file_assignment_buffer = req.file.buffer;
 		bucket
 			.file(file_assignment)
 			.createWriteStream()
@@ -86,7 +86,9 @@ module.exports = {
 					const date_submit = moment();
 
 					const activity_detail = {
-						date_submit: moment(deadline).format("DD/MM/YYYY hh:mm:ss"),
+						date_submit: moment(material_data.created_at).format(
+							"DD/MM/YYYY hh:mm:ss"
+						),
 						file_assignment: file_assignment,
 						file_assignment_link: linkFile,
 					};
@@ -114,6 +116,81 @@ module.exports = {
 				});
 			});
 	}),
+
+	/**
+	 * @desc      Update file assignment
+	 * @route     PUT /api/v1/assignment/:session_id
+	 * @access    Private
+	 */
+	updateAssignment: asyncHandler(async (req, res) => {
+		const { session_id } = req.params;
+		const student_id = req.student_id;
+		const bucket = admin.storage().bucket();
+		const storage = getStorage();
+
+		const assign = await Assignment.findOne({
+			where: {
+				session_id,
+			},
+		});
+		if (!assign) {
+			return res.sendJson(404, false, "session id not found");
+		}
+
+		const checkFile = await MaterialEnrolled.findOne({
+			where: {
+				session_id,
+				student_id,
+				type: ASSIGNMENT,
+			},
+		});
+
+		//*check for deleta a file
+		checkFileIfExistFirebase(res, checkFile.activity_detail.file_assignment);
+
+		const file_assignment =
+			"documents/assignments/" +
+			uuidv4() +
+			"-" +
+			req.file.originalname.split(" ").join("-");
+		const file_assignment_buffer = req.file.buffer;
+
+		bucket
+			.file(file_assignment)
+			.createWriteStream()
+			.end(file_assignment_buffer)
+			.on("finish", () => {
+				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
+					const activity_detail = {
+						date_submit: moment.now(),
+						file_assignment: file_assignment,
+						file_assignment_link: linkFile,
+					};
+					await MaterialEnrolled.update(
+						{
+							activity_detail: activity_detail,
+							status: GRADING,
+							type: ASSIGNMENT,
+						},
+						{
+							where: {
+								student_id,
+								session_id,
+							},
+						}
+					);
+					material_data = await MaterialEnrolled.findOne({
+						where: {
+							id_referrer: assign.id,
+							student_id,
+						},
+					});
+					checkDoneSession(student_id, material_data.session_id);
+					return res.sendJson(200, true, "Successfully update file assignment");
+				});
+			});
+	}),
+
 	/**
 	 * @desc      Get all Assignment
 	 * @route     GET /api/v1/assignment/
@@ -131,7 +208,7 @@ module.exports = {
 	getAssignmentInSession: asyncHandler(async (req, res) => {
 		const { session_id } = req.params;
 		const student_id = req.student_id;
-		const assign = await Assignment.findOne({
+		let assign = await Assignment.findOne({
 			attributes: [
 				"id",
 				"content",
@@ -139,12 +216,12 @@ module.exports = {
 				"file_assignment",
 				"file_assignment_link",
 				"duration",
-				"created_at",
 			],
 			where: {
 				session_id: session_id,
 			},
 		});
+		assign.file_assignment = assign.file_assignment.slice(59);
 
 		const session = await Session.findOne({
 			where: {
@@ -152,16 +229,14 @@ module.exports = {
 			},
 		});
 
-		const deadline = new Date(
-			new Date(assign.created_at).getTime() + assign.duration * 1000
-		);
-		assign.dataValues.deadline = moment(deadline).format("DD/MM/YYYY hh:mm:ss");
-
 		if (!assign) {
 			return res.sendJson(400, false, "No assignment was assigned");
 		}
 
 		const student_taken_assignment = await MaterialEnrolled.findOne({
+			attributes: {
+				include: ["created_at"],
+			},
 			where: {
 				student_id: student_id,
 				session_id: session_id,
@@ -169,7 +244,7 @@ module.exports = {
 			},
 		});
 		if (!student_taken_assignment) {
-			await MaterialEnrolled.create({
+			const material_enrolled = await MaterialEnrolled.create({
 				student_id,
 				session_id,
 				subject_id: session.subject_id,
@@ -178,6 +253,21 @@ module.exports = {
 				id_referrer: assign.id,
 				type: ASSIGNMENT,
 			});
+			const deadline = new Date(
+				new Date(material_enrolled.created_at).getTime() +
+					assign.duration * 1000
+			);
+			assign.dataValues.deadline = moment(deadline).format(
+				"DD/MM/YYYY hh:mm:ss"
+			);
+		} else {
+			const deadline = new Date(
+				new Date(student_taken_assignment.created_at).getTime() +
+					assign.duration * 1000
+			);
+			assign.dataValues.deadline = moment(deadline).format(
+				"DD/MM/YYYY hh:mm:ss"
+			);
 		}
 		let result = {
 			assignment: assign,
@@ -198,6 +288,45 @@ module.exports = {
 			},
 		});
 		res.sendJson(200, true, "Success", assign);
+	}),
+	/**
+	 * @desc      Get Assignment ongoing
+	 * @route     GET /api/v1/assignment/ongoing
+	 * @access    Private
+	 */
+	getAssignmentOngoing: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
+		const enr_data = await MaterialEnrolled.findAll({
+			where: {
+				student_id,
+				status: ONGOING,
+				type: ASSIGNMENT,
+			},
+			attributes: { include: ["created_at"] },
+		});
+
+		let result = [];
+		for (let i = 0; i < enr_data.length; i++) {
+			let curr_assign = await Assignment.findOne({
+				where: {
+					id: enr_data[i].id_referrer,
+				},
+			});
+			const deadline = moment(
+				new Date(
+					new Date(enr_data[i].created_at).getTime() +
+						curr_assign.duration * 1000
+				)
+			);
+
+			result.push({
+				assignment: curr_assign,
+				start_date: enr_data[i].created_at,
+				duration: curr_assign.duration,
+				deadline: deadline,
+			});
+		}
+		res.sendJson(200, true, "Success", result);
 	}),
 	/**
 	 * @desc      update Assignment
@@ -311,4 +440,17 @@ module.exports = {
 			message: "Submission Removed",
 		});
 	}),
+};
+
+const checkFileIfExistFirebase = async (res, data) => {
+	const storage = getStorage();
+	if (data) {
+		await deleteObject(ref(storage, data))
+			.then(() => {
+				return console.log("success deleteObject");
+			})
+			.catch(() => {
+				return res.sendJson(200, true, "file data was deleted");
+			});
+	}
 };

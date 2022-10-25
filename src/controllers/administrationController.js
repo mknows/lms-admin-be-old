@@ -815,8 +815,12 @@ const checkIfExistFirebase = async (res, data) => {
 			.then(() => {
 				console.log("success deleteObject");
 			})
-			.catch(err, () => {
-				return res.sendJson(400, false, "failed deleteObject", err);
+			.catch(() => {
+				return res.sendJson(
+					400,
+					false,
+					"failed deleteObject, maybe file was deleted"
+				);
 			});
 	}
 };
