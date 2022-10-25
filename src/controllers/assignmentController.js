@@ -70,8 +70,8 @@ module.exports = {
 			uuidv4() +
 			"-" +
 			req.file.originalname.split(" ").join("-");
-		const file_assignment_buffer = req.file.buffer;
 
+		const file_assignment_buffer = req.file.buffer;
 		bucket
 			.file(file_assignment)
 			.createWriteStream()
@@ -86,7 +86,9 @@ module.exports = {
 					const date_submit = moment();
 
 					const activity_detail = {
-						date_submit: moment(deadline).format("DD/MM/YYYY hh:mm:ss"),
+						date_submit: moment(material_data.created_at).format(
+							"DD/MM/YYYY hh:mm:ss"
+						),
 						file_assignment: file_assignment,
 						file_assignment_link: linkFile,
 					};
@@ -214,7 +216,6 @@ module.exports = {
 				"file_assignment",
 				"file_assignment_link",
 				"duration",
-				"created_at",
 			],
 			where: {
 				session_id: session_id,
@@ -228,16 +229,14 @@ module.exports = {
 			},
 		});
 
-		const deadline = new Date(
-			new Date(assign.created_at).getTime() + assign.duration * 1000
-		);
-		assign.dataValues.deadline = moment(deadline).format("DD/MM/YYYY hh:mm:ss");
-
 		if (!assign) {
 			return res.sendJson(400, false, "No assignment was assigned");
 		}
 
 		const student_taken_assignment = await MaterialEnrolled.findOne({
+			attributes: {
+				include: ["created_at"],
+			},
 			where: {
 				student_id: student_id,
 				session_id: session_id,
@@ -245,7 +244,7 @@ module.exports = {
 			},
 		});
 		if (!student_taken_assignment) {
-			await MaterialEnrolled.create({
+			const material_enrolled = await MaterialEnrolled.create({
 				student_id,
 				session_id,
 				subject_id: session.subject_id,
@@ -254,6 +253,21 @@ module.exports = {
 				id_referrer: assign.id,
 				type: ASSIGNMENT,
 			});
+			const deadline = new Date(
+				new Date(material_enrolled.created_at).getTime() +
+					assign.duration * 1000
+			);
+			assign.dataValues.deadline = moment(deadline).format(
+				"DD/MM/YYYY hh:mm:ss"
+			);
+		} else {
+			const deadline = new Date(
+				new Date(student_taken_assignment.created_at).getTime() +
+					assign.duration * 1000
+			);
+			assign.dataValues.deadline = moment(deadline).format(
+				"DD/MM/YYYY hh:mm:ss"
+			);
 		}
 		let result = {
 			assignment: assign,
