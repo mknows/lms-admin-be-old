@@ -196,6 +196,10 @@ exports.existence = (Model) => {
 				id = req.params.quiz_id;
 				break;
 			}
+			case Major: {
+				id = req.params.major_id;
+				break;
+			}
 			case Session: {
 				id = req.params.session_id;
 				break;
@@ -224,7 +228,6 @@ exports.existence = (Model) => {
 				id,
 			},
 		});
-
 		if (!existence) {
 			return next(new ErrorResponse(`ID not found`, 404));
 		}
