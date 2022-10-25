@@ -45,8 +45,6 @@ route.post(
 	authorize("student", "user"),
 	upload.single("file_assignment"),
 	existence(Session),
-	enrolled(Session),
-	moduleTaken(Session),
 	assignmentController.submitAssignment
 );
 route.put(
@@ -62,9 +60,6 @@ route.get(
 	"/session/:session_id",
 	protection,
 	authorize("student", "user"),
-	existence(Session),
-	enrolled(Session),
-	moduleTaken(Session),
 	assignmentController.getAssignmentInSession
 );
 route.get("/:assignment_id", protection, assignmentController.getAssignment);
