@@ -222,11 +222,8 @@ module.exports = {
 			material_score.push(dat_val / amount);
 		}
 
-<<<<<<< HEAD
 		console.log(material_score);
 
-=======
->>>>>>> 9a4ac3e (session scoring try 1)
 		return score;
 	}),
 };
