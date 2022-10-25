@@ -1,7 +1,7 @@
-const { User } = require("../models");
+const { User, Student, Subject, Certificate } = require("../models");
 const { getAuth: getClientAuth, updateProfile } = require("firebase/auth");
 const Sequelize = require("sequelize");
-
+const { FINISHED, ONGOING } = process.env;
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("express-async-handler");
 const {
@@ -12,6 +12,7 @@ const {
 } = require("firebase/storage");
 const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
+const scoringController = require("./scoringController");
 
 module.exports = {
 	/**
@@ -52,14 +53,50 @@ module.exports = {
 	 */
 	achievements: asyncHandler(async (req, res) => {
 		let student_id = req.student_id;
-		const subject_count = await Student.findOne({
+		let finished_subjects = 0;
+		let subjects_taken = 0;
+
+		const subjects = await Student.findOne({
+			attributes: ["id"],
 			where: {
 				id: student_id,
 			},
 			include: {
 				model: Subject,
-				attributes: [Sequelize.fn("COUNT", Sequelize.col("id")), ""],
+				attributes: ["id"],
+				through: {
+					attributes: ["status"],
+					where: {
+						status: {
+							[Sequelize.Op.or]: ["FINISHED", "ONGOING"],
+						},
+					},
+				},
 			},
+		});
+		for (i = 0; i < subjects.Subjects.length; i++) {
+			if (subjects.Subjects[i].StudentSubject.status == "FINISHED") {
+				finished_subjects++;
+			}
+			if (subjects.Subjects[i].StudentSubject.status == "ONGOING") {
+				subjects_taken++;
+			}
+			subjects.Subjects[i].dataValues.progress =
+				await scoringController.getSubjectProgress(
+					subjects.Subjects[i].id,
+					req.student_id
+				);
+		}
+		const students_certificate = await Certificate.findAll({
+			where: {
+				student_id,
+			},
+		});
+		return res.sendJson(200, true, "success update profile", {
+			finished_subjects: finished_subjects,
+			subject_taken: subjects_taken,
+			students_certificate: students_certificate.length,
+			subjects_enrolled: subjects,
 		});
 	}),
 

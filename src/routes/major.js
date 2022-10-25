@@ -3,7 +3,13 @@ const route = express.Router();
 const multer = require("multer");
 
 const majorController = require("../controllers/majorController");
-const { protection, authorize } = require("../middlewares/Authentication");
+const {
+	protection,
+	authorize,
+	existence,
+} = require("../middlewares/Authentication");
+
+const { Major } = require("../models");
 
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -50,6 +56,12 @@ route.put(
 );
 route.delete("/delete/:major_id", protection, majorController.removeMajor);
 
-route.post("/take/:major_id", protection, authorize('student','user'), majorController.enrollMajor);
+route.post(
+	"/take/:major_id",
+	protection,
+	authorize("student", "user"),
+	existence(Major),
+	majorController.enrollMajor
+);
 
 module.exports = route;

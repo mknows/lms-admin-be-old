@@ -282,31 +282,21 @@ module.exports = {
 		const { major_id } = req.params;
 		const student_id = req.student_id;
 
-		const major_exists = await Major.findOne({
-			attribute: ["id", "name"],
-			where: {
-				id: major_id,
-			},
-		});
-
-		if (!major_exists) {
-			return res.status(400).json({
-				success: true,
-				message: `Major doesn't exist`,
-			});
-		}
-
 		const students_major = await StudentMajor.findOne({
 			where: {
 				student_id: student_id,
-				major_id: major_id,
 			},
 		});
-
-		if (students_major) {
+		if (students_major.major_id === major_id) {
 			return res.status(400).json({
 				success: false,
 				message: `Student is already enrolled in this major`,
+			});
+		}
+		if (students_major) {
+			return res.status(400).json({
+				success: false,
+				message: `Student is already enrolled to a major`,
 			});
 		}
 		if (!students_major) {
