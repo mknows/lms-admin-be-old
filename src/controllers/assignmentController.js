@@ -105,13 +105,12 @@ module.exports = {
 						}
 					);
 					material_data = material_data[1][0];
-					checkDoneSession(student_id, material_data[1][0].session_id);
-					return res.sendJson(
-						200,
-						true,
-						"Successfully Submitted",
-						activity_detail
-					);
+
+					checkDoneSession(student_id, material_data.session_id);
+					return res.sendJson(200, true, "Successfully Submitted", {
+						activity_detail,
+						status: moment(date_submit).isAfter(deadline) ? LATE : GRADING,
+					});
 				});
 			});
 	}),
