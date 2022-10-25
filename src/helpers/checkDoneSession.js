@@ -17,6 +17,7 @@ const moment = require("moment");
 require("dotenv").config({
 	path: __dirname + "../controllers/controllerconfig.env",
 });
+const scoringController = require("../controllers/scoringController");
 const {
 	DRAFT,
 	PENDING,
@@ -100,11 +101,16 @@ async function completedSession(student_id, session_id) {
 
 	if (intersection === undefined || intersection.length == 0) {
 		// array does not exist or is empty (present)
+		const score = await scoringController.getSessionScore(
+			student_id,
+			session_id
+		);
 		await StudentSession.update(
 			{
 				status: FINISHED,
 				present: true,
 				date_present: moment().format("YYYY-MM-DD HH:mm:ss"),
+				final_score: score,
 			},
 			{
 				where: {

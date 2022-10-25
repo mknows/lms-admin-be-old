@@ -804,7 +804,6 @@ async function getParsedPlan(student_id) {
 				id: currStudSub.subject_id,
 			},
 		});
-		console.log(currSub);
 		draftcred += currSub.credit;
 
 		let dataval = {

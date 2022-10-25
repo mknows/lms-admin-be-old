@@ -114,6 +114,7 @@ exports.enrolled = (Model) => {
 						id: session_id,
 					},
 				});
+
 				enrolled = await Student.findOne({
 					attributes: ["id"],
 					where: {
@@ -127,6 +128,7 @@ exports.enrolled = (Model) => {
 						},
 					},
 				});
+
 				break;
 			}
 			case Subject: {
@@ -206,7 +208,7 @@ exports.existence = (Model) => {
 			}
 			case StudentSubject: {
 				id = req.params.subject_id;
-				console.log(id);
+
 				const student_id = req.student_id;
 				const existence = await Model.findOne({
 					where: {
@@ -214,7 +216,7 @@ exports.existence = (Model) => {
 						student_id: student_id,
 					},
 				});
-				console.log(existence);
+
 				if (!existence) {
 					return next(new ErrorResponse(`ID not found`, 404));
 				}

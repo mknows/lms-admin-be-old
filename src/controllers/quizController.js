@@ -106,7 +106,6 @@ module.exports = {
 				"status",
 			],
 		});
-
 		const checkIfCurrentlyTaking = await MaterialEnrolled.findOne({
 			where: {
 				student_id: student_id,

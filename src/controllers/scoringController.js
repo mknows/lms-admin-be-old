@@ -46,6 +46,10 @@ const {
 	MODULE,
 	QUIZ,
 	ASSIGNMENT,
+
+	QUIZ_WEIGHT,
+	ASSIGNMENT_WEIGHT,
+	MODULE_WEIGHT,
 } = process.env;
 const asyncHandler = require("express-async-handler");
 
@@ -171,16 +175,10 @@ module.exports = {
 	}),
 
 	/**
-<<<<<<< HEAD
-	 * @desc      calculate Session Score
-=======
 	 * @desc      calculate Session Score score
->>>>>>> 9a4ac3e (session scoring try 1)
 	 * @access    Private
 	 */
 	getSessionScore: asyncHandler(async (student_id, session_id) => {
-		let score = 0;
-
 		let sesh = await Session.findOne({
 			where: {
 				id: session_id,
@@ -189,19 +187,25 @@ module.exports = {
 
 		let materials = await Promise.all([
 			await MaterialEnrolled.findAll({
-				student_id,
-				session_id,
-				type: MODULE,
+				where: {
+					student_id,
+					session_id,
+					type: MODULE,
+				},
 			}),
 			await MaterialEnrolled.findAll({
-				student_id,
-				session_id,
-				type: QUIZ,
+				where: {
+					student_id,
+					session_id,
+					type: QUIZ,
+				},
 			}),
 			await MaterialEnrolled.findAll({
-				student_id,
-				session_id,
-				type: ASSIGNMENT,
+				where: {
+					student_id,
+					session_id,
+					type: ASSIGNMENT,
+				},
 			}),
 		]);
 
@@ -221,10 +225,13 @@ module.exports = {
 			}
 			material_score.push(dat_val / amount);
 		}
+		let final_score = 0;
 
-		console.log(material_score);
+		final_score += (material_score[0] * parseFloat(MODULE_WEIGHT)) / 100;
+		final_score += (material_score[1] * parseFloat(QUIZ_WEIGHT)) / 100;
+		final_score += (material_score[2] * parseFloat(ASSIGNMENT_WEIGHT)) / 100;
 
-		return score;
+		return final_score;
 	}),
 };
 
