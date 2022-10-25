@@ -341,7 +341,7 @@ module.exports = {
 		const { major_id, degree } = req.query;
 		const student_id = req.student_id;
 		let result;
-		const key = "getCurriculum-" + student_id;
+		const key = "getCurriculum-" + student_id + major_id + degree;
 
 		const cacheResult = await redisClient.get(key);
 		if (cacheResult) {
@@ -599,9 +599,7 @@ module.exports = {
 				},
 			});
 			const students_information = await Student.findOne({
-				attributes:[
-					'semester'	
-				],
+				attributes: ["semester"],
 				where: {
 					id: student_id,
 				},
@@ -613,13 +611,13 @@ module.exports = {
 					{
 						model: Major,
 						attributes: ["name"],
-						through:{
-							attributes:[]
-						}
+						through: {
+							attributes: [],
+						},
 					},
 					{
 						model: Lecturer,
-						attributes:['id'],
+						attributes: ["id"],
 						include: [
 							{
 								model: User,
