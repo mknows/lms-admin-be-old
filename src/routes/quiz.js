@@ -57,4 +57,11 @@ route.get(
 	quizController.getQuizReview
 );
 
+route.get(
+	"/current",
+	protection,
+	authorize("student"),
+	quizController.getCurrentQuiz
+);
+
 module.exports = route;

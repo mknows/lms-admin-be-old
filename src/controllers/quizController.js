@@ -484,4 +484,37 @@ module.exports = {
 
 		return res.sendJson(200, true, "Success", result);
 	}),
+
+	/**
+	 * @desc      Get current quiz
+	 * @route     GET /api/v1/quiz/current/
+	 * @access    Private (Admin)
+	 */
+	getCurrentQuiz: asyncHandler(async (req, res, next) => {
+		const student_id = req.student_id;
+
+		let mat_enr_get = await MaterialEnrolled.findAll({
+			where: {
+				student_id,
+				type: QUIZ,
+				status: ONGOING,
+			},
+		});
+
+		if (!mat_enr_get) {
+			return res.sendJson(
+				200,
+				true,
+				"User is not currently taking any quizzes",
+				{}
+			);
+		}
+
+		return res.sendJson(
+			200,
+			true,
+			"User is currently taking these quizzes",
+			mat_enr_get
+		);
+	}),
 };

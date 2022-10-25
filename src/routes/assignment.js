@@ -62,7 +62,6 @@ route.get(
 	authorize("student", "user"),
 	assignmentController.getAssignmentInSession
 );
-route.get("/:assignment_id", protection, assignmentController.getAssignment);
 
 // route.put(
 // 	"/edit/:assignment_id",
@@ -76,5 +75,12 @@ route.delete(
 	authorize("user", "student"),
 	assignmentController.removeSubmission
 );
+route.get(
+	"/ongoing/",
+	protection,
+	authorize("student"),
+	assignmentController.getAssignmentOngoing
+);
+route.get("/:assignment_id", protection, assignmentController.getAssignment);
 
 module.exports = route;

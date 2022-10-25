@@ -290,6 +290,105 @@ module.exports = {
 		res.sendJson(200, true, "Success", assign);
 	}),
 	/**
+	 * @desc      Get Assignment ongoing
+	 * @route     GET /api/v1/assignment/ongoing
+	 * @access    Private
+	 */
+	getAssignmentOngoing: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
+		const enr_data = await MaterialEnrolled.findAll({
+			where: {
+				student_id,
+				status: ONGOING,
+				type: ASSIGNMENT,
+			},
+			attributes: { include: ["created_at"] },
+		});
+
+		let result = [];
+		for (let i = 0; i < enr_data.length; i++) {
+			let curr_assign = await Assignment.findOne({
+				where: {
+					id: enr_data[i].id_referrer,
+				},
+			});
+			const deadline = moment(
+				new Date(
+					new Date(enr_data[i].created_at).getTime() +
+						curr_assign.duration * 1000
+				)
+			);
+
+			result.push({
+				assignment: curr_assign,
+				start_date: enr_data[i].created_at,
+				duration: curr_assign.duration,
+				deadline: deadline,
+			});
+		}
+		res.sendJson(200, true, "Success", result);
+	}),
+	/**
+	 * @desc      update Assignment
+	 * @route     put /api/v1/assignment/:session_id
+	 * @access    Private
+	 */
+	updateAssignment: asyncHandler(async (req, res) => {
+		const { session_id } = req.params;
+		const student_id = req.student_id;
+		const storage = getStorage();
+		const bucket = admin.storage().bucket();
+
+		const exist = await MaterialEnrolled.findOne({
+			where: {
+				student_id: student_id,
+				session_id: session_id,
+			},
+		});
+
+		if (!exist) {
+			return res.status(404).json({
+				success: false,
+				message: "Assignment not found",
+				data: {},
+			});
+		}
+
+		if (exist.activity_detail.file_assignment) {
+			deleteObject(
+				ref(storage, `document_assignment/${exist.file_assignment}`)
+			);
+		}
+		const file_assignment =
+			"document_assignment/" +
+			uuidv4() +
+			"-" +
+			req.file.originalname.split(" ").join("-");
+		const file_assignment_buffer = req.file.buffer;
+
+		bucket
+			.file(file_assignment)
+			.createWriteStream()
+			.end(file_assignment_buffer)
+			.on("finish", () => {
+				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
+					await MaterialEnrolled.update(
+						{
+							activity_detail: null,
+							status: ONGOING,
+						},
+						{
+							where: {
+								session_id: session_id,
+								student_id: student_id,
+							},
+						}
+					);
+				});
+			});
+		return res.sendJson(200, true, "Success");
+	}),
+	/**
 	 * @desc      Delete submission
 	 * @route     DELETE /api/v1/assignment/delete/:session_id
 	 * @access    Private (Admin)
