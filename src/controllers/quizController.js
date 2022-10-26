@@ -534,7 +534,7 @@ module.exports = {
 			},
 		});
 
-		if (!mat_enr_get) {
+		if (mat_enr_get.length === 0) {
 			return res.sendJson(
 				200,
 				true,
@@ -553,7 +553,7 @@ module.exports = {
 
 			let deadline = moment(
 				new Date(
-					new Date(mat_enr_get[i].created_at).getTime() + quiz.duration * 1000
+					new Date(mat_enr_get[i].created_at).getTime() + quiz?.duration * 1000
 				)
 			);
 
