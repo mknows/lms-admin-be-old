@@ -575,12 +575,16 @@ module.exports = {
 				type: MODULE,
 				activity_detail: detail,
 				status: FINISHED,
+
+				score: 100,
 			});
 		} else {
 			material_enrolled_data = await MaterialEnrolled.update(
 				{
 					activity_detail: detail,
 					status: FINISHED,
+
+					score: 100,
 				},
 				{
 					where: {

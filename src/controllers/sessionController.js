@@ -69,6 +69,7 @@ module.exports = {
 			where: {
 				subject_id: subject_id,
 			},
+			order: ["session_no"],
 		});
 
 		for (i = 0; i < data.length; i++) {

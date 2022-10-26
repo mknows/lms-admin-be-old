@@ -42,7 +42,7 @@ const upload = multer({
 route.post(
 	"/submit/:session_id",
 	protection,
-	authorize("student", "user"),
+	authorize("student"),
 	upload.single("file_assignment"),
 	existence(Session),
 	assignmentController.submitAssignment
@@ -50,7 +50,7 @@ route.post(
 route.put(
 	"/edit/:session_id",
 	protection,
-	authorize("student", "user"),
+	authorize("student"),
 	upload.single("file_assignment"),
 	assignmentController.updateAssignment
 );
@@ -59,20 +59,14 @@ route.get("/", protection, assignmentController.getAllAssignment);
 route.get(
 	"/session/:session_id",
 	protection,
-	authorize("student", "user"),
+	authorize("student"),
 	assignmentController.getAssignmentInSession
 );
 
-// route.put(
-// 	"/edit/:assignment_id",
-// 	protection,
-// 	upload.single("file_assignment"),
-// 	assignmentController.updateAssignment
-// );
 route.delete(
 	"/delete/:session_id",
 	protection,
-	authorize("user", "student"),
+	authorize("student"),
 	assignmentController.removeSubmission
 );
 route.get(

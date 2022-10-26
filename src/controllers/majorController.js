@@ -287,7 +287,7 @@ module.exports = {
 				student_id: student_id,
 			},
 		});
-		if (students_major.major_id === major_id) {
+		if (students_major?.major_id === major_id) {
 			return res.status(400).json({
 				success: false,
 				message: `Student is already enrolled in this major`,
@@ -300,14 +300,20 @@ module.exports = {
 			});
 		}
 		if (!students_major) {
-			await StudentMajor.create({
+			let stud_maj = await StudentMajor.create({
 				student_id: student_id,
 				major_id: major_id,
 				status: "ONGOING",
 			});
+
+			let maj = await Major.findOne({
+				where: {
+					id: major_id,
+				},
+			});
 			return res.status(200).json({
 				success: true,
-				message: `Enrolled to ${major_exists.name}`,
+				message: `Enrolled to ${maj.name}`,
 			});
 		}
 	}),

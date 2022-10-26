@@ -48,6 +48,16 @@ async function completedSession(student_id, session_id) {
 		return present;
 	}
 
+	// testttttt
+
+	let sesh = await Session.findOne({
+		where: {
+			id: session_id,
+		},
+	});
+
+	// testttttt
+
 	let all_task = await Promise.all([
 		Quiz.findAll({
 			where: { session_id: session_id },
@@ -105,6 +115,14 @@ async function completedSession(student_id, session_id) {
 			student_id,
 			session_id
 		);
+
+		// tesst ------------------------
+		const sub_score = await scoringController.getSubjectScoreV2(
+			student_id,
+			sesh.subject_id
+		);
+		// tesst -----------------------
+
 		await StudentSession.update(
 			{
 				status: FINISHED,

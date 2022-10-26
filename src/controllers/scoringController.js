@@ -1,11 +1,18 @@
 const {
 	Student,
+
 	MajorSubject,
 	StudentSubject,
-	MaterialEnrolled,
 	Subject,
+
+	MaterialEnrolled,
+
 	StudentSession,
 	Session,
+
+	Quiz,
+	Assignment,
+	Module,
 } = require("../models");
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
@@ -47,9 +54,15 @@ const {
 	QUIZ,
 	ASSIGNMENT,
 
-	QUIZ_WEIGHT,
-	ASSIGNMENT_WEIGHT,
-	MODULE_WEIGHT,
+	QUIZ_WEIGHT_SESSION,
+	ASSIGNMENT_WEIGHT_SESSION,
+	MODULE_WEIGHT_SESSION,
+
+	UTS,
+	UAS,
+	ASSIGNMENT_WEIGHT_ALL,
+	QUIZ_WEIGHT_ALL,
+	ATTENDANCE_WEIGHT_ALL,
 } = process.env;
 const asyncHandler = require("express-async-handler");
 
@@ -126,6 +139,100 @@ module.exports = {
 		}
 
 		return progress;
+	}),
+
+	/**
+	 * @desc      calculate Subject score V2
+	 * @access    Private
+	 */
+	getSubjectScoreV2: asyncHandler(async (student_id, subject_id) => {
+		let score = 0;
+
+		let sub = await Subject.findOne({
+			where: { id: subject_id },
+		});
+
+		let sessions = await Session.findAll({
+			where: { subject_id: sub.id },
+		});
+
+		let sesh_id_list = [];
+
+		for (let i = 0; i < sessions; i++) {
+			sesh_id_list.push(sessions[i].id);
+		}
+
+		let quiz_pool = 0;
+		let assignment_pool = 0;
+		let module_pool = 0;
+
+		let material_all = await Promise.all([
+			await MaterialEnrolled.findAll({
+				where: {
+					student_id,
+					session_id: sesh_id_list,
+					status: FINISHED,
+					type: QUIZ,
+				},
+			}),
+			await Quiz.findAll({
+				where: {
+					session_id: sesh_id_list,
+				},
+			}),
+			await MaterialEnrolled.findAll({
+				where: {
+					student_id,
+					session_id: sesh_id_list,
+					status: FINISHED,
+					type: ASSIGNMENT,
+				},
+			}),
+			await Assignment.findAll({
+				where: {
+					session_id: sesh_id_list,
+				},
+			}),
+			await MaterialEnrolled.findAll({
+				where: {
+					student_id,
+					session_id: sesh_id_list,
+					status: FINISHED,
+					type: MODULE,
+				},
+			}),
+			await Module.findAll({
+				where: {
+					session_id: sesh_id_list,
+				},
+			}),
+		]);
+
+		for (let i = 0; i < material_all[0].length; i++) {
+			curr_mat = material_all[0][i];
+			quiz_pool += curr_mat?.score;
+			console.log(quiz_pool);
+		}
+		let counter = material_all[1].length;
+		// quiz_pool = quiz_pool / counter;
+
+		for (let i = 0; i < material_all[2].length; i++) {
+			curr_mat = material_all[2][i];
+			assignment_pool += curr_mat?.score;
+		}
+		counter = material_all[3].length;
+		// assignment_pool = assignment_pool / counter;
+
+		for (let i = 0; i < material_all[4].length; i++) {
+			curr_mat = material_all[4][i];
+			module_pool += curr_mat?.score;
+		}
+		counter = material_all[5].length;
+		// module_pool = module_pool / counter;
+
+		console.log(quiz_pool, assignment_pool, module_pool);
+
+		return score;
 	}),
 
 	/**
@@ -227,9 +334,11 @@ module.exports = {
 		}
 		let final_score = 0;
 
-		final_score += (material_score[0] * parseFloat(MODULE_WEIGHT)) / 100;
-		final_score += (material_score[1] * parseFloat(QUIZ_WEIGHT)) / 100;
-		final_score += (material_score[2] * parseFloat(ASSIGNMENT_WEIGHT)) / 100;
+		final_score +=
+			(material_score[0] * parseFloat(MODULE_WEIGHT_SESSION)) / 100;
+		final_score += (material_score[1] * parseFloat(QUIZ_WEIGHT_SESSION)) / 100;
+		final_score +=
+			(material_score[2] * parseFloat(ASSIGNMENT_WEIGHT_SESSION)) / 100;
 
 		return final_score;
 	}),

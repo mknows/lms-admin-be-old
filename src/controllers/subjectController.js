@@ -611,7 +611,7 @@ module.exports = {
 	}),
 	/**
 	 * @desc      enroll in a subject
-	 * @route     PUT /api/v1/subject/sendDraft
+	 * @route     PUT /api/v1/subject/senddraft
 	 * @access    Private
 	 */
 	sendDraft: asyncHandler(async (req, res) => {
@@ -622,7 +622,7 @@ module.exports = {
 			},
 			{
 				where: {
-					id: student_id,
+					student_id: student_id,
 					status: DRAFT,
 				},
 			}

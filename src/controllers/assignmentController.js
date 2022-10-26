@@ -80,7 +80,8 @@ module.exports = {
 				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
 					const deadline = moment(
 						new Date(
-							new Date(assign.created_at).getTime() + assign.duration * 1000
+							new Date(material_data.created_at).getTime() +
+								assign.duration * 1000
 						)
 					);
 					const date_submit = moment();
@@ -119,7 +120,7 @@ module.exports = {
 
 	/**
 	 * @desc      Update file assignment
-	 * @route     PUT /api/v1/assignment/:session_id
+	 * @route     PUT /api/v1/assignment/edit/:session_id
 	 * @access    Private
 	 */
 	updateAssignment: asyncHandler(async (req, res) => {
@@ -166,27 +167,31 @@ module.exports = {
 						file_assignment: file_assignment,
 						file_assignment_link: linkFile,
 					};
-					await MaterialEnrolled.update(
+					material_data = await MaterialEnrolled.update(
 						{
 							activity_detail: activity_detail,
 							status: GRADING,
-							type: ASSIGNMENT,
 						},
 						{
 							where: {
 								student_id,
 								session_id,
+								type: ASSIGNMENT,
 							},
+							returning: true,
 						}
 					);
-					material_data = await MaterialEnrolled.findOne({
-						where: {
-							id_referrer: assign.id,
-							student_id,
-						},
-					});
+					material_data = material_data[1][0];
 					checkDoneSession(student_id, material_data.session_id);
-					return res.sendJson(200, true, "Successfully update file assignment");
+					return res.sendJson(
+						200,
+						true,
+						"Successfully update file assignment",
+						{
+							activity_detail,
+							status: moment(date_submit).isAfter(deadline) ? LATE : GRADING,
+						}
+					);
 				});
 			});
 	}),
