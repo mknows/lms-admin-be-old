@@ -529,6 +529,9 @@ module.exports = {
 				type: QUIZ,
 				status: ONGOING,
 			},
+			attributes: {
+				include: ["created_at"],
+			},
 		});
 
 		if (!mat_enr_get) {
@@ -544,20 +547,20 @@ module.exports = {
 
 		for (let i = 0; i < mat_enr_get.length; i++) {
 			let quiz = await Quiz.findOne({
-				where: { id: mat_enr_get.id_referrer },
+				where: { id: mat_enr_get[i].id_referrer },
 				attributes: ["duration", "questions", "description", "session_id"],
 			});
 
 			let deadline = moment(
 				new Date(
-					new Date(mat_enr_get.created_at).getTime() + quiz.duration * 1000
+					new Date(mat_enr_get[i].created_at).getTime() + quiz.duration * 1000
 				)
 			);
 
 			let datval = {
-				quiz_id: mat_enr_get.id_referrer,
+				quiz_id: mat_enr_get[i].id_referrer,
 				material_enrolled_id: mat_enr_get[i].id,
-				original_start_time: mat_enr_get.created_at,
+				original_start_time: mat_enr_get[i].created_at,
 				deadline: deadline,
 			};
 
