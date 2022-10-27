@@ -110,7 +110,18 @@ module.exports = {
 		let user = req.userData;
 		const storage = getStorage();
 
-		const { full_name, gender, phone, address } = req.body;
+		let { full_name, gender, phone, address } = req.body;
+
+		let curr_user = await User.findOne({
+			where: {
+				id: user.id,
+			},
+		});
+
+		full_name = full_name ? full_name : curr_user.full_name;
+		gender = gender ? gender : curr_user.gender;
+		phone = phone ? phone : curr_user.phone;
+		address = address ? address : curr_user.address;
 
 		if (req.file) {
 			const getFile = await User.findOne({
@@ -180,7 +191,7 @@ module.exports = {
 			full_name: titleCase(full_name),
 		});
 
-		return res.sendJson(200, true, "success update profile");
+		return res.sendJson(200, true, "success update profile", data[1]);
 	}),
 };
 
