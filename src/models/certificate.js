@@ -24,6 +24,8 @@ module.exports = (sequelize, DataTypes) => {
 			id_certificate: DataTypes.STRING,
 			file: DataTypes.STRING,
 			link: DataTypes.STRING,
+			thumbnail: DataTypes.STRING,
+			thumbnail_link: DataTypes.STRING,
 		},
 		{
 			sequelize,
