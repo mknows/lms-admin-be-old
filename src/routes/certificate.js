@@ -7,7 +7,7 @@ const { validate, validatorMessage } = require("../middlewares/Validator");
 
 route.post(
 	"/subject",
-	// protection,
+	protection,
 	// authorize("admin"),
 	// validate("createCertificate"),
 	// validatorMessage,
@@ -23,5 +23,11 @@ route.post(
 );
 
 route.get("/:id_certificate", certificateController.getCertificate);
+route.get(
+	"/",
+	protection,
+	authorize("student"),
+	certificateController.getCertificateByStudent
+);
 
 module.exports = route;
