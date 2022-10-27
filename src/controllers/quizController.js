@@ -94,6 +94,7 @@ module.exports = {
 
 		return res.sendJson(200, true, "Success", {
 			quiz: quiz,
+			quiz_id: mat_enr.id_referrer,
 			material_enrolled_id: material_enrolled_id,
 		});
 	}),
