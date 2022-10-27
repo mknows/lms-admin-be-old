@@ -128,7 +128,6 @@ module.exports = {
 		const student_id = req.student_id;
 		const bucket = admin.storage().bucket();
 		const storage = getStorage();
-
 		const assign = await Assignment.findOne({
 			where: {
 				session_id,
@@ -148,7 +147,6 @@ module.exports = {
 
 		//*check for deleta a file
 		checkFileIfExistFirebase(res, checkFile.activity_detail.file_assignment);
-
 		const file_assignment =
 			"documents/assignments/" +
 			uuidv4() +
@@ -162,15 +160,21 @@ module.exports = {
 			.end(file_assignment_buffer)
 			.on("finish", () => {
 				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
+					let date_submit = moment.now();
+					const deadline = moment(
+						new Date(
+							new Date(checkFile.created_at).getTime() + assign.duration * 1000
+						)
+					);
 					const activity_detail = {
-						date_submit: moment.now(),
+						date_submit,
 						file_assignment: file_assignment,
 						file_assignment_link: linkFile,
 					};
-					material_data = await MaterialEnrolled.update(
+					let check_file = await MaterialEnrolled.update(
 						{
 							activity_detail: activity_detail,
-							status: GRADING,
+							status: moment(date_submit).isAfter(deadline) ? LATE : GRADING,
 						},
 						{
 							where: {
@@ -181,8 +185,7 @@ module.exports = {
 							returning: true,
 						}
 					);
-					material_data = material_data[1][0];
-					checkDoneSession(student_id, material_data.session_id);
+					checkDoneSession(student_id, check_file[1][0].session_id);
 					return res.sendJson(
 						200,
 						true,
@@ -333,66 +336,6 @@ module.exports = {
 			});
 		}
 		res.sendJson(200, true, "Success", result);
-	}),
-	/**
-	 * @desc      update Assignment
-	 * @route     put /api/v1/assignment/:session_id
-	 * @access    Private
-	 */
-	updateAssignment: asyncHandler(async (req, res) => {
-		const { session_id } = req.params;
-		const student_id = req.student_id;
-		const storage = getStorage();
-		const bucket = admin.storage().bucket();
-
-		const exist = await MaterialEnrolled.findOne({
-			where: {
-				student_id: student_id,
-				session_id: session_id,
-			},
-		});
-
-		if (!exist) {
-			return res.status(404).json({
-				success: false,
-				message: "Assignment not found",
-				data: {},
-			});
-		}
-
-		if (exist.activity_detail.file_assignment) {
-			deleteObject(
-				ref(storage, `document_assignment/${exist.file_assignment}`)
-			);
-		}
-		const file_assignment =
-			"document_assignment/" +
-			uuidv4() +
-			"-" +
-			req.file.originalname.split(" ").join("-");
-		const file_assignment_buffer = req.file.buffer;
-
-		bucket
-			.file(file_assignment)
-			.createWriteStream()
-			.end(file_assignment_buffer)
-			.on("finish", () => {
-				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
-					await MaterialEnrolled.update(
-						{
-							activity_detail: null,
-							status: ONGOING,
-						},
-						{
-							where: {
-								session_id: session_id,
-								student_id: student_id,
-							},
-						}
-					);
-				});
-			});
-		return res.sendJson(200, true, "Success");
 	}),
 	/**
 	 * @desc      Delete submission
