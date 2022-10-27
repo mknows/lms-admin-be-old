@@ -60,11 +60,16 @@ const {
 
 	UTS,
 	UAS,
+
 	ASSIGNMENT_WEIGHT_ALL,
 	QUIZ_WEIGHT_ALL,
 	ATTENDANCE_WEIGHT_ALL,
+	MIDTERM_WEIGHT,
+	FINALS_WEIGHT,
 } = process.env;
 const asyncHandler = require("express-async-handler");
+const { Op } = require("sequelize");
+const e = require("express");
 
 module.exports = {
 	/**
@@ -153,12 +158,15 @@ module.exports = {
 		});
 
 		let sessions = await Session.findAll({
-			where: { subject_id: sub.id },
+			where: {
+				subject_id: sub.id,
+				[Op.not]: { type: [UTS, UAS] },
+			},
 		});
 
 		let sesh_id_list = [];
 
-		for (let i = 0; i < sessions; i++) {
+		for (let i = 0; i < sessions.length; i++) {
 			sesh_id_list.push(sessions[i].id);
 		}
 
@@ -171,7 +179,7 @@ module.exports = {
 				where: {
 					student_id,
 					session_id: sesh_id_list,
-					status: FINISHED,
+					status: [PASSED, FINISHED, FAILED],
 					type: QUIZ,
 				},
 			}),
@@ -208,29 +216,98 @@ module.exports = {
 			}),
 		]);
 
+		console.log(sesh_id_list);
+
+		// calculate total quiz score
 		for (let i = 0; i < material_all[0].length; i++) {
 			curr_mat = material_all[0][i];
+			// log
+			console.log("quiz ... ", curr_mat?.score);
 			quiz_pool += curr_mat?.score;
-			console.log(quiz_pool);
 		}
 		let counter = material_all[1].length;
-		// quiz_pool = quiz_pool / counter;
+		quiz_pool = quiz_pool / counter;
 
+		// calculate total assignment score
 		for (let i = 0; i < material_all[2].length; i++) {
 			curr_mat = material_all[2][i];
+			// log
+			console.log("assignment ... ", curr_mat?.score);
 			assignment_pool += curr_mat?.score;
 		}
 		counter = material_all[3].length;
-		// assignment_pool = assignment_pool / counter;
+		assignment_pool = assignment_pool / counter;
 
+		// calculate module / attendance score
 		for (let i = 0; i < material_all[4].length; i++) {
 			curr_mat = material_all[4][i];
+			// log
+			console.log("module ... ", curr_mat?.score);
 			module_pool += curr_mat?.score;
 		}
 		counter = material_all[5].length;
-		// module_pool = module_pool / counter;
+		module_pool = module_pool / counter;
 
-		console.log(quiz_pool, assignment_pool, module_pool);
+		console.log("quiz", quiz_pool);
+		console.log("assignment", assignment_pool);
+		console.log("module", module_pool);
+
+		let session_midterm = await Session.findOne({
+			where: {
+				subject_id: sub.id,
+				type: UTS,
+			},
+		});
+
+		let midterm_score = await MaterialEnrolled.findOne({
+			where: {
+				session_id: session_midterm.id,
+				student_id,
+				type: QUIZ,
+			},
+			attributes: ["score"],
+		});
+		midterm_score = midterm_score?.score || 0;
+		console.log("midterm score", midterm_score);
+
+		let session_finals = await Session.findOne({
+			where: {
+				subject_id: sub.id,
+				type: UAS,
+			},
+		});
+		let finals_score = await MaterialEnrolled.findOne({
+			where: {
+				session_id: session_finals.id,
+				student_id,
+				type: QUIZ,
+			},
+			attributes: ["score"],
+		});
+		finals_score = finals_score?.score || 0;
+		console.log("finals score", finals_score);
+
+		let final_subject_score =
+			(parseFloat(QUIZ_WEIGHT_ALL) / 100) * quiz_pool +
+			(parseFloat(ASSIGNMENT_WEIGHT_ALL) / 100) * assignment_pool +
+			(parseFloat(ATTENDANCE_WEIGHT_ALL) / 100) * module_pool +
+			(parseFloat(MIDTERM_WEIGHT) / 100) * midterm_score +
+			(parseFloat(FINALS_WEIGHT) / 100) * finals_score;
+
+		final_subject_score = parseFloat(final_subject_score);
+		console.log("final subject score", final_subject_score);
+
+		let stud_sub = await StudentSubject.update(
+			{
+				final_score: final_subject_score,
+			},
+			{
+				where: {
+					subject_id,
+					student_id,
+				},
+			}
+		);
 
 		return score;
 	}),
@@ -334,11 +411,16 @@ module.exports = {
 		}
 		let final_score = 0;
 
-		final_score +=
-			(material_score[0] * parseFloat(MODULE_WEIGHT_SESSION)) / 100;
-		final_score += (material_score[1] * parseFloat(QUIZ_WEIGHT_SESSION)) / 100;
-		final_score +=
-			(material_score[2] * parseFloat(ASSIGNMENT_WEIGHT_SESSION)) / 100;
+		if (sesh.type === UTS || sesh.type === UAS) {
+			final_score = materials[1][0].score;
+		} else {
+			final_score +=
+				(material_score[0] * parseFloat(MODULE_WEIGHT_SESSION)) / 100;
+			final_score +=
+				(material_score[1] * parseFloat(QUIZ_WEIGHT_SESSION)) / 100;
+			final_score +=
+				(material_score[2] * parseFloat(ASSIGNMENT_WEIGHT_SESSION)) / 100;
+		}
 
 		return final_score;
 	}),
