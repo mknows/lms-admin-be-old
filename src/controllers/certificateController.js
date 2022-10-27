@@ -1,4 +1,4 @@
-const { StudentSubject, Certificate, User, Subject } = require("../models");
+const { Student, Certificate, User, Subject } = require("../models");
 const asyncHandler = require("express-async-handler");
 const {
 	getStorage,
@@ -7,6 +7,7 @@ const {
 	deleteObject,
 } = require("firebase/storage");
 const admin = require("firebase-admin");
+const moment = require("moment");
 const { v4: uuidv4 } = require("uuid");
 const pdfKit = require("pdfkit");
 const fs = require("fs");
@@ -20,7 +21,18 @@ const qr = require("qr-image");
 const { Buffer } = require("buffer");
 const randomString = require("randomstring");
 require("dotenv").config({ path: "./controllerconfig.env" });
-const { FINISHED } = process.env;
+const scoringController = require("./scoringController");
+const {
+	FLOOR_A,
+	FLOOR_A_MINUS,
+	FLOOR_B_PLUS,
+	FLOOR_B,
+	FLOOR_B_MINUS,
+	FLOOR_C_PLUS,
+	FLOOR_C,
+	FLOOR_D,
+	FLOOR_E,
+} = process.env;
 
 module.exports = {
 	/**
@@ -28,36 +40,43 @@ module.exports = {
 	 * @route     POST /api/v1/certificate/subject
 	 * @access    Private
 	 */
-	createCertificateSubject: asyncHandler(async (req, res) => {
-		const { user_id, student_id, subject_id } = req.body;
+	createCertificateSubject: asyncHandler(async (data) => {
 		const storage = getStorage();
 		const bucket = admin.storage().bucket();
-
-		const checkDoneSubject = await StudentSubject.findOne({
+		const { student_id, subject_id, final_subject_score } = data;
+		const student = await Student.findOne({
+			attributes: ["id"],
 			where: {
-				student_id,
-				subject_id,
+				id: student_id,
 			},
+			include: [
+				{
+					model: Subject,
+					where: {
+						id: subject_id,
+					},
+					attributes: ["name", "id"],
+					through: {
+						attributes: ["status"],
+						where: {
+							status: "FINISHED",
+						},
+					},
+				},
+				{
+					model: User,
+					attributes: ["full_name", "id"],
+				},
+			],
 		});
-
-		const user = await User.findOne({
-			where: {
-				id: user_id,
-			},
-		});
-
-		const subject = await Subject.findOne({
-			where: {
-				id: subject_id,
-			},
-		});
-
-		if (!subject) {
-			return res.sendJson(404, false, "subject invalid");
+		if (!student) {
+			return "User not found";
 		}
-
-		if (!checkDoneSubject.status !== FINISHED) {
-			return res.sendJson(404, false, "student has not finished his subject ");
+		if (!student.Subjects) {
+			return "Subject not found";
+		}
+		if (student.Subjects[0].StudentSubject.status !== "FINISHED") {
+			return "Student has not finished the subject";
 		}
 
 		const generateRandomCert = randomString.generate({
@@ -78,12 +97,11 @@ module.exports = {
 		});
 		qr_svg.pipe(fs.createWriteStream(outputQr));
 
-		const name = user.full_name;
-		const subjectName = subject.name;
-		const time = "12 Desember 2022";
-		const predikat = "Sangat Baik";
-		const nilai = 99;
-
+		const name = student.User.full_name;
+		const subjectName = student.Subjects[0].name;
+		const time = moment().format("DD/MM/YYYY");
+		const score = final_subject_score.toFixed(2);
+		const predicate = letterByPercent(score);
 		const outputPdf = `${generateRandomCert}-${name}-certificat.pdf`;
 		pdfDocument.pipe(fs.createWriteStream(outputPdf));
 		pdfDocument.image("public/cert/matkul.png", {
@@ -155,12 +173,12 @@ module.exports = {
 			.font("public/fonts/Segoe-UI-Variable-Static-Display-Bold.ttf")
 			.fillColor("#FBB416")
 			.fontSize(60)
-			.text(predikat, 1110, 1482);
+			.text(predicate, 1110, 1482);
 		pdfDocument
 			.font("public/fonts/Segoe-UI-Variable-Static-Display-Bold.ttf")
 			.fillColor("#FBB416")
 			.fontSize(60)
-			.text(nilai, 1865, 1482);
+			.text(score, 1865, 1482);
 
 		pdfDocument.end();
 
@@ -179,7 +197,7 @@ module.exports = {
 				.on("finish", () => {
 					getDownloadURL(ref(storage, nameFile)).then((fileLink) => {
 						Certificate.create({
-							user_id,
+							user_id: student.User.id,
 							subject_id,
 							student_id,
 							file: nameFile,
@@ -187,12 +205,6 @@ module.exports = {
 							id_certificate: generateRandomCert,
 						});
 					});
-
-					return res.sendJson(
-						201,
-						true,
-						"success upload new subject certificate"
-					);
 				});
 
 			await sleep(2000);
@@ -359,4 +371,26 @@ module.exports = {
 
 function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+function letterByPercent(percent) {
+	if (percent >= parseFloat(FLOOR_A)) {
+		return "A";
+	} else if (percent >= parseFloat(FLOOR_A_MINUS)) {
+		return "A-";
+	} else if (percent >= parseFloat(FLOOR_B_PLUS)) {
+		return "B+";
+	} else if (percent >= parseFloat(FLOOR_B)) {
+		return "B";
+	} else if (percent >= parseFloat(FLOOR_B_MINUS)) {
+		return "B-";
+	} else if (percent >= parseFloat(FLOOR_C_PLUS)) {
+		return "C+";
+	} else if (percent >= parseFloat(FLOOR_C)) {
+		return "C";
+	} else if (percent >= parseFloat(FLOOR_D)) {
+		return "D";
+	} else if (percent >= parseFloat(FLOOR_E)) {
+		return "E";
+	}
+	return null;
 }
