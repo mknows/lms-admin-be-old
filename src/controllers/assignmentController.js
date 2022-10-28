@@ -200,6 +200,80 @@ module.exports = {
 	}),
 
 	/**
+	 * @desc      Update file assignment
+	 * @route     PUT /api/v1/assignment/:session_id
+	 * @access    Private
+	 */
+	updateAssignment: asyncHandler(async (req, res) => {
+		const { session_id } = req.params;
+		const student_id = req.student_id;
+		const bucket = admin.storage().bucket();
+		const storage = getStorage();
+
+		const assign = await Assignment.findOne({
+			where: {
+				session_id,
+			},
+		});
+		if (!assign) {
+			return res.sendJson(404, false, "session id not found");
+		}
+
+		const checkFile = await MaterialEnrolled.findOne({
+			where: {
+				session_id,
+				student_id,
+				type: ASSIGNMENT,
+			},
+		});
+
+		//*check for deleta a file
+		checkFileIfExistFirebase(res, checkFile.activity_detail.file_assignment);
+
+		const file_assignment =
+			"documents/assignments/" +
+			uuidv4() +
+			"-" +
+			req.file.originalname.split(" ").join("-");
+		const file_assignment_buffer = req.file.buffer;
+
+		bucket
+			.file(file_assignment)
+			.createWriteStream()
+			.end(file_assignment_buffer)
+			.on("finish", () => {
+				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
+					const activity_detail = {
+						date_submit: moment.now(),
+						file_assignment: file_assignment,
+						file_assignment_link: linkFile,
+					};
+					await MaterialEnrolled.update(
+						{
+							activity_detail: activity_detail,
+							status: GRADING,
+							type: ASSIGNMENT,
+						},
+						{
+							where: {
+								student_id,
+								session_id,
+							},
+						}
+					);
+					material_data = await MaterialEnrolled.findOne({
+						where: {
+							id_referrer: assign.id,
+							student_id,
+						},
+					});
+					checkDoneSession(student_id, material_data.session_id);
+					return res.sendJson(200, true, "Successfully update file assignment");
+				});
+			});
+	}),
+
+	/**
 	 * @desc      Get all Assignment
 	 * @route     GET /api/v1/assignment/
 	 * @access    Private
