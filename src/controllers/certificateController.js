@@ -68,7 +68,7 @@ module.exports = {
 		}
 		if (student.Subjects[0].StudentSubject.status !== "FINISHED") {
 			return "Student has not finished the subject";
-
+		}
 		if (checkDoneSubject.status !== FINISHED) {
 			return res.sendJson(400, false, "student has not finished his subject ");
 		}
