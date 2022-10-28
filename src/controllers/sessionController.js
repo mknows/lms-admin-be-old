@@ -93,6 +93,7 @@ module.exports = {
 				data[i].dataValues.is_locked = false;
 				data[i].dataValues.assignment_done = true;
 				data[i].dataValues.quiz_done = true;
+				data[i].dataValues.session_locked = false;
 			} else if (latest_session === data[i].session_no) {
 				data[i].dataValues.is_locked = await lockUpdate(student_id, data[i].id);
 				data[i].dataValues.assignment_done = await progress(
@@ -100,15 +101,18 @@ module.exports = {
 					data[i].id,
 					"ASSIGNMENT"
 				);
+
 				data[i].dataValues.quiz_done = await progress(
 					student_id,
 					data[i].id,
 					"QUIZ"
 				);
+				data[i].dataValues.session_locked = false;
 			} else if (latest_session < data[i].session_no) {
 				data[i].dataValues.is_locked = true;
 				data[i].dataValues.assignment_done = false;
 				data[i].dataValues.quiz_done = false;
+				data[i].dataValues.session_locked = true;
 			}
 		}
 		return res.sendJson(200, true, "success get all session in sub", data);
