@@ -423,12 +423,17 @@ module.exports = {
 	 */
 	getCertificateByStudent: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
-
-		const search = await Certificate.findAll({
+		console.log(student_id);
+		let search = await Certificate.findAll({
 			where: {
 				student_id,
 			},
-			attributes: ["id_certificate", "link", "thumbnail_link"],
+			attributes: ["id_certificate", "subject_id", "link", "thumbnail_link"],
+			include: {
+				model: Subject,
+				as: "subject",
+				attributes: ["name"],
+			},
 		});
 
 		if (!search) {
