@@ -38,8 +38,27 @@ module.exports = {
 		const student = await Student.findOne({
 			attributes: ["id"],
 			where: {
-				[Op.and]: [{ student_id }, { subject_id }],
+				id: student_id,
 			},
+			include: [
+				{
+					model: Subject,
+					where: {
+						id: subject_id,
+					},
+					attributes: ["name", "id"],
+					through: {
+						attributes: ["status"],
+						where: {
+							status: "FINISHED",
+						},
+					},
+				},
+				{
+					model: User,
+					attributes: ["full_name", "id"],
+				},
+			],
 		});
 		if (!student) {
 			return "User not found";
