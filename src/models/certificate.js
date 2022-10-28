@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// define association here
+			this.belongsTo(models.Subject, {
+				foreignKey: "subject_id",
+				as: "subject",
+			});
 		}
 	}
 	Certificate.init(

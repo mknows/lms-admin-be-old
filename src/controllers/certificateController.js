@@ -21,18 +21,6 @@ const qr = require("qr-image");
 const { Buffer } = require("buffer");
 const randomString = require("randomstring");
 require("dotenv").config({ path: "./controllerconfig.env" });
-const scoringController = require("./scoringController");
-const {
-	FLOOR_A,
-	FLOOR_A_MINUS,
-	FLOOR_B_PLUS,
-	FLOOR_B,
-	FLOOR_B_MINUS,
-	FLOOR_C_PLUS,
-	FLOOR_C,
-	FLOOR_D,
-	FLOOR_E,
-} = process.env;
 const { FINISHED } = process.env;
 const { Op } = require("sequelize");
 const { fromPath } = require("pdf2pic");
@@ -50,27 +38,8 @@ module.exports = {
 		const student = await Student.findOne({
 			attributes: ["id"],
 			where: {
-				id: student_id,
+				[Op.and]: [{ student_id }, { subject_id }],
 			},
-			include: [
-				{
-					model: Subject,
-					where: {
-						id: subject_id,
-					},
-					attributes: ["name", "id"],
-					through: {
-						attributes: ["status"],
-						where: {
-							status: "FINISHED",
-						},
-					},
-				},
-				{
-					model: User,
-					attributes: ["full_name", "id"],
-				},
-			],
 		});
 		if (!student) {
 			return "User not found";
@@ -81,7 +50,6 @@ module.exports = {
 		if (student.Subjects[0].StudentSubject.status !== "FINISHED") {
 			return "Student has not finished the subject";
 		}
-
 		const generateRandomCert = randomString.generate({
 			capitalization: "uppercase",
 			length: 12,
@@ -105,7 +73,7 @@ module.exports = {
 		const time = moment().format("DD/MM/YYYY");
 		const score = final_subject_score.toFixed(2);
 		const predicate = letterByPercent(score);
-		const outputPdf = `${generateRandomCert}-${name}-certificat.pdf`;
+		const outputPdf = `${generateRandomCert}-${name}-certificate.pdf`;
 		pdfDocument.pipe(fs.createWriteStream(outputPdf));
 		pdfDocument.image("public/cert/matkul.png", {
 			fit: [3509, 2482],
@@ -423,6 +391,11 @@ module.exports = {
 				id_certificate,
 			},
 			attributes: ["link", "thumbnail_link"],
+			include: {
+				model: Subject,
+				as: "subject",
+				attributes: ["name"],
+			},
 		});
 
 		if (!search) {
@@ -439,12 +412,17 @@ module.exports = {
 	 */
 	getCertificateByStudent: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
-
-		const search = await Certificate.findAll({
+		console.log(student_id);
+		let search = await Certificate.findAll({
 			where: {
 				student_id,
 			},
-			attributes: ["id_certificate", "link", "thumbnail_link"],
+			attributes: ["id_certificate", "subject_id", "link", "thumbnail_link"],
+			include: {
+				model: Subject,
+				as: "subject",
+				attributes: ["name"],
+			},
 		});
 
 		if (!search) {
