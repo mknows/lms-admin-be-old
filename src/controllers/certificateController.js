@@ -402,11 +402,16 @@ module.exports = {
 	 */
 	getCertificate: asyncHandler(async (req, res) => {
 		const { id_certificate } = req.params;
-		const search = await Certificate.findOne({
+		const search = await Certificate.findAll({
 			where: {
 				id_certificate,
 			},
 			attributes: ["link", "thumbnail_link"],
+			include: {
+				model: Subject,
+				as: "subject",
+				attributes: ["name"],
+			},
 		});
 
 		if (!search) {
