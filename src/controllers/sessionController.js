@@ -12,7 +12,7 @@ const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const { redisClient } = require("../helpers/redis");
 const checkExistence = require("../helpers/checkExistence");
-const lockUpdate = require("../helpers/lockHelp");
+const { lockUpdate, progress } = require("../helpers/lockHelp");
 
 module.exports = {
 	/**
