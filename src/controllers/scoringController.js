@@ -69,7 +69,8 @@ const {
 } = process.env;
 const asyncHandler = require("express-async-handler");
 const { Op } = require("sequelize");
-const e = require("express");
+const scoringController = require("./scoringController");
+const certificateController = require("./certificateController");
 
 module.exports = {
 	/**
@@ -297,6 +298,26 @@ module.exports = {
 		final_subject_score = parseFloat(final_subject_score);
 		console.log("final subject score", final_subject_score);
 
+		if (finals_score) {
+			await StudentSubject.update(
+				{
+					status: FINISHED,
+				},
+				{
+					where: {
+						student_id,
+						subject_id,
+					},
+				}
+			);
+			let data = {
+				student_id,
+				subject_id,
+				final_subject_score,
+			};
+			const status = await certificateController.createCertificateSubject(data);
+		}
+
 		let stud_sub = await StudentSubject.update(
 			{
 				final_score: final_subject_score,
@@ -423,6 +444,13 @@ module.exports = {
 		}
 
 		return final_score;
+	}),
+	/**
+	 * @desc      calculate Session Score score
+	 * @access    Private
+	 */
+	getPredicate: asyncHandler(async (percent) => {
+		return letterByPercent(percent);
 	}),
 };
 
