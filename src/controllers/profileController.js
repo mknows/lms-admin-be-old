@@ -191,7 +191,17 @@ module.exports = {
 			full_name: titleCase(full_name),
 		});
 
-		return res.sendJson(200, true, "success update profile", data[1]);
+		let student_id = "Not a STUDENT";
+
+		if (req.role === "student") {
+			student_id = req.student_id;
+		}
+
+		return res.status(200).json({
+			success: true,
+			message: "success update profile",
+			data: { ...data[1].dataValues, role: req.role, student_id: student_id },
+		});
 	}),
 };
 
