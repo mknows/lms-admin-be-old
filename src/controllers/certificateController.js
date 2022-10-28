@@ -402,7 +402,7 @@ module.exports = {
 	 */
 	getCertificate: asyncHandler(async (req, res) => {
 		const { id_certificate } = req.params;
-		const search = await Certificate.findAll({
+		const search = await Certificate.findOne({
 			where: {
 				id_certificate,
 			},
