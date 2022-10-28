@@ -67,5 +67,27 @@ async function lockUpdate(student_id, session_id) {
 	}
 	return false;
 }
+async function progress(student_id, session_id, type) {
+	const progress = await MaterialEnrolled.findOne({
+		attributes: {
+			include: ["status"],
+		},
+		where: {
+			id: student_id,
+			session_id,
+			type,
+		},
+	});
+	if (
+		!progress ||
+		progress?.status !== "FINISHED" ||
+		progress?.status !== "GRADING"
+	) {
+		return false;
+	}
+	if (progress.status === "GRADING" || progress.status === "FINISHED") {
+		return true;
+	}
+}
 
-module.exports = lockUpdate;
+module.exports = { lockUpdate, progress };
