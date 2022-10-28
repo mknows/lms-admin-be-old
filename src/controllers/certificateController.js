@@ -33,6 +33,9 @@ const {
 	FLOOR_D,
 	FLOOR_E,
 } = process.env;
+const { FINISHED } = process.env;
+const { Op } = require("sequelize");
+const { fromPath } = require("pdf2pic");
 
 module.exports = {
 	/**
@@ -127,31 +130,31 @@ module.exports = {
 				.font("public/fonts/Monotype-Corsiva.ttf")
 				.fillColor("#623B60")
 				.fontSize(145)
-				.text(name.toUpperCase(), 1385, 930);
+				.text(name.toUpperCase(), 1370, 930);
 		} else if (name.length <= 25) {
 			pdfDocument
 				.font("public/fonts/Monotype-Corsiva.ttf")
 				.fillColor("#623B60")
 				.fontSize(145)
-				.text(name.toUpperCase(), 1300, 930);
+				.text(name.toUpperCase(), 1100, 930);
 		} else if (name.length <= 30) {
 			pdfDocument
 				.font("public/fonts/Monotype-Corsiva.ttf")
 				.fillColor("#623B60")
 				.fontSize(145)
-				.text(name.toUpperCase(), 1215, 930);
+				.text(name.toUpperCase(), 1000, 930);
 		} else if (name.length <= 35) {
 			pdfDocument
 				.font("public/fonts/Monotype-Corsiva.ttf")
 				.fillColor("#623B60")
 				.fontSize(145)
-				.text(name.toUpperCase(), 1125, 930);
+				.text(name.toUpperCase(), 900, 930);
 		} else {
 			pdfDocument
 				.font("public/fonts/Monotype-Corsiva.ttf")
 				.fillColor("#623B60")
 				.fontSize(145)
-				.text(name.toUpperCase(), 825, 930);
+				.text(name.toUpperCase(), 820, 930);
 		}
 		pdfDocument
 			.font("public/fonts/Segoe-UI-Variable-Static-Display-Bold.ttf")
@@ -182,34 +185,95 @@ module.exports = {
 
 		pdfDocument.end();
 
+		const createdPdf = await Certificate.create({
+			user_id,
+			subject_id,
+			student_id,
+			id_certificate: generateRandomCert,
+			student_id,
+		});
+
 		const stream = pdfDocument.pipe(blobStream());
 		stream.on("finish", async () => {
 			await sleep(3000);
 			// upload to firebase storage
-			const file = fs.readFileSync(outputPdf);
-			const nameFile = "documents/certificate/" + outputPdf;
-			const buffer = Buffer.from(file, "utf-8");
+			const filePdf = fs.readFileSync(outputPdf);
+			const nameFilePath = "documents/certificate/" + outputPdf;
+			const bufferPdf = Buffer.from(filePdf, "utf-8");
 
 			bucket
-				.file(nameFile)
+				.file(nameFilePath)
 				.createWriteStream()
-				.end(buffer)
+				.end(bufferPdf)
 				.on("finish", () => {
-					getDownloadURL(ref(storage, nameFile)).then((fileLink) => {
-						Certificate.create({
-							user_id: student.User.id,
-							subject_id,
-							student_id,
-							file: nameFile,
-							link: fileLink,
-							id_certificate: generateRandomCert,
-						});
+					getDownloadURL(ref(storage, nameFilePath)).then(async (fileLink) => {
+						await Certificate.update(
+							{
+								file: nameFilePath,
+								link: fileLink,
+							},
+							{
+								where: {
+									id: createdPdf.id,
+								},
+							}
+						);
 					});
 				});
 
-			await sleep(2000);
+			await sleep(1000);
+			// create an image for thumbnail file pdf
+			const storeAsImage = fromPath(outputPdf, {
+				density: 100,
+				saveFilename: `${generateRandomCert}-${name}`,
+				savePath: "./",
+				format: "png",
+				width: 3509,
+				height: 2482,
+			});
+
+			const fileThumbnail = `${generateRandomCert}-${name}.1.png`;
+			storeAsImage(1).then((res) => {
+				console.log("success convert");
+				return res;
+			});
+
+			// const fileThumbnail =
+			await sleep(3000);
+			fs.readFileSync(fileThumbnail, (err, data) => {
+				if (err) console.log(err);
+				// convert image file to base64-encoded string
+				const base64Image = Buffer.from(data, "binary");
+				const nameFilePathThumbnail = "documents/certificate/" + fileThumbnail;
+
+				bucket
+					.file(nameFilePathThumbnail)
+					.createWriteStream()
+					.end(base64Image)
+					.on("finish", () => {
+						getDownloadURL(ref(storage, nameFilePathThumbnail)).then(
+							async (fileLink) => {
+								await Certificate.update(
+									{
+										thumbnail: nameFilePathThumbnail,
+										thumbnail_link: fileLink,
+									},
+									{
+										where: {
+											id: createdPdf.id,
+										},
+									}
+								);
+							}
+						);
+					});
+			});
+			await sleep(1000);
 			fs.unlinkSync(outputPdf);
 			fs.unlinkSync(outputQr);
+			fs.unlinkSync(fileThumbnail);
+
+			return res.sendJson(201, true, "success upload new subject certificate");
 		});
 	}),
 	/**
@@ -348,24 +412,55 @@ module.exports = {
 	}),
 
 	/**
-	 * @desc      Get certificate
+	 * @desc      Get certificate by id certificate
 	 * @route     GET /api/v1/certificate/:id_certificate
 	 * @access    Public
 	 */
 	getCertificate: asyncHandler(async (req, res) => {
 		const { id_certificate } = req.params;
-
 		const search = await Certificate.findOne({
 			where: {
 				id_certificate,
 			},
+			attributes: ["link", "thumbnail_link"],
 		});
 
 		if (!search) {
 			return res.sendJson(404, false, "certificate not found");
 		}
 
-		return res.sendJson(200, true, "success get certificate", search.link);
+		return res.sendJson(200, true, "success get certificate", search);
+	}),
+
+	/**
+	 * @desc      Get certificate by student
+	 * @route     GET /api/v1/certificate
+	 * @access    private
+	 */
+	getCertificateByStudent: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
+
+		const search = await Certificate.findAll({
+			where: {
+				student_id,
+			},
+			attributes: ["id_certificate", "link", "thumbnail_link"],
+		});
+
+		if (!search) {
+			return res.sendJson(
+				404,
+				false,
+				"searching certificate by id student not found"
+			);
+		}
+
+		return res.sendJson(
+			200,
+			true,
+			"success get certificate by student",
+			search
+		);
 	}),
 };
 
