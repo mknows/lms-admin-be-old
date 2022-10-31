@@ -93,7 +93,7 @@ module.exports = {
 						file_assignment: file_assignment,
 						file_assignment_link: linkFile,
 					};
-
+					console.log(moment().format("DD/MM/YYYY hh:mm:ss"));
 					material_data = await MaterialEnrolled.update(
 						{
 							activity_detail: activity_detail,
