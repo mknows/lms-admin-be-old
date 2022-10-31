@@ -71,19 +71,23 @@ module.exports = {
 			},
 			order: ["session_no"],
 		});
+		console.log(subject_id);
 		const students_session = await Student.findOne({
 			where: {
 				id: student_id,
 			},
 			include: {
 				model: Session,
+				where: {
+					subject_id,
+				},
 				attribute: {
 					include: ["session_no"],
 				},
 			},
 		});
 		for (let i = 0; i < students_session.Sessions.length; i++) {
-			if (latest_session > students_session.Sessions[i].session_no) {
+			if (latest_session < students_session.Sessions[i].session_no) {
 				latest_session = students_session.Sessions[i].session_no;
 			}
 		}
