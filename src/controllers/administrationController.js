@@ -469,57 +469,6 @@ module.exports = {
 				}
 			);
 		}
-		// required
-		// const integrityPactFile = nameFile(req.files.integrity_pact);
-		// const integrityPactBuffer = req.files.integrity_pact[0].buffer;
-
-		// const ninCardFile = nameFile(req.files.nin_card);
-		// const ninCardBuffer = req.files.nin_card[0].buffer;
-
-		// const familyCardFile = nameFile(req.files.family_card);
-		// const familyCardBuffer = req.files.family_card[0].buffer;
-
-		// const certificateFile = nameFile(req.files.certificate);
-		// const certificateBuffer = req.files.certificate[0].buffer;
-
-		// const photoFile = nameFile(req.files.photo);
-		// const photoBuffer = req.files.photo[0].buffer;
-
-		// bucket
-		// 	.file(integrityPactFile)
-		// 	.createWriteStream()
-		// 	.end(integrityPactBuffer)
-		// 	.on("finish", () => {
-		// 		createLinkFirebaseIntegrityPact(integrityPactFile, administration_id);
-		// 	});
-		// bucket
-		// 	.file(ninCardFile)
-		// 	.createWriteStream()
-		// 	.end(ninCardBuffer)
-		// 	.on("finish", () => {
-		// 		createLinkFirebaseNinCard(ninCardFile, administration_id);
-		// 	});
-		// bucket
-		// 	.file(familyCardFile)
-		// 	.createWriteStream()
-		// 	.end(familyCardBuffer)
-		// 	.on("finish", () => {
-		// 		createLinkFirebaseFamilyCard(familyCardFile, administration_id);
-		// 	});
-		// bucket
-		// 	.file(certificateFile)
-		// 	.createWriteStream()
-		// 	.end(certificateBuffer)
-		// 	.on("finish", () => {
-		// 		createLinkFirebaseCertificate(certificateFile, administration_id);
-		// 	});
-		// bucket
-		// 	.file(photoFile)
-		// 	.createWriteStream()
-		// 	.end(photoBuffer)
-		// 	.on("finish", () => {
-		// 		createLinkFirebasePhoto(photoFile, administration_id);
-		// 	});
 
 		data = await Administration.update(
 			{
