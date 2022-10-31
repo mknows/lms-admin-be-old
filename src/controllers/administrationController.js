@@ -531,8 +531,6 @@ module.exports = {
 				// family_card: familyCardFile,
 				// certificate: certificateFile,
 				// photo: photoFile,
-
-				is_approved: "waiting",
 				approved_by: null,
 			},
 			{
