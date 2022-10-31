@@ -87,13 +87,11 @@ module.exports = {
 					const date_submit = moment();
 
 					const activity_detail = {
-						date_submit: moment(material_data.created_at).format(
-							"DD/MM/YYYY hh:mm:ss"
-						),
+						date_submit: moment().format("DD/MM/YYYY hh:mm:ss"),
 						file_assignment: file_assignment,
 						file_assignment_link: linkFile,
 					};
-
+					console.log(moment().format("DD/MM/YYYY hh:mm:ss"));
 					material_data = await MaterialEnrolled.update(
 						{
 							activity_detail: activity_detail,

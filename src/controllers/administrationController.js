@@ -110,6 +110,12 @@ module.exports = {
 			return res.sendJson(400, false, "invalid administration user data.", {});
 		}
 
+		const eligible = await checkAdminDataAprooved("biodata", exist.id);
+
+		if (eligible.status === false) {
+			return res.sendJson(400, false, eligible.message, {});
+		}
+
 		let data = await Administration.update(
 			{
 				// non - file
@@ -188,6 +194,12 @@ module.exports = {
 			return res.sendJson(400, false, "invalid administration id", {});
 		}
 
+		const eligible = await checkAdminDataAprooved("familial", exist.id);
+
+		if (eligible.status === false) {
+			return res.sendJson(400, false, eligible.message, {});
+		}
+
 		let data = await Administration.update(
 			{
 				father_name,
@@ -250,6 +262,12 @@ module.exports = {
 
 		if (!data) {
 			return res.sendJson(400, false, "invalid administration user data", {});
+		}
+
+		const eligible = await checkAdminDataAprooved("files", data.id);
+
+		if (eligible.status === false) {
+			return res.sendJson(400, false, eligible.message, {});
 		}
 
 		checkIfExistFirebase(data.integrity_pact);
@@ -456,7 +474,6 @@ module.exports = {
 		data = await Administration.update(
 			{
 				updated_by: user.id,
-				is_approved: "waiting",
 				approved_by: null,
 			},
 			{
@@ -500,6 +517,12 @@ module.exports = {
 
 		if (!exist) {
 			return res.sendJson(400, false, "invalid administration id", {});
+		}
+
+		const eligible = await checkAdminDataAprooved("degree", exist.id);
+
+		if (eligible.status === false) {
+			return res.sendJson(400, false, eligible.message, {});
 		}
 
 		let data = await Administration.update(
@@ -1052,4 +1075,51 @@ const nameFile = (file_name) => {
 		"-" +
 		file_name[0].originalname.split(" ").join("-")
 	);
+};
+
+const checkAdminDataAprooved = async (type, administration_id) => {
+	let result;
+	let admin_data = await Administration.findOne({
+		where: {
+			id: administration_id,
+		},
+	});
+
+	let aprooval_status = admin_data.is_approved;
+
+	if (aprooval_status.overall === true) {
+		return (result = {
+			status: false,
+			message: "All administration data has already been aprooved",
+		});
+	}
+	let comp = aprooval_status.component;
+	if (comp.biodata === true && type === "biodata") {
+		return {
+			status: false,
+			message: "Not eligible for change, biodata has been aprooved",
+		};
+	}
+	if (comp.familial === true && type === "familial") {
+		return {
+			status: false,
+			message: "Not eligible for change, familial data has been aprooved",
+		};
+	}
+	if (comp.files === true && type === "files") {
+		return {
+			status: false,
+			message: "Not eligible for change, files data has been aprooved",
+		};
+	}
+	if (comp.degree === true && type === "degree") {
+		return {
+			status: false,
+			message: "Not eligible for change, degree data has been aprooved",
+		};
+	}
+	return {
+		status: true,
+		message: "eligible for change, data in question has not been aprooved",
+	};
 };

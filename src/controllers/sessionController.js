@@ -11,8 +11,7 @@ const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const { redisClient } = require("../helpers/redis");
-const checkExistence = require("../helpers/checkExistence");
-const lockUpdate = require("../helpers/lockHelp");
+const { lockUpdate, progress } = require("../helpers/lockHelp");
 
 module.exports = {
 	/**
@@ -64,6 +63,7 @@ module.exports = {
 	getAllSessionInSubject: asyncHandler(async (req, res) => {
 		const { subject_id } = req.params;
 		const student_id = req.student_id;
+		let latest_session = 0;
 
 		const data = await Session.findAll({
 			where: {
@@ -71,9 +71,57 @@ module.exports = {
 			},
 			order: ["session_no"],
 		});
-
+		console.log(subject_id);
+		const students_session = await Student.findOne({
+			where: {
+				id: student_id,
+			},
+			include: {
+				model: Session,
+				where: {
+					subject_id,
+				},
+				attribute: {
+					include: ["session_no"],
+				},
+			},
+		});
+		for (let i = 0; i < students_session.Sessions.length; i++) {
+			if (latest_session < students_session.Sessions[i].session_no) {
+				latest_session = students_session.Sessions[i].session_no;
+			}
+		}
 		for (i = 0; i < data.length; i++) {
-			data[i].dataValues.is_locked = await lockUpdate(student_id, data[i].id);
+			if (latest_session > data[i].session_no) {
+				data[i].dataValues.is_locked = false;
+				data[i].dataValues.assignment_done = true;
+				data[i].dataValues.quiz_done = true;
+				data[i].dataValues.session_lock = false;
+			} else if (latest_session === data[i].session_no) {
+				data[i].dataValues.is_locked = await lockUpdate(student_id, data[i].id);
+				data[i].dataValues.assignment_done = await progress(
+					student_id,
+					data[i].id,
+					"ASSIGNMENT"
+				);
+				data[i].dataValues.quiz_done = await progress(
+					student_id,
+					data[i].id,
+					"QUIZ"
+				);
+				data[i].dataValues.session_lock = false;
+			} else if (latest_session < data[i].session_no) {
+				data[i].dataValues.is_locked = true;
+				data[i].dataValues.assignment_done = false;
+				data[i].dataValues.quiz_done = false;
+				data[i].dataValues.session_lock = true;
+			}
+		}
+		if (latest_session === 0) {
+			data[0].dataValues.is_locked = true;
+			data[0].dataValues.assignment_done = false;
+			data[0].dataValues.quiz_done = false;
+			data[0].dataValues.session_lock = false;
 		}
 		return res.sendJson(200, true, "success get all session in sub", data);
 	}),
