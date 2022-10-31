@@ -82,7 +82,6 @@ module.exports = {
 					include: ["session_no"],
 				},
 			},
-			order: [Session, "session_no", "DESC"],
 		});
 		for (let i = 0; i < students_session.Sessions.length; i++) {
 			if (latest_session > students_session.Sessions[i].session_no) {
