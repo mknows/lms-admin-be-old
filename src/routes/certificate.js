@@ -11,7 +11,7 @@ route.post(
 	// authorize("admin"),
 	// validate("createCertificate"),
 	// validatorMessage,
-	certificateController.createCertificateSubject
+	certificateController.createCertificateSubjectManual
 );
 route.post(
 	"/training",

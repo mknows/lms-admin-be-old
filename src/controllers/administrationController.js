@@ -9,6 +9,7 @@ const {
 } = require("firebase/storage");
 const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
+const { Op } = require("sequelize");
 
 module.exports = {
 	/**
@@ -473,13 +474,6 @@ module.exports = {
 		data = await Administration.update(
 			{
 				updated_by: user.id,
-
-				// file
-				// integrity_pact: integrityPactFile,
-				// nin_card: ninCardFile,
-				// family_card: familyCardFile,
-				// certificate: certificateFile,
-				// photo: photoFile,
 				approved_by: null,
 			},
 			{
@@ -609,6 +603,284 @@ module.exports = {
 		});
 
 		return res.sendJson(200, true, "succes delete administration");
+	}),
+
+	/**
+	 * @desc      Delete per file Administration
+	 * @route     DELETE /api/v1/administrations/delete/file?integrity_pact=
+	 * @access    Private (User)
+	 */
+	deleteFileAdministration: asyncHandler(async (req, res) => {
+		const {
+			integrity_pact,
+			nin_card,
+			family_card,
+			certificate,
+			photo,
+			transcript,
+			recommendation_letter,
+		} = req.query;
+		const storage = getStorage();
+
+		if (integrity_pact) {
+			const searchingFile = await Administration.findOne({
+				where: {
+					integrity_pact,
+				},
+			});
+			if (searchingFile.integrity_pact) {
+				await deleteObject(ref(storage, searchingFile.integrity_pact))
+					.then(() => {
+						return res.sendJson(
+							200,
+							true,
+							"success deleteObject file integrity_pact"
+						);
+					})
+					.catch((err) => {
+						return res.sendJson(
+							400,
+							false,
+							"failed deleteObject in firebase, maybe file was deleted"
+						);
+					});
+
+				await Administration.update(
+					{
+						integrity_pact: null,
+						integrity_pact_link: null,
+					},
+					{
+						where: {
+							integrity_pact,
+						},
+					}
+				);
+			}
+		}
+
+		if (nin_card) {
+			const searchingFile = await Administration.findOne({
+				where: {
+					nin_card,
+				},
+			});
+
+			if (searchingFile.nin_card) {
+				await deleteObject(ref(storage, searchingFile.nin_card))
+					.then(async () => {
+						return res.sendJson(
+							200,
+							true,
+							"success deleteObject file nin_card"
+						);
+					})
+					.catch((err) => {
+						return res.sendJson(
+							400,
+							false,
+							"failed deleteObject in firebase, maybe file was deleted"
+						);
+					});
+
+				await Administration.update(
+					{
+						nin_card: null,
+						nin_card_link: null,
+					},
+					{
+						where: {
+							nin_card,
+						},
+					}
+				);
+			}
+		}
+
+		if (family_card) {
+			const searchingFile = await Administration.findOne({
+				where: {
+					family_card,
+				},
+			});
+
+			if (searchingFile.family_card) {
+				await deleteObject(ref(storage, searchingFile.family_card))
+					.then(() => {
+						return res.sendJson(
+							200,
+							true,
+							"success deleteObject file family_card"
+						);
+					})
+					.catch((err) => {
+						return res.sendJson(
+							400,
+							false,
+							"failed deleteObject in firebase, maybe file was deleted"
+						);
+					});
+
+				await Administration.update(
+					{
+						family_card: null,
+						family_card_link: null,
+					},
+					{
+						where: {
+							family_card,
+						},
+					}
+				);
+			}
+		}
+
+		if (certificate) {
+			const searchingFile = await Administration.findOne({
+				where: {
+					certificate,
+				},
+			});
+
+			if (searchingFile.certificate) {
+				await deleteObject(ref(storage, searchingFile.certificate))
+					.then(() => {
+						return res.sendJson(
+							200,
+							true,
+							"success deleteObject file certificate"
+						);
+					})
+					.catch((err) => {
+						return res.sendJson(
+							400,
+							false,
+							"failed deleteObject in firebase, maybe file was deleted"
+						);
+					});
+
+				await Administration.update(
+					{
+						certificate: null,
+						certificate_link: null,
+					},
+					{
+						where: {
+							certificate,
+						},
+					}
+				);
+			}
+		}
+
+		if (photo) {
+			const searchingFile = await Administration.findOne({
+				where: {
+					photo,
+				},
+			});
+
+			if (searchingFile.photo) {
+				await deleteObject(ref(storage, searchingFile.photo))
+					.then(() => {
+						return res.sendJson(200, true, "success deleteObject file photo");
+					})
+					.catch((err) => {
+						return res.sendJson(
+							400,
+							false,
+							"failed deleteObject in firebase, maybe file was deleted"
+						);
+					});
+
+				await Administration.update(
+					{
+						photo: null,
+						photo_link: null,
+					},
+					{
+						where: {
+							photo,
+						},
+					}
+				);
+			}
+		}
+		if (transcript) {
+			const searchingFile = await Administration.findOne({
+				where: {
+					transcript,
+				},
+			});
+
+			if (searchingFile.transcript) {
+				await deleteObject(ref(storage, searchingFile.transcript))
+					.then(() => {
+						return res.sendJson(
+							200,
+							true,
+							"success deleteObject file transcript"
+						);
+					})
+					.catch((err) => {
+						return res.sendJson(
+							400,
+							false,
+							"failed deleteObject in firebase, maybe file was deleted"
+						);
+					});
+
+				await Administration.update(
+					{
+						transcript: null,
+						transcript_link: null,
+					},
+					{
+						where: {
+							transcript,
+						},
+					}
+				);
+			}
+		}
+
+		if (recommendation_letter) {
+			const searchingFile = await Administration.findOne({
+				where: {
+					recommendation_letter,
+				},
+			});
+
+			if (searchingFile.recommendation_letter) {
+				await deleteObject(ref(storage, searchingFile.recommendation_letter))
+					.then(() => {
+						return res.sendJson(
+							200,
+							true,
+							"success deleteObject file recommendation_letter"
+						);
+					})
+					.catch((err) => {
+						return res.sendJson(
+							400,
+							false,
+							"failed deleteObject in firebase, maybe file was deleted"
+						);
+					});
+
+				await Administration.update(
+					{
+						recommendation_letter: null,
+						recommendation_letter_link: null,
+					},
+					{
+						where: {
+							recommendation_letter,
+						},
+					}
+				);
+			}
+		}
 	}),
 };
 
