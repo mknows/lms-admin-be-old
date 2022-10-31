@@ -77,6 +77,13 @@ route.put(
 );
 
 route.delete(
+	"/delete/file",
+	protection,
+	authorize("user"),
+	administrationController.deleteFileAdministration
+);
+
+route.delete(
 	"/delete/:id",
 	protection,
 	authorize("user"),

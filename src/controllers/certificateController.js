@@ -267,6 +267,243 @@ module.exports = {
 		});
 	}),
 	/**
+	 * @desc      Create new certificate SUBJECT
+	 * @route     POST /api/v1/certificate/subject
+	 * @access    Private
+	 */
+	createCertificateSubjectManual: asyncHandler(async (req, res) => {
+		const storage = getStorage();
+		const bucket = admin.storage().bucket();
+		const { student_id, subject_id, final_subject_score } = req.body;
+		const student = await Student.findOne({
+			attributes: ["id"],
+			where: {
+				id: student_id,
+			},
+			include: [
+				{
+					model: Subject,
+					where: {
+						id: subject_id,
+					},
+					attributes: ["name", "id"],
+					through: {
+						attributes: ["status"],
+						where: {
+							status: "FINISHED",
+						},
+					},
+				},
+				{
+					model: User,
+					attributes: ["full_name", "id"],
+				},
+			],
+		});
+		if (!student) {
+			return "User not found";
+		}
+		if (!student.Subjects) {
+			return "Subject not found";
+		}
+		if (student.Subjects[0].StudentSubject.status !== "FINISHED") {
+			return "Student has not finished the subject";
+		}
+		const generateRandomCert = randomString.generate({
+			capitalization: "uppercase",
+			length: 12,
+			charset: "alphanumeric",
+		});
+
+		const certificateLink =
+			"www.kampusgratis.com/certificate/" + generateRandomCert;
+
+		const outputQr = `${generateRandomCert}.png`;
+
+		var qr_svg = qr.image(certificateLink, {
+			type: "png",
+			size: 6,
+			margin: 1,
+		});
+		qr_svg.pipe(fs.createWriteStream(outputQr));
+
+		const name = student.User.full_name;
+		const subjectName = student.Subjects[0].name;
+		const time = moment().format("DD/MM/YYYY");
+		const score = final_subject_score.toFixed(2);
+		const predicate = letterByPercent(score);
+		const outputPdf = `${generateRandomCert}-${name}-certificate.pdf`;
+		pdfDocument.pipe(fs.createWriteStream(outputPdf));
+		pdfDocument.image("public/cert/matkul.png", {
+			fit: [3509, 2482],
+			align: "center",
+		});
+
+		await sleep(2000);
+		if (name.length <= 10) {
+			pdfDocument
+				.font("public/fonts/Monotype-Corsiva.ttf")
+				.fillColor("#623B60")
+				.fontSize(145)
+				.text(name.toUpperCase(), 1625, 930);
+		} else if (name.length <= 15) {
+			pdfDocument
+				.font("public/fonts/Monotype-Corsiva.ttf")
+				.fillColor("#623B60")
+				.fontSize(145)
+				.text(name.toUpperCase(), 1470, 930);
+		} else if (name.length <= 20) {
+			pdfDocument
+				.font("public/fonts/Monotype-Corsiva.ttf")
+				.fillColor("#623B60")
+				.fontSize(145)
+				.text(name.toUpperCase(), 1370, 930);
+		} else if (name.length <= 25) {
+			pdfDocument
+				.font("public/fonts/Monotype-Corsiva.ttf")
+				.fillColor("#623B60")
+				.fontSize(145)
+				.text(name.toUpperCase(), 1100, 930);
+		} else if (name.length <= 30) {
+			pdfDocument
+				.font("public/fonts/Monotype-Corsiva.ttf")
+				.fillColor("#623B60")
+				.fontSize(145)
+				.text(name.toUpperCase(), 1000, 930);
+		} else if (name.length <= 35) {
+			pdfDocument
+				.font("public/fonts/Monotype-Corsiva.ttf")
+				.fillColor("#623B60")
+				.fontSize(145)
+				.text(name.toUpperCase(), 900, 930);
+		} else {
+			pdfDocument
+				.font("public/fonts/Monotype-Corsiva.ttf")
+				.fillColor("#623B60")
+				.fontSize(145)
+				.text(name.toUpperCase(), 820, 930);
+		}
+		pdfDocument
+			.font("public/fonts/Segoe-UI-Variable-Static-Display-Bold.ttf")
+			.fillColor("#623B60")
+			.fontSize(85)
+			.text(subjectName.toUpperCase(), 1200, 1300);
+		pdfDocument
+			.font("public/fonts/Segoe-UI-Variable-Static-Display-Regular.ttf")
+			.fillColor("black")
+			.fontSize(60)
+			.text(time, 1010, 1691);
+		pdfDocument
+			.font("public/fonts/Segoe-UI-Variable-Static-Display-Regular.ttf")
+			.fillColor("#3C4048")
+			.fontSize(40)
+			.text(certificateLink, 2400, 2360);
+		pdfDocument.image(outputQr, 3075, 2157);
+		pdfDocument
+			.font("public/fonts/Segoe-UI-Variable-Static-Display-Bold.ttf")
+			.fillColor("#FBB416")
+			.fontSize(60)
+			.text(predicate, 1110, 1482);
+		pdfDocument
+			.font("public/fonts/Segoe-UI-Variable-Static-Display-Bold.ttf")
+			.fillColor("#FBB416")
+			.fontSize(60)
+			.text(score, 1865, 1482);
+
+		pdfDocument.end();
+
+		const createdPdf = await Certificate.create({
+			user_id,
+			subject_id,
+			student_id,
+			id_certificate: generateRandomCert,
+			student_id,
+		});
+
+		const stream = pdfDocument.pipe(blobStream());
+		stream.on("finish", async () => {
+			await sleep(3000);
+			// upload to firebase storage
+			const filePdf = fs.readFileSync(outputPdf);
+			const nameFilePath = "documents/certificate/" + outputPdf;
+			const bufferPdf = Buffer.from(filePdf, "utf-8");
+
+			bucket
+				.file(nameFilePath)
+				.createWriteStream()
+				.end(bufferPdf)
+				.on("finish", () => {
+					getDownloadURL(ref(storage, nameFilePath)).then(async (fileLink) => {
+						await Certificate.update(
+							{
+								file: nameFilePath,
+								link: fileLink,
+							},
+							{
+								where: {
+									id: createdPdf.id,
+								},
+							}
+						);
+					});
+				});
+
+			await sleep(1000);
+			// create an image for thumbnail file pdf
+			const storeAsImage = fromPath(outputPdf, {
+				density: 100,
+				saveFilename: `${generateRandomCert}-${name}`,
+				savePath: "./",
+				format: "png",
+				width: 3509,
+				height: 2482,
+			});
+
+			const fileThumbnail = `${generateRandomCert}-${name}.1.png`;
+			storeAsImage(1).then((res) => {
+				console.log("success convert");
+				return res;
+			});
+
+			// const fileThumbnail =
+			await sleep(3000);
+			fs.readFileSync(fileThumbnail, (err, data) => {
+				if (err) console.log(err);
+				// convert image file to base64-encoded string
+				const base64Image = Buffer.from(data, "binary");
+				const nameFilePathThumbnail = "documents/certificate/" + fileThumbnail;
+
+				bucket
+					.file(nameFilePathThumbnail)
+					.createWriteStream()
+					.end(base64Image)
+					.on("finish", () => {
+						getDownloadURL(ref(storage, nameFilePathThumbnail)).then(
+							async (fileLink) => {
+								await Certificate.update(
+									{
+										thumbnail: nameFilePathThumbnail,
+										thumbnail_link: fileLink,
+									},
+									{
+										where: {
+											id: createdPdf.id,
+										},
+									}
+								);
+							}
+						);
+					});
+			});
+			await sleep(1000);
+			fs.unlinkSync(outputPdf);
+			fs.unlinkSync(outputQr);
+			fs.unlinkSync(fileThumbnail);
+
+			return res.sendJson(201, true, "success upload new subject certificate");
+		});
+	}),
+	/**
 	 * @desc      Create new certificate TRAINING
 	 * @route     POST /api/v1/certificate/training
 	 * @access    Private
