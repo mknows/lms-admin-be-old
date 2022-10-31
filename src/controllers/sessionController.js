@@ -82,6 +82,7 @@ module.exports = {
 					include: ["session_no"],
 				},
 			},
+			order: [Session, "session_no", "DESC"],
 		});
 		for (let i = 0; i < students_session.Sessions.length; i++) {
 			if (latest_session > students_session.Sessions[i].session_no) {
@@ -89,7 +90,12 @@ module.exports = {
 			}
 		}
 		for (i = 0; i < data.length; i++) {
-			if (latest_session > data[i].session_no) {
+			if (latest_session === 0) {
+				data[i].dataValues.is_locked = true;
+				data[i].dataValues.assignment_done = false;
+				data[i].dataValues.quiz_done = false;
+				data[i].dataValues.session_locked = false;
+			} else if (latest_session > data[i].session_no) {
 				data[i].dataValues.is_locked = false;
 				data[i].dataValues.assignment_done = true;
 				data[i].dataValues.quiz_done = true;
