@@ -486,7 +486,7 @@ module.exports = {
 		return res.sendJson(200, true, "success upload khs");
 	}),
 
-	// Student Specific
+	// Student Specific / thi is a cpanel test
 	/**
 	 * @desc      Get subjects of student
 	 * @route     GET /api/v1/subject/forstudent
