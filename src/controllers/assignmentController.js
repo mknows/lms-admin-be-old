@@ -56,12 +56,12 @@ module.exports = {
 		}
 
 		let material_data = await MaterialEnrolled.findOne({
+			attributes: ["created_at"],
 			where: {
 				id_referrer: assign.id,
 				student_id,
 			},
 		});
-
 		if (!material_data) {
 			return res.sendJson(400, false, "student haven't taken assignment");
 		}
@@ -78,6 +78,7 @@ module.exports = {
 			.end(file_assignment_buffer)
 			.on("finish", () => {
 				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
+					let date_submit = moment().tz("Asia/Jakarta");
 					const deadline = moment(
 						new Date(
 							new Date(material_data.created_at).getTime() +
@@ -85,9 +86,7 @@ module.exports = {
 						)
 					);
 					const activity_detail = {
-						date_submit: moment()
-							.tz("Asia/Jakarta")
-							.format("DD/MM/YYYY hh:mm:ss"),
+						date_submit: date_submit.format("DD/MM/YYYY hh:mm:ss"),
 						file_assignment: file_assignment,
 						file_assignment_link: linkFile,
 					};
@@ -162,10 +161,9 @@ module.exports = {
 							new Date(checkFile.created_at).getTime() + assign.duration * 1000
 						)
 					);
+					const date_submit = moment().tz("Asia/Jakarta");
 					const activity_detail = {
-						date_submit: moment()
-							.tz("Asia/Jakarta")
-							.format("DD/MM/YYYY hh:mm:ss"),
+						date_submit: date_submit.format("DD/MM/YYYY hh:mm:ss"),
 						file_assignment: file_assignment,
 						file_assignment_link: linkFile,
 					};
@@ -184,15 +182,10 @@ module.exports = {
 						}
 					);
 					checkDoneSession(student_id, check_file[1][0].session_id);
-					return res.sendJson(
-						200,
-						true,
-						"Successfully update file assignment",
-						{
-							activity_detail,
-							status: moment(date_submit).isAfter(deadline) ? LATE : GRADING,
-						}
-					);
+					return res.sendJson(200, true, "Successfully Updated the File", {
+						activity_detail,
+						status: moment(date_submit).isAfter(deadline) ? LATE : GRADING,
+					});
 				});
 			});
 	}),
