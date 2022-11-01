@@ -324,7 +324,7 @@ module.exports = {
 				deadline: deadline,
 			});
 		}
-		res.sendJson(200, true, "Success", result);
+		return res.sendJson(200, true, "Success", result);
 	}),
 	/**
 	 * @desc      Delete submission
@@ -379,6 +379,18 @@ module.exports = {
 			message: "Submission Removed",
 		});
 	}),
+	/**
+	 * @desc      get submission data
+	 * @route     GET /api/v1/assignment/submissiondata
+	 * @access    Private (Admin)
+	 */
+	getAllSubmissionFiltered: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
+
+		let result = await getAllAssignmentSubmissionFiltered(student_id);
+
+		return res.sendJson(200, true, "Success", result);
+	}),
 };
 
 const checkFileIfExistFirebase = async (res, data) => {
@@ -392,4 +404,40 @@ const checkFileIfExistFirebase = async (res, data) => {
 				return res.sendJson(200, true, "file data was deleted");
 			});
 	}
+};
+
+const getAllAssignmentSubmissionFiltered = async (student_id) => {
+	const all_data = await Promise.all([
+		await Assignment.findAll({
+			where: {
+				student_id,
+				status: ONGOING,
+			},
+		}),
+		await Assignment.findAll({
+			where: {
+				student_id,
+				status: GRADING,
+			},
+		}),
+		await Assignment.findAll({
+			where: {
+				student_id,
+				status: FINISHED,
+			},
+		}),
+		await Assignment.findAll({
+			where: {
+				student_id,
+				status: LATE,
+			},
+		}),
+	]);
+
+	return {
+		ongoing: all_data[0],
+		grading: all_data[1],
+		finished: all_data[2],
+		late: all_data[3],
+	};
 };
