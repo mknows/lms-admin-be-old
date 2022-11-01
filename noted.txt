@@ -1,5 +1,0 @@
-- Construct endpoint untuk CRUD Jurusan (Majors).
-- Construct endpoint untuk CRUD Mata Kuliah (Subjects).
-- Construct endpoint untuk CRUD Administrasi (Administrations).
-- Fixing Error Handler untuk bagian middleware.
-- Brainstorming Dept. Apps. dan Dept. Web. bersama mentor dan asisten mentor membahas final flowchart v2.
