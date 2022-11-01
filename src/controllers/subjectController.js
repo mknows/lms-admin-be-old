@@ -694,7 +694,7 @@ module.exports = {
 			],
 		});
 		let result = {
-			studentsInformation: students_information,
+			students_information: students_information,
 			subjects_enrolled: subjects_enrolled,
 		};
 

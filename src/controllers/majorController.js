@@ -361,7 +361,7 @@ module.exports = {
 				],
 			});
 			let studplan = {
-				studentsInformation: students_information,
+				students_information: students_information,
 				subjects_enrolled: subjects_enrolled,
 			};
 			return res.status(200).json({
