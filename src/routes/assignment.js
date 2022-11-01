@@ -55,7 +55,13 @@ route.put(
 	assignmentController.updateAssignment
 );
 
-route.get("/", protection, assignmentController.getAllAssignment);
+route.get(
+	"/submissiondata",
+	protection,
+	authorize("student"),
+	assignmentController.getAllSubmissionFiltered
+);
+
 route.get(
 	"/session/:session_id",
 	protection,
@@ -75,6 +81,7 @@ route.get(
 	authorize("student"),
 	assignmentController.getAssignmentOngoing
 );
+route.get("/", protection, assignmentController.getAllAssignment);
 route.get("/:assignment_id", protection, assignmentController.getAssignment);
 
 module.exports = route;

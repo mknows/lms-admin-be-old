@@ -668,7 +668,6 @@ module.exports = {
 	 */
 	getCertificateByStudent: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
-		console.log(student_id);
 		let search = await Certificate.findAll({
 			where: {
 				student_id,

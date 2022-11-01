@@ -1,0 +1,64 @@
+const { Op } = require("sequelize");
+const {
+	Major,
+	Subject,
+	MajorSubject,
+	StudentMajor,
+	StudentSubject,
+	Student,
+	User,
+	Lecturer,
+} = require("../models");
+const scoringController = require("../controllers/scoringController");
+const {
+	DRAFT,
+	PENDING,
+	ONGOING,
+	GRADING,
+	PASSED,
+	FAILED,
+	FINISHED,
+	ABANDONED,
+	INVALID,
+	NOT_ENROLLED,
+
+	QUIZ,
+	MODULE,
+} = process.env;
+
+async function getPlan(student_id) {
+	const all_dat = await Promise.all([
+		await StudentSubject.findAll({
+			attributes: ["subject_id"],
+			where: {
+				student_id: student_id,
+				status: PENDING,
+			},
+			order: ["created_at"],
+		}),
+		await StudentSubject.findAll({
+			attributes: ["subject_id"],
+			where: {
+				student_id: student_id,
+				status: ONGOING,
+			},
+			order: ["created_at"],
+		}),
+		await StudentSubject.findAll({
+			attributes: ["subject_id"],
+			where: {
+				student_id: student_id,
+				status: DRAFT,
+			},
+			order: ["created_at"],
+		}),
+	]);
+
+	let plan = {
+		datapending: all_dat[0],
+		dataongoing: all_dat[1],
+		datadraft: all_dat[2],
+	};
+	return plan;
+}
+module.exports = getPlan;

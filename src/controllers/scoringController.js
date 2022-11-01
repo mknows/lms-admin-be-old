@@ -217,13 +217,10 @@ module.exports = {
 			}),
 		]);
 
-		console.log(sesh_id_list);
-
 		// calculate total quiz score
 		for (let i = 0; i < material_all[0].length; i++) {
 			curr_mat = material_all[0][i];
-			// log
-			console.log("quiz ... ", curr_mat?.score);
+
 			quiz_pool += curr_mat?.score;
 		}
 		let counter = material_all[1].length;
@@ -232,8 +229,7 @@ module.exports = {
 		// calculate total assignment score
 		for (let i = 0; i < material_all[2].length; i++) {
 			curr_mat = material_all[2][i];
-			// log
-			console.log("assignment ... ", curr_mat?.score);
+
 			assignment_pool += curr_mat?.score;
 		}
 		counter = material_all[3].length;
@@ -242,16 +238,11 @@ module.exports = {
 		// calculate module / attendance score
 		for (let i = 0; i < material_all[4].length; i++) {
 			curr_mat = material_all[4][i];
-			// log
-			console.log("module ... ", curr_mat?.score);
+
 			module_pool += curr_mat?.score;
 		}
 		counter = material_all[5].length;
 		module_pool = module_pool / counter;
-
-		console.log("quiz", quiz_pool);
-		console.log("assignment", assignment_pool);
-		console.log("module", module_pool);
 
 		let session_midterm = await Session.findOne({
 			where: {
@@ -269,7 +260,6 @@ module.exports = {
 			attributes: ["score"],
 		});
 		midterm_score = midterm_score?.score || 0;
-		console.log("midterm score", midterm_score);
 
 		let session_finals = await Session.findOne({
 			where: {
@@ -286,7 +276,6 @@ module.exports = {
 			attributes: ["score"],
 		});
 		finals_score = finals_score?.score || 0;
-		console.log("finals score", finals_score);
 
 		let final_subject_score =
 			(parseFloat(QUIZ_WEIGHT_ALL) / 100) * quiz_pool +
@@ -296,7 +285,6 @@ module.exports = {
 			(parseFloat(FINALS_WEIGHT) / 100) * finals_score;
 
 		final_subject_score = parseFloat(final_subject_score);
-		console.log("final subject score", final_subject_score);
 
 		if (finals_score) {
 			await StudentSubject.update(
