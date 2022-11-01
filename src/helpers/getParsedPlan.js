@@ -87,7 +87,7 @@ async function getParsedPlan(student_id) {
 
 	for (let i = 0; i < datadraft.length; i++) {
 		let currStudSub = datadraft[i];
-		console.log(currStudSub.subject_id);
+
 		let currSub = await Subject.findOne({
 			where: {
 				id: currStudSub.subject_id,
