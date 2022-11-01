@@ -63,7 +63,6 @@ module.exports = {
 	getAllSessionInSubject: asyncHandler(async (req, res) => {
 		const { subject_id } = req.params;
 		const student_id = req.student_id;
-		let latest_session = 0;
 
 		const data = await Session.findAll({
 			where: {
@@ -85,12 +84,11 @@ module.exports = {
 					include: ["session_no"],
 				},
 			},
+			order: [[Session, "session_no", "DESC"]],
 		});
-		for (let i = 0; i < students_session.Sessions.length; i++) {
-			if (latest_session < students_session.Sessions[i].session_no) {
-				latest_session = students_session.Sessions[i].session_no;
-			}
-		}
+
+		const latest_session = students_session.Sessions[0].session_no;
+
 		for (i = 0; i < data.length; i++) {
 			if (latest_session > data[i].session_no) {
 				data[i].dataValues.is_locked = false;
