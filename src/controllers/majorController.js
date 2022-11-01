@@ -1,4 +1,13 @@
-const { Major, Subject, MajorSubject, StudentMajor } = require("../models");
+const {
+	Major,
+	Subject,
+	MajorSubject,
+	StudentMajor,
+	StudentSubject,
+	Student,
+	User,
+	Lecturer,
+} = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -13,6 +22,20 @@ const {
 } = require("firebase/storage");
 const student = require("../models/student");
 const { redisClient } = require("../helpers/redis");
+const getParsedPlan = require("../helpers/getParsedPlan");
+require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
+const {
+	DRAFT,
+	PENDING,
+	ONGOING,
+	GRADING,
+	PASSED,
+	FAILED,
+	FINISHED,
+	ABANDONED,
+
+	MAX_CREDIT,
+} = process.env;
 
 module.exports = {
 	/**
@@ -311,9 +334,40 @@ module.exports = {
 					id: major_id,
 				},
 			});
+
+			const subjects_enrolled = await getParsedPlan(student_id);
+			const students_information = await Student.findOne({
+				where: {
+					id: student_id,
+				},
+				include: [
+					{
+						model: User,
+						attributes: ["full_name"],
+					},
+					{
+						model: Major,
+						attributes: ["name"],
+					},
+					{
+						model: Lecturer,
+						include: [
+							{
+								model: User,
+								attributes: ["full_name"],
+							},
+						],
+					},
+				],
+			});
+			let studplan = {
+				studentsInformation: students_information,
+				subjects_enrolled: subjects_enrolled,
+			};
 			return res.status(200).json({
 				success: true,
 				message: `Enrolled to ${maj.name}`,
+				data: studplan,
 			});
 		}
 	}),
