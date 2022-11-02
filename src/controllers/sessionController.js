@@ -87,7 +87,7 @@ module.exports = {
 			order: [[Session, "session_no", "DESC"]],
 		});
 
-		const latest_session = students_session.Sessions[0].session_no;
+		const latest_session = students_session?.Sessions[0].session_no || 0;
 
 		for (i = 0; i < data.length; i++) {
 			if (latest_session > data[i].session_no) {
