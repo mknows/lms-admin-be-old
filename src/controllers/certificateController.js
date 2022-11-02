@@ -21,9 +21,60 @@ const qr = require("qr-image");
 const { Buffer } = require("buffer");
 const randomString = require("randomstring");
 require("dotenv").config({ path: "./controllerconfig.env" });
-const { FINISHED } = process.env;
 const { Op } = require("sequelize");
 const { fromPath } = require("pdf2pic");
+const {
+	WEIGHT_A,
+	WEIGHT_A_MINUS,
+	WEIGHT_B_PLUS,
+	WEIGHT_B,
+	WEIGHT_B_MINUS,
+	WEIGHT_C_PLUS,
+	WEIGHT_C,
+	WEIGHT_C_MINUS,
+	WEIGHT_D,
+	WEIGHT_E,
+
+	DRAFT,
+	PENDING,
+	ONGOING,
+	GRADING,
+	PASSED,
+	FAILED,
+	FINISHED,
+	ABANDONED,
+	NOT_ENROLLED,
+	INVALID,
+
+	FLOOR_A,
+	FLOOR_A_MINUS,
+	FLOOR_B_PLUS,
+	FLOOR_B,
+	FLOOR_B_MINUS,
+	FLOOR_C_PLUS,
+	FLOOR_C,
+	FLOOR_D,
+	FLOOR_E,
+
+	KKM,
+
+	MODULE,
+	QUIZ,
+	ASSIGNMENT,
+
+	QUIZ_WEIGHT_SESSION,
+	ASSIGNMENT_WEIGHT_SESSION,
+	MODULE_WEIGHT_SESSION,
+
+	UTS,
+	UAS,
+
+	ASSIGNMENT_WEIGHT_ALL,
+	QUIZ_WEIGHT_ALL,
+	ATTENDANCE_WEIGHT_ALL,
+	MIDTERM_WEIGHT,
+	FINALS_WEIGHT,
+} = process.env;
 
 module.exports = {
 	/**
@@ -221,13 +272,12 @@ module.exports = {
 
 			const fileThumbnail = `${generateRandomCert}-${name}.1.png`;
 			storeAsImage(1).then((res) => {
-				console.log("success convert");
+				console.log("success convert pdf to png");
 				return res;
 			});
 
-			// const fileThumbnail =
-			await sleep(3000);
-			fs.readFileSync(fileThumbnail, (err, data) => {
+			await sleep(5000);
+			fs.readFile(fileThumbnail, async (err, data) => {
 				if (err) console.log(err);
 				// convert image file to base64-encoded string
 				const base64Image = Buffer.from(data, "binary");
@@ -254,13 +304,17 @@ module.exports = {
 							}
 						);
 					});
-			});
-			await sleep(1000);
-			fs.unlinkSync(outputPdf);
-			fs.unlinkSync(outputQr);
-			fs.unlinkSync(fileThumbnail);
+				await sleep(1000);
+				fs.unlinkSync(outputPdf);
+				fs.unlinkSync(outputQr);
+				fs.unlinkSync(fileThumbnail);
 
-			return res.sendJson(201, true, "success upload new subject certificate");
+				return res.sendJson(
+					201,
+					true,
+					"success upload new subject certificate"
+				);
+			});
 		});
 	}),
 	/**
@@ -297,6 +351,12 @@ module.exports = {
 				},
 			],
 		});
+		const findUserId = await Student.findOne({
+			where: {
+				id: student_id,
+			},
+		});
+		const user_id = findUserId.user_id;
 		if (!student) {
 			return "User not found";
 		}
@@ -458,14 +518,13 @@ module.exports = {
 
 			const fileThumbnail = `${generateRandomCert}-${name}.1.png`;
 			storeAsImage(1).then((res) => {
-				console.log("success convert");
+				console.log("success convert pdf to png");
 				return res;
 			});
 
-			// const fileThumbnail =
-			await sleep(3000);
-			fs.readFileSync(fileThumbnail, (err, data) => {
-				if (err) console.log(err);
+			await sleep(5000);
+			fs.readFile(fileThumbnail, async (err, data) => {
+				if (err) console.log("error read file pdf2pic", err);
 				// convert image file to base64-encoded string
 				const base64Image = Buffer.from(data, "binary");
 				const nameFilePathThumbnail = "documents/certificate/" + fileThumbnail;
@@ -491,154 +550,158 @@ module.exports = {
 							}
 						);
 					});
+				await sleep(1000);
+				fs.unlinkSync(outputPdf);
+				fs.unlinkSync(outputQr);
+				fs.unlinkSync(fileThumbnail);
+
+				return res.sendJson(
+					201,
+					true,
+					"success upload new subject certificate"
+				);
 			});
-			await sleep(1000);
-			fs.unlinkSync(outputPdf);
-			fs.unlinkSync(outputQr);
-			fs.unlinkSync(fileThumbnail);
-
-			return res.sendJson(201, true, "success upload new subject certificate");
 		});
 	}),
-	/**
-	 * @desc      Create new certificate TRAINING
-	 * @route     POST /api/v1/certificate/training
-	 * @access    Private
-	 */
-	createCertificateTraining: asyncHandler(async (req, res) => {
-		const { user_id, student_id, subject_id, id_certificate } = req.body;
-		const storage = getStorage();
-		const bucket = admin.storage().bucket();
+	// /**
+	//  * @desc      Create new certificate TRAINING
+	//  * @route     POST /api/v1/certificate/training
+	//  * @access    Private
+	//  */
+	// createCertificateTraining: asyncHandler(async (req, res) => {
+	// 	const { user_id, student_id, subject_id, id_certificate } = req.body;
+	// 	const storage = getStorage();
+	// 	const bucket = admin.storage().bucket();
 
-		const user = await User.findOne({
-			where: {
-				id: user_id,
-			},
-		});
+	// 	const user = await User.findOne({
+	// 		where: {
+	// 			id: user_id,
+	// 		},
+	// 	});
 
-		const subject = await Subject.findOne({
-			where: {
-				id: subject_id,
-			},
-		});
+	// 	const subject = await Subject.findOne({
+	// 		where: {
+	// 			id: subject_id,
+	// 		},
+	// 	});
 
-		const generateRandomCert = randomString.generate({
-			capitalization: "uppercase",
-			length: 12,
-			charset: "alphanumeric",
-		});
+	// 	const generateRandomCert = randomString.generate({
+	// 		capitalization: "uppercase",
+	// 		length: 12,
+	// 		charset: "alphanumeric",
+	// 	});
 
-		const certificateLink =
-			"www.kampusgratis.com/certificate/" + generateRandomCert;
+	// 	const certificateLink =
+	// 		"www.kampusgratis.com/certificate/" + generateRandomCert;
 
-		const outputQr = `${generateRandomCert}.png`;
+	// 	const outputQr = `${generateRandomCert}.png`;
 
-		var qr_svg = qr.image(certificateLink, {
-			type: "png",
-			size: 6,
-			margin: 1,
-		});
-		qr_svg.pipe(fs.createWriteStream(outputQr));
+	// 	var qr_svg = qr.image(certificateLink, {
+	// 		type: "png",
+	// 		size: 6,
+	// 		margin: 1,
+	// 	});
+	// 	qr_svg.pipe(fs.createWriteStream(outputQr));
 
-		const name = user.full_name;
-		const subjectName = subject.name;
-		const time = "12 Desember 2022";
-		const predikat = "SANGAT BAIK";
-		const nilai = 99;
+	// 	const name = user.full_name;
+	// 	const subjectName = subject.name;
+	// 	const time = "12 Desember 2022";
+	// 	const predikat = "SANGAT BAIK";
+	// 	const nilai = 99;
 
-		const outputPdf = `${generateRandomCert}-${name}-certificat.pdf`;
-		pdfDocument.pipe(fs.createWriteStream(outputPdf));
-		pdfDocument.image("public/cert/pelatihan.png", {
-			fit: [3509, 2482],
-			align: "center",
-		});
+	// 	const outputPdf = `${generateRandomCert}-${name}-certificat.pdf`;
+	// 	pdfDocument.pipe(fs.createWriteStream(outputPdf));
+	// 	pdfDocument.image("public/cert/pelatihan.png", {
+	// 		fit: [3509, 2482],
+	// 		align: "center",
+	// 	});
 
-		await sleep(2000);
-		if (name.length <= 10) {
-			pdfDocument
-				.font("public/fonts/Monotype-Corsiva.ttf")
-				.fillColor("#623B60")
-				.fontSize(145)
-				.text(name, 1590, 875);
-		} else if (name.length <= 17) {
-			pdfDocument
-				.font("public/fonts/Monotype-Corsiva.ttf")
-				.fillColor("#623B60")
-				.fontSize(145)
-				.text(name, 1290, 875);
-		} else if (name.length <= 25) {
-			pdfDocument
-				.font("public/fonts/Monotype-Corsiva.ttf")
-				.fillColor("#623B60")
-				.fontSize(145)
-				.text(name, 1000, 875);
-		} else {
-			pdfDocument
-				.font("public/fonts/Monotype-Corsiva.ttf")
-				.fillColor("#623B60")
-				.fontSize(145)
-				.text(name, 825, 875);
-		}
-		pdfDocument
-			.font("public/fonts/Segoe-UI-Variable-Static-Display-Bold.ttf")
-			.fillColor("#623B60")
-			.fontSize(85)
-			.text(subjectName, 1200, 1200);
-		pdfDocument
-			.font("public/fonts/SegoeUIVF.ttf")
-			.fillColor("black")
-			.fontSize(60)
-			.text(time, 1010, 1691);
-		pdfDocument
-			.font("public/fonts/Segoe-UI-Variable-Static-Display-Regular.ttf")
-			.fillColor("#3C4048")
-			.fontSize(40)
-			.text(certificateLink, 2400, 2360);
-		pdfDocument.image(outputQr, 3075, 2157);
-		pdfDocument
-			.font("public/fonts/Segoe-UI-Variable-Static-Display-Bold.ttf")
-			.fillColor("#FBB416")
-			.fontSize(60)
-			.text(predikat, 1500, 1373);
-		pdfDocument
-			.font("public/fonts/Segoe-UI-Variable-Static-Display-Bold.ttf")
-			.fillColor("#FBB416")
-			.fontSize(60)
-			.text(nilai, 2227, 1373);
+	// 	await sleep(2000);
+	// 	if (name.length <= 10) {
+	// 		pdfDocument
+	// 			.font("public/fonts/Monotype-Corsiva.ttf")
+	// 			.fillColor("#623B60")
+	// 			.fontSize(145)
+	// 			.text(name, 1590, 875);
+	// 	} else if (name.length <= 17) {
+	// 		pdfDocument
+	// 			.font("public/fonts/Monotype-Corsiva.ttf")
+	// 			.fillColor("#623B60")
+	// 			.fontSize(145)
+	// 			.text(name, 1290, 875);
+	// 	} else if (name.length <= 25) {
+	// 		pdfDocument
+	// 			.font("public/fonts/Monotype-Corsiva.ttf")
+	// 			.fillColor("#623B60")
+	// 			.fontSize(145)
+	// 			.text(name, 1000, 875);
+	// 	} else {
+	// 		pdfDocument
+	// 			.font("public/fonts/Monotype-Corsiva.ttf")
+	// 			.fillColor("#623B60")
+	// 			.fontSize(145)
+	// 			.text(name, 825, 875);
+	// 	}
+	// 	pdfDocument
+	// 		.font("public/fonts/Segoe-UI-Variable-Static-Display-Bold.ttf")
+	// 		.fillColor("#623B60")
+	// 		.fontSize(85)
+	// 		.text(subjectName, 1200, 1200);
+	// 	pdfDocument
+	// 		.font("public/fonts/SegoeUIVF.ttf")
+	// 		.fillColor("black")
+	// 		.fontSize(60)
+	// 		.text(time, 1010, 1691);
+	// 	pdfDocument
+	// 		.font("public/fonts/Segoe-UI-Variable-Static-Display-Regular.ttf")
+	// 		.fillColor("#3C4048")
+	// 		.fontSize(40)
+	// 		.text(certificateLink, 2400, 2360);
+	// 	pdfDocument.image(outputQr, 3075, 2157);
+	// 	pdfDocument
+	// 		.font("public/fonts/Segoe-UI-Variable-Static-Display-Bold.ttf")
+	// 		.fillColor("#FBB416")
+	// 		.fontSize(60)
+	// 		.text(predikat, 1500, 1373);
+	// 	pdfDocument
+	// 		.font("public/fonts/Segoe-UI-Variable-Static-Display-Bold.ttf")
+	// 		.fillColor("#FBB416")
+	// 		.fontSize(60)
+	// 		.text(nilai, 2227, 1373);
 
-		pdfDocument.end();
-		return res.sendJson(201, true, "success upload new certificate");
+	// 	pdfDocument.end();
+	// 	return res.sendJson(201, true, "success upload new certificate");
 
-		const stream = pdfDocument.pipe(blobStream());
-		// stream.on("finish", async () => {
-		// 	await sleep(2000);
-		// 	// upload to firebase storage
-		// 	const file = fs.readFileSync(outputPdf);
-		// 	const nameFile = "documents/certificate/" + outputPdf;
-		// 	const buffer = Buffer.from(file, "utf-8");
+	// 	const stream = pdfDocument.pipe(blobStream());
+	// 	// stream.on("finish", async () => {
+	// 	// 	await sleep(2000);
+	// 	// 	// upload to firebase storage
+	// 	// 	const file = fs.readFileSync(outputPdf);
+	// 	// 	const nameFile = "documents/certificate/" + outputPdf;
+	// 	// 	const buffer = Buffer.from(file, "utf-8");
 
-		// 	bucket
-		// 		.file(nameFile)
-		// 		.createWriteStream()
-		// 		.end(buffer)
-		// 		.on("finish", () => {
-		// 			getDownloadURL(ref(storage, nameFile)).then((fileLink) => {
-		// 				console.log("link in firebase => ", fileLink);
-		// 			});
+	// 	// 	bucket
+	// 	// 		.file(nameFile)
+	// 	// 		.createWriteStream()
+	// 	// 		.end(buffer)
+	// 	// 		.on("finish", () => {
+	// 	// 			getDownloadURL(ref(storage, nameFile)).then((fileLink) => {
+	// 	// 				console.log("link in firebase => ", fileLink);
+	// 	// 			});
 
-		// 			return res.sendJson(201, true, "success upload new certificate");
-		// 		});
+	// 	// 			return res.sendJson(201, true, "success upload new certificate");
+	// 	// 		});
 
-		// 	await sleep(2000);
-		// 	fs.unlinkSync(outputPdf);
-		// 	fs.unlinkSync(outputQr);
-		// });
-	}),
+	// 	// 	await sleep(2000);
+	// 	// 	fs.unlinkSync(outputPdf);
+	// 	// 	fs.unlinkSync(outputQr);
+	// 	// });
+	// }),
 
 	/**
 	 * @desc      Get certificate by id certificate
 	 * @route     GET /api/v1/certificate/:id_certificate
-	 * @access    Public
+	 * @access    public
 	 */
 	getCertificate: asyncHandler(async (req, res) => {
 		const { id_certificate } = req.params;
