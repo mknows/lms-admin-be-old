@@ -67,10 +67,12 @@ module.exports = {
 		const data = await Session.findAll({
 			where: {
 				subject_id: subject_id,
+				session_no: {
+					[Op.not]: 0,
+				},
 			},
 			order: ["session_no"],
 		});
-
 		const students_session = await Student.findOne({
 			where: {
 				id: student_id,
@@ -86,7 +88,6 @@ module.exports = {
 			},
 			order: [[Session, "session_no", "DESC"]],
 		});
-
 		const latest_session = students_session?.Sessions[0].session_no || 0;
 
 		for (i = 0; i < data.length; i++) {
