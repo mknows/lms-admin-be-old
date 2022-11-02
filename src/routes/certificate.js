@@ -13,14 +13,14 @@ route.post(
 	// validatorMessage,
 	certificateController.createCertificateSubjectManual
 );
-route.post(
-	"/training",
-	// protection,
-	// authorize("admin"),
-	// validate("createCertificate"),
-	// validatorMessage,
-	certificateController.createCertificateTraining
-);
+// route.post(
+// 	"/training",
+// 	// protection,
+// 	// authorize("admin"),
+// 	// validate("createCertificate"),
+// 	// validatorMessage,
+// 	certificateController.createCertificateTraining
+// );
 
 route.get("/:id_certificate", certificateController.getCertificate);
 route.get(
