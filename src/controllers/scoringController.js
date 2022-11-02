@@ -485,7 +485,7 @@ module.exports = {
 			semester: student?.semester,
 			credit_finished: parsedPlan.finished.credit,
 			subjects_finished: parsedPlan.finished.subjects.length,
-			gpa_percent: parseFloat(
+			gpa: parseFloat(
 				(await GPACalculatorFromList(student.Subjects)).toFixed(2)
 			),
 		};
