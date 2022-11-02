@@ -20,32 +20,10 @@ const pdfDocument = new pdfKit({
 const qr = require("qr-image");
 const { Buffer } = require("buffer");
 const randomString = require("randomstring");
-require("dotenv").config({ path: "./controllerconfig.env" });
 const { Op } = require("sequelize");
 const { fromPath } = require("pdf2pic");
+require("dotenv").config({ path: "./controllerconfig.env" });
 const {
-	WEIGHT_A,
-	WEIGHT_A_MINUS,
-	WEIGHT_B_PLUS,
-	WEIGHT_B,
-	WEIGHT_B_MINUS,
-	WEIGHT_C_PLUS,
-	WEIGHT_C,
-	WEIGHT_C_MINUS,
-	WEIGHT_D,
-	WEIGHT_E,
-
-	DRAFT,
-	PENDING,
-	ONGOING,
-	GRADING,
-	PASSED,
-	FAILED,
-	FINISHED,
-	ABANDONED,
-	NOT_ENROLLED,
-	INVALID,
-
 	FLOOR_A,
 	FLOOR_A_MINUS,
 	FLOOR_B_PLUS,
@@ -55,25 +33,6 @@ const {
 	FLOOR_C,
 	FLOOR_D,
 	FLOOR_E,
-
-	KKM,
-
-	MODULE,
-	QUIZ,
-	ASSIGNMENT,
-
-	QUIZ_WEIGHT_SESSION,
-	ASSIGNMENT_WEIGHT_SESSION,
-	MODULE_WEIGHT_SESSION,
-
-	UTS,
-	UAS,
-
-	ASSIGNMENT_WEIGHT_ALL,
-	QUIZ_WEIGHT_ALL,
-	ATTENDANCE_WEIGHT_ALL,
-	MIDTERM_WEIGHT,
-	FINALS_WEIGHT,
 } = process.env;
 
 module.exports = {
@@ -224,7 +183,7 @@ module.exports = {
 		pdfDocument.end();
 
 		const createdPdf = await Certificate.create({
-			user_id,
+			user_id: student.User.id,
 			subject_id,
 			student_id,
 			id_certificate: generateRandomCert,

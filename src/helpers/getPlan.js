@@ -32,6 +32,14 @@ async function getPlan(student_id) {
 			attributes: ["subject_id"],
 			where: {
 				student_id: student_id,
+				status: DRAFT,
+			},
+			order: ["created_at"],
+		}),
+		await StudentSubject.findAll({
+			attributes: ["subject_id"],
+			where: {
+				student_id: student_id,
 				status: PENDING,
 			},
 			order: ["created_at"],
@@ -48,16 +56,17 @@ async function getPlan(student_id) {
 			attributes: ["subject_id"],
 			where: {
 				student_id: student_id,
-				status: DRAFT,
+				status: FINISHED,
 			},
 			order: ["created_at"],
 		}),
 	]);
 
 	let plan = {
-		datapending: all_dat[0],
-		dataongoing: all_dat[1],
-		datadraft: all_dat[2],
+		datadraft: all_dat[0],
+		datapending: all_dat[1],
+		dataongoing: all_dat[2],
+		datafinished: all_dat[3],
 	};
 	return plan;
 }
