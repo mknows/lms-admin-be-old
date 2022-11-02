@@ -483,10 +483,11 @@ module.exports = {
 			nsn: student?.User?.Administration?.nsn,
 			major: student?.Majors[0].name,
 			semester: student?.semester,
+			credit_finished: parsedPlan.finished.credit,
+			subjects_finished: parsedPlan.finished.subjects.length,
 			gpa_percent: parseFloat(
 				(await GPACalculatorFromList(student.Subjects)).toFixed(2)
 			),
-			credit_finished: parsedPlan.finished.credit,
 		};
 
 		let subjects = [];
