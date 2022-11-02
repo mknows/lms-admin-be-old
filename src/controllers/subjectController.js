@@ -473,7 +473,8 @@ module.exports = {
 						});
 					});
 				});
-			return res.sendJson(200, true, "Enrolled Subject");
+			let result = await getParsedPlan(student_id);
+			return res.sendJson(200, true, "Enrolled Subject", result);
 		} else if (credit > credit_thresh) {
 			return res.sendJson(400, false, "Exceeded maximum credit", {
 				credit: credit,

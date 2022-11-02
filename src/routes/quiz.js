@@ -71,4 +71,11 @@ route.get(
 	quizController.continueQuiz
 );
 
+route.get(
+	"/pretest",
+	protection,
+	authorize("student"),
+	quizController.getPretestDate
+);
+
 module.exports = route;

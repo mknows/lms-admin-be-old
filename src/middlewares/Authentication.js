@@ -92,7 +92,7 @@ exports.authorize = (...roles) => {
 
 		if (!currentUserRole.includes(...roles)) {
 			return next(
-				new ErrorResponse(`Not authorized to access this route`, 401)
+				new ErrorResponse(`Not authorized to access this route`, 404)
 			);
 		}
 
@@ -105,6 +105,7 @@ exports.authorize = (...roles) => {
 exports.enrolled = (Model) => {
 	return asyncHandler(async (req, res, next) => {
 		let enrolled;
+		let additional_message;
 		switch (Model) {
 			case Session: {
 				let { session_id } = req.params;
@@ -127,6 +128,9 @@ exports.enrolled = (Model) => {
 						},
 					},
 				});
+				if (!enrolled) {
+					additional_message = "Student is not in this session";
+				}
 				break;
 			}
 			case Subject: {
@@ -144,6 +148,9 @@ exports.enrolled = (Model) => {
 						},
 					},
 				});
+				if (!enrolled) {
+					additional_message = "Student is not enrolled to this subject";
+				}
 				break;
 			}
 			case Major: {
@@ -173,6 +180,9 @@ exports.enrolled = (Model) => {
 					},
 				});
 				enrolled = enrolled.Majors.length === 0 ? false : true;
+				if (!enrolled) {
+					additional_message = "Subject is not in student's major";
+				}
 				break;
 			}
 			case Quiz: {
@@ -181,7 +191,12 @@ exports.enrolled = (Model) => {
 			}
 		}
 		if (!enrolled) {
-			return next(new ErrorResponse(`Student is not authorized`, 401));
+			return next(
+				new ErrorResponse(
+					`Student is not authorized. ${additional_message}`,
+					404
+				)
+			);
 		}
 
 		next();

@@ -1,4 +1,10 @@
-const { MaterialEnrolled, Quiz, Material, Session } = require("../models");
+const {
+	MaterialEnrolled,
+	Quiz,
+	Material,
+	Session,
+	Student,
+} = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -574,5 +580,64 @@ module.exports = {
 			"User is currently taking these quizzes",
 			result
 		);
+	}),
+	/**
+	 * @desc      Get current quiz
+	 * @route     GET /api/v1/quiz/pretest/
+	 * @access    Private
+	 */
+	getPretestDate: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
+		const student_pretest = await Student.findOne({
+			attributes: {
+				include: ["id"],
+			},
+			where: {
+				id: student_id,
+			},
+			include: {
+				model: Session,
+				attributes: {
+					include: ["id"],
+				},
+				where: {
+					session_no: 0,
+				},
+				through: {
+					attributes: {
+						include: ["created_at"],
+					},
+				},
+			},
+		});
+		if (!student_pretest) {
+			return res.sendJson(
+				400,
+				false,
+				"Student isn't enrolled for any pretests",
+				{}
+			);
+		} else {
+			let result = [];
+			for (let i = 0; i < student_pretest.Sessions.length; i++) {
+				const date_pretest = moment(
+					student_pretest.Sessions[i].StudentSession.created_at,
+					"DD-MM-YYYY"
+				).add(3, "days");
+				const date_pretest_over = moment(
+					student_pretest.Sessions[i].StudentSession.created_at,
+					"DD-MM-YYYY"
+				).add(4, "days");
+				result.push({
+					session_id: student_pretest.Sessions[i].id,
+					date_pretest: date_pretest.format("DD/MM/YYYY"),
+					status: !moment().isAfter(date_pretest_over, "date")
+						? "SCHEDULED"
+						: "LATE",
+					eligible: moment().isSame(date_pretest, "date") ? true : false,
+				});
+			}
+			return res.sendJson(200, true, "Success", result);
+		}
 	}),
 };
