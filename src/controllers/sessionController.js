@@ -73,6 +73,7 @@ module.exports = {
 			},
 			order: ["session_no"],
 		});
+		console.log(data);
 		const students_session = await Student.findOne({
 			where: {
 				id: student_id,
