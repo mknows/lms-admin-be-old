@@ -41,10 +41,10 @@ module.exports = {
 	 * @route     POST /api/v1/certificate/subject
 	 * @access    Private
 	 **/
-	createCertificateSubject: asyncHandler(async (req, res) => {
+	createCertificateSubject: asyncHandler(async (data) => {
 		const storage = getStorage();
 		const bucket = admin.storage().bucket();
-		const { student_id, subject_id, final_subject_score } = req.body;
+		const { student_id, subject_id, final_subject_score } = data;
 		const student = await Student.findOne({
 			attributes: {
 				include: ["id"],

@@ -4,6 +4,8 @@ const {
 	Material,
 	Session,
 	Student,
+	StudentSubject,
+	StudentSession,
 } = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
@@ -13,7 +15,8 @@ const moduleTaken = require("../helpers/moduleTaken");
 const getSession = require("../helpers/getSession");
 const checkExistence = require("../helpers/checkExistence");
 const checkDoneSession = require("../helpers/checkDoneSession");
-const scoringController = require("./scoringController");
+const certificateController = require("./certificateController");
+
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	DRAFT,
@@ -442,39 +445,91 @@ module.exports = {
 					subject_id: quiz_session.subject_id,
 					final_subject_score: score,
 				};
-				await StudentSubject.update(
+				await MaterialEnrolled.update(
+					{
+						status: FINISHED,
+						score,
+					},
 					{
 						where: {
 							student_id,
-							subject_id,
-							final_score: score,
+							subject_id: quiz_session.subject_id,
+							session_id,
+							activity_detail: summary,
 						},
+					}
+				);
+				await StudentSession.update(
+					{
+						date_present: date_submitted,
+						final_score: score,
+						present: true,
 					},
+					{
+						where: {
+							student_id,
+							session_id,
+						},
+					}
+				);
+				await StudentSubject.update(
 					{
 						status: FINISHED,
 						date_finished: moment().tz("Asia/Jakarta"),
+					},
+					{
+						where: {
+							student_id,
+							subject_id: quiz_session.subject_id,
+						},
 					}
 				);
 				await certificateController.createCertificateSubject(data);
 				return res.sendJson(
 					200,
 					true,
-					"Student Passed. Check your profile to see the certificate.",
+					"Student Passed. Check your profile to get your certificate.",
 					summary
 				);
 			}
 			if (score < kkm) {
-				await StudentSubject.update(
+				await MaterialEnrolled.update(
+					{
+						status: FAILED,
+						score,
+					},
 					{
 						where: {
 							student_id,
-							subject_id,
+							subject_id: quiz_session.subject_id,
+							session_id,
 						},
+					}
+				);
+				await StudentSession.update(
+					{
+						date_present: date_submitted,
+						final_score: score,
+						present: true,
 					},
+					{
+						where: {
+							student_id,
+							session_id,
+						},
+					}
+				);
+				await StudentSubject.update(
 					{
 						status: FAILED,
 						date_finished: moment().tz("Asia/Jakarta"),
 						final_score: score,
+					},
+					{
+						where: {
+							student_id,
+							subject_id: quiz_session.subject_id,
+						},
 					}
 				);
 				return res.sendJson(200, true, "Student Failed", summary);
