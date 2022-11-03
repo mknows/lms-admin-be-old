@@ -460,6 +460,7 @@ module.exports = {
 				student_id: student_id,
 				subject_id: subject_id,
 				status: DRAFT,
+				date_taken: moment().tz("Asia/Jakarta"),
 			});
 			bucket
 				.file(nameFile)
@@ -716,7 +717,7 @@ module.exports = {
 async function getPlan(student_id) {
 	const all_dat = await Promise.all([
 		await StudentSubject.findAll({
-			attributes: ["subject_id"],
+			attributes: ["subject_id", "proof_link"],
 			where: {
 				student_id: student_id,
 				status: PENDING,
@@ -724,7 +725,7 @@ async function getPlan(student_id) {
 			order: ["created_at"],
 		}),
 		await StudentSubject.findAll({
-			attributes: ["subject_id"],
+			attributes: ["subject_id", "proof_link"],
 			where: {
 				student_id: student_id,
 				status: ONGOING,
@@ -732,7 +733,7 @@ async function getPlan(student_id) {
 			order: ["created_at"],
 		}),
 		await StudentSubject.findAll({
-			attributes: ["subject_id"],
+			attributes: ["subject_id", "proof_link"],
 			where: {
 				student_id: student_id,
 				status: DRAFT,
@@ -782,7 +783,9 @@ async function getParsedPlan(student_id) {
 			subject_id: currSub?.id,
 			student_subject_id: currStudSub.id,
 		};
-
+		if (currStudSub?.proof_link) {
+			dataval.proof_link = currStudSub?.proof_link;
+		}
 		pendingres.push(dataval);
 	}
 
@@ -803,13 +806,15 @@ async function getParsedPlan(student_id) {
 			subject_id: currSub?.id,
 			student_subject_id: currStudSub.id,
 		};
+		if (currStudSub?.proof_link) {
+			dataval.proof_link = currStudSub?.proof_link;
+		}
 
 		ongoingres.push(dataval);
 	}
 
 	for (let i = 0; i < datadraft.length; i++) {
 		let currStudSub = datadraft[i];
-
 		let currSub = await Subject.findOne({
 			where: {
 				id: currStudSub.subject_id,
@@ -824,6 +829,9 @@ async function getParsedPlan(student_id) {
 			student_subject_id: currStudSub.id,
 		};
 
+		if (currStudSub?.proof_link) {
+			dataval.proof_link = currStudSub?.proof_link;
+		}
 		draftres.push(dataval);
 	}
 

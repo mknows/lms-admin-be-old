@@ -13,6 +13,7 @@ const moduleTaken = require("../helpers/moduleTaken");
 const getSession = require("../helpers/getSession");
 const checkExistence = require("../helpers/checkExistence");
 const checkDoneSession = require("../helpers/checkDoneSession");
+const scoringController = require("./scoringController");
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	DRAFT,
@@ -425,6 +426,45 @@ module.exports = {
 				},
 			}
 		);
+
+		if (quiz_session.session_no === 0) {
+			if (score >= kkm) {
+				let data = {
+					student_id,
+					subject_id: quiz_session.subject_id,
+					final_subject_score: score,
+				};
+				await StudentSubject.update(
+					{
+						where: {
+							student_id,
+							subject_id,
+							final_score: score,
+						},
+					},
+					{
+						status: FINISHED,
+						date_finished: moment().tz("Asia/Jakarta"),
+					}
+				);
+				await certificateController.createCertificateSubject(data);
+			}
+			if (score < kkm) {
+				await StudentSubject.update(
+					{
+						where: {
+							student_id,
+							subject_id,
+						},
+					},
+					{
+						status: FAILED,
+						date_finished: moment().tz("Asia/Jakarta"),
+						final_score: score,
+					}
+				);
+			}
+		}
 
 		material_enrolled_data = await MaterialEnrolled.findOne({
 			where: {
