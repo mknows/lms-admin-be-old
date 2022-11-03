@@ -412,6 +412,14 @@ module.exports = {
 			);
 		}
 
+		let summary = {
+			score: score,
+			status: status,
+			date_submitted: date_submitted,
+			number_of_questions: quizAns.length,
+			correct_answers: correct,
+			duration_taken: duration_taken,
+		};
 		const result = await MaterialEnrolled.update(
 			{
 				score: score,
@@ -448,6 +456,12 @@ module.exports = {
 					}
 				);
 				await certificateController.createCertificateSubject(data);
+				return res.sendJson(
+					200,
+					true,
+					"Student Passed. Check your profile to see the certificate.",
+					summary
+				);
 			}
 			if (score < kkm) {
 				await StudentSubject.update(
@@ -463,6 +477,7 @@ module.exports = {
 						final_score: score,
 					}
 				);
+				return res.sendJson(200, true, "Student Failed", summary);
 			}
 		}
 
@@ -474,14 +489,6 @@ module.exports = {
 
 		checkDoneSession(student_id, material_enrolled_data.session_id);
 
-		let summary = {
-			score: score,
-			status: status,
-			date_submitted: date_submitted,
-			number_of_questions: quizAns.length,
-			correct_answers: correct,
-			duration_taken: duration_taken,
-		};
 		return res.sendJson(200, true, "Success", summary);
 	}),
 
