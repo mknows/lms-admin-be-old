@@ -347,7 +347,7 @@ module.exports = {
 		const kkm = parseInt(KKM);
 		let status;
 		let correct = 0;
-		date_submitted = moment().format("MMMM Do YYYY, h:mm:ss a");
+		date_submitted = moment().format("DD/MM/YYYY hh:mm:ss");
 
 		const quiz = await Quiz.findOne({
 			where: {

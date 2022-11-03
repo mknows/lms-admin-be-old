@@ -127,7 +127,7 @@ async function completedSession(student_id, session_id) {
 			{
 				status: FINISHED,
 				present: true,
-				date_present: moment().format("YYYY-MM-DD HH:mm:ss"),
+				date_present: moment().format("DD/MM/YYYY hh:mm:ss"),
 				final_score: score,
 			},
 			{

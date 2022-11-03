@@ -540,7 +540,7 @@ module.exports = {
 		}
 
 		let detail = {
-			date_submitted: moment().format("MMMM Do YYYY, h:mm:ss a"),
+			date_submitted: moment().format("DD/MM/YYYY hh:mm:ss"),
 			takeaway: takeaway,
 		};
 
