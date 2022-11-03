@@ -261,7 +261,13 @@ module.exports = {
 
 		const session_id = await getSession(Quiz, quiz_id);
 
-		const max_attempt = parseInt(MAX_ATTEMPT);
+		const session_no = await Session.findOne({
+			where: {
+				id: session_id,
+			},
+		});
+
+		const max_attempt = session_no === 0 ? 1 : parseInt(MAX_ATTEMPT);
 
 		const quizQuestions = await Quiz.findOne({
 			where: {
