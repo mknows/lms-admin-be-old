@@ -456,6 +456,11 @@ module.exports = {
 			credit += sub.credit;
 		}
 		if (enrolled === false && credit <= credit_thresh) {
+			await StudentSubject.create({
+				student_id: student_id,
+				subject_id: subject_id,
+				status: DRAFT,
+			});
 			bucket
 				.file(nameFile)
 				.createWriteStream()
@@ -464,13 +469,18 @@ module.exports = {
 					console.log("Lanjut finish ini");
 					getDownloadURL(ref(storage, nameFile)).then(async (linkFile) => {
 						console.log("link nya => ", linkFile);
-						await StudentSubject.create({
-							student_id: student_id,
-							subject_id: subject_id,
-							proof: nameFile,
-							proof_link: linkFile,
-							status: DRAFT,
-						});
+						await StudentSubject.update(
+							{
+								proof: nameFile,
+								proof_link: linkFile,
+							},
+							{
+								where: {
+									subject_id,
+									student_id,
+								},
+							}
+						);
 					});
 				});
 			let result = await getParsedPlan(student_id);

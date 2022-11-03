@@ -215,7 +215,7 @@ module.exports = {
 		return res.sendJson(200, true, "Success", {
 			module: mod,
 			takeaway: takeaway,
-			date_submitted: date_submitted,
+			date_submitted: moment(date_submitted).format("DD/MM/YYYY hh:mm:ss"),
 			videos: vids,
 			documents: docs,
 		});
