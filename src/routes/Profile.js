@@ -40,6 +40,12 @@ route.get(
 	authorize("user", "student"),
 	profileController.achievements
 );
+route.get(
+	"/report",
+	protection,
+	authorize("student"),
+	profileController.getReport
+);
 route.put(
 	"/me",
 	protection,

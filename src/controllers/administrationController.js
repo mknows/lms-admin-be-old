@@ -251,7 +251,7 @@ module.exports = {
 		const user = req.userData;
 		const storage = getStorage();
 		const bucket = admin.storage().bucket();
-		const { administration_id } = req.body;
+		// const { administration_id } = req.body;
 
 		let data = await Administration.findOne({
 			where: {
@@ -259,6 +259,7 @@ module.exports = {
 			},
 			include: User,
 		});
+		const administration_id = data.id
 
 		if (!data) {
 			return res.sendJson(400, false, "invalid administration user data", {});
@@ -325,7 +326,6 @@ module.exports = {
 
 			await Administration.update(
 				{
-					updated_by: user.id,
 					recommendation_letter: recommendationLetterFile,
 				},
 				{
@@ -349,10 +349,8 @@ module.exports = {
 				.on("finish", () => {
 					createLinkFirebaseIntegrityPact(integrityPactFile, administration_id);
 				});
-
 			await Administration.update(
 				{
-					updated_by: user.id,
 					integrity_pact: integrityPactFile,
 				},
 				{
@@ -379,7 +377,6 @@ module.exports = {
 
 			await Administration.update(
 				{
-					updated_by: user.id,
 					nin_card: ninCardFile,
 				},
 				{
@@ -406,7 +403,6 @@ module.exports = {
 
 			await Administration.update(
 				{
-					updated_by: user.id,
 					family_card: familyCardFile,
 				},
 				{
@@ -433,7 +429,6 @@ module.exports = {
 
 			await Administration.update(
 				{
-					updated_by: user.id,
 					certificate: certificateFile,
 				},
 				{
@@ -459,7 +454,6 @@ module.exports = {
 
 			await Administration.update(
 				{
-					updated_by: user.id,
 					photo: photoFile,
 				},
 				{
@@ -473,7 +467,6 @@ module.exports = {
 
 		data = await Administration.update(
 			{
-				updated_by: user.id,
 				approved_by: null,
 			},
 			{
