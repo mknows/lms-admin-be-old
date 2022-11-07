@@ -123,6 +123,36 @@ module.exports = {
 		phone = phone ? phone : curr_user.phone;
 		address = address ? address : curr_user.address;
 
+		let data = await User.update(
+			{
+				full_name: titleCase(full_name),
+				gender,
+				phone,
+				address,
+			},
+			{
+				where: {
+					id: user.id,
+				},
+				returning: true,
+				plain: true,
+			}
+		);
+
+		delete data[1].dataValues["id"];
+		delete data[1].dataValues["firebase_uid"];
+		delete data[1].dataValues["password"];
+
+		await updateProfile(getClientAuth(), {
+			full_name: titleCase(full_name),
+		});
+
+		let student_id = "Not a STUDENT";
+
+		if (req.role === "student") {
+			student_id = req.student_id;
+		}
+
 		if (req.file) {
 			const getFile = await User.findOne({
 				where: {
@@ -162,45 +192,23 @@ module.exports = {
 									plain: true,
 								}
 							);
+							delete data[1].dataValues["display_picture_link"];
+
+							return await res.sendJson(200, true, "success update data user", {
+								...data[1].dataValues,
+								role: req.role,
+								student_id: student_id,
+								display_picture_link: linkFile,
+							});
 						}
 					);
 				});
 		}
 
-		let data = await User.update(
-			{
-				full_name: titleCase(full_name),
-				gender,
-				phone,
-				address,
-			},
-			{
-				where: {
-					id: user.id,
-				},
-				returning: true,
-				plain: true,
-			}
-		);
-
-		delete data[1].dataValues["id"];
-		delete data[1].dataValues["firebase_uid"];
-		delete data[1].dataValues["password"];
-
-		await updateProfile(getClientAuth(), {
-			full_name: titleCase(full_name),
-		});
-
-		let student_id = "Not a STUDENT";
-
-		if (req.role === "student") {
-			student_id = req.student_id;
-		}
-
-		return res.status(200).json({
-			success: true,
-			message: "success update profile",
-			data: { ...data[1].dataValues, role: req.role, student_id: student_id },
+		res.sendJson(200, true, "success update data user", {
+			...data[1].dataValues,
+			role: req.role,
+			student_id: student_id,
 		});
 	}),
 };
