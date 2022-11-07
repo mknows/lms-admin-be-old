@@ -467,7 +467,6 @@ module.exports = {
 				.createWriteStream()
 				.end(fileBuffer)
 				.on("finish", () => {
-					console.log("Lanjut finish ini");
 					getDownloadURL(ref(storage, nameFile)).then(async (linkFile) => {
 						console.log("link nya => ", linkFile);
 						await StudentSubject.update(
