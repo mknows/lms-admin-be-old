@@ -38,7 +38,7 @@ async function completedSession(student_id, session_id) {
 		if (!values.includes(null)) {
 			StudentSession.update(
 				{
-					date_present: moment().format("YYYY-MM-DD HH:mm:ss"),
+					date_present: moment().format("DD/MM/YYYY hh:mm:ss"),
 					present: true,
 				},
 				{

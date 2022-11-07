@@ -20,32 +20,10 @@ const pdfDocument = new pdfKit({
 const qr = require("qr-image");
 const { Buffer } = require("buffer");
 const randomString = require("randomstring");
-require("dotenv").config({ path: "./controllerconfig.env" });
 const { Op } = require("sequelize");
 const { fromPath } = require("pdf2pic");
+require("dotenv").config({ path: "./controllerconfig.env" });
 const {
-	WEIGHT_A,
-	WEIGHT_A_MINUS,
-	WEIGHT_B_PLUS,
-	WEIGHT_B,
-	WEIGHT_B_MINUS,
-	WEIGHT_C_PLUS,
-	WEIGHT_C,
-	WEIGHT_C_MINUS,
-	WEIGHT_D,
-	WEIGHT_E,
-
-	DRAFT,
-	PENDING,
-	ONGOING,
-	GRADING,
-	PASSED,
-	FAILED,
-	FINISHED,
-	ABANDONED,
-	NOT_ENROLLED,
-	INVALID,
-
 	FLOOR_A,
 	FLOOR_A_MINUS,
 	FLOOR_B_PLUS,
@@ -55,25 +33,6 @@ const {
 	FLOOR_C,
 	FLOOR_D,
 	FLOOR_E,
-
-	KKM,
-
-	MODULE,
-	QUIZ,
-	ASSIGNMENT,
-
-	QUIZ_WEIGHT_SESSION,
-	ASSIGNMENT_WEIGHT_SESSION,
-	MODULE_WEIGHT_SESSION,
-
-	UTS,
-	UAS,
-
-	ASSIGNMENT_WEIGHT_ALL,
-	QUIZ_WEIGHT_ALL,
-	ATTENDANCE_WEIGHT_ALL,
-	MIDTERM_WEIGHT,
-	FINALS_WEIGHT,
 } = process.env;
 
 module.exports = {
@@ -81,33 +40,30 @@ module.exports = {
 	 * @desc      Create new certificate SUBJECT
 	 * @route     POST /api/v1/certificate/subject
 	 * @access    Private
-	 */
+	 **/
 	createCertificateSubject: asyncHandler(async (data) => {
 		const storage = getStorage();
 		const bucket = admin.storage().bucket();
 		const { student_id, subject_id, final_subject_score } = data;
 		const student = await Student.findOne({
-			attributes: ["id"],
+			attributes: {
+				include: ["id"],
+			},
 			where: {
 				id: student_id,
 			},
 			include: [
 				{
 					model: Subject,
-					where: {
-						id: subject_id,
-					},
-					attributes: ["name", "id"],
-					through: {
-						attributes: ["status"],
-						where: {
-							status: "FINISHED",
-						},
+					attributes: {
+						include: ["id", "name"],
 					},
 				},
 				{
 					model: User,
-					attributes: ["full_name", "id"],
+					attributes: {
+						include: ["full_name", "id"],
+					},
 				},
 			],
 		});
@@ -224,7 +180,7 @@ module.exports = {
 		pdfDocument.end();
 
 		const createdPdf = await Certificate.create({
-			user_id,
+			user_id: student.User.id,
 			subject_id,
 			student_id,
 			id_certificate: generateRandomCert,

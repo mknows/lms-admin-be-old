@@ -408,28 +408,32 @@ const checkFileIfExistFirebase = async (res, data) => {
 
 const getAllAssignmentSubmissionFiltered = async (student_id) => {
 	const all_data = await Promise.all([
-		await Assignment.findAll({
+		await MaterialEnrolled.findAll({
 			where: {
 				student_id,
 				status: ONGOING,
+				type: ASSIGNMENT,
 			},
 		}),
-		await Assignment.findAll({
+		await MaterialEnrolled.findAll({
 			where: {
 				student_id,
 				status: GRADING,
+				type: ASSIGNMENT,
 			},
 		}),
-		await Assignment.findAll({
+		await MaterialEnrolled.findAll({
 			where: {
 				student_id,
 				status: FINISHED,
+				type: ASSIGNMENT,
 			},
 		}),
-		await Assignment.findAll({
+		await MaterialEnrolled.findAll({
 			where: {
 				student_id,
 				status: LATE,
+				type: ASSIGNMENT,
 			},
 		}),
 	]);

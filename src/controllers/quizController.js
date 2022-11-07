@@ -4,6 +4,8 @@ const {
 	Material,
 	Session,
 	Student,
+	StudentSubject,
+	StudentSession,
 } = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
@@ -13,6 +15,8 @@ const moduleTaken = require("../helpers/moduleTaken");
 const getSession = require("../helpers/getSession");
 const checkExistence = require("../helpers/checkExistence");
 const checkDoneSession = require("../helpers/checkDoneSession");
+const certificateController = require("./certificateController");
+
 require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
 const {
 	DRAFT,
@@ -261,7 +265,13 @@ module.exports = {
 
 		const session_id = await getSession(Quiz, quiz_id);
 
-		const max_attempt = parseInt(MAX_ATTEMPT);
+		const session_no = await Session.findOne({
+			where: {
+				id: session_id,
+			},
+		});
+
+		const max_attempt = session_no === 0 ? 1 : parseInt(MAX_ATTEMPT);
 
 		const quizQuestions = await Quiz.findOne({
 			where: {
@@ -347,7 +357,7 @@ module.exports = {
 		const kkm = parseInt(KKM);
 		let status;
 		let correct = 0;
-		date_submitted = moment().format("MMMM Do YYYY, h:mm:ss a");
+		date_submitted = moment().format("DD/MM/YYYY hh:mm:ss");
 
 		const quiz = await Quiz.findOne({
 			where: {
@@ -405,6 +415,14 @@ module.exports = {
 			);
 		}
 
+		let summary = {
+			score: score,
+			status: status,
+			date_submitted: date_submitted,
+			number_of_questions: quizAns.length,
+			correct_answers: correct,
+			duration_taken: duration_taken,
+		};
 		const result = await MaterialEnrolled.update(
 			{
 				score: score,
@@ -420,6 +438,104 @@ module.exports = {
 			}
 		);
 
+		if (quiz_session.session_no === 0) {
+			if (score >= kkm) {
+				let data = {
+					student_id,
+					subject_id: quiz_session.subject_id,
+					final_subject_score: score,
+				};
+				await MaterialEnrolled.update(
+					{
+						status: FINISHED,
+						score,
+					},
+					{
+						where: {
+							student_id,
+							subject_id: quiz_session.subject_id,
+							session_id,
+							activity_detail: summary,
+						},
+					}
+				);
+				await StudentSession.update(
+					{
+						date_present: date_submitted,
+						final_score: score,
+						present: true,
+					},
+					{
+						where: {
+							student_id,
+							session_id,
+						},
+					}
+				);
+				await StudentSubject.update(
+					{
+						status: FINISHED,
+						date_finished: moment().tz("Asia/Jakarta"),
+					},
+					{
+						where: {
+							student_id,
+							subject_id: quiz_session.subject_id,
+						},
+					}
+				);
+				await certificateController.createCertificateSubject(data);
+				return res.sendJson(
+					200,
+					true,
+					"Student Passed. Check your profile to get your certificate.",
+					summary
+				);
+			}
+			if (score < kkm) {
+				await MaterialEnrolled.update(
+					{
+						status: FAILED,
+						score,
+					},
+					{
+						where: {
+							student_id,
+							subject_id: quiz_session.subject_id,
+							session_id,
+						},
+					}
+				);
+				await StudentSession.update(
+					{
+						date_present: date_submitted,
+						final_score: score,
+						present: true,
+					},
+					{
+						where: {
+							student_id,
+							session_id,
+						},
+					}
+				);
+				await StudentSubject.update(
+					{
+						status: FAILED,
+						date_finished: moment().tz("Asia/Jakarta"),
+						final_score: score,
+					},
+					{
+						where: {
+							student_id,
+							subject_id: quiz_session.subject_id,
+						},
+					}
+				);
+				return res.sendJson(200, true, "Student Failed", summary);
+			}
+		}
+
 		material_enrolled_data = await MaterialEnrolled.findOne({
 			where: {
 				id: material_enrolled_id,
@@ -428,14 +544,6 @@ module.exports = {
 
 		checkDoneSession(student_id, material_enrolled_data.session_id);
 
-		let summary = {
-			score: score,
-			status: status,
-			date_submitted: date_submitted,
-			number_of_questions: quizAns.length,
-			correct_answers: correct,
-			duration_taken: duration_taken,
-		};
 		return res.sendJson(200, true, "Success", summary);
 	}),
 

@@ -215,7 +215,7 @@ module.exports = {
 		return res.sendJson(200, true, "Success", {
 			module: mod,
 			takeaway: takeaway,
-			date_submitted: date_submitted,
+			date_submitted: moment(date_submitted).format("DD/MM/YYYY hh:mm:ss"),
 			videos: vids,
 			documents: docs,
 		});
@@ -540,7 +540,7 @@ module.exports = {
 		}
 
 		let detail = {
-			date_submitted: moment().format("MMMM Do YYYY, h:mm:ss a"),
+			date_submitted: moment().format("DD/MM/YYYY hh:mm:ss"),
 			takeaway: takeaway,
 		};
 

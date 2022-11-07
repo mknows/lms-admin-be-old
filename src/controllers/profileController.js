@@ -47,6 +47,24 @@ module.exports = {
 	}),
 
 	/**
+	 * @desc      Get student Report
+	 * @route     GET /api/v1/profile/report
+	 * @access    Private
+	 */
+	getReport: asyncHandler(async (req, res) => {
+		let token = req.firebaseToken;
+		const student_id = req.student_id;
+
+		let report = await scoringController.getReport(student_id);
+
+		return res.status(200).json({
+			success: true,
+			message: "Account connected.",
+			data: report,
+		});
+	}),
+
+	/**
 	 * @desc      Get User's Achievements
 	 * @route     GET /api/v1/profile/achievement
 	 * @access    Private
