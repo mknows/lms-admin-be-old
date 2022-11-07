@@ -267,6 +267,10 @@ module.exports = {
 				"DD/MM/YYYY hh:mm:ss"
 			);
 		}
+
+		student_taken_assignment.activity_detail.file_assignment =
+			student_taken_assignment.activity_detail.file_assignment.substr(59);
+
 		let result = {
 			assignment: assign,
 			students_work: student_taken_assignment,
