@@ -67,6 +67,15 @@ module.exports = {
 
 		const sessions = await getStudentOngoingSessionId(student_id);
 
+		if (sessions == null) {
+			return res.sendJson(
+				404,
+				false,
+				"student is not enrolled to any sessions",
+				null
+			);
+		}
+
 		const data = await DiscussionForum.findAll({
 			attributes: {
 				include: ["created_at", "updated_at"],
