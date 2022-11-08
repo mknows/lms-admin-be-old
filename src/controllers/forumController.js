@@ -10,6 +10,7 @@ const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
+const getStudentOngoingSessionId = require("../helpers/getStudentOngoingSessionId");
 
 module.exports = {
 	/**
@@ -58,6 +59,35 @@ module.exports = {
 	/**
 	 * @desc      Get All Forums
 	 * @route     GET /api/v1/forum/discussionforum/
+	 * @access    Public
+	 */
+	getAllDiscussionForumOngoing: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
+		let result;
+
+		const sessions = await getStudentOngoingSessionId(student_id);
+
+		const data = await DiscussionForum.findAll({
+			attributes: {
+				include: ["created_at", "updated_at"],
+			},
+			where: {
+				session_id: sessions,
+			},
+		});
+
+		result = data;
+
+		return res.sendJson(
+			200,
+			true,
+			"sucess get all discussion forums in enrolled sessions",
+			result
+		);
+	}),
+	/**
+	 * @desc      Get All Forums
+	 * @route     GET /api/v1/forum/discussionforum/all
 	 * @access    Public
 	 */
 	getAllDiscussionForum: asyncHandler(async (req, res) => {

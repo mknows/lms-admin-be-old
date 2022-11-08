@@ -7,6 +7,13 @@ const { protection, authorize } = require("../middlewares/Authentication");
 route.get(
 	"/discussionforum",
 	protection,
+	authorize("student"),
+	forumController.getAllDiscussionForumOngoing
+);
+
+route.get(
+	"/discussionforum/all",
+	protection,
 	forumController.getAllDiscussionForum
 );
 
