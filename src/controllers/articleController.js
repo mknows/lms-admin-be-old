@@ -47,6 +47,27 @@ module.exports = {
 	}),
 
 	/**
+	 * @desc      Get data Article by id
+	 * @route     GET /api/v1/article/:id
+	 * @access    Private
+	 */
+	getArticleById: asyncHandler(async (req, res) => {
+		const { id } = req.params;
+
+		const data = await Article.findOne({
+			where: {
+				id,
+			},
+		});
+
+		if (!data) {
+			return res.sendJson(404, false, "article id not found", null);
+		}
+
+		return res.sendJson(200, true, "suceess get data article by id", data);
+	}),
+
+	/**
 	 * @desc      Create a new data article
 	 * @route     POST /api/v1/article/create
 	 * @access    Private
