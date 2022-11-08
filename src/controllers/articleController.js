@@ -20,14 +20,14 @@ module.exports = {
 	 * @access    Private
 	 */
 	index: asyncHandler(async (req, res) => {
-		let results, paginated;
+		let results;
 		const { page, limit, search } = req.query;
 		let search_query = "%%";
 
 		if (search) {
 			search_query = "%" + search + "%";
 		}
-		const key = "get-all-data-article";
+		const key = "get-all-data-article" + search + page + limit;
 
 		const cacheResult = await redisClient.get(key);
 		if (cacheResult) {

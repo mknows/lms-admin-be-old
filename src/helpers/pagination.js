@@ -10,7 +10,7 @@ async function pagination(data, page, limit) {
 
 		const maxPage = Math.ceil(data.length / intLimit);
 		if (typeof data === "object") {
-			let result = data.slice(firstIndex, lastIndex);
+			let result = data?.slice(firstIndex, lastIndex);
 			return {
 				max_page: maxPage,
 				result: result,

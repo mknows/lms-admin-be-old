@@ -20,6 +20,7 @@ const pdfDocument = new pdfKit({
 const qr = require("qr-image");
 const { Buffer } = require("buffer");
 const randomString = require("randomstring");
+const pagination = require("../helpers/pagination");
 const { Op } = require("sequelize");
 const { fromPath } = require("pdf2pic");
 require("dotenv").config({ path: "./controllerconfig.env" });
@@ -682,24 +683,35 @@ module.exports = {
 
 	/**
 	 * @desc      Get certificate by student
-	 * @route     GET /api/v1/certificate
+	 * @route     GET /api/v1/certificate?page=(number)&limit=(number)&search=(str)
 	 * @access    private
 	 */
 	getCertificateByStudent: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
-		let search = await Certificate.findAll({
+		const { page, limit, search } = req.query;
+		let search_query = "%%";
+
+		if (search) {
+			search_query = "%" + search + "%";
+		}
+		let certificate = await Certificate.findAll({
 			where: {
 				student_id,
 			},
 			attributes: ["id_certificate", "subject_id", "link", "thumbnail_link"],
 			include: {
 				model: Subject,
+				where: {
+					name: {
+						[Op.iLike]: search_query,
+					},
+				},
 				as: "subject",
 				attributes: ["name"],
 			},
 		});
-
-		if (!search) {
+		certificate = await pagination(certificate, page, limit);
+		if (!certificate) {
 			return res.sendJson(
 				404,
 				false,
@@ -711,7 +723,7 @@ module.exports = {
 			200,
 			true,
 			"success get certificate by student",
-			search
+			certificate
 		);
 	}),
 };
