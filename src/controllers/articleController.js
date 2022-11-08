@@ -10,15 +10,23 @@ const {
 } = require("firebase/storage");
 const asyncHandler = require("express-async-handler");
 const { redisClient } = require("../helpers/redis");
+const pagination = require("../helpers/pagination");
+const { Op } = require("sequelize");
 
 module.exports = {
 	/**
 	 * @desc      Get All data Article
-	 * @route     GET /api/v1/article/index
+	 * @route     GET /api/v1/article/index?page=(number)&limit=(number)&search=(str)
 	 * @access    Private
 	 */
 	index: asyncHandler(async (req, res) => {
-		let results;
+		let results, paginated;
+		const { page, limit, search } = req.query;
+		let search_query = "%%";
+
+		if (search) {
+			search_query = "%" + search + "%";
+		}
 		const key = "get-all-data-article";
 
 		const cacheResult = await redisClient.get(key);
@@ -29,17 +37,20 @@ module.exports = {
 				attributes: {
 					include: ["created_at"],
 				},
+				where: {
+					title: {
+						[Op.iLike]: search_query,
+					},
+				},
+				order: [["created_at", "desc"]],
 			});
+			results = await pagination(results, page, limit);
 			await redisClient.set(key, JSON.stringify(results), {
 				EX: 120,
 			});
 
 			if (results.length == 0) {
-				return res.sendJson(
-					200,
-					true,
-					"success get, but not have data article"
-				);
+				return res.sendJson(200, true, "success get, but no article is found");
 			}
 		}
 
