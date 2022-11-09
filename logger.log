@@ -1,0 +1,4 @@
+::1 - - [2022-11-09 08:58:27] "POST /api/v1/auth/login HTTP/1.1" STATUS:200 2184.579 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-09 08:58:31] "GET /api/v1/article/index?page=1&limit=6&search HTTP/1.1" STATUS:200 180.970 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-09 08:58:37] "GET /api/v1/article/6d3598e1-5d6c-4359-9dbc-25ae0f25c7bf HTTP/1.1" STATUS:200 14.078 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-09 09:00:12] "GET /api/v1/article/6d3598e1-5d6c-4359-9dbc-25ae0f25c7bf HTTP/1.1" STATUS:200 245.102 ms "-" "PostmanRuntime/7.29.2"

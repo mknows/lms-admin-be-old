@@ -66,6 +66,9 @@ module.exports = {
 		const { id } = req.params;
 
 		const data = await Article.findOne({
+			attributes: {
+				include: ["created_at"],
+			},
 			where: {
 				id,
 			},
