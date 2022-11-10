@@ -220,18 +220,6 @@ module.exports = {
 			},
 		});
 
-		const checkExist = await MaterialEnrolled.findOne({
-			where: {
-				session_id: session_id,
-				student_id: student_id,
-				type: ASSIGNMENT,
-			},
-		});
-
-		if (checkExist.activity_detail == null) {
-			return res.sendJson(400, false, "No assignment was assigned");
-		}
-
 		const session = await Session.findOne({
 			where: {
 				id: session_id,
@@ -252,6 +240,7 @@ module.exports = {
 				id_referrer: assign.id,
 			},
 		});
+
 		if (!student_taken_assignment) {
 			const material_enrolled = await MaterialEnrolled.create({
 				student_id,
@@ -279,12 +268,13 @@ module.exports = {
 			);
 		}
 
-		student_taken_assignment.activity_detail.file_assignment =
-			student_taken_assignment.activity_detail.file_assignment.substr(59);
+		if (student_taken_assignment?.activity_detail?.file_assignment)
+			student_taken_assignment.activity_detail.file_assignment =
+				student_taken_assignment.activity_detail.file_assignment.substr(59);
 
 		let result = {
 			assignment: assign,
-			students_work: student_taken_assignment,
+			students_work: student_taken_assignment || null,
 		};
 		return res.sendJson(200, true, "Success", result);
 	}),
