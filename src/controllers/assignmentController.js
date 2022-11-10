@@ -220,6 +220,18 @@ module.exports = {
 			},
 		});
 
+		const checkExist = await MaterialEnrolled.findOne({
+			where: {
+				session_id: session_id,
+				student_id: student_id,
+				type: ASSIGNMENT,
+			},
+		});
+
+		if (checkExist.activity_detail == null) {
+			return res.sendJson(400, false, "No assignment was assigned");
+		}
+
 		const session = await Session.findOne({
 			where: {
 				id: session_id,
