@@ -219,7 +219,6 @@ module.exports = {
 				session_id: session_id,
 			},
 		});
-		assign.file_assignment = assign.file_assignment.slice(59);
 
 		const session = await Session.findOne({
 			where: {
