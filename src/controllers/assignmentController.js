@@ -2,7 +2,7 @@ const {
 	Assignment,
 	Material,
 	MaterialEnrolled,
-	sequelize,
+	Subject,
 	Session,
 } = require("../models");
 const { Op } = require("sequelize");
@@ -414,34 +414,114 @@ const checkFileIfExistFirebase = async (res, data) => {
 const getAllAssignmentSubmissionFiltered = async (student_id) => {
 	const all_data = await Promise.all([
 		await MaterialEnrolled.findAll({
+			attributes: {
+				include: ["created_at"],
+			},
 			where: {
 				student_id,
 				status: ONGOING,
 				type: ASSIGNMENT,
 			},
+			include: [
+				{
+					model: Assignment,
+					attributes: ["content", "duration"],
+				},
+				{
+					model: Session,
+					attributes: ["session_no"],
+				},
+				{
+					model: Subject,
+					attributes: ["name"],
+				},
+			],
 		}),
 		await MaterialEnrolled.findAll({
+			attributes: {
+				include: ["created_at"],
+			},
 			where: {
 				student_id,
 				status: GRADING,
 				type: ASSIGNMENT,
 			},
+			include: [
+				{
+					model: Assignment,
+					attributes: ["content", "duration"],
+				},
+				{
+					model: Session,
+					attributes: ["session_no"],
+				},
+				{
+					model: Subject,
+					attributes: ["name"],
+				},
+			],
 		}),
 		await MaterialEnrolled.findAll({
+			attributes: {
+				include: ["created_at"],
+			},
 			where: {
 				student_id,
 				status: FINISHED,
 				type: ASSIGNMENT,
 			},
+			include: [
+				{
+					model: Assignment,
+					attributes: ["content", "duration"],
+				},
+				{
+					model: Session,
+					attributes: ["session_no"],
+				},
+				{
+					model: Subject,
+					attributes: ["name"],
+				},
+			],
 		}),
 		await MaterialEnrolled.findAll({
+			attributes: {
+				include: ["created_at"],
+			},
 			where: {
 				student_id,
 				status: LATE,
 				type: ASSIGNMENT,
 			},
+			include: [
+				{
+					model: Assignment,
+					attributes: ["content", "duration"],
+				},
+				{
+					model: Session,
+					attributes: ["session_no"],
+				},
+				{
+					model: Subject,
+					attributes: ["name"],
+				},
+			],
 		}),
 	]);
+
+	for (i = 0; i < all_data.length; i++) {
+		all_data[i].forEach((element) => {
+			const deadline = moment(
+				new Date(
+					new Date(element.created_at).getTime() +
+						element.Assignment.duration * 1000
+				)
+			).format("DD/MM/YYYY hh:mm:ss");
+			element.dataValues.deadline = deadline;
+		});
+	}
 
 	return {
 		ongoing: all_data[0],

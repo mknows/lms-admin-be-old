@@ -8,7 +8,16 @@ module.exports = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			// define association here
+			this.belongsTo(models.Assignment, {
+				foreignKey: "id_referrer",
+				targetKey: "id",
+			});
+			this.belongsTo(models.Session, {
+				foreignKey: "session_id",
+			});
+			this.belongsTo(models.Subject, {
+				foreignKey: "subject_id",
+			});
 		}
 	}
 	MaterialEnrolled.init(
