@@ -30,7 +30,12 @@ route.post(
 	validatorMessage,
 	userController.requestResetPassword
 );
-route.post("/google-validate", protection, userController.googleValidate);
+route.post(
+	"/google-validate",
+	protection,
+	authorize("user"),
+	userController.googleValidate
+);
 route.get("/logout", userController.signOutUser);
 
 route.get(
