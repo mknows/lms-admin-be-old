@@ -20,7 +20,7 @@ module.exports = {
 	 */
 	getAllDiscussionForumContent: asyncHandler(async (req, res) => {
 		const { df_id } = req.params;
-		const data = await DiscussionForum.findOne({
+		let data = await DiscussionForum.findOne({
 			where: {
 				id: df_id,
 			},
@@ -54,6 +54,9 @@ module.exports = {
 				[Comment, Reply, "content", "DESC"],
 			],
 		});
+
+		data = data.dataValues;
+
 		return res.sendJson(200, true, "sucess get all discussion forums", data);
 	}),
 	/**
