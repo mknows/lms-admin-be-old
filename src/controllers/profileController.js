@@ -223,7 +223,7 @@ module.exports = {
 				});
 		}
 
-		res.sendJson(200, true, "success update data user", {
+		return res.sendJson(200, true, "success update data user", {
 			...data[1].dataValues,
 			role: req.role,
 			student_id: student_id,
