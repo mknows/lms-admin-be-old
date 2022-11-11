@@ -204,3 +204,6 @@
 ::1 - - [2022-11-10 14:47:41] "GET /api/v1/assignment/session/ae272183-ad0c-41d5-a1eb-308f75a13b5f HTTP/1.1" STATUS:200 204.089 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-10 14:48:04] "GET /api/v1/assignment/session/ae272183-ad0c-41d5-a1eb-308f75a13b5f HTTP/1.1" STATUS:200 219.880 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-10 14:48:11] "GET /api/v1/assignment/session/ae272183-ad0c-41d5-a1eb-308f75a13b5f HTTP/1.1" STATUS:200 60.367 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 10:26:56] "POST /api/v1/auth/login HTTP/1.1" STATUS:200 2884.298 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 10:27:04] "PUT /api/v1/profile/me HTTP/1.1" STATUS:200 1027.856 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 10:27:21] "GET /api/v1/profile/me HTTP/1.1" STATUS:200 1157.230 ms "-" "PostmanRuntime/7.29.2"
