@@ -238,3 +238,8 @@
 ::1 - - [2022-11-11 10:54:06] "GET /api/v1/assignment/submissiondata HTTP/1.1" STATUS:500 972.616 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-11 10:54:20] "GET /api/v1/assignment/submissiondata HTTP/1.1" STATUS:200 948.498 ms "-" "PostmanRuntime/7.29.2"
 >>>>>>> Stashed changes
+::1 - - [2022-11-11 11:03:30] "GET /api/v1/assignment/submissiondata HTTP/1.1" STATUS:200 1063.882 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 11:29:57] "GET /api/v1/assignment/submissiondata HTTP/1.1" STATUS:400 13.384 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 11:30:28] "GET /api/v1/assignment/submissiondata HTTP/1.1" STATUS:400 4.728 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 11:44:28] "POST /api/v1/auth/login HTTP/1.1" STATUS:200 3361.217 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 11:44:33] "GET /api/v1/profile/achievements HTTP/1.1" STATUS:200 238.199 ms "-" "PostmanRuntime/7.29.2"

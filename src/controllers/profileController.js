@@ -74,6 +74,10 @@ module.exports = {
 		let finished_subjects = 0;
 		let subjects_taken = 0;
 
+		if (!student_id) {
+			return res.sendJson(404, false, "User is not a student", {});
+		}
+
 		const subjects = await Student.findOne({
 			attributes: ["id"],
 			where: {
