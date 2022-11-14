@@ -86,6 +86,10 @@ module.exports = {
 			where: {
 				session_id: sessions,
 			},
+			include: {
+				model: User,
+				attributes: ["full_name", "display_picture_link"],
+			},
 		});
 
 		result = data;
