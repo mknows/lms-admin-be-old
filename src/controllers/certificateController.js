@@ -297,9 +297,6 @@ module.exports = {
 					attributes: ["name", "id"],
 					through: {
 						attributes: ["status"],
-						where: {
-							status: "FINISHED",
-						},
 					},
 				},
 				{
@@ -314,15 +311,15 @@ module.exports = {
 			},
 		});
 		const user_id = findUserId.user_id;
-		if (!student) {
-			return "User not found";
-		}
-		if (!student.Subjects) {
-			return "Subject not found";
-		}
-		if (student.Subjects[0].StudentSubject.status !== "FINISHED") {
-			return "Student has not finished the subject";
-		}
+		// if (!student) {
+		// 	return "User not found";
+		// }
+		// if (!student.Subjects) {
+		// 	return "Subject not found";
+		// }
+		// if (student.Subjects[0].StudentSubject.status !== "FINISHED") {
+		// 	return "Student has not finished the subject";
+		// }
 		const generateRandomCert = randomString.generate({
 			capitalization: "uppercase",
 			length: 12,
@@ -718,7 +715,9 @@ module.exports = {
 				"searching certificate by id student not found"
 			);
 		}
-
+		if (certificate === "Invalid") {
+			return res.sendJson(404, false, "Page or limit is invalid");
+		}
 		return res.sendJson(
 			200,
 			true,

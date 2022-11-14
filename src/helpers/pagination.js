@@ -19,8 +19,10 @@ async function pagination(data, page, limit) {
 		} else {
 			return "Data cannot be sliced";
 		}
-	} else {
-		return "Limit and / or Page is not an integer";
+	} else if (!Number.isInteger(intPage) || !Number.isInteger(intLimit)) {
+		return "Invalid";
+	} else if (!intPage || !intLimit) {
+		return data;
 	}
 }
 module.exports = pagination;
