@@ -125,3 +125,4 @@
 ::1 - - [2022-11-14 17:03:09] "DELETE /api/v1/assignment/delete/f0952340-5acf-4f35-b757-8dec462c8f4c HTTP/1.1" STATUS:500 1010.042 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-14 17:03:18] "DELETE /api/v1/assignment/delete/f0952340-5acf-4f35-b757-8dec462c8f4c HTTP/1.1" STATUS:200 1077.445 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-14 17:04:25] "POST /api/v1/assignment/submit/f0952340-5acf-4f35-b757-8dec462c8f4c HTTP/1.1" STATUS:200 5597.292 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-14 17:05:21] "GET /api/v1/assignment/session/f0952340-5acf-4f35-b757-8dec462c8f4c HTTP/1.1" STATUS:400 603.889 ms "-" "PostmanRuntime/7.29.2"
