@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "herokuupdate": "git pull origin master && git push origin master && git push heroku master",
-    "herokupush": "git push origin master && git push heroku master"
+    "herokuupdate": "git pull origin master && git push origin master && git push heroku master"
   },
   "keywords": [],
   "author": "",
