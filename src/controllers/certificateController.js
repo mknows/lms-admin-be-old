@@ -280,9 +280,10 @@ module.exports = {
 	 * @access    Private
 	 */
 	createCertificateSubjectManual: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
 		const storage = getStorage();
 		const bucket = admin.storage().bucket();
-		const { student_id, subject_id, final_subject_score } = req.body;
+		const { subject_id, final_subject_score } = req.body;
 		const student = await Student.findOne({
 			attributes: ["id"],
 			where: {
@@ -310,16 +311,39 @@ module.exports = {
 				id: student_id,
 			},
 		});
+
 		const user_id = findUserId.user_id;
-		// if (!student) {
-		// 	return "User not found";
-		// }
-		// if (!student.Subjects) {
-		// 	return "Subject not found";
-		// }
-		// if (student.Subjects[0].StudentSubject.status !== "FINISHED") {
-		// 	return "Student has not finished the subject";
-		// }
+		if (!student) {
+			return res.sendJson(400, false, "User or subject not invalid");
+		}
+
+		if (!student.Subjects) {
+			return res.sendJson(404, false, "Subject not found");
+		}
+
+		if (student.Subjects[0].StudentSubject.status !== "FINISHED") {
+			return res.sendJson(400, false, "Student has not finished the subject", {
+				status: student.Subjects[0].StudentSubject.status,
+			});
+		}
+
+		const checkAvailable = await Certificate.findOne({
+			where: {
+				subject_id,
+				student_id,
+			},
+		});
+
+		if (checkAvailable) {
+			return res.sendJson(200, true, "certificate already exist", {
+				user_id: checkAvailable.user_id,
+				student_id: checkAvailable.student_id,
+				subject_id: checkAvailable.subject_id,
+				id_certificate: checkAvailable.id_certificate,
+				link: checkAvailable.link,
+			});
+		}
+
 		const generateRandomCert = randomString.generate({
 			capitalization: "uppercase",
 			length: 12,
@@ -456,65 +480,82 @@ module.exports = {
 								},
 							}
 						);
-					});
-				});
 
-			await sleep(1000);
-			// create an image for thumbnail file pdf
-			const storeAsImage = fromPath(outputPdf, {
-				density: 100,
-				saveFilename: `${generateRandomCert}-${name}`,
-				savePath: "./",
-				format: "png",
-				width: 3509,
-				height: 2482,
-			});
+						await sleep(4000);
+						fs.unlinkSync(outputPdf);
+						fs.unlinkSync(outputQr);
 
-			const fileThumbnail = `${generateRandomCert}-${name}.1.png`;
-			storeAsImage(1).then((res) => {
-				console.log("success convert pdf to png");
-				return res;
-			});
-
-			await sleep(5000);
-			fs.readFile(fileThumbnail, async (err, data) => {
-				if (err) console.log("error read file pdf2pic", err);
-				// convert image file to base64-encoded string
-				const base64Image = Buffer.from(data, "binary");
-				const nameFilePathThumbnail = "documents/certificate/" + fileThumbnail;
-
-				bucket
-					.file(nameFilePathThumbnail)
-					.createWriteStream()
-					.end(base64Image)
-					.on("finish", () => {
-						getDownloadURL(ref(storage, nameFilePathThumbnail)).then(
-							async (fileLink) => {
-								await Certificate.update(
-									{
-										thumbnail: nameFilePathThumbnail,
-										thumbnail_link: fileLink,
-									},
-									{
-										where: {
-											id: createdPdf.id,
-										},
-									}
-								);
+						return await res.sendJson(
+							201,
+							true,
+							"success upload new subject certificate",
+							{
+								user_id: createdPdf.user_id,
+								student_id: createdPdf.student_id,
+								subject_id: createdPdf.subject_id,
+								id_certificate: createdPdf.id_certificate,
+								link: fileLink,
 							}
 						);
 					});
-				await sleep(1000);
-				fs.unlinkSync(outputPdf);
-				fs.unlinkSync(outputQr);
-				fs.unlinkSync(fileThumbnail);
+				});
 
-				return res.sendJson(
-					201,
-					true,
-					"success upload new subject certificate"
-				);
-			});
+			// *convert pdf to image png for thumbnail cert
+			// await sleep(1000);
+			// const storeAsImage = fromPath(outputPdf, {
+			// 	density: 100,
+			// 	saveFilename: `${generateRandomCert}-${name}`,
+			// 	savePath: "./",
+			// 	format: "png",
+			// 	width: 3509,
+			// 	height: 2482,
+			// });
+
+			// const fileThumbnail = `${generateRandomCert}-${name}.1.png`;
+			// storeAsImage(1).then((res) => {
+			// 	console.log("success convert pdf to png");
+			// 	return res;
+			// });
+
+			// await sleep(5000);
+			// fs.readFile(fileThumbnail, async (err, data) => {
+			// 	if (err) console.log("error read file pdf2pic", err);
+			// 	// convert image file to base64-encoded string
+			// 	const base64Image = Buffer.from(data, "binary");
+			// 	const nameFilePathThumbnail = "documents/certificate/" + fileThumbnail;
+
+			// 	bucket
+			// 		.file(nameFilePathThumbnail)
+			// 		.createWriteStream()
+			// 		.end(base64Image)
+			// 		.on("finish", () => {
+			// 			getDownloadURL(ref(storage, nameFilePathThumbnail)).then(
+			// 				async (fileLink) => {
+			// 					await Certificate.update(
+			// 						{
+			// 							thumbnail: nameFilePathThumbnail,
+			// 							thumbnail_link: fileLink,
+			// 						},
+			// 						{
+			// 							where: {
+			// 								id: createdPdf.id,
+			// 							},
+			// 						}
+			// 					);
+			// 				}
+			// 			);
+			// 		});
+			// 	await sleep(1000);
+			// 	fs.unlinkSync(outputPdf);
+			// 	fs.unlinkSync(outputQr);
+			// 	fs.unlinkSync(fileThumbnail);
+
+			// 	return res.sendJson(
+			// 		201,
+			// 		true,
+			// 		"success upload new subject certificate"
+			// 	);
+			// });
 		});
 	}),
 	// /**

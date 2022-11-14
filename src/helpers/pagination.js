@@ -3,6 +3,7 @@ const ErrorResponse = require("../utils/errorResponse");
 async function pagination(data, page, limit) {
 	const intPage = parseInt(page);
 	const intLimit = parseInt(limit);
+
 	if (Number.isInteger(intPage) && Number.isInteger(intLimit)) {
 		let firstIndex = (intPage - 1) * intLimit;
 		if (firstIndex < 0) firstIndex = 0;
@@ -19,10 +20,10 @@ async function pagination(data, page, limit) {
 		} else {
 			return "Data cannot be sliced";
 		}
-	} else if (!Number.isInteger(intPage) || !Number.isInteger(intLimit)) {
-		return "Invalid";
-	} else if (!intPage || !intLimit) {
+	} else if (!limit || !page) {
 		return data;
+	} else {
+		return "Invalid";
 	}
 }
 module.exports = pagination;
