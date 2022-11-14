@@ -8,7 +8,7 @@ const { validate, validatorMessage } = require("../middlewares/Validator");
 route.post(
 	"/subject",
 	protection,
-	// authorize("admin"),
+	authorize("student"),
 	// validate("createCertificate"),
 	// validatorMessage,
 	certificateController.createCertificateSubjectManual
