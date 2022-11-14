@@ -115,7 +115,6 @@ async function completedSession(student_id, session_id) {
 			student_id,
 			session_id
 		);
-
 		// tesst ------------------------
 		const sub_score = await scoringController.getSubjectScoreV2(
 			student_id,

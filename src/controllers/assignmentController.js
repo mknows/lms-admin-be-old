@@ -45,7 +45,16 @@ module.exports = {
 		const student_id = req.student_id;
 
 		const assign = await Assignment.findOne({
-			attributes: ["created_at", "id", "duration"],
+			attributes: [
+				"created_at",
+				"id",
+				"duration",
+				"content",
+				"description",
+				"file_assignment",
+				"file_assignment_link",
+				"duration",
+			],
 			where: {
 				session_id: session_id,
 			},
@@ -55,14 +64,14 @@ module.exports = {
 			return res.sendJson(400, false, "Assignment not found");
 		}
 
-		let material_data = await MaterialEnrolled.findOne({
+		let student_taken_assignment = await MaterialEnrolled.findOne({
 			attributes: ["created_at"],
 			where: {
 				id_referrer: assign.id,
 				student_id,
 			},
 		});
-		if (!material_data) {
+		if (!student_taken_assignment) {
 			return res.sendJson(400, false, "student haven't taken assignment");
 		}
 		const file_assignment =
@@ -79,18 +88,19 @@ module.exports = {
 			.on("finish", () => {
 				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
 					let date_submit = moment().tz("Asia/Jakarta");
-					const deadline = moment(
-						new Date(
-							new Date(material_data.created_at).getTime() +
-								assign.duration * 1000
-						)
-					);
 					const activity_detail = {
 						date_submit: date_submit.format("DD/MM/YYYY hh:mm:ss"),
 						file_assignment: file_assignment,
 						file_assignment_link: linkFile,
 					};
-					material_data = await MaterialEnrolled.update(
+					const deadline = new Date(
+						new Date(student_taken_assignment.created_at).getTime() +
+							assign.duration * 1000
+					);
+					assign.dataValues.deadline = moment(deadline).format(
+						"DD/MM/YYYY hh:mm:ss"
+					);
+					student_taken_assignment = await MaterialEnrolled.update(
 						{
 							activity_detail: activity_detail,
 							status: moment(date_submit).isAfter(deadline) ? LATE : GRADING,
@@ -99,16 +109,21 @@ module.exports = {
 							where: {
 								id_referrer: assign.id,
 								student_id,
+								type: ASSIGNMENT,
 							},
 							returning: true,
 						}
 					);
-					material_data = material_data[1][0];
+					student_taken_assignment = student_taken_assignment[1][0];
 
-					checkDoneSession(student_id, material_data.session_id);
+					checkDoneSession(student_id, student_taken_assignment.session_id);
+
+					let result = {
+						assignment: assign,
+						students_work: student_taken_assignment || null,
+					};
 					return res.sendJson(200, true, "Successfully Submitted", {
-						activity_detail,
-						status: moment(date_submit).isAfter(deadline) ? LATE : GRADING,
+						result,
 					});
 				});
 			});
@@ -133,7 +148,8 @@ module.exports = {
 			return res.sendJson(404, false, "session id not found");
 		}
 
-		const checkFile = await MaterialEnrolled.findOne({
+		let student_taken_assignment = await MaterialEnrolled.findOne({
+			attributes: ["created_at"],
 			where: {
 				session_id,
 				student_id,
@@ -142,7 +158,10 @@ module.exports = {
 		});
 
 		//*check for deleta a file
-		checkFileIfExistFirebase(res, checkFile.activity_detail.file_assignment);
+		checkFileIfExistFirebase(
+			res,
+			student_taken_assignment.activity_detail?.file_assignment
+		);
 		const file_assignment =
 			"documents/assignments/" +
 			uuidv4() +
@@ -158,8 +177,12 @@ module.exports = {
 				getDownloadURL(ref(storage, file_assignment)).then(async (linkFile) => {
 					const deadline = moment(
 						new Date(
-							new Date(checkFile.created_at).getTime() + assign.duration * 1000
+							new Date(student_taken_assignment.created_at).getTime() +
+								assign.duration * 1000
 						)
+					);
+					assign.dataValues.deadline = moment(deadline).format(
+						"DD/MM/YYYY hh:mm:ss"
 					);
 					const date_submit = moment().tz("Asia/Jakarta");
 					const activity_detail = {
@@ -167,7 +190,7 @@ module.exports = {
 						file_assignment: file_assignment,
 						file_assignment_link: linkFile,
 					};
-					let check_file = await MaterialEnrolled.update(
+					student_taken_assignment = await MaterialEnrolled.update(
 						{
 							activity_detail: activity_detail,
 							status: moment(date_submit).isAfter(deadline) ? LATE : GRADING,
@@ -181,11 +204,20 @@ module.exports = {
 							returning: true,
 						}
 					);
-					checkDoneSession(student_id, check_file[1][0].session_id);
-					return res.sendJson(200, true, "Successfully Updated the File", {
-						activity_detail,
-						status: moment(date_submit).isAfter(deadline) ? LATE : GRADING,
-					});
+					student_taken_assignment = student_taken_assignment[1][0];
+					checkDoneSession(student_id, student_taken_assignment.session_id);
+
+					let result = {
+						assignment: assign,
+						students_work: student_taken_assignment || null,
+					};
+
+					return res.sendJson(
+						200,
+						true,
+						"Successfully Updated the File",
+						result
+					);
 				});
 			});
 	}),
@@ -208,7 +240,10 @@ module.exports = {
 		const student_id = req.student_id;
 		let assign = await Assignment.findOne({
 			attributes: [
+				"created_at",
 				"id",
+				"session_id",
+				"duration",
 				"content",
 				"description",
 				"file_assignment",
@@ -341,22 +376,35 @@ module.exports = {
 		const student_id = req.student_id;
 		const storage = getStorage();
 
-		const exist = await MaterialEnrolled.findOne({
-			attributes: ["activity_detail"],
+		const assign = await Assignment.findOne({
+			attributes: [
+				"created_at",
+				"id",
+				"duration",
+				"content",
+				"description",
+				"file_assignment",
+				"file_assignment_link",
+				"duration",
+			],
+			where: {
+				session_id: session_id,
+			},
+		});
+
+		if (!assign) {
+			return res.sendJson(400, false, "Assignment not found");
+		}
+
+		let student_taken_assignment = await MaterialEnrolled.findOne({
+			attributes: ["created_at"],
 			where: {
 				student_id: student_id,
 				session_id: session_id,
 			},
 		});
 
-		if (!exist) {
-			return res.status(404).json({
-				success: false,
-				message: "Assignment not found",
-				data: {},
-			});
-		}
-		if (exist.activity_detail) {
+		if (student_taken_assignment.activity_detail) {
 			deleteObject(
 				ref(
 					storage,
@@ -365,7 +413,7 @@ module.exports = {
 			);
 		}
 
-		await MaterialEnrolled.update(
+		student_taken_assignment = await MaterialEnrolled.update(
 			{
 				activity_detail: null,
 				status: ONGOING,
@@ -378,10 +426,17 @@ module.exports = {
 				},
 			}
 		);
+		console.log(student_taken_assignment);
+
+		let result = {
+			assignment: assign,
+			students_work: student_taken_assignment,
+		};
 
 		return res.status(200).json({
 			success: true,
 			message: "Submission Removed",
+			result,
 		});
 	}),
 	/**
