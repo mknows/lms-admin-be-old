@@ -71,17 +71,6 @@ module.exports = {
 		const student_id = req.student_id;
 		let result;
 
-		// const sessions = await getStudentOngoingSessionId(student_id);
-
-		// if (sessions == null) {
-		// 	return res.sendJson(
-		// 		404,
-		// 		false,
-		// 		"student is not enrolled to any sessions",
-		// 		null
-		// 	);
-		// }
-
 		let data;
 
 		data = await Student.findOne({
