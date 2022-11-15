@@ -5,12 +5,16 @@ const {
 	Comment,
 	Reply,
 	User,
+	Session,
+	Subject,
 } = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const getStudentOngoingSessionId = require("../helpers/getStudentOngoingSessionId");
+const { SessionFlusher } = require("@sentry/hub");
+const session = require("../models/session");
 
 module.exports = {
 	/**
@@ -68,31 +72,41 @@ module.exports = {
 		const student_id = req.student_id;
 		let result;
 
-		const sessions = await getStudentOngoingSessionId(student_id);
+		// const sessions = await getStudentOngoingSessionId(student_id);
 
-		if (sessions == null) {
-			return res.sendJson(
-				404,
-				false,
-				"student is not enrolled to any sessions",
-				null
-			);
-		}
+		// if (sessions == null) {
+		// 	return res.sendJson(
+		// 		404,
+		// 		false,
+		// 		"student is not enrolled to any sessions",
+		// 		null
+		// 	);
+		// }
 
-		const data = await DiscussionForum.findAll({
-			attributes: {
-				include: ["created_at", "updated_at"],
-			},
+		let data;
+
+		data = await Student.findOne({
 			where: {
-				session_id: sessions,
+				id: student_id,
 			},
+			attributes: [],
 			include: {
-				model: User,
-				attributes: ["full_name", "display_picture_link"],
+				model: Subject,
+				attributes: ["name"],
+				through: {
+					attributes: [],
+				},
+				include: {
+					model: Session,
+					attributes: ["session_no"],
+					include: {
+						model: DiscussionForum,
+					},
+				},
 			},
 		});
 
-		result = data;
+		result = data.Subjects;
 
 		return res.sendJson(
 			200,

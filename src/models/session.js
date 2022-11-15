@@ -16,9 +16,15 @@ module.exports = (sequelize, DataTypes) => {
 				through: models.StudentSession,
 				foreignKey: "session_id",
 			});
-			this.hasMany(models.MaterialEnrolled,{
-				foreignKey:"session_id",
-			})
+			this.hasMany(models.MaterialEnrolled, {
+				foreignKey: "session_id",
+			});
+			this.hasMany(models.DiscussionForum, {
+				foreignKey: "session_id",
+			});
+			this.belongsTo(models.Subject, {
+				foreignKey: "subject_id",
+			});
 		}
 	}
 	Session.init(

@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
 			// define association here
 			this.hasMany(models.Comment, { foreignKey: "df_id" });
 			this.belongsTo(models.User, { foreignKey: "author_id" });
+			this.belongsTo(models.Session, { foreignKey: "session_id" });
 		}
 	}
 	DiscussionForum.init(
