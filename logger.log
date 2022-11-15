@@ -30,6 +30,7 @@
 ::1 - - [2022-11-14 15:35:32] "GET /api/v1/certificate HTTP/1.1" STATUS:200 2171.236 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-14 15:35:59] "GET /api/v1/certificate HTTP/1.1" STATUS:200 993.899 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-14 15:36:21] "GET /api/v1/certificate HTTP/1.1" STATUS:200 1198.300 ms "-" "PostmanRuntime/7.29.2"
+<<<<<<< Updated upstream
 ::1 - - [2022-11-15 10:52:05] "GET /api/v1/module/b992aaec-23de-4e86-82c4-bc521a654abb HTTP/1.1" STATUS:200 2422.610 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-15 10:57:53] "POST /api/v1/auth/login HTTP/1.1" STATUS:200 2139.161 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-15 10:57:57] "GET /api/v1/forum/discussionforum HTTP/1.1" STATUS:200 703.036 ms "-" "PostmanRuntime/7.29.2"
@@ -39,3 +40,12 @@
 ::1 - - [2022-11-15 11:02:54] "GET /api/v1/forum/discussionforum HTTP/1.1" STATUS:200 931.525 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-15 11:03:07] "GET /api/v1/forum/discussionforum HTTP/1.1" STATUS:200 955.272 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-15 11:05:08] "GET /api/v1/forum/discussionforum HTTP/1.1" STATUS:200 904.560 ms "-" "PostmanRuntime/7.29.2"
+=======
+::1 - - [2022-11-15 10:48:28] "GET /api/v1/forum/discussionforum HTTP/1.1" STATUS:400 654.224 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-15 10:48:34] "POST /api/v1/auth/login HTTP/1.1" STATUS:200 2016.993 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-15 10:48:36] "GET /api/v1/forum/discussionforum HTTP/1.1" STATUS:500 51.783 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-15 10:52:43] "GET /api/v1/forum/discussionforum HTTP/1.1" STATUS:500 908.160 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-15 10:53:01] "GET /api/v1/forum/discussionforum HTTP/1.1" STATUS:200 935.341 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-15 10:53:33] "GET /api/v1/forum/discussionforum HTTP/1.1" STATUS:500 910.818 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-15 10:53:55] "GET /api/v1/forum/discussionforum HTTP/1.1" STATUS:200 891.461 ms "-" "PostmanRuntime/7.29.2"
+>>>>>>> Stashed changes
