@@ -69,13 +69,13 @@ module.exports = {
 			],
 		});
 		if (!student) {
-			return "User not found";
+			return res.sendJson(400, false, "Student not found");
 		}
 		if (!student.Subjects) {
-			return "Subject not found";
+			return res.sendJson(400, false, "Subject not found");
 		}
 		if (student.Subjects[0].StudentSubject.status !== "FINISHED") {
-			return "Student has not finished the subject";
+			return res.sendJson(400, false, "Subject not finished");
 		}
 		const generateRandomCert = randomString.generate({
 			capitalization: "uppercase",

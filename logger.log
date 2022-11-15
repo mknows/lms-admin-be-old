@@ -63,6 +63,7 @@
 >>>>>>> Stashed changes
 ::1 - - [2022-11-11 14:47:57] "GET /api/v1/article/index?page=1&limit=50&search=stasd HTTP/1.1" STATUS:200 504.590 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-11 14:49:22] "GET /api/v1/article/index?page=1&limit=50&search=a HTTP/1.1" STATUS:200 23.513 ms "-" "PostmanRuntime/7.29.2"
+<<<<<<< Updated upstream
 ::1 - - [2022-11-14 11:21:16] "POST /api/v1/auth/login HTTP/1.1" STATUS:200 6213.745 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-14 11:21:24] "GET /api/v1/certificate?page=2&limit=2 HTTP/1.1" STATUS:200 600.758 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-14 11:22:35] "POST /api/v1/auth/login HTTP/1.1" STATUS:400 754.968 ms "-" "PostmanRuntime/7.29.2"
@@ -173,3 +174,14 @@
 ::1 - - [2022-11-15 10:28:34] "POST /api/v1/assignment/submit/f0952340-5acf-4f35-b757-8dec462c8f4c HTTP/1.1" STATUS:200 2620.440 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-15 10:29:32] "GET /api/v1/assignment/session/f0952340-5acf-4f35-b757-8dec462c8f4c HTTP/1.1" STATUS:200 1038.910 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-15 10:30:37] "PUT /api/v1/assignment/edit/f0952340-5acf-4f35-b757-8dec462c8f4c HTTP/1.1" STATUS:200 5163.622 ms "-" "PostmanRuntime/7.29.2"
+=======
+::1 - - [2022-11-11 16:49:32] "POST /api/v1/certificate/subject HTTP/1.1" STATUS:400 3163.033 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 16:50:10] "POST /api/v1/auth/login HTTP/1.1" STATUS:200 10896.523 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 16:57:16] "POST /api/v1/certificate/subject HTTP/1.1" STATUS:400 1682.761 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 16:58:07] "POST /api/v1/certificate/subject HTTP/1.1" STATUS:400 1016.780 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 16:58:27] "POST /api/v1/certificate/subject HTTP/1.1" STATUS:400 1128.466 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 16:58:53] "POST /api/v1/certificate/subject HTTP/1.1" STATUS:400 1011.162 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 16:59:24] "POST /api/v1/certificate/subject HTTP/1.1" STATUS:400 1174.672 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 16:59:37] "POST /api/v1/certificate/subject HTTP/1.1" STATUS:400 1302.648 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-11 17:04:22] "POST /api/v1/certificate/subject HTTP/1.1" STATUS:- - ms "-" "PostmanRuntime/7.29.2"
+>>>>>>> Stashed changes
