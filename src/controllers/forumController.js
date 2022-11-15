@@ -13,7 +13,6 @@ const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const getStudentOngoingSessionId = require("../helpers/getStudentOngoingSessionId");
-const { SessionFlusher } = require("@sentry/hub");
 const session = require("../models/session");
 
 module.exports = {
