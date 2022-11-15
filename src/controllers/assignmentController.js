@@ -122,9 +122,7 @@ module.exports = {
 						assignment: assign,
 						students_work: student_taken_assignment || null,
 					};
-					return res.sendJson(200, true, "Successfully Submitted", {
-						result,
-					});
+					return res.sendJson(200, true, "Successfully Submitted", result);
 				});
 			});
 	}),
