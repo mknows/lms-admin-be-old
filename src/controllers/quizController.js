@@ -262,41 +262,64 @@ module.exports = {
 	takeQuiz: asyncHandler(async (req, res) => {
 		const { quiz_id } = req.params;
 		const student_id = req.student_id;
+		let max_attempt = parseInt(MAX_ATTEMPT);
 
-		const session_id = await getSession(Quiz, quiz_id);
-
-		const session_no = await Session.findOne({
-			where: {
-				id: session_id,
-			},
-		});
-
-		const max_attempt = session_no === 0 ? 1 : parseInt(MAX_ATTEMPT);
-
-		const quizQuestions = await Quiz.findOne({
+		const quiz = await Quiz.findOne({
 			where: {
 				id: quiz_id,
 			},
-			attributes: ["duration", "questions", "description", "session_id"],
+			include: {
+				model: Session,
+				include: {
+					model: Student,
+					through: {
+						attributes: {
+							include: ["created_at"],
+						},
+						where: {
+							student_id,
+						},
+					},
+				},
+			},
 		});
 
+		if (quiz.Session.Students[0]) {
+			if (quiz.Session.session_no === 0) {
+				max_attempt = 1;
+				const date_pretest = moment(
+					quiz.Session.Students[0].StudentSession.created_at,
+					"DD-MM-YYYY"
+				).add(3, "days");
+				if (!moment().isSame(date_pretest, "date")) {
+					return res.sendJson(
+						400,
+						false,
+						`Student isn't eligible to take the pretest now. Available at ${date_pretest}`,
+						{}
+					);
+				}
+			}
+		} else {
+			return res.sendJson(
+				400,
+				false,
+				"Student is not enrolled to this session",
+				{}
+			);
+		}
 		// const material = await Material.findOne({
 		// 	where: {
 		// 		id_referrer: quiz_id,
 		// 	},
 		// });
 
-		const session = await Session.findOne({
-			where: {
-				id: session_id,
-			},
-		});
 		const checkIfCurrentlyTaking = await MaterialEnrolled.findOne({
 			where: {
 				student_id: student_id,
-				session_id: session_id,
+				session_id: quiz.Session.id,
 				// material_id: material.id,
-				subject_id: session.subject_id,
+				subject_id: quiz.Session.subject_id,
 				id_referrer: quiz_id,
 				status: ONGOING,
 			},
@@ -306,9 +329,9 @@ module.exports = {
 		const checkHowManyTries = await MaterialEnrolled.findAll({
 			where: {
 				student_id: student_id,
-				session_id: session_id,
+				session_id: quiz.Session.id,
 				// material_id: material.id,
-				subject_id: session.subject_id,
+				subject_id: quiz.Session.subject_id,
 				id_referrer: quiz_id,
 				[Op.not]: { status: ONGOING },
 			},
@@ -330,16 +353,16 @@ module.exports = {
 		} else {
 			this_material_enrolled = await MaterialEnrolled.create({
 				student_id: student_id,
-				session_id: session_id,
+				session_id: quiz.Session.id,
 				// material_id: material.id,
-				subject_id: session.subject_id,
+				subject_id: quiz.Session.subject_id,
 				id_referrer: quiz_id,
 				status: ONGOING,
 				type: QUIZ,
 			});
 		}
 		return res.sendJson(200, true, "Success", {
-			quiz: quizQuestions,
+			quiz: quiz.questions,
 			material_enrolled_id: this_material_enrolled.id,
 			start_time: this_material_enrolled.created_at,
 		});

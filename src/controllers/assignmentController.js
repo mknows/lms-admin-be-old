@@ -265,7 +265,7 @@ module.exports = {
 			return res.sendJson(400, false, "No assignment was assigned");
 		}
 
-		const student_taken_assignment = await MaterialEnrolled.findOne({
+		let student_taken_assignment = await MaterialEnrolled.findOne({
 			attributes: {
 				include: ["created_at"],
 			},
@@ -277,7 +277,7 @@ module.exports = {
 		});
 
 		if (!student_taken_assignment) {
-			const material_enrolled = await MaterialEnrolled.create({
+			student_taken_assignment = await MaterialEnrolled.create({
 				student_id,
 				session_id,
 				subject_id: session.subject_id,
@@ -287,7 +287,7 @@ module.exports = {
 				type: ASSIGNMENT,
 			});
 			const deadline = new Date(
-				new Date(material_enrolled.created_at).getTime() +
+				new Date(student_taken_assignment.created_at).getTime() +
 					assign.duration * 1000
 			);
 			assign.dataValues.deadline = moment(deadline).format(
@@ -424,13 +424,12 @@ module.exports = {
 					student_id: student_id,
 					type: ASSIGNMENT,
 				},
+				returning: true,
 			}
 		);
-		console.log(student_taken_assignment);
-
 		let result = {
 			assignment: assign,
-			students_work: student_taken_assignment,
+			students_work: student_taken_assignment[1][0],
 		};
 
 		return res.status(200).json({
