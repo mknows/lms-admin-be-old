@@ -92,9 +92,6 @@ module.exports = {
 			include: {
 				model: Subject,
 				attributes: ["name"],
-				through: {
-					attributes: [],
-				},
 				include: {
 					model: Session,
 					attributes: ["session_no"],
