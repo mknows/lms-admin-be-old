@@ -95,3 +95,4 @@
 ::1 - - [2022-11-14 15:35:32] "GET /api/v1/certificate HTTP/1.1" STATUS:200 2171.236 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-14 15:35:59] "GET /api/v1/certificate HTTP/1.1" STATUS:200 993.899 ms "-" "PostmanRuntime/7.29.2"
 ::1 - - [2022-11-14 15:36:21] "GET /api/v1/certificate HTTP/1.1" STATUS:200 1198.300 ms "-" "PostmanRuntime/7.29.2"
+::1 - - [2022-11-15 10:52:05] "GET /api/v1/module/b992aaec-23de-4e86-82c4-bc521a654abb HTTP/1.1" STATUS:200 2422.610 ms "-" "PostmanRuntime/7.29.2"

@@ -212,10 +212,13 @@ module.exports = {
 				},
 			},
 		});
+		console.log(date_submitted);
 		return res.sendJson(200, true, "Success", {
 			module: mod,
 			takeaway: takeaway,
-			date_submitted: moment(date_submitted).format("DD/MM/YYYY hh:mm:ss"),
+			date_submitted:
+				moment(date_submitted).format("DD/MM/YYYY hh:mm:ss") ||
+				"Not yet submitted",
 			videos: vids,
 			documents: docs,
 		});
