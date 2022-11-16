@@ -89,6 +89,10 @@ module.exports = {
 					attributes: ["session_no", "id"],
 					include: {
 						model: DiscussionForum,
+						attributes: {
+							include: ["created_at", "updated_at"],
+							exclude: ["deleted_at", "created_by", "updated_by"],
+						},
 						include: {
 							model: User,
 							attributes: ["full_name", "display_picture_link"],
