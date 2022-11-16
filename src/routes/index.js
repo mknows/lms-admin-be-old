@@ -20,6 +20,8 @@ const certificateController = require("./certificate");
 const notificationRoute = require("./notification");
 const reportRoute = require("./report");
 
+const pingRoutes = require("./ping");
+
 //punya ryo
 const administrationRoute = require("./Administration");
 route.use("/administration", administrationRoute);
@@ -42,5 +44,7 @@ route.use("/document", documentRoute);
 route.use("/certificate", certificateController);
 route.use("/notification", notificationRoute);
 route.use("/report", reportRoute);
+
+route.use("/test", pingRoutes);
 
 module.exports = route;
