@@ -86,9 +86,13 @@ module.exports = {
 				},
 				include: {
 					model: Session,
-					attributes: ["session_no"],
+					attributes: ["session_no", "id"],
 					include: {
 						model: DiscussionForum,
+						include: {
+							model: User,
+							attributes: ["full_name", "display_picture_link"],
+						},
 					},
 				},
 			},
