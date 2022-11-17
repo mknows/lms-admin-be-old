@@ -81,7 +81,8 @@ async function progress(student_id, session_id, type) {
 	if (
 		progress?.status === "GRADING" ||
 		progress?.status === "PASSED" ||
-		progress?.status === "FAILED"
+		progress?.status === "FAILED" ||
+		progress?.status === "LATE"
 	) {
 		return true;
 	} else {
