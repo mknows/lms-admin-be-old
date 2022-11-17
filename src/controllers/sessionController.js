@@ -93,8 +93,16 @@ module.exports = {
 		for (i = 0; i < data.length; i++) {
 			if (latest_session > data[i].session_no) {
 				data[i].dataValues.is_locked = false;
-				data[i].dataValues.assignment_done = true;
-				data[i].dataValues.quiz_done = true;
+				data[i].dataValues.assignment_done = await progress(
+					student_id,
+					data[i].id,
+					"ASSIGNMENT"
+				);
+				data[i].dataValues.quiz_done = await progress(
+					student_id,
+					data[i].id,
+					"QUIZ"
+				);
 				data[i].dataValues.session_lock = false;
 			} else if (latest_session === data[i].session_no) {
 				data[i].dataValues.is_locked = await lockUpdate(student_id, data[i].id);
