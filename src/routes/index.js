@@ -39,5 +39,6 @@ route.use("/materialenrolled", materialEnrolledRoute);
 route.use("/syllabus", syllabusRoute);
 route.use("/document", documentRoute);
 route.use("/certificate", certificateController);
+route.use("/notification", notificationRoute);
 
 module.exports = route;
