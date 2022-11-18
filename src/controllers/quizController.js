@@ -340,15 +340,15 @@ module.exports = {
 
 		let this_material_enrolled;
 
-		let deadline = moment(
-			new Date(
-				new Date(checkIfCurrentlyTaking.created_at).getTime() +
-					quiz?.duration * 1000
-			)
-		);
-
 		if (checkIfCurrentlyTaking != null) {
 			// TODO: NOTE THAT THIS IS ERROR BUT RETURNS TRUE TO ACCOMODATE APPS
+			let deadline = moment(
+				new Date(
+					new Date(checkIfCurrentlyTaking.created_at).getTime() +
+						quiz?.duration * 1000
+				)
+			);
+
 			return res.sendJson(200, true, "user is currenty having an attempt", {
 				quiz: quiz.questions,
 				material_enrolled_id: checkIfCurrentlyTaking.id,
