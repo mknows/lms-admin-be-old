@@ -323,7 +323,7 @@ module.exports = {
 				id_referrer: quiz_id,
 				status: ONGOING,
 			},
-			attributes: ["id"],
+			attributes: ["id", "created_at"],
 		});
 
 		const checkHowManyTries = await MaterialEnrolled.findAll({
@@ -377,6 +377,9 @@ module.exports = {
 					quiz?.duration * 1000
 			)
 		);
+
+		console.log(deadline);
+
 		return res.sendJson(200, true, "Success", {
 			quiz: quiz.questions,
 			material_enrolled_id: this_material_enrolled.id,
