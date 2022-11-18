@@ -335,7 +335,7 @@ module.exports = {
 				id_referrer: quiz_id,
 				[Op.not]: { status: ONGOING },
 			},
-			attributes: ["id", "start_time"],
+			attributes: ["id", "created_at"],
 		});
 
 		let this_material_enrolled;
@@ -345,7 +345,7 @@ module.exports = {
 			return res.sendJson(200, true, "user is currenty having an attempt", {
 				quiz: quiz.questions,
 				material_enrolled_id: checkIfCurrentlyTaking.id,
-				start_time: checkIfCurrentlyTaking.start_time,
+				start_time: checkIfCurrentlyTaking.created_at,
 			});
 		} else if (checkHowManyTries.length >= max_attempt) {
 			return res.sendJson(400, false, "user have exceeded maximum attempts", {
