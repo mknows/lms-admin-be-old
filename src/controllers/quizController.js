@@ -343,7 +343,7 @@ module.exports = {
 		if (checkIfCurrentlyTaking != null) {
 			// TODO: NOTE THAT THIS IS ERROR BUT RETURNS TRUE TO ACCOMODATE APPS
 			return res.sendJson(200, true, "user is currenty having an attempt", {
-				quiz: quizQuestions,
+				quiz: quiz.questions,
 				material_enrolled_id: checkIfCurrentlyTaking.id,
 			});
 		} else if (checkHowManyTries.length >= max_attempt) {
