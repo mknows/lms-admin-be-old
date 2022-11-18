@@ -340,12 +340,20 @@ module.exports = {
 
 		let this_material_enrolled;
 
+		let deadline = moment(
+			new Date(
+				new Date(checkIfCurrentlyTaking.created_at).getTime() +
+					quiz?.duration * 1000
+			)
+		);
+
 		if (checkIfCurrentlyTaking != null) {
 			// TODO: NOTE THAT THIS IS ERROR BUT RETURNS TRUE TO ACCOMODATE APPS
 			return res.sendJson(200, true, "user is currenty having an attempt", {
 				quiz: quiz.questions,
 				material_enrolled_id: checkIfCurrentlyTaking.id,
 				start_time: checkIfCurrentlyTaking.created_at,
+				deadline: deadline,
 			});
 		} else if (checkHowManyTries.length >= max_attempt) {
 			return res.sendJson(400, false, "user have exceeded maximum attempts", {
@@ -362,10 +370,18 @@ module.exports = {
 				type: QUIZ,
 			});
 		}
+
+		deadline = moment(
+			new Date(
+				new Date(this_material_enrolled.created_at).getTime() +
+					quiz?.duration * 1000
+			)
+		);
 		return res.sendJson(200, true, "Success", {
 			quiz: quiz.questions,
 			material_enrolled_id: this_material_enrolled.id,
 			start_time: this_material_enrolled.created_at,
+			deadline: deadline,
 		});
 	}),
 	/**
