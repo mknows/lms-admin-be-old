@@ -12,10 +12,14 @@ const {
 	StudentSubject,
 	Subject,
 
-	MaterialEnrolled,
-
 	StudentSession,
 	Session,
+
+	DiscussionForum,
+	Comment,
+	Reply,
+
+	MaterialEnrolled,
 
 	Quiz,
 	Assignment,
@@ -73,11 +77,15 @@ const {
 	ATTENDANCE_WEIGHT_ALL,
 	MIDTERM_WEIGHT,
 	FINALS_WEIGHT,
+
+	STUDENT_LIKE_WEIGHT,
+	LECTURER_LIKE_WEIGHT,
 } = process.env;
 const asyncHandler = require("express-async-handler");
-const { Op } = require("sequelize");
+const { Op, fn, col } = require("sequelize");
 const certificateController = require("./certificateController");
 const getParsedPlan = require("../helpers/getParsedPlan");
+// const Sequelize = require("sequelize");
 
 module.exports = {
 	/**
@@ -440,12 +448,67 @@ module.exports = {
 
 		return final_score;
 	}),
+
 	/**
 	 * @desc      calculate Session Score score
 	 * @access    Private
 	 */
 	getPredicate: asyncHandler(async (percent) => {
 		return letterByPercent(percent);
+	}),
+
+	/**
+	 * @desc      calculate likes Score
+	 * @access    Private
+	 */
+	getTotalLikesScore: asyncHandler(async (student_like, lecturer_like) => {
+		return (
+			student_like * STUDENT_LIKE_WEIGHT + lecturer_like * LECTURER_LIKE_WEIGHT
+		);
+	}),
+
+	/**
+	 * @desc      calculate students like score
+	 * @access    Private
+	 */
+	getLikesReport: asyncHandler(async (user_id) => {
+		let result;
+
+		let author_id = user_id;
+
+		let all_data = await Promise.all([
+			await DiscussionForum.findAll({
+				where: {
+					author_id,
+				},
+				attributes: [
+					[fn("SUM", fn("CARDINALITY", col("student_like"))), "n_student_like"],
+					[fn("SUM", fn("CARDINALITY", col("teacher_like"))), "n_teacher_like"],
+				],
+			}),
+			await Comment.findAll({
+				where: {
+					author_id,
+				},
+				attributes: [
+					[fn("SUM", fn("CARDINALITY", col("student_like"))), "n_student_like"],
+					[fn("SUM", fn("CARDINALITY", col("teacher_like"))), "n_teacher_like"],
+				],
+			}),
+			await Reply.findAll({
+				where: {
+					author_id,
+				},
+				attributes: [
+					[fn("SUM", fn("CARDINALITY", col("student_like"))), "n_student_like"],
+					[fn("SUM", fn("CARDINALITY", col("teacher_like"))), "n_teacher_like"],
+				],
+			}),
+		]);
+
+		result = all_data;
+
+		return result;
 	}),
 
 	/**

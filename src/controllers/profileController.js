@@ -46,6 +46,7 @@ module.exports = {
 		});
 	}),
 
+	// TODO: DEPRICATE
 	/**
 	 * @desc      Get student Report
 	 * @route     GET /api/v1/profile/report
