@@ -64,7 +64,7 @@ route.get(
 
 route.put(
 	"/lecturer/grade",
-	protection,
+	// protection,
 	// authorize("lecturer"),
 	assignmentController.gradeSubmission
 );
