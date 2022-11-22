@@ -459,7 +459,7 @@ module.exports = {
 			await StudentSubject.create({
 				student_id: student_id,
 				subject_id: subject_id,
-				status: DRAFT,
+				status: PENDING,
 				date_taken: moment().tz("Asia/Jakarta"),
 			});
 			bucket

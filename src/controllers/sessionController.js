@@ -85,14 +85,27 @@ module.exports = {
 				attribute: {
 					include: ["session_no"],
 				},
+				through: {
+					where: {
+						present: true,
+					},
+				},
 			},
 			order: [[Session, "session_no", "DESC"]],
 		});
-		const latest_session = students_session?.Sessions[0].session_no || 0;
+		const latest_session = students_session?.Sessions[0].session_no;
 
 		for (i = 0; i < data.length; i++) {
-			if (latest_session > data[i].session_no) {
-				data[i].dataValues.is_locked = false;
+			if (
+				!latest_session ||
+				latest_session + 1 === data[i].session_no ||
+				latest_session + 1 > data[i].session_no
+			) {
+				data[i].dataValues.is_locked = !(await progress(
+					student_id,
+					data[i].id,
+					"MODULE"
+				));
 				data[i].dataValues.assignment_done = await progress(
 					student_id,
 					data[i].id,
@@ -104,31 +117,12 @@ module.exports = {
 					"QUIZ"
 				);
 				data[i].dataValues.session_lock = false;
-			} else if (latest_session === data[i].session_no) {
-				data[i].dataValues.is_locked = await lockUpdate(student_id, data[i].id);
-				data[i].dataValues.assignment_done = await progress(
-					student_id,
-					data[i].id,
-					"ASSIGNMENT"
-				);
-				data[i].dataValues.quiz_done = await progress(
-					student_id,
-					data[i].id,
-					"QUIZ"
-				);
-				data[i].dataValues.session_lock = false;
-			} else if (latest_session < data[i].session_no) {
+			} else if (latest_session + 1 < data[i].session_no) {
 				data[i].dataValues.is_locked = true;
 				data[i].dataValues.assignment_done = false;
 				data[i].dataValues.quiz_done = false;
 				data[i].dataValues.session_lock = true;
 			}
-		}
-		if (latest_session === 0) {
-			data[0].dataValues.is_locked = true;
-			data[0].dataValues.assignment_done = false;
-			data[0].dataValues.quiz_done = false;
-			data[0].dataValues.session_lock = false;
 		}
 		return res.sendJson(200, true, "success get all session in sub", data);
 	}),

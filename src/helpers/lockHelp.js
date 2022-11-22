@@ -78,12 +78,8 @@ async function progress(student_id, session_id, type) {
 			type,
 		},
 	});
-	if (
-		progress?.status === "GRADING" ||
-		progress?.status === "PASSED" ||
-		progress?.status === "FAILED" ||
-		progress?.status === "LATE"
-	) {
+	const eligible_status = ["GRADING", "PASSED", "FAILED", "LATE", "FINISHED"];
+	if (eligible_status.includes(progress?.status)) {
 		return true;
 	} else {
 		return false;
