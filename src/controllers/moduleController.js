@@ -600,7 +600,7 @@ module.exports = {
 			material_enrolled_data = material_enrolled_data[1][0];
 		}
 
-		checkDoneSession(student_id, material_enrolled_data.session_id);
+		await checkDoneSession(student_id, material_enrolled_data.session_id);
 
 		return res.sendJson(200, true, "Success", material_enrolled_data);
 	}),

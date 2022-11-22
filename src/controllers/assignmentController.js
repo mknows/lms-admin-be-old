@@ -116,7 +116,10 @@ module.exports = {
 					);
 					student_taken_assignment = student_taken_assignment[1][0];
 
-					checkDoneSession(student_id, student_taken_assignment.session_id);
+					await checkDoneSession(
+						student_id,
+						student_taken_assignment.session_id
+					);
 
 					let result = {
 						assignment: assign,
@@ -203,7 +206,10 @@ module.exports = {
 						}
 					);
 					student_taken_assignment = student_taken_assignment[1][0];
-					checkDoneSession(student_id, student_taken_assignment.session_id);
+					await checkDoneSession(
+						student_id,
+						student_taken_assignment.session_id
+					);
 
 					let result = {
 						assignment: assign,
@@ -439,7 +445,7 @@ module.exports = {
 	/**
 	 * @desc      get submission data
 	 * @route     GET /api/v1/assignment/submissiondata
-	 * @access    Private (Admin)
+	 * @access    Private
 	 */
 	getAllSubmissionFiltered: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
@@ -447,6 +453,69 @@ module.exports = {
 		let result = await getAllAssignmentSubmissionFiltered(student_id);
 
 		return res.sendJson(200, true, "Success", result);
+	}),
+	/**
+	 * @desc      grade a submission
+	 * @route     PUT /api/v1/assignment/lecturer/grade
+	 * @access    Private (Admin)
+	 */
+	gradeSubmission: asyncHandler(async (req, res) => {
+		const { material_enrolled_id, student_id, score } = req.body;
+		let status;
+
+		let submission_data = await MaterialEnrolled.findOne({
+			where: {
+				id: material_enrolled_id,
+				student_id: student_id,
+			},
+		});
+
+		if (submission_data.type != ASSIGNMENT) {
+			return res.sendJson(
+				400,
+				false,
+				"Submission data is not an Assignment",
+				{}
+			);
+		}
+
+		status = submission_data.status;
+		if (status == GRADING) {
+			status = FINISHED;
+		}
+
+		if (submission_data.type != ASSIGNMENT) {
+			return res.sendJson(
+				400,
+				false,
+				"Submission data is not an Assignment",
+				{}
+			);
+		}
+
+		let date_present = moment()
+			.tz("Asia/Jakarta")
+			.format("DD/MM/YYYY hh:mm:ss");
+
+		submission_data = await MaterialEnrolled.update(
+			{
+				status,
+				score,
+				date_present,
+			},
+			{
+				where: {
+					id: material_enrolled_id,
+					student_id: student_id,
+				},
+				returning: true,
+			}
+		);
+		let result = submission_data[1][0].dataValues;
+
+		await checkDoneSession(student_id, result.session_id);
+
+		return res.sendJson(200, true, "Successfully graded assignment", result);
 	}),
 };
 

@@ -62,6 +62,13 @@ route.get(
 	assignmentController.getAllSubmissionFiltered
 );
 
+route.put(
+	"/lecturer/grade",
+	protection,
+	// authorize("lecturer"),
+	assignmentController.gradeSubmission
+);
+
 route.get(
 	"/session/:session_id",
 	protection,

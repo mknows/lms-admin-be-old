@@ -122,12 +122,14 @@ async function completedSession(student_id, session_id) {
 		);
 		// tesst -----------------------
 
+		let date_present = moment().tz("Asia/Jakarta");
+
 		await StudentSession.update(
 			{
 				status: FINISHED,
 				present: true,
-				date_present: moment().format("DD/MM/YYYY hh:mm:ss"),
 				final_score: score,
+				date_present,
 			},
 			{
 				where: {

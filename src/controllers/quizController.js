@@ -585,7 +585,7 @@ module.exports = {
 			},
 		});
 
-		checkDoneSession(student_id, material_enrolled_data.session_id);
+		await checkDoneSession(student_id, material_enrolled_data.session_id);
 
 		return res.sendJson(200, true, "Success", summary);
 	}),
