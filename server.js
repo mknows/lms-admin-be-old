@@ -47,7 +47,7 @@ morgan.format(
 	':remote-addr - :remote-user [:date[Asia/Jakarta]] ":method :url HTTP/:http-version" STATUS::status :response-time ms ":referrer" ":user-agent"'
 );
 app.use(morgan("dev"));
-app.use(morgan("combined", { stream: accessLogStream }));
+// app.use(morgan("combined", { stream: accessLogStream }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, strict: false }));
 app.use(cookieParser());
