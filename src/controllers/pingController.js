@@ -1,6 +1,15 @@
+const { SessionFlusher } = require("@sentry/hub");
 const asyncHandler = require("express-async-handler");
 
-const { Student, StudentSubject, Subject, User, Major } = require("../models");
+const {
+	Student,
+	StudentSubject,
+	Subject,
+	User,
+	Major,
+	MaterialEnrolled,
+	Session,
+} = require("../models");
 
 module.exports = {
 	testAPI: asyncHandler(async (req, res) => {
@@ -47,5 +56,34 @@ module.exports = {
 		};
 
 		return res.sendJson(200, true, "berhasil", result);
+	}),
+	materialEnrolled: asyncHandler(async (req, res) => {
+		const material_enrolled = await MaterialEnrolled.findOne({
+			include: [
+				{
+					model: Subject,
+					attributes: ["name"],
+				},
+				{
+					model: Session,
+					attributes: ["session_no"],
+				},
+				{
+					model: Student,
+					attributes: ["user_id"],
+					include: {
+						model: User,
+						attributes: ["full_name"],
+					},
+				},
+			],
+		});
+		let data = {
+			student_id: material_enrolled.student_id,
+			student_name: material_enrolled.Student.User.full_name,
+			subject_name: material_enrolled.Subject.name,
+			session_no: material_enrolled.Session.session_no,
+		};
+		return res.sendJson(200, true, "berhasil", data);
 	}),
 };

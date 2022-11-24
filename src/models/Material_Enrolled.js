@@ -18,6 +18,9 @@ module.exports = (sequelize, DataTypes) => {
 			this.belongsTo(models.Subject, {
 				foreignKey: "subject_id",
 			});
+			this.belongsTo(models.Student, {
+				foreignKey: "student_id",
+			});
 		}
 	}
 	MaterialEnrolled.init(
