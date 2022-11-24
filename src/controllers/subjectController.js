@@ -164,6 +164,7 @@ module.exports = {
 					"credit",
 					"lecturer",
 					"thumbnail_link",
+					"subject_code",
 				],
 				where: {
 					name: { [Op.iLike]: search_query },
