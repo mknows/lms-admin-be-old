@@ -178,7 +178,7 @@ module.exports = {
 
 		const exist = await Quiz.findOne({
 			where: {
-				quiz_id,
+				id: quiz_id,
 			},
 		});
 
@@ -221,7 +221,7 @@ module.exports = {
 				returning: true,
 			}
 		);
-		return res.sendJson(200, true, "Success", { ...quiz[1].dataValues });
+		return res.sendJson(200, true, "Success", quiz[1][0]);
 	}),
 
 	/**
