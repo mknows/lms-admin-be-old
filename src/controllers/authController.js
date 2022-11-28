@@ -221,10 +221,11 @@ module.exports = {
 			user = user.dataValues;
 
 			await defaultUsernameFromEmail(user);
-
+			console.log(user);
 			insertLog("daily-active-user", user.id);
 			insertLogActivity(req, user.id, "Login with Google");
 		} else {
+			console.log(user);
 			insertLog("daily-active-user", user.id);
 			insertLogActivity(req, user.id, "Login with Google");
 		}

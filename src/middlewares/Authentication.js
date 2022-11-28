@@ -64,6 +64,13 @@ exports.authorize = (...roles) => {
 	return asyncHandler(async (req, res, next) => {
 		let student_id;
 
+		if (req?.userData?.id) {
+			req.student_id = null;
+			req.role = "guest";
+
+			next();
+		}
+
 		const currentUserRole = await Promise.all([
 			User.findOne({ where: { id: req.userData.id } }),
 			Lecturer.findOne({ where: { user_id: req.userData.id } }),
