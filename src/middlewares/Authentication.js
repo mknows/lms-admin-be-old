@@ -64,11 +64,11 @@ exports.authorize = (...roles) => {
 	return asyncHandler(async (req, res, next) => {
 		let student_id;
 
-		if (req?.userData?.id) {
+		if (req?.userData === undefined) {
 			req.student_id = null;
 			req.role = "guest";
 
-			next();
+			return next();
 		}
 
 		const currentUserRole = await Promise.all([
