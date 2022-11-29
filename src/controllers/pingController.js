@@ -87,6 +87,6 @@ module.exports = {
 	}),
 
 	ping: asyncHandler(async (req, res) => {
-		return res.sendJson(200, true, "YALL PINGED?", data);
+		return res.sendJson(200, true, "YALL PINGED?");
 	}),
 };
