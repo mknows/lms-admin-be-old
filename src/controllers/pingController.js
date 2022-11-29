@@ -1,4 +1,3 @@
-const { SessionFlusher } = require("@sentry/hub");
 const asyncHandler = require("express-async-handler");
 
 const {
@@ -85,5 +84,9 @@ module.exports = {
 			session_no: material_enrolled.Session.session_no,
 		};
 		return res.sendJson(200, true, "berhasil", data);
+	}),
+
+	ping: asyncHandler(async (req, res) => {
+		return res.sendJson(200, true, "YALL PINGED?", data);
 	}),
 };

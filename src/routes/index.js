@@ -24,6 +24,7 @@ const pingRoutes = require("./ping");
 
 //punya ryo
 const administrationRoute = require("./Administration");
+const pingController = require("../controllers/pingController");
 route.use("/administration", administrationRoute);
 
 route.use("/auth", userRoute);
@@ -46,5 +47,7 @@ route.use("/notification", notificationRoute);
 route.use("/report", reportRoute);
 
 route.use("/test", pingRoutes);
+
+route.get("/", pingController.ping);
 
 module.exports = route;
