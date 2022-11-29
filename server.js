@@ -24,10 +24,10 @@ require("./src/helpers/redis");
 
 const app = express();
 
-const accessLogStream = fs.createWriteStream(
-	path.join(__dirname, "logger.log"),
-	{ flags: "a" }
-);
+// const accessLogStream = fs.createWriteStream(
+// 	path.join(__dirname, "logger.log"),
+// 	{ flags: "a" }
+// );
 
 initializeFirebase();
 
