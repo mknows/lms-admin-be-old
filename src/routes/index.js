@@ -48,6 +48,4 @@ route.use("/report", reportRoute);
 
 route.use("/test", pingRoutes);
 
-route.get("/", pingController.ping);
-
 module.exports = route;
