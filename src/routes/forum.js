@@ -18,6 +18,12 @@ route.get(
 );
 
 route.get(
+	"/discussionforum/allcontent/",
+	protection,
+	forumController.getAllDiscussionForumContent
+);
+
+route.get(
 	"/discussionforum/allcontent/:df_id",
 	protection,
 	forumController.getAllDiscussionForumContent
