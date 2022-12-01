@@ -7,6 +7,7 @@ const adminRoute = require("./admin");
 
 const subjectRoute = require("./subject");
 const sessionRoute = require("./session");
+const guideRoute = require("./guide");
 const forumRoute = require("./forum");
 const quizRoute = require("./quiz");
 const moduleRoute = require("./module");
@@ -27,7 +28,7 @@ route.use("/administration", administrationRoute);
 route.use("/auth", userRoute);
 route.use("/profile", profileRoute);
 route.use("/admin", adminRoute);
-
+route.use("/guide", guideRoute);
 route.use("/subject", subjectRoute);
 route.use("/session", sessionRoute);
 route.use("/forum", forumRoute);
