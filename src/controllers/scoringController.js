@@ -85,7 +85,7 @@ const asyncHandler = require("express-async-handler");
 const { Op, fn, col } = require("sequelize");
 const certificateController = require("./certificateController");
 const getParsedPlan = require("../helpers/getParsedPlan");
-// const Sequelize = require("sequelize");
+const leaderboardController = require("./leaderboardController");
 
 module.exports = {
 	/**
@@ -111,7 +111,9 @@ module.exports = {
 			total_cred += cursub.credit;
 		}
 
-		return score / total_cred;
+		let result = score / total_cred;
+
+		return result;
 	}),
 
 	/**
@@ -553,6 +555,14 @@ module.exports = {
 			),
 		};
 
+		// ####### TODO #######
+		user_id = await leaderboardController.getUserId(student_id, "STUDENT");
+		await leaderboardController.updateLeaderboardGPA(
+			user_id,
+			student_information.gpa
+		);
+		// ######## scoring forum #######
+
 		let subjects = [];
 
 		for (let i = 0; i < student.Subjects.length; i++) {
@@ -592,7 +602,13 @@ async function GPACalculatorFromList(subject_list) {
 		total_cred += curr_sub.credit;
 	}
 
-	return score / total_cred;
+	let result;
+	result = score / total_cred;
+	result = isNaN(result) ? 0 : result;
+
+	console.log(result);
+
+	return result;
 }
 
 function letterByPercent(percent) {
