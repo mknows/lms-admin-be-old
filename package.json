@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "updateheroku": "./node_modules/.bin/herokuupdate.sh"
+    "herokuupdate": "./node_modules/.bin/herokuupdate.sh"
   },
   "keywords": [],
   "author": "",
