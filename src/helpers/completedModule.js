@@ -1,4 +1,5 @@
 const { MaterialEnrolled,Session } = require("../models");
+require("dotenv").config();
 const {
 	MODULE,
 } = process.env;

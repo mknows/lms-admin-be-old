@@ -25,7 +25,7 @@ const {
 	Assignment,
 	Module,
 } = require("../models");
-require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
+require("dotenv").config();
 const {
 	WEIGHT_A,
 	WEIGHT_A_MINUS,

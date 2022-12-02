@@ -23,7 +23,7 @@ const randomString = require("randomstring");
 const pagination = require("../helpers/pagination");
 const { Op } = require("sequelize");
 const { fromPath } = require("pdf2pic");
-require("dotenv").config({ path: "./controllerconfig.env" });
+require("dotenv").config();
 const {
 	FLOOR_A,
 	FLOOR_A_MINUS,

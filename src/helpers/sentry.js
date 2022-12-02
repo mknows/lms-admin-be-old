@@ -1,4 +1,4 @@
-require("dotenv").config({ path: __dirname + "../config/config.env" });
+require("dotenv").config();
 const Sentry = require("@sentry/node");
 
 const { SENTRY_DSN } = process.env;

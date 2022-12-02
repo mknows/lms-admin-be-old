@@ -1,6 +1,7 @@
 const { User, Student, Subject, Certificate } = require("../models");
 const { getAuth: getClientAuth, updateProfile } = require("firebase/auth");
 const Sequelize = require("sequelize");
+require("dotenv").config();
 const { FINISHED, ONGOING } = process.env;
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("express-async-handler");

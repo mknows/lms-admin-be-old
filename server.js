@@ -12,7 +12,7 @@ const moment = require("moment");
 // const csrf = require("csurf");
 const csrfMiddleware = require("./src/middlewares/csrf");
 
-dotenv.config({ path: "./src/config/config.env" });
+dotenv.config();
 
 const response = require("./src/helpers/responseFormatter");
 const errResponseFirebase = require("./src/helpers/responseErrorFirebase");

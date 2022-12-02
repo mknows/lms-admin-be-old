@@ -17,7 +17,7 @@ const checkExistence = require("../helpers/checkExistence");
 const checkDoneSession = require("../helpers/checkDoneSession");
 const certificateController = require("./certificateController");
 
-require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
+require("dotenv").config();
 const {
 	DRAFT,
 	PENDING,

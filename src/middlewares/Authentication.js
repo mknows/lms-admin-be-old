@@ -9,6 +9,7 @@ const {
 	Quiz,
 	MaterialEnrolled,
 } = require("../models");
+require("dotenv").config();
 const { MODULE } = process.env;
 const { getAuth } = require("firebase-admin/auth");
 const ErrorResponse = require("../utils/errorResponse");

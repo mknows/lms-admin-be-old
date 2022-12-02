@@ -10,6 +10,7 @@ const {
 	Lecturer,
 } = require("../models");
 const scoringController = require("../controllers/scoringController");
+require("dotenv").config();
 const {
 	DRAFT,
 	PENDING,

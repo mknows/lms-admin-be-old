@@ -18,7 +18,7 @@ const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
 const moment = require("moment");
 const checkDoneSession = require("../helpers/checkDoneSession");
-require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
+require("dotenv").config();
 const {
 	ONGOING,
 	GRADING,
