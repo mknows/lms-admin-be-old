@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "herokuupdate": "git stash && git pull origin master && git push origin master && git push heroku master && git stash pop"
+    "herokuupdate": "./node_modules/.bin/herokuupdate.sh"
   },
   "keywords": [],
   "author": "",
@@ -41,7 +41,6 @@
     "randomstring": "^1.2.2",
     "redis": "^4.3.1",
     "sequelize": "^6.21.4",
-    "slugify": "^1.6.5",
     "uuid": "^9.0.0"
   }
 }

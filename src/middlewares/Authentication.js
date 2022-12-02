@@ -9,6 +9,7 @@ const {
 	Quiz,
 	MaterialEnrolled,
 } = require("../models");
+require("dotenv").config();
 const { MODULE } = process.env;
 const { getAuth } = require("firebase-admin/auth");
 const ErrorResponse = require("../utils/errorResponse");
@@ -63,6 +64,13 @@ exports.protection = asyncHandler(async (req, res, next) => {
 exports.authorize = (...roles) => {
 	return asyncHandler(async (req, res, next) => {
 		let student_id;
+
+		if (req?.userData === undefined) {
+			req.student_id = null;
+			req.role = "guest";
+
+			return next();
+		}
 
 		const currentUserRole = await Promise.all([
 			User.findOne({ where: { id: req.userData.id } }),

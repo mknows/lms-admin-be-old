@@ -8,12 +8,10 @@ const {
 	Session,
 	Subject,
 } = require("../models");
-const moment = require("moment");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
-const ErrorResponse = require("../utils/errorResponse");
-const getStudentOngoingSessionId = require("../helpers/getStudentOngoingSessionId");
-const session = require("../models/session");
+const makeslug = require("../helpers/makeslug");
+const sequelize = require("sequelize");
 
 module.exports = {
 	/**
@@ -23,9 +21,31 @@ module.exports = {
 	 */
 	getAllDiscussionForumContent: asyncHandler(async (req, res) => {
 		const { df_id } = req.params;
+		const { slug_query } = req.query;
+
+		let slug_search = null;
+		let id_search = null;
+
+		let slug;
+
+		if (slug_query) {
+			slug_search = await makeslug(slug_query, false);
+		}
+		if (df_id) {
+			id_search = df_id;
+		}
+
 		let data = await DiscussionForum.findOne({
 			where: {
-				id: df_id,
+				[Op.or]: [
+					{ id: id_search },
+					{
+						title: sequelize.where(
+							sequelize.fn("LOWER", sequelize.col("title")),
+							slug_search
+						),
+					},
+				],
 			},
 			attributes: { include: ["created_at", "updated_at"] },
 			include: [
@@ -59,8 +79,10 @@ module.exports = {
 		});
 
 		data = data.dataValues;
+		slug = await makeslug(data.title.toLowerCase(), true);
+		data.slug = slug;
 
-		return res.sendJson(200, true, "sucess get all discussion forums", data);
+		return res.sendJson(200, true, "sucess get discussion forum content", data);
 	}),
 	/**
 	 * @desc      Get All Forums

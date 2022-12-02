@@ -17,7 +17,7 @@ const checkExistence = require("../helpers/checkExistence");
 const checkDoneSession = require("../helpers/checkDoneSession");
 const certificateController = require("./certificateController");
 
-require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
+require("dotenv").config();
 const {
 	DRAFT,
 	PENDING,
@@ -178,7 +178,7 @@ module.exports = {
 
 		const exist = await Quiz.findOne({
 			where: {
-				quiz_id,
+				id: quiz_id,
 			},
 		});
 
@@ -221,7 +221,7 @@ module.exports = {
 				returning: true,
 			}
 		);
-		return res.sendJson(200, true, "Success", { ...quiz[1].dataValues });
+		return res.sendJson(200, true, "Success", quiz[1][0]);
 	}),
 
 	/**

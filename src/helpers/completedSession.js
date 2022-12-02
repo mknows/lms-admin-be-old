@@ -1,5 +1,6 @@
 const { Op } = require("sequelize");
 const { MaterialEnrolled, StudentSession } = require("../models");
+require("dotenv").config();
 const { MODULE, ASSIGNMENT, QUIZ, FINISHED, GRADING, PASSED } = process.env;
 
 async function completedSession(student_id, session_id) {

@@ -221,11 +221,12 @@ module.exports = {
 			user = user.dataValues;
 
 			await defaultUsernameFromEmail(user);
-
 			insertLog("daily-active-user", user.id);
-		} else insertLog("daily-active-user", user.id);
-
-		insertLogActivity(req, user.id, "Login with Google");
+			insertLogActivity(req, user.id, "Login with Google");
+		} else {
+			insertLog("daily-active-user", user.id);
+			insertLogActivity(req, user.id, "Login with Google");
+		}
 
 		delete user["id"];
 		delete user["firebase_uid"];

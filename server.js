@@ -12,7 +12,7 @@ const moment = require("moment");
 // const csrf = require("csurf");
 const csrfMiddleware = require("./src/middlewares/csrf");
 
-dotenv.config({ path: "./src/config/config.env" });
+dotenv.config();
 
 const response = require("./src/helpers/responseFormatter");
 const errResponseFirebase = require("./src/helpers/responseErrorFirebase");
@@ -24,10 +24,10 @@ require("./src/helpers/redis");
 
 const app = express();
 
-const accessLogStream = fs.createWriteStream(
-	path.join(__dirname, "logger.log"),
-	{ flags: "a" }
-);
+// const accessLogStream = fs.createWriteStream(
+// 	path.join(__dirname, "logger.log"),
+// 	{ flags: "a" }
+// );
 
 initializeFirebase();
 

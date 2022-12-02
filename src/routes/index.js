@@ -7,6 +7,7 @@ const adminRoute = require("./admin");
 
 const subjectRoute = require("./subject");
 const sessionRoute = require("./session");
+const guideRoute = require("./guide");
 const forumRoute = require("./forum");
 const quizRoute = require("./quiz");
 const moduleRoute = require("./module");
@@ -20,14 +21,17 @@ const certificateController = require("./certificate");
 const notificationRoute = require("./notification");
 const reportRoute = require("./report");
 
+const pingRoutes = require("./ping");
+
 //punya ryo
 const administrationRoute = require("./Administration");
+const pingController = require("../controllers/pingController");
 route.use("/administration", administrationRoute);
 
 route.use("/auth", userRoute);
 route.use("/profile", profileRoute);
 route.use("/admin", adminRoute);
-
+route.use("/guide", guideRoute);
 route.use("/subject", subjectRoute);
 route.use("/session", sessionRoute);
 route.use("/forum", forumRoute);
@@ -42,5 +46,7 @@ route.use("/document", documentRoute);
 route.use("/certificate", certificateController);
 route.use("/notification", notificationRoute);
 route.use("/report", reportRoute);
+
+route.use("/test", pingRoutes);
 
 module.exports = route;

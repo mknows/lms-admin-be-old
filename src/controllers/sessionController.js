@@ -5,6 +5,7 @@ const {
 	MaterialEnrolled,
 	Student,
 } = require("../models");
+require("dotenv").config();
 const { MODULE, QUIZ, ASSIGNMENT, FINISHED } = process.env;
 const moment = require("moment");
 const { Op } = require("sequelize");
@@ -98,10 +99,7 @@ module.exports = {
 			: 0;
 
 		for (i = 0; i < data.length; i++) {
-			if (
-				latest_session + 1 === data[i].session_no ||
-				latest_session + 1 > data[i].session_no
-			) {
+			if (latest_session + 1 >= data[i].session_no) {
 				data[i].dataValues.is_locked = !(await progress(
 					student_id,
 					data[i].id,
@@ -124,24 +122,6 @@ module.exports = {
 				data[i].dataValues.quiz_done = false;
 				data[i].dataValues.session_lock = true;
 			}
-		}
-		if (latest_session === 0) {
-			data[0].dataValues.is_locked = !(await progress(
-				student_id,
-				data[0].id,
-				"MODULE"
-			));
-			data[0].dataValues.assignment_done = await progress(
-				student_id,
-				data[0].id,
-				"ASSIGNMENT"
-			);
-			data[0].dataValues.quiz_done = await progress(
-				student_id,
-				data[0].id,
-				"QUIZ"
-			);
-			data[0].dataValues.session_lock = false;
 		}
 		return res.sendJson(200, true, "success get all session in sub", data);
 	}),
