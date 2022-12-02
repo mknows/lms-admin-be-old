@@ -1,4 +1,5 @@
 const { MaterialEnrolled , Module} = require("../models");
+require("dotenv").config();
 const {
 	MODULE,
     FINISHED

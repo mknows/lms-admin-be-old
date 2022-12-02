@@ -13,7 +13,7 @@ const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const scoringController = require("./scoringController");
 const checkDoneSession = require("../helpers/checkDoneSession");
-require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
+require("dotenv").config();
 const {
 	DRAFT,
 	PENDING,

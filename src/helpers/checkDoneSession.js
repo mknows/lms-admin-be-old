@@ -14,9 +14,7 @@ const {
 	User,
 } = require("../models");
 const moment = require("moment");
-require("dotenv").config({
-	path: __dirname + "../controllers/controllerconfig.env",
-});
+require("dotenv").config();
 const scoringController = require("../controllers/scoringController");
 const {
 	DRAFT,

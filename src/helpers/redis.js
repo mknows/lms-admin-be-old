@@ -1,5 +1,5 @@
 const dotenv = require("dotenv");
-dotenv.config({ path: "../config/config.env" });
+dotenv.config();
 const redis = require("redis");
 
 let redisClient;

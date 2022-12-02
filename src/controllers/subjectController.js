@@ -22,7 +22,7 @@ const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
 const scoringController = require("./scoringController");
 const pagination = require("../helpers/pagination");
-require("dotenv").config({ path: __dirname + "/controllerconfig.env" });
+require("dotenv").config();
 const {
 	DRAFT,
 	PENDING,

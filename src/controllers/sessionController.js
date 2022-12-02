@@ -5,6 +5,7 @@ const {
 	MaterialEnrolled,
 	Student,
 } = require("../models");
+require("dotenv").config();
 const { MODULE, QUIZ, ASSIGNMENT, FINISHED } = process.env;
 const moment = require("moment");
 const { Op } = require("sequelize");

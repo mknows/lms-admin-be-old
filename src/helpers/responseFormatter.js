@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 module.exports = (req, res, next) => {
 	res.sendJson = (statusCode, status, message, data, cookie) => {
 		if (cookie)
