@@ -21,6 +21,7 @@ const certificateController = require("./certificate");
 const notificationRoute = require("./notification");
 const reportRoute = require("./report");
 const previewRoute = require("./preview");
+const leaderboardRoute = require("./leaderboard");
 
 const pingRoutes = require("./ping");
 
@@ -48,6 +49,7 @@ route.use("/certificate", certificateController);
 route.use("/notification", notificationRoute);
 route.use("/report", reportRoute);
 route.use("/preview", previewRoute);
+route.use("/leaderboard", leaderboardRoute);
 
 route.use("/test", pingRoutes);
 

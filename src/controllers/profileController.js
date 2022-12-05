@@ -13,7 +13,7 @@ const {
 } = require("firebase/storage");
 const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
-const scoringController = require("./scoringController");
+const scoringFunctions = require("../functions/scoringFunctions");
 
 module.exports = {
 	/**
@@ -57,7 +57,7 @@ module.exports = {
 		let token = req.firebaseToken;
 		const student_id = req.student_id;
 
-		let report = await scoringController.getReport(student_id);
+		let report = await scoringFunctions.getReport(student_id);
 
 		return res.status(200).json({
 			success: true,
@@ -106,7 +106,7 @@ module.exports = {
 				subjects_taken++;
 			}
 			subjects.Subjects[i].dataValues.progress =
-				await scoringController.getSubjectProgress(
+				await scoringFunctions.getSubjectProgress(
 					subjects.Subjects[i].id,
 					req.student_id
 				);

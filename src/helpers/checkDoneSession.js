@@ -15,7 +15,7 @@ const {
 } = require("../models");
 const moment = require("moment");
 require("dotenv").config();
-const scoringController = require("../controllers/scoringController");
+const scoringFunctions = require("../functions/scoringFunctions");
 const {
 	DRAFT,
 	PENDING,
@@ -109,12 +109,12 @@ async function completedSession(student_id, session_id) {
 
 	if (intersection === undefined || intersection.length == 0) {
 		// array does not exist or is empty (present)
-		const score = await scoringController.getSessionScore(
+		const score = await scoringFunctions.getSessionScore(
 			student_id,
 			session_id
 		);
 		// tesst ------------------------
-		const sub_score = await scoringController.getSubjectScoreV2(
+		const sub_score = await scoringFunctions.getSubjectScoreV2(
 			student_id,
 			sesh.subject_id
 		);

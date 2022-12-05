@@ -1,3 +1,4 @@
+// TODO should be depricated
 const {
 	Administration,
 
@@ -85,7 +86,7 @@ const asyncHandler = require("express-async-handler");
 const { Op, fn, col } = require("sequelize");
 const certificateController = require("./certificateController");
 const getParsedPlan = require("../helpers/getParsedPlan");
-const leaderboardController = require("./leaderboardController");
+const leaderboardFunctions = require("../functions/leaderboardFunctions");
 
 module.exports = {
 	/**
@@ -473,7 +474,7 @@ module.exports = {
 	 * @desc      calculate students like score
 	 * @access    Private
 	 */
-	getLikesReport: (async (user_id) => {
+	getLikesReport: async (user_id) => {
 		let result;
 
 		let author_id = user_id;
@@ -508,12 +509,12 @@ module.exports = {
 			}),
 		]);
 
-		console.log("dadadda")
+		console.log("dadadda");
 
 		result = all_data;
 
 		return result;
-	}),
+	},
 
 	/**
 	 * @desc      student report
@@ -557,13 +558,12 @@ module.exports = {
 			),
 		};
 
-		// ####### TODO #######
-		user_id = await leaderboardController.getUserId(student_id, "STUDENT");
-		await leaderboardController.updateLeaderboardGPA(
+		// TODO GPA TESTS #######
+		user_id = await leaderboardFunctions.getUserId(student_id, "STUDENT");
+		await leaderboardFunctions.updateLeaderboardGPA(
 			user_id,
 			student_information.gpa
 		);
-		// ######## scoring forum #######
 
 		let subjects = [];
 

@@ -20,7 +20,7 @@ const {
 } = require("firebase/storage");
 const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
-const scoringController = require("./scoringController");
+const scoringFunctions = require("../functions/scoringFunctions");
 const pagination = require("../helpers/pagination");
 require("dotenv").config();
 const {
@@ -200,7 +200,7 @@ module.exports = {
 				teach.push(teachers[i].User.full_name);
 			}
 
-			let progress = await scoringController.getSubjectProgress(
+			let progress = await scoringFunctions.getSubjectProgress(
 				req.student_id,
 				subjectsEnrolled[i].Subject.id
 			);
@@ -217,7 +217,7 @@ module.exports = {
 				progress: progress,
 				student_count: count,
 				lecturers: teach,
-				score: await scoringController.getSubjectScore(
+				score: await scoringFunctions.getSubjectScore(
 					student_id,
 					subjectsEnrolled[i].Subject.id
 				),

@@ -9,7 +9,7 @@ const {
 	User,
 	Lecturer,
 } = require("../models");
-const scoringController = require("../controllers/scoringController");
+const scoringFunctions = require("../functions/scoringFunctions");
 require("dotenv").config();
 const {
 	DRAFT,
