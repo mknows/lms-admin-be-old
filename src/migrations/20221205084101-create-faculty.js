@@ -1,7 +1,7 @@
 "use strict";
 module.exports = {
 	async up(queryInterface, Sequelize) {
-		await queryInterface.createTable("majors", {
+		await queryInterface.createTable("faculties", {
 			id: {
 				allowNull: false,
 				primaryKey: true,
@@ -9,21 +9,6 @@ module.exports = {
 			},
 			name: {
 				type: Sequelize.STRING,
-			},
-			head_of_major: {
-				type: Sequelize.UUID,
-			},
-			description: {
-				type: Sequelize.STRING,
-			},
-			thumbnail: {
-				type: Sequelize.STRING,
-			},
-			thumbnail_link: {
-				type: Sequelize.STRING,
-			},
-			faculty: {
-				type: Sequelize.UUID,
 			},
 			created_at: {
 				allowNull: false,
@@ -48,6 +33,6 @@ module.exports = {
 		});
 	},
 	async down(queryInterface, Sequelize) {
-		await queryInterface.dropTable("majors");
+		await queryInterface.dropTable("faculties");
 	},
 };

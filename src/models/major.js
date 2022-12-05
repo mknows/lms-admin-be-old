@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
 				through: "StudentMajor",
 				foreignKey: "major_id",
 			});
+			this.belongsTo(models.Faculty, {
+				foreignKey: "faculty",
+			});
 		}
 	}
 	Major.init(
@@ -28,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
 			thumbnail: DataTypes.STRING,
 			thumbnail_link: DataTypes.STRING,
 			description: DataTypes.STRING,
+			faculty: DataTypes.UUID,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
 			deleted_at: DataTypes.DATE,

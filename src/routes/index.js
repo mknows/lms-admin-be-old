@@ -22,6 +22,7 @@ const notificationRoute = require("./notification");
 const reportRoute = require("./report");
 const previewRoute = require("./preview");
 const leaderboardRoute = require("./leaderboard");
+const facultyRoute = require("./faculty");
 
 const pingRoutes = require("./ping");
 
@@ -50,6 +51,7 @@ route.use("/notification", notificationRoute);
 route.use("/report", reportRoute);
 route.use("/preview", previewRoute);
 route.use("/leaderboard", leaderboardRoute);
+route.use("/faculty", facultyRoute);
 
 route.use("/test", pingRoutes);
 
