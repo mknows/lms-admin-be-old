@@ -20,16 +20,11 @@ const {
 
 module.exports = {
 	development: {
-		// username: DB_USERNAME_GCP,
-		// password: DB_PASSWORD_GCP,
-		// database: DB_NAME_GCP,
-		// host: DB_HOST_GCP,
-		// dialect: DB_DIALECT,
-		username: "postgres",
-		password: "D^Eos<=#hyusu{P8",
-		database: "kampus-gratis-develop",
-		host: "34.101.250.5",
-		dialect: "postgres",
+		username: DB_USERNAME_GCP,
+		password: DB_PASSWORD_GCP,
+		database: DB_NAME_GCP,
+		host: DB_HOST_GCP,
+		dialect: DB_DIALECT,
 		define: {
 			paranoid: true,
 			timestamps: true,
