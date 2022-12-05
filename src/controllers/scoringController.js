@@ -473,7 +473,7 @@ module.exports = {
 	 * @desc      calculate students like score
 	 * @access    Private
 	 */
-	getLikesReport: asyncHandler(async (user_id) => {
+	getLikesReport: (async (user_id) => {
 		let result;
 
 		let author_id = user_id;
@@ -507,6 +507,8 @@ module.exports = {
 				],
 			}),
 		]);
+
+		console.log("dadadda")
 
 		result = all_data;
 

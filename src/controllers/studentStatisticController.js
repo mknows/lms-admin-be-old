@@ -1,7 +1,9 @@
 const { User, Student, Subject, Certificate } = require("../models");
 const asyncHandler = require("express-async-handler");
-const leaderboardController = require("./leaderboardController");
 const scoringController = require("./scoringController");
+const leaderboardController = require("./leaderboardController");
+
+const betaScoring = require('./betaScoring');
 
 module.exports = {
 	/**
@@ -33,7 +35,9 @@ module.exports = {
 
 		let raw_dat = [];
 		let total_score = 0;
-		let likes = await scoringController.getLikesReport(user_id);
+
+		// let likes = await scoringController.getLikesReportTest(user_id);
+		let likes = await betaScoring.getLikesReportTest(user_id);
 
 		for (let i = 0; i < likes.length; i++) {
 			let currlike = likes[i][0].dataValues;
@@ -44,7 +48,7 @@ module.exports = {
 			let leclike =
 				currlike.n_teacher_like == null ? 0 : parseInt(currlike.n_teacher_like);
 
-			let currscore = await scoringController.getTotalLikesScore(
+			let currscore = await betaScoring.getTotalLikesScore(
 				studlike,
 				leclike
 			);
@@ -59,7 +63,7 @@ module.exports = {
 		}
 
 		// ####### TODO ####### FORUM SCORE TEST
-		await leaderboardController.updateLeaderboardForum(user_id, total_score);
+		// await leaderboardController.updateLeaderboardForum(user_id, total_score);
 
 		report = {
 			discussion_forum: {
