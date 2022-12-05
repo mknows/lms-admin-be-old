@@ -1,6 +1,7 @@
 const { Leaderboard, Student, Lecturer, User } = require("../models");
 const asyncHandler = require("express-async-handler");
 const scoringController = require("./scoringController");
+const studentStatisticController = require("./studentStatisticController");
 
 module.exports = {
 	/**

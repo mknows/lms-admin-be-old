@@ -1,9 +1,6 @@
 const { User, Student, Subject, Certificate } = require("../models");
-const { getAuth: getClientAuth, updateProfile } = require("firebase/auth");
-const Sequelize = require("sequelize");
-require("dotenv").config();
-const { FINISHED, ONGOING } = process.env;
 const asyncHandler = require("express-async-handler");
+const leaderboardController = require("./leaderboardController");
 const scoringController = require("./scoringController");
 
 module.exports = {
@@ -60,6 +57,9 @@ module.exports = {
 				score: currscore,
 			});
 		}
+
+		// ####### TODO ####### FORUM SCORE TEST
+		await leaderboardController.updateLeaderboardForum(user_id, total_score);
 
 		report = {
 			discussion_forum: {
