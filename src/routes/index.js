@@ -20,6 +20,7 @@ const documentRoute = require("./document");
 const certificateController = require("./certificate");
 const notificationRoute = require("./notification");
 const reportRoute = require("./report");
+const previewRoute = require("./preview");
 
 const pingRoutes = require("./ping");
 
@@ -46,6 +47,7 @@ route.use("/document", documentRoute);
 route.use("/certificate", certificateController);
 route.use("/notification", notificationRoute);
 route.use("/report", reportRoute);
+route.use("/preview", previewRoute);
 
 route.use("/test", pingRoutes);
 

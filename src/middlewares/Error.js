@@ -46,6 +46,11 @@ const errorHandler = (err, req, res, next) => {
 			errors = new ErrorResponse(message, 400);
 			break;
 		}
+		case "LIMIT_UNEXPECTED_FILE": {
+			const message = `${err.name} ${err.message}`;
+			errors = new ErrorResponse(message, 400);
+			break;
+		}
 		case "auth/network-request-failed": {
 			const message = "network error";
 			errors = new ErrorResponse(message, 500);
