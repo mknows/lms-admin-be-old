@@ -25,6 +25,7 @@ const leaderboardRoute = require("./leaderboard");
 const facultyRoute = require("./faculty");
 
 const pingRoutes = require("./ping");
+const calendarRoute = require("./calendar");
 
 //punya ryo
 const administrationRoute = require("./Administration");
@@ -49,10 +50,6 @@ route.use("/document", documentRoute);
 route.use("/certificate", certificateController);
 route.use("/notification", notificationRoute);
 route.use("/report", reportRoute);
-route.use("/preview", previewRoute);
-route.use("/leaderboard", leaderboardRoute);
-route.use("/faculty", facultyRoute);
-
-route.use("/test", pingRoutes);
+route.use("/calendar", calendarRoute);
 
 module.exports = route;
