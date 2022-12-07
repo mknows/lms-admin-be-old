@@ -54,6 +54,7 @@ module.exports = {
 				"file_assignment",
 				"file_assignment_link",
 				"duration",
+				"created_by",
 			],
 			where: {
 				session_id: session_id,
@@ -253,6 +254,7 @@ module.exports = {
 				"file_assignment",
 				"file_assignment_link",
 				"duration",
+				"created_by",
 			],
 			where: {
 				session_id: session_id,
@@ -390,6 +392,7 @@ module.exports = {
 				"file_assignment",
 				"file_assignment_link",
 				"duration",
+				"updated_by",
 			],
 			where: {
 				session_id: session_id,
