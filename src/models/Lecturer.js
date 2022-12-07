@@ -9,10 +9,10 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			this.hasMany(models.Major, {
-				foreignKey: "head_of_major"	
+				foreignKey: "head_of_major",
 			});
 			this.belongsTo(models.User, {
-				foreignKey: "user_id"
+				foreignKey: "user_id",
 			});
 		}
 	}
@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
 			user_id: DataTypes.UUID,
 			is_lecturer: DataTypes.BOOLEAN,
 			is_mentor: DataTypes.BOOLEAN,
+			title: DataTypes.STRING,
 			approvedBy: DataTypes.UUID,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,

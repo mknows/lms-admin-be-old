@@ -19,6 +19,9 @@ module.exports = {
 			approved_by: {
 				type: Sequelize.UUID,
 			},
+			title: {
+				type: Sequelize.STRING,
+			},
 			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,

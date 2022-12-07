@@ -4,6 +4,8 @@ const {
 	MaterialEnrolled,
 	Subject,
 	Session,
+	Lecturer,
+	User,
 } = require("../models");
 const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
@@ -58,6 +60,14 @@ module.exports = {
 			],
 			where: {
 				session_id: session_id,
+			},
+			include: {
+				model: Lecturer,
+				attributes: ["user_id", "title"],
+				include: {
+					model: User,
+					attributes: ["full_name"],
+				},
 			},
 		});
 
@@ -144,6 +154,14 @@ module.exports = {
 		const assign = await Assignment.findOne({
 			where: {
 				session_id,
+			},
+			include: {
+				model: Lecturer,
+				attributes: ["user_id", "title"],
+				include: {
+					model: User,
+					attributes: ["full_name"],
+				},
 			},
 		});
 		if (!assign) {
@@ -259,6 +277,14 @@ module.exports = {
 			where: {
 				session_id: session_id,
 			},
+			include: {
+				model: Lecturer,
+				attributes: ["user_id", "title"],
+				include: {
+					model: User,
+					attributes: ["full_name"],
+				},
+			},
 		});
 
 		const session = await Session.findOne({
@@ -352,8 +378,19 @@ module.exports = {
 		let result = [];
 		for (let i = 0; i < enr_data.length; i++) {
 			let curr_assign = await Assignment.findOne({
+				attributes: {
+					include: ["created_by"],
+				},
 				where: {
 					id: enr_data[i].id_referrer,
+				},
+				include: {
+					model: Lecturer,
+					attributes: ["user_id", "title"],
+					include: {
+						model: User,
+						attributes: ["full_name"],
+					},
 				},
 			});
 			const deadline = moment(
@@ -392,10 +429,18 @@ module.exports = {
 				"file_assignment",
 				"file_assignment_link",
 				"duration",
-				"updated_by",
+				"created_by",
 			],
 			where: {
 				session_id: session_id,
+			},
+			include: {
+				model: Lecturer,
+				attributes: ["user_id", "title"],
+				include: {
+					model: User,
+					attributes: ["full_name"],
+				},
 			},
 		});
 
@@ -550,6 +595,14 @@ const getAllAssignmentSubmissionFiltered = async (student_id) => {
 				{
 					model: Assignment,
 					attributes: ["content", "duration"],
+					include: {
+						model: Lecturer,
+						attributes: ["user_id", "title"],
+						include: {
+							model: User,
+							attributes: ["full_name"],
+						},
+					},
 				},
 				{
 					model: Session,
@@ -574,6 +627,14 @@ const getAllAssignmentSubmissionFiltered = async (student_id) => {
 				{
 					model: Assignment,
 					attributes: ["content", "duration"],
+					include: {
+						model: Lecturer,
+						attributes: ["user_id", "title"],
+						include: {
+							model: User,
+							attributes: ["full_name"],
+						},
+					},
 				},
 				{
 					model: Session,
@@ -598,6 +659,14 @@ const getAllAssignmentSubmissionFiltered = async (student_id) => {
 				{
 					model: Assignment,
 					attributes: ["content", "duration"],
+					include: {
+						model: Lecturer,
+						attributes: ["user_id", "title"],
+						include: {
+							model: User,
+							attributes: ["full_name"],
+						},
+					},
 				},
 				{
 					model: Session,
@@ -622,6 +691,14 @@ const getAllAssignmentSubmissionFiltered = async (student_id) => {
 				{
 					model: Assignment,
 					attributes: ["content", "duration"],
+					include: {
+						model: Lecturer,
+						attributes: ["user_id", "title"],
+						include: {
+							model: User,
+							attributes: ["full_name"],
+						},
+					},
 				},
 				{
 					model: Session,
