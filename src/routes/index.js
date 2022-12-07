@@ -51,5 +51,8 @@ route.use("/certificate", certificateController);
 route.use("/notification", notificationRoute);
 route.use("/report", reportRoute);
 route.use("/calendar", calendarRoute);
+route.use("/preview", previewRoute);
+route.use("/leaderboard", leaderboardRoute);
+route.use("/faculty", facultyRoute);
 
 module.exports = route;
