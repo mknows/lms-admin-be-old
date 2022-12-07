@@ -8,13 +8,20 @@ route.get(
 	"/discussionforum",
 	protection,
 	authorize("student"),
+	forumController.getAllDiscussionForum
+);
+
+route.get(
+	"/discussionforum/ongoing",
+	protection,
+	authorize("student"),
 	forumController.getAllDiscussionForumOngoing
 );
 
 route.get(
-	"/discussionforum/all",
+	"/discussionforum/global",
 	protection,
-	forumController.getAllDiscussionForum
+	forumController.getAllDiscussionForumGlobal
 );
 
 route.get(

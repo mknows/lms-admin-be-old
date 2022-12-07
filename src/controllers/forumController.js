@@ -23,14 +23,15 @@ module.exports = {
 		const { df_id } = req.params;
 		const { slug_query } = req.query;
 
-		let slug_search = null;
 		let id_search = null;
 
-		let slug;
+		// TODO SLUG
+		// let slug_search = null;
+		// let slug;
 
-		if (slug_query) {
-			slug_search = await makeslug(slug_query, false);
-		}
+		// if (slug_query) {
+		// 	slug_search = await makeslug(slug_query, false);
+		// }
 		if (df_id) {
 			id_search = df_id;
 		}
@@ -79,8 +80,9 @@ module.exports = {
 		});
 
 		data = data.dataValues;
-		slug = await makeslug(data.title.toLowerCase(), true);
-		data.slug = slug;
+		// TODO SLUG
+		// slug = await makeslug(data.title.toLowerCase(), true);
+		// data.slug = slug;
 
 		return res.sendJson(200, true, "sucess get discussion forum content", data);
 	}),
@@ -145,6 +147,27 @@ module.exports = {
 			},
 		});
 		return res.sendJson(200, true, "sucess get all discussion forums", data);
+	}),
+	/**
+	 * @desc      Get All Forums
+	 * @route     GET /api/v1/forum/discussionforum/global
+	 * @access    Public
+	 */
+	getAllDiscussionForumGlobal: asyncHandler(async (req, res) => {
+		const data = await DiscussionForum.findAll({
+			where: {
+				session_id: null,
+			},
+			attributes: {
+				include: ["created_at", "updated_at"],
+			},
+		});
+		return res.sendJson(
+			200,
+			true,
+			"sucess get all global discussion forums",
+			data
+		);
 	}),
 	/**
 	 * @desc      Get All Forums in session
