@@ -162,6 +162,7 @@ module.exports = {
 			},
 			attributes: {
 				include: ["created_at", "updated_at"],
+				exclude: ["session_id"],
 			},
 		});
 		return res.sendJson(
