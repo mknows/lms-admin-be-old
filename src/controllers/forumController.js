@@ -162,6 +162,11 @@ module.exports = {
 			},
 			attributes: {
 				include: ["created_at", "updated_at"],
+				exclude: ["session_id"],
+			},
+			include: {
+				model: User,
+				attributes: ["full_name", "display_picture_link"],
 			},
 		});
 		return res.sendJson(
