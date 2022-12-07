@@ -38,15 +38,17 @@ module.exports = {
 
 		let data = await DiscussionForum.findOne({
 			where: {
-				[Op.or]: [
-					{ id: id_search },
-					{
-						title: sequelize.where(
-							sequelize.fn("LOWER", sequelize.col("title")),
-							slug_search
-						),
-					},
-				],
+				// TODO SLUG
+				// [Op.or]: [
+				// 	{ id: id_search },
+				// 	{
+				// 		title: sequelize.where(
+				// 			sequelize.fn("LOWER", sequelize.col("title")),
+				// 			slug_search
+				// 		),
+				// 	},
+				// ],
+				id: id_search,
 			},
 			attributes: { include: ["created_at", "updated_at"] },
 			include: [
