@@ -127,8 +127,6 @@ exports.getLikesReportTest = async (user_id) => {
 		}),
 	]);
 
-	console.log("dadadda");
-
 	result = all_data;
 
 	return result;
@@ -478,6 +476,33 @@ exports.getSessionScore = async (student_id, session_id) => {
 
 exports.getPredicate = async (percent) => {
 	return letterByPercent(percent);
+};
+
+exports.getStudentGPA = async (student_id) => {
+	let result = null;
+
+	const student = await Student.findOne({
+		where: {
+			id: student_id,
+		},
+		include: [
+			{
+				model: Subject,
+				through: {
+					where: {
+						status: FINISHED,
+					},
+				},
+			},
+		],
+	});
+
+	let gpa = parseFloat(
+		(await GPACalculatorFromList(student.Subjects)).toFixed(2)
+	);
+
+	result = gpa;
+	return result;
 };
 
 exports.getReport = async (student_id) => {

@@ -1,4 +1,37 @@
 const { Leaderboard, Student, Lecturer, User } = require("../models");
+const scoringFunctions = require("./scoringFunctions");
+
+exports.updateUserInLeaderboard = async (user_id) => {
+	let result;
+
+	let likes = await scoringFunctions.getLikesReportTest(user_id);
+
+	let total_forum_score = 0;
+	for (let i = 0; i < likes.length; i++) {
+		let currlike = likes[i][0].dataValues;
+
+		let studlike =
+			currlike.n_student_like == null ? 0 : parseInt(currlike.n_student_like);
+
+		let leclike =
+			currlike.n_teacher_like == null ? 0 : parseInt(currlike.n_teacher_like);
+
+		let currscore = await scoringFunctions.getTotalLikesScore(
+			studlike,
+			leclike
+		);
+		total_forum_score += currscore;
+	}
+
+	const student_id = await this.getStudentId(user_id);
+
+	let gpa = await scoringFunctions.getStudentGPA(student_id);
+
+	await this.updateLeaderboardGPA(user_id, gpa);
+	await this.updateLeaderboardForum(user_id, total_forum_score);
+
+	return result;
+};
 
 /**
  * @desc      Update leaderboard
@@ -120,6 +153,24 @@ exports.getUserId = async (role_id, role) => {
 			result = data.user_id;
 			break;
 	}
+	return result;
+};
+
+/**
+ * @desc      get student id of user id
+ * @access    Private
+ */
+exports.getStudentId = async (user_id) => {
+	let result;
+
+	let data = await Student.findOne({
+		where: {
+			user_id: user_id,
+		},
+		attributes: ["id"],
+	});
+
+	result = data.id;
 	return result;
 };
 
