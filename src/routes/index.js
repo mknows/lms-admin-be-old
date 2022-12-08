@@ -23,10 +23,11 @@ const reportRoute = require("./report");
 const previewRoute = require("./preview");
 const leaderboardRoute = require("./leaderboard");
 const facultyRoute = require("./faculty");
-
-const pingRoutes = require("./ping");
+const eventRoute = require("./event");
 const calendarRoute = require("./calendar");
 const jobRoute = require("./job");
+
+const pingRoutes = require("./ping");
 
 //punya ryo
 const administrationRoute = require("./Administration");
@@ -56,5 +57,6 @@ route.use("/preview", previewRoute);
 route.use("/leaderboard", leaderboardRoute);
 route.use("/faculty", facultyRoute);
 route.use("/jobs", jobRoute);
+route.use("/events", eventRoute);
 
 module.exports = route;

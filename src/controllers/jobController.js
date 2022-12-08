@@ -34,10 +34,10 @@ module.exports = {
 		let search_company_query = "%%",
 			search_position_query = "%%",
 			location_query = "%%";
-		if (search_position) {
+		if (position) {
 			search_position_query = "%" + position + "%";
 		}
-		if (search_company) {
+		if (name) {
 			search_company_query = "%" + name + "%";
 		}
 		if (location) {
