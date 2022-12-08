@@ -26,6 +26,7 @@ const facultyRoute = require("./faculty");
 
 const pingRoutes = require("./ping");
 const calendarRoute = require("./calendar");
+const jobRoute = require("./job");
 
 //punya ryo
 const administrationRoute = require("./Administration");
@@ -54,5 +55,6 @@ route.use("/calendar", calendarRoute);
 route.use("/preview", previewRoute);
 route.use("/leaderboard", leaderboardRoute);
 route.use("/faculty", facultyRoute);
+route.use("/jobs", jobRoute);
 
 module.exports = route;

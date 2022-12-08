@@ -1,0 +1,54 @@
+"use strict";
+module.exports = {
+	async up(queryInterface, Sequelize) {
+		await queryInterface.createTable("jobs", {
+			id: {
+				type: Sequelize.UUID,
+				allowNull: false,
+				autoIncrement: true,
+				primaryKey: true,
+			},
+			company_id: {
+				type: Sequelize.UUID,
+			},
+			description: {
+				type: Sequelize.TEXT,
+			},
+			salary: {
+				type: Sequelize.INTEGER,
+			},
+			deadline: {
+				type: Sequelize.DATE,
+			},
+			type: {
+				type: Sequelize.STRING,
+			},
+			position: {
+				type: Sequelize.STRING,
+			},
+			created_at: {
+				allowNull: true,
+				type: Sequelize.DATE,
+			},
+			updated_at: {
+				allowNull: true,
+				type: Sequelize.DATE,
+			},
+			created_by: {
+				allowNull: true,
+				type: Sequelize.UUID,
+			},
+			updated_by: {
+				allowNull: true,
+				type: Sequelize.UUID,
+			},
+			deleted_at: {
+				allowNull: true,
+				type: Sequelize.DATE,
+			},
+		});
+	},
+	async down(queryInterface, Sequelize) {
+		await queryInterface.dropTable("jobs");
+	},
+};

@@ -58,7 +58,10 @@ module.exports = {
 					", " +
 					material_enrolled.type,
 				color:
-					endAt < Date.now()
+					endAt <
+					new Date(
+						new Date().toLocaleString("en", { timeZone: "Asia/Jakarta" })
+					)
 						? "red"
 						: colors[Math.floor(Math.random() * colors.length - 1) + 1],
 				allDay: material_enrolled.created_at === endAt,
