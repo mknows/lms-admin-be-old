@@ -15,6 +15,10 @@ module.exports = {
 		result = await Leaderboard.findAll({
 			limit: 23,
 			order: [["final_score", "DESC"]],
+			include: {
+				model: User,
+				attributes: ["full_name", "display_picture_link", "id"],
+			},
 		});
 
 		return res.sendJson(

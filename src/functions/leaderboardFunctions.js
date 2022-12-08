@@ -208,6 +208,7 @@ async function updateLeaederboardFinalScore(user_id) {
 	});
 
 	let new_final_score = await calculateFinalScore(data.gpa, data.forum_score);
+	new_final_score = parseFloat(new_final_score.toFixed(3)) * 1000;
 
 	data = await Leaderboard.update(
 		{
