@@ -48,9 +48,9 @@ module.exports = {
 					  )
 					: material_enrolled.created_at;
 			schedule.push({
-				startedAt: material_enrolled.created_at,
+				id: material_enrolled.id_referrer,
+				startAt: material_enrolled.created_at,
 				endAt,
-				timezoneStartAt: "Asia/Jakarta",
 				summary:
 					material_enrolled.Session.Subject.name +
 					" Session no. " +
