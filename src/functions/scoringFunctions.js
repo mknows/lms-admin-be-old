@@ -569,6 +569,31 @@ exports.getReport = async (student_id) => {
 	return result;
 };
 
+exports.submitLateQuizAsFail = async (material_enrolled_id) => {};
+
+exports.isQuizLate = async (material_enrolled_id) => {
+	const enroll_data = await MaterialEnrolled.findOne(material_enrolled_id);
+
+	const quiz_id = enroll_data.id_referrer;
+	const quiz = await Quiz.findOne(quiz_id);
+
+	const date_now = new Date();
+
+	var deadline = CalculateDeadline(enroll_data.created_at, quiz.duration);
+	var isLate = isOverDeadline(deadline, date_now);
+
+	return isLate;
+};
+
+async function CalculateDeadline(start, duration) {
+	const deadline = new Date(new Date(start).getTime() + duration * 1000);
+	return deadline;
+}
+
+async function isOverDeadline(deadline, date) {
+	return moment(date).isAfter(deadline) ? true : false;
+}
+
 async function GPACalculatorFromList(subject_list) {
 	let score = 0;
 	let total_cred = 0;
@@ -589,8 +614,6 @@ async function GPACalculatorFromList(subject_list) {
 	let result;
 	result = score / total_cred;
 	result = isNaN(result) ? 0 : result;
-
-	console.log(result);
 
 	return result;
 }

@@ -11,7 +11,7 @@ module.exports = {
 	 */
 	getNotification: asyncHandler(async (req, res) => {
 		const user_id = req.userData.id;
-		console.log(user_id);
+
 		let notification = await Notification.findAll({
 			attributes: {
 				include: ["created_at"],
