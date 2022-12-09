@@ -212,7 +212,6 @@ module.exports = {
 				},
 			},
 		});
-		console.log(date_submitted);
 		return res.sendJson(200, true, "Success", {
 			module: mod,
 			takeaway: takeaway,

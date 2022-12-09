@@ -41,8 +41,6 @@ module.exports = {
 		});
 
 		for (let i = 0; i < students.length; i++) {
-			console.log("bro got the rizz");
-			console.log(students[i]);
 			let user_id = students[i].user_id;
 			await leaderboardFunctions.updateUserInLeaderboard(user_id);
 		}
