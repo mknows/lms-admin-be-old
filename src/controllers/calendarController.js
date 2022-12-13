@@ -11,18 +11,6 @@ module.exports = {
 	 **/
 	getAllSchedule: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
-		const colors = [
-			"indigo",
-			"blue",
-			"orange",
-			"pink",
-			"crimson",
-			"dodgerblue",
-			"brown",
-			"purple",
-			"salmon",
-			"gray",
-		];
 		let schedule = [];
 		const all_activities = await MaterialEnrolled.findAll({
 			attributes: ["created_at", "type", "id_referrer"],
@@ -58,12 +46,11 @@ module.exports = {
 					", " +
 					material_enrolled.type,
 				color:
-					endAt <
-					new Date(
-						new Date().toLocaleString("en", { timeZone: "Asia/Jakarta" })
-					)
-						? "red"
-						: colors[Math.floor(Math.random() * colors.length - 1) + 1],
+					material_enrolled.type === "ASSIGNMENT"
+						? "indigo"
+						: material_enrolled.type === "QUIZ"
+						? "dodgerblue"
+						: "indigo",
 				allDay: material_enrolled.created_at === endAt,
 			});
 		}
