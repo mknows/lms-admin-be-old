@@ -26,7 +26,11 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: "student_id",
 			});
 			this.belongsTo(models.Lecturer, {
-				foreignKey: 'supervisor_id'
+				foreignKey: "supervisor_id",
+			});
+			this.belongsToMany(models.Event, {
+				through: models.StudentEvent,
+				foreignKey: "student_id",
 			});
 		}
 	}
@@ -34,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
 	Student.init(
 		{
 			id: {
-				type: DataTypes.UUID,		
+				type: DataTypes.UUID,
 				primaryKey: true,
 				defaultValue: sequelize.literal("gen_random_uuid()"),
 			},

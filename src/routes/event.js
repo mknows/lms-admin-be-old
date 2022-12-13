@@ -5,6 +5,12 @@ const eventController = require("../controllers/eventController");
 const { protection, authorize } = require("../middlewares/Authentication");
 
 route.get("/all", eventController.getAllSchedule);
+route.get(
+	"/student",
+	protection,
+	authorize("student"),
+	eventController.getStudentsEvent
+);
 route.post(
 	"/join/:event_id",
 	protection,

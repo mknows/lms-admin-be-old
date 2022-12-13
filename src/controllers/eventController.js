@@ -68,4 +68,46 @@ module.exports = {
 
 		return res.sendJson(200, true, "Success", event);
 	}),
+	/**
+	 * @desc      Participate the event
+	 * @route     GET /api/v1/events/student
+	 * @access    Private
+	 **/
+	getStudentsEvent: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
+
+		const student_event = await Promise.all([
+			await Student.findOne({
+				where: {
+					id: student_id,
+				},
+				include: {
+					model: Event,
+					through: {
+						where: {
+							status: "ONGOING",
+						},
+					},
+				},
+			}),
+			await Student.findOne({
+				where: {
+					id: student_id,
+				},
+				include: {
+					model: Event,
+					through: {
+						where: {
+							status: "FINISHED",
+						},
+					},
+				},
+			}),
+		]);
+		let result = {
+			ongoing: student_event[0],
+			finished: student_event[1],
+		};
+		return res.sendJson(200, true, "Success", result);
+	}),
 };
