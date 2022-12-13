@@ -1,4 +1,4 @@
-const { body, validationResult } = require("express-validator");
+const { body, validationResult, param } = require("express-validator");
 
 exports.validate = (method) => {
 	switch (method) {
@@ -181,6 +181,22 @@ exports.validate = (method) => {
 				body("student_id", "student_id is invalid").notEmpty().trim(),
 				body("subject_id", "subject_id is invalid").notEmpty().trim(),
 				body("id_certificate", "id_certificate is invalid").notEmpty().trim(),
+			];
+		}
+
+		case "createMeetingStudent": {
+			return [
+				body("time", "time is invalid").notEmpty(),
+				body("topic", "topic is invalid").notEmpty().trim(),
+				body("description", "description is invalid").notEmpty().trim(),
+				body("place", "place is invalid").notEmpty().trim(),
+			];
+		}
+
+		case "accMeetingByAssessor": {
+			return [
+				body("status", "status bool is invalid").notEmpty().trim().isBoolean(),
+				param("id", "id params is invalid").notEmpty().trim().isUUID(),
 			];
 		}
 	}

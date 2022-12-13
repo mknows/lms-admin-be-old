@@ -23,10 +23,13 @@ module.exports = {
 				type: Sequelize.STRING,
 			},
 			user_id: {
-				type: Sequelize.ARRAY(Sequelize.UUID),
+				type: Sequelize.UUID,
 			},
 			assessor_id: {
 				type: Sequelize.UUID,
+			},
+			status: {
+				type: Sequelize.BOOLEAN,
 			},
 			score: {
 				type: Sequelize.FLOAT,

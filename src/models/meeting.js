@@ -23,14 +23,15 @@ module.exports = (sequelize, DataTypes) => {
 			place: DataTypes.STRING,
 			topic: DataTypes.STRING,
 			description: DataTypes.STRING,
-			user_id: DataTypes.ARRAY(DataTypes.UUID),
+			user_id: DataTypes.UUID,
 			assessor_id: DataTypes.UUID,
+			status: DataTypes.BOOLEAN,
 			score: DataTypes.FLOAT,
 			score_description: DataTypes.STRING,
 		},
 		{
 			sequelize,
-			tableName: "Meeting",
+			tableName: "Meetings",
 		}
 	);
 	return Meeting;
