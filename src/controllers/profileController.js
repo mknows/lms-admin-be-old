@@ -1,8 +1,21 @@
-const { User, Student, Subject, Certificate } = require("../models");
+const {
+	User,
+	Student,
+	Subject,
+	Certificate,
+	StudentSubject,
+	MaterialEnrolled,
+	Session,
+	Assignment,
+	DiscussionForum,
+	Comment,
+	Reply,
+} = require("../models");
+const moment = require("moment");
 const { getAuth: getClientAuth, updateProfile } = require("firebase/auth");
 const Sequelize = require("sequelize");
 require("dotenv").config();
-const { FINISHED, ONGOING } = process.env;
+const { FINISHED, ONGOING, PENDING } = process.env;
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("express-async-handler");
 const {
@@ -73,6 +86,7 @@ module.exports = {
 	 */
 	achievements: asyncHandler(async (req, res) => {
 		let student_id = req.student_id;
+		let user_id = req.userData.id;
 		let finished_subjects = 0;
 		let subjects_taken = 0;
 
@@ -116,11 +130,134 @@ module.exports = {
 				student_id,
 			},
 		});
-		return res.sendJson(200, true, "success update profile", {
+
+		const agenda = await Promise.all([
+			await StudentSubject.findAll({
+				attributes: ["subject_id"],
+				where: {
+					student_id: student_id,
+					status: PENDING,
+				},
+				include: {
+					model: Subject,
+					attributes: ["name", "credit", "subject_code"],
+				},
+				order: ["created_at"],
+			}),
+			await MaterialEnrolled.findOne({
+				where: {
+					student_id,
+				},
+				attributes: ["updated_at"],
+				include: {
+					model: Subject,
+					attributes: ["name"],
+				},
+				order: [["updated_at"]],
+			}),
+			await Certificate.findOne({
+				attributes: ["created_at", "file", "link"],
+				where: {
+					student_id,
+				},
+				include: {
+					model: Subject,
+					as: "subject",
+					attributes: ["name", "credit"],
+				},
+				order: [["created_at", "DESC"]],
+			}),
+			await MaterialEnrolled.findAll({
+				attributes: ["created_at"],
+				where: {
+					student_id,
+					type: "ASSIGNMENT",
+					status: "ONGOING",
+				},
+				include: [
+					{
+						model: Subject,
+						attributes: ["name"],
+					},
+					{
+						model: Session,
+						attributes: ["session_no"],
+					},
+					{
+						model: Assignment,
+						attributes: ["duration"],
+					},
+				],
+			}),
+
+			await Student.findOne({
+				where: {
+					id: student_id,
+				},
+				include: {
+					model: Session,
+					include: [
+						{
+							model: DiscussionForum,
+							include: [
+								{
+									model: Comment,
+									where: {
+										author_id: user_id,
+									},
+									required: false,
+								},
+								{
+									model: Reply,
+									where: {
+										author_id: user_id,
+									},
+									required: false,
+								},
+							],
+						},
+						{
+							model: Subject,
+							attributes: ["name"],
+						},
+					],
+				},
+			}),
+		]);
+		let uncommented_sessions = [];
+		agenda[4].Sessions.forEach((session) => {
+			session.DiscussionForums.forEach((df) => {
+				if (df.Comments.length === 0 && df.Replies.length === 0) {
+					uncommented_sessions.push({
+						session_no: session.session_no,
+						subject: session.Subject.name,
+						df_id: df.id,
+					});
+				}
+			});
+		});
+		let undone_assignment = [];
+		for (let i = 0; i < agenda[3].length; i++) {
+			const deadline = new Date(
+				new Date(agenda[3][i].created_at).getTime() +
+					agenda[3][i].Assignment.duration * 1000
+			);
+			agenda[3][i].deadline = moment(deadline).format("DD/MM/YYYY hh:mm:ss");
+			undone_assignment.push({
+				deadline: moment(deadline).format("DD/MM/YYYY hh:mm:ss"),
+				assignment_info: agenda[3][i],
+			});
+		}
+		return res.sendJson(200, true, "success get achievement", {
 			finished_subjects: finished_subjects,
 			subject_taken: subjects_taken,
 			students_certificate: students_certificate.length,
 			subjects_enrolled: subjects,
+			plans_not_accepted: agenda[0],
+			least_opened_subject: agenda[1],
+			newest_cert: agenda[2],
+			undone_assignment: undone_assignment,
+			discussion_uncommented: uncommented_sessions,
 		});
 	}),
 
