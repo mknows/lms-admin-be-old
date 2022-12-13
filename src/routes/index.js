@@ -26,6 +26,7 @@ const facultyRoute = require("./faculty");
 const eventRoute = require("./event");
 const calendarRoute = require("./calendar");
 const jobRoute = require("./job");
+const meetingRoute = require("./meeting");
 
 const pingRoutes = require("./ping");
 
@@ -58,5 +59,6 @@ route.use("/leaderboard", leaderboardRoute);
 route.use("/faculty", facultyRoute);
 route.use("/jobs", jobRoute);
 route.use("/events", eventRoute);
+route.use("/meeting", meetingRoute);
 
 module.exports = route;
