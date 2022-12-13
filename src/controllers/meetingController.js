@@ -8,7 +8,8 @@ module.exports = {
 	 * @access    Private
 	 */
 	createMeeting: asyncHandler(async (req, res) => {
-		const { meeting_type, time, place, topic, description } = req.body;
+		const { meeting_type, time, place, topic, description, assessor_id } =
+			req.body;
 		const user = req.userData;
 
 		const data = await Meeting.create({
@@ -18,6 +19,7 @@ module.exports = {
 			place,
 			topic,
 			description,
+			assessor_id,
 			status: false,
 		});
 
@@ -78,20 +80,26 @@ module.exports = {
 		const { status } = req.body;
 		const user = req.userData;
 
-		const checkData = await Meeting.findOne({
+		const checkDataUser = await Meeting.findOne({
 			where: {
 				id,
 			},
 		});
-
+		if (!checkDataUser) {
+			return res.sendJson(404, false, "data meeting not found");
+		}
 		const student = await User.findOne({
 			where: {
-				id: checkData.user_id,
+				id: checkDataUser.user_id,
 			},
 		});
 
-		if (!checkData) {
-			return res.sendJson(404, false, "data meeting not found");
+		if (checkDataUser.dataValues.assessor_id != user.id) {
+			return res.sendJson(
+				403,
+				false,
+				`sorry you're not assessor student ${student.full_name}}`
+			);
 		}
 
 		const data = await Meeting.update(
@@ -109,7 +117,10 @@ module.exports = {
 			200,
 			true,
 			`success update meeting by assessor ${user.full_name} with student ${student.full_name}`,
-			{ result: data == 1 ? "acc | TRUE" : "reject | FALSE" }
+			{
+				time: checkDataUser.time,
+				result: data == 1 ? "acc | TRUE" : "reject | FALSE",
+			}
 		);
 	}),
 };
