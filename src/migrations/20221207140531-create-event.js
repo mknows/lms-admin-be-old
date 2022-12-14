@@ -22,8 +22,23 @@ module.exports = {
 			registration_closed: {
 				type: Sequelize.DATE,
 			},
+			capacity: {
+				type: Sequelize.INTEGER,
+			},
+			price: {
+				type: Sequelize.INTEGER,
+			},
+			type: {
+				type: Sequelize.STRING,
+			},
+			material: {
+				type: Sequelize.ARRAY(Sequelize.STRING),
+			},
 			description: {
 				type: Sequelize.TEXT,
+			},
+			speaker_details: {
+				type: Sequelize.JSON,
 			},
 			created_at: {
 				allowNull: true,

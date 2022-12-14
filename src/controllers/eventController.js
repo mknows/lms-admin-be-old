@@ -18,10 +18,11 @@ module.exports = {
 	 * @route     POST /api/v1/events/all?page=(number)&limit=(number)
 	 * @access    Private
 	 **/
-	getAllSchedule: asyncHandler(async (req, res) => {
+	getAllEvents: asyncHandler(async (req, res) => {
 		const { page, limit } = req.query;
 
 		let events = await Event.findAll({
+			attributes: ["date_start", "name", "thumbnail", "price", "id"],
 			where: {
 				registration_closed: {
 					[Op.gte]: moment().toDate(),
@@ -30,6 +31,24 @@ module.exports = {
 		});
 		events = await pagination(events, page, limit);
 		return res.sendJson(200, true, "Success", events);
+	}),
+	/**
+	 * @desc      Get all events
+	 * @route     POST /api/v1/events/event/:id
+	 * @access    Private
+	 **/
+	getEvent: asyncHandler(async (req, res) => {
+		const { id } = req.params;
+
+		let event = await Event.findOne({
+			where: {
+				id,
+				registration_closed: {
+					[Op.gte]: moment().toDate(),
+				},
+			},
+		});
+		return res.sendJson(200, true, "Success", event);
 	}),
 	/**
 	 * @desc      Participate the event
@@ -77,7 +96,7 @@ module.exports = {
 		const student_id = req.student_id;
 
 		const student_event = await Promise.all([
-			await Student.findOne({
+			await Student.findAll({
 				where: {
 					id: student_id,
 				},
@@ -90,7 +109,7 @@ module.exports = {
 					},
 				},
 			}),
-			await Student.findOne({
+			await Student.findAll({
 				where: {
 					id: student_id,
 				},

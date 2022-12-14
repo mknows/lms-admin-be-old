@@ -10,8 +10,8 @@ module.exports = {
 			company_id: {
 				type: Sequelize.UUID,
 			},
-			description: {
-				type: Sequelize.TEXT,
+			requirements: {
+				type: Sequelize.ARRAY(Sequelize.STRING),
 			},
 			salary: {
 				type: Sequelize.INTEGER,
@@ -23,6 +23,15 @@ module.exports = {
 				type: Sequelize.STRING,
 			},
 			position: {
+				type: Sequelize.STRING,
+			},
+			work_days: {
+				type: Sequelize.STRING,
+			},
+			work_hour: {
+				type: Sequelize.STRING,
+			},
+			url: {
 				type: Sequelize.STRING,
 			},
 			created_at: {
