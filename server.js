@@ -21,7 +21,7 @@ const initializeFirebase = require("./src/config/firebaseConnection");
 const errorHandler = require("./src/middlewares/Error");
 const fs = require("fs");
 require("./src/helpers/redis");
-require("./src/helpers/loggingGcp");
+// require("./src/helpers/loggingGcp");
 
 const app = express();
 

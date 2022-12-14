@@ -1,21 +1,44 @@
-const { Meeting, User } = require("../models");
+const { Meeting, User, Student } = require("../models");
 const asyncHandler = require("express-async-handler");
+const Sequelize = require("sequelize");
 
 module.exports = {
 	/**
-	 * @desc      create new meeting student and assessor
+	 * @desc      create new meeting by Assessor for student
 	 * @route     POST /api/v1/meeting/create
-	 * @access    Private
+	 * @access    Private (Assessor)
 	 */
-	createMeeting: asyncHandler(async (req, res) => {
-		const { meeting_type, time, place, topic, description, assessor_id } =
-			req.body;
+	createMeetingByAssessor: asyncHandler(async (req, res) => {
+		const {
+			student_id,
+			meeting_type,
+			place,
+			topic,
+			description,
+			assessor_id,
+			time,
+		} = req.body;
 		const user = req.userData;
 
+		const findStudent = await Student.findOne({
+			where: {
+				id: student_id,
+			},
+		});
+
+		if (!findStudent) {
+			return res.sendJson(404, "student not found");
+		}
+
+		const profileStudent = await User.findOne({
+			where: {
+				id: findStudent.user_id,
+			},
+		});
+
 		const data = await Meeting.create({
-			user_id: user.id,
+			student_id,
 			meeting_type,
-			time,
 			place,
 			topic,
 			description,
@@ -23,22 +46,55 @@ module.exports = {
 			status: false,
 		});
 
-		return res.sendJson(201, "success create data", data);
+		for (times of time) {
+			await Meeting.update(
+				{
+					time: Sequelize.fn("array_append", Sequelize.col("time"), times),
+				},
+				{
+					where: {
+						id: data.id,
+					},
+				}
+			);
+		}
+
+		delete data.dataValues.time;
+		delete data.dataValues.updated_at;
+		delete data.dataValues.created_at;
+		delete data.dataValues.deleted_at;
+
+		return res.sendJson(
+			201,
+			true,
+			`success request time by assessor/lecturer : ${user.full_name} for student : ${profileStudent.full_name}`,
+			{
+				lecturer_name: user.full_name,
+				student_name: profileStudent.full_name,
+				...data.dataValues,
+				time,
+			}
+		);
 	}),
 
 	/**
 	 * @desc      get all meeting by student
 	 * @route     GET /api/v1/meeting/
-	 * @access    Private
+	 * @access    Private (student)
 	 */
 	getAllMeetingByStudent: asyncHandler(async (req, res) => {
 		const user = req.userData;
+		const student_id = req.student_id;
 
 		const data = await Meeting.findAll({
 			where: {
-				user_id: user.id,
+				student_id: student_id,
 			},
 		});
+
+		if (data.length === 0) {
+			return res.sendJson(200, true, "there are no data meeting", null);
+		}
 
 		return res.sendJson(
 			200,
@@ -51,7 +107,7 @@ module.exports = {
 	/**
 	 * @desc      show data by id
 	 * @route     GET /api/v1/meeting/:id
-	 * @access    Private
+	 * @access    Private (student)
 	 */
 	showDataById: asyncHandler(async (req, res) => {
 		const { id } = req.params;
@@ -73,12 +129,13 @@ module.exports = {
 	/**
 	 * @desc      acc meeting by assessor for stuent, must login by lecturer
 	 * @route     PUT /api/v1/meeting/assessor/:id
-	 * @access    Private
+	 * @access    Private (student)
 	 */
-	accMeetingByAssessor: asyncHandler(async (req, res) => {
+	accMeetingByStudent: asyncHandler(async (req, res) => {
 		const { id } = req.params;
-		const { status } = req.body;
+		const { status, time } = req.body;
 		const user = req.userData;
+		const student_id = req.student_id;
 
 		const checkDataUser = await Meeting.findOne({
 			where: {
