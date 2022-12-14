@@ -109,7 +109,7 @@ module.exports = {
 	 * @route     GET /api/v1/meeting/:id
 	 * @access    Private (student)
 	 */
-	showDataById: asyncHandler(async (req, res) => {
+	getMeetingById: asyncHandler(async (req, res) => {
 		const { id } = req.params;
 		const user = req.userData;
 
@@ -133,35 +133,67 @@ module.exports = {
 	 */
 	accMeetingByStudent: asyncHandler(async (req, res) => {
 		const { id } = req.params;
-		const { status, time } = req.body;
+		const { time } = req.body;
 		const user = req.userData;
 		const student_id = req.student_id;
 
-		const checkDataUser = await Meeting.findOne({
+		const dataMeeting = await Meeting.findOne({
 			where: {
 				id,
 			},
 		});
-		if (!checkDataUser) {
+		if (!dataMeeting) {
 			return res.sendJson(404, false, "data meeting not found");
 		}
 		const student = await User.findOne({
 			where: {
-				id: checkDataUser.user_id,
+				id: user.id,
+			},
+		});
+		const assessorName = await User.findOne({
+			where: {
+				id: dataMeeting.assessor_id,
 			},
 		});
 
-		if (checkDataUser.dataValues.assessor_id != user.id) {
+		if (dataMeeting.dataValues.student_id != student_id) {
 			return res.sendJson(
 				403,
 				false,
-				`sorry you're not assessor student ${student.full_name}}`
+				`sorry ${student.full_name} you're not student for meeting with lecturer ${assessorName.full_name}`,
+				null
+			);
+		}
+
+		const timeToDate = new Date(time);
+		const timeToEpoch = timeToDate.getTime();
+
+		const times = dataMeeting.dataValues.time;
+
+		const convertToEpochTimes = times.map((item) => {
+			const convert = new Date(item);
+			return convert.getTime();
+		});
+
+		const filterDate = convertToEpochTimes.filter((item) => {
+			console.log(item, timeToEpoch);
+			if (item == timeToEpoch) {
+				return item;
+			}
+		});
+
+		if (filterDate.length === 0) {
+			return res.sendJson(
+				403,
+				false,
+				`sorry student ${student.full_name} please pick your request time meeting with lecturer ${assessorName.full_name}`
 			);
 		}
 
 		const data = await Meeting.update(
 			{
-				status,
+				status: true,
+				pick_time: time,
 			},
 			{
 				where: {
@@ -173,9 +205,11 @@ module.exports = {
 		return res.sendJson(
 			200,
 			true,
-			`success update meeting by assessor ${user.full_name} with student ${student.full_name}`,
+			`success pick time meeting by Lecturer ${assessorName.full_name} with student ${student.full_name}, lecturer will craeate zoom/google meeting`,
 			{
-				time: checkDataUser.time,
+				lecturer_name: assessorName.full_name,
+				student_name: student.full_name,
+				time,
 				result: data == 1 ? "acc | TRUE" : "reject | FALSE",
 			}
 		);
