@@ -199,9 +199,14 @@ exports.validate = (method) => {
 
 		case "accMeetingByStudent": {
 			return [
-				body("status", "status bool is invalid").notEmpty().trim().isBoolean(),
-				param("id", "id params is invalid").notEmpty().trim().isUUID(),
-				body("time", "time is invalid in array").notEmpty(),
+				param("id", "id params uuid is invalid").notEmpty().trim().isUUID(),
+				body("time", "time is invalid").notEmpty(),
+			];
+		}
+
+		case "getMeetingById": {
+			return [
+				param("id", "id params uuid is invalid").notEmpty().trim().isUUID(),
 			];
 		}
 	}

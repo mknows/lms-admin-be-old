@@ -21,6 +21,13 @@ route.get(
 	meetingController.getAllMeetingByStudent
 );
 
+route.get(
+	"/:id",
+	protection,
+	authorize("student"),
+	meetingController.getMeetingById
+);
+
 route.put(
 	"/assessor/:id",
 	protection,
