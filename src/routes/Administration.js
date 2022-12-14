@@ -76,6 +76,22 @@ route.put(
 	administrationController.degreeAdministration
 );
 
+route.put(
+	"/all",
+	protection,
+	authorize("user"),
+	upload.fields([
+		{ name: "integrity_pact", maxCount: 1 },
+		{ name: "nin_card", maxCount: 1 },
+		{ name: "family_card", maxCount: 1 },
+		{ name: "certificate", maxCount: 1 },
+		{ name: "photo", maxCount: 1 },
+		{ name: "transcript", maxCount: 1 },
+		{ name: "recommendation_letter", maxCount: 1 },
+	]),
+	administrationController.updateAllDataAdministration
+);
+
 route.delete(
 	"/delete/file",
 	protection,
