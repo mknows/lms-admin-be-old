@@ -1347,7 +1347,7 @@ const createLinkFirebaseRecommendationLetter = (file, id) => {
 	});
 };
 
-const checkIfExistFirebase = async (res, data) => {
+const checkIfExistFirebase = async (data) => {
 	const storage = getStorage();
 	if (data) {
 		await deleteObject(ref(storage, data))
@@ -1355,11 +1355,7 @@ const checkIfExistFirebase = async (res, data) => {
 				console.log("success deleteObject");
 			})
 			.catch(() => {
-				return res.sendJson(
-					400,
-					false,
-					"failed deleteObject, maybe file was deleted"
-				);
+				console.log("file maybe was deleted");
 			});
 	}
 };
