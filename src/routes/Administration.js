@@ -62,8 +62,11 @@ route.put(
 		{ name: "family_card", maxCount: 1 },
 		{ name: "certificate", maxCount: 1 },
 		{ name: "photo", maxCount: 1 },
-		{ name: "transcript", maxCount: 1 },
+		{ name: "last_certificate_diploma", maxCount: 1 },
+		{ name: "parent_statement", maxCount: 1 },
+		// ?optional
 		{ name: "recommendation_letter", maxCount: 1 },
+		{ name: "transcript", maxCount: 1 },
 	]),
 	administrationController.filesAdministration
 );
@@ -88,6 +91,8 @@ route.put(
 		{ name: "photo", maxCount: 1 },
 		{ name: "transcript", maxCount: 1 },
 		{ name: "recommendation_letter", maxCount: 1 },
+		{ name: "last_certificate_diploma", maxCount: 1 },
+		{ name: "parent_statement", maxCount: 1 },
 	]),
 	administrationController.updateAllDataAdministration
 );
