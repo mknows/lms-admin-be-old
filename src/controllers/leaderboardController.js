@@ -17,7 +17,11 @@ module.exports = {
 			order: [["final_score", "DESC"]],
 			include: {
 				model: User,
-				attributes: ["full_name", "display_picture_link", "id"],
+				attributes: ["full_name", "display_picture_link", "id", "username"],
+				include: {
+					model: Student,
+					attributes: ["semester"],
+				},
 			},
 		});
 

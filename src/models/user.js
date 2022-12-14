@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
 			this.hasMany(models.Reply, { foreignKey: "author_id" });
 			this.hasOne(models.Administration, { foreignKey: "user_id" });
 			this.hasOne(models.Leaderboard, { foreignKey: "user_id" });
+			this.hasOne(models.Student, { foreignKey: "user_id" });
 		}
 	}
 	User.init(
