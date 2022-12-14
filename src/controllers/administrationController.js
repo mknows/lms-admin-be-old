@@ -75,6 +75,7 @@ module.exports = {
 			ret_data
 		);
 	}),
+
 	/**
 	 * @desc      Insert Administration for self data
 	 * @route     PUT /api/v1/administration/biodata
@@ -161,6 +162,7 @@ module.exports = {
 			ret_data
 		);
 	}),
+
 	/**
 	 * @desc      Insert Administration for familial data
 	 * @route     PUS /api/v1/administration/familial
@@ -259,7 +261,7 @@ module.exports = {
 			},
 			include: User,
 		});
-		const administration_id = data.id
+		const administration_id = data.id;
 
 		if (!data) {
 			return res.sendJson(400, false, "invalid administration user data", {});
@@ -497,6 +499,7 @@ module.exports = {
 	 * @route     PUT /api/v1/administrations/degree
 	 * @access    Private (User)
 	 */
+
 	degreeAdministration: asyncHandler(async (req, res, next) => {
 		const user = req.userData;
 		const { degree } = req.body;
@@ -546,6 +549,306 @@ module.exports = {
 			"Successfully created administration with degree",
 			ret_data
 		);
+	}),
+
+	/**
+	 * @desc      update all administration data if exist
+	 * @route     PUT /api/v1/administrations/all
+	 * @access    Private (User)
+	 */
+	updateAllDataAdministration: asyncHandler(async (req, res, next) => {
+		const user = req.userData;
+		const {
+			// biodata
+			full_name,
+			email,
+			nin,
+			study_program,
+			semester,
+			nin_address,
+			residence_address,
+			birth_place,
+			birth_date,
+			phone,
+			gender,
+			nsn,
+			university_of_origin,
+
+			// familial
+			father_name,
+			father_occupation,
+			father_income,
+			mother_name,
+			mother_occupation,
+			mother_income,
+			occupation,
+			income,
+			living_partner,
+			financier,
+		} = req.body;
+
+		const bucket = admin.storage().bucket();
+
+		const dataAdministration = await Administration.findOne({
+			where: {
+				user_id: user.id,
+			},
+			include: User,
+		});
+
+		if (!dataAdministration) {
+			return res.sendJson(400, false, "invalid administration id", {});
+		}
+
+		const eligible = await checkAdminDataAprooved("all", dataAdministration.id);
+
+		if (eligible.status === false) {
+			return res.sendJson(400, false, eligible.message, {});
+		}
+
+		const administration_id = dataAdministration.id;
+
+		const data = await Administration.update(
+			{
+				// biodata
+				full_name,
+				email,
+				nin,
+				study_program,
+				semester,
+				nin_address,
+				residence_address,
+				birth_place,
+				birth_date,
+				phone,
+				gender,
+				nsn,
+				university_of_origin,
+
+				// familial
+				father_name,
+				father_occupation,
+				father_income,
+				mother_name,
+				mother_occupation,
+				mother_income,
+
+				occupation,
+				income,
+				living_partner,
+				financier,
+
+				updated_by: user.id,
+			},
+			{
+				where: {
+					id: administration_id,
+				},
+				include: User,
+				returning: true,
+				plain: true,
+			}
+		);
+		// update file if exist
+		// file integrity pact
+		if (req.files.integrity_pact) {
+			checkIfExistFirebase(dataAdministration.integrity_pact);
+
+			const integrityPactFile = nameFile(req.files.integrity_pact);
+			const integrityPactBuffer = req.files.integrity_pact[0].buffer;
+
+			bucket
+				.file(integrityPactFile)
+				.createWriteStream()
+				.end(integrityPactBuffer)
+				.on("finish", () => {
+					createLinkFirebaseIntegrityPact(integrityPactFile, administration_id);
+				});
+			await Administration.update(
+				{
+					integrity_pact: integrityPactFile,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+		// file ktp
+		if (req.files.nin_card) {
+			checkIfExistFirebase(dataAdministration.nin_card);
+
+			const ninCardFile = nameFile(req.files.nin_card);
+			const ninCardBuffer = req.files.nin_card[0].buffer;
+
+			bucket
+				.file(ninCardFile)
+				.createWriteStream()
+				.end(ninCardBuffer)
+				.on("finish", () => {
+					createLinkFirebaseNinCard(ninCardFile, administration_id);
+				});
+
+			await Administration.update(
+				{
+					nin_card: ninCardFile,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+		// file recommendation letter
+		if (req.files.recommendation_letter) {
+			checkIfExistFirebase(dataAdministration.recommendation_letter);
+
+			const recommendationLetterFile = nameFile(
+				req.files.recommendation_letter
+			);
+			const recommendationLetterBuffer =
+				req.files.recommendation_letter[0].buffer;
+
+			bucket
+				.file(recommendationLetterFile)
+				.createWriteStream()
+				.end(recommendationLetterBuffer)
+				.on("finish", () => {
+					createLinkFirebaseRecommendationLetter(
+						recommendationLetterFile,
+						administration_id
+					);
+				});
+
+			await Administration.update(
+				{
+					recommendation_letter: recommendationLetterFile,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+		// file transcript
+		if (req.files.transcript) {
+			checkIfExistFirebase(dataAdministration.transcript);
+
+			const transcriptFile = nameFile(req.files.transcript);
+			const transcriptBuffer = req.files.transcript[0].buffer;
+
+			bucket
+				.file(transcriptFile)
+				.createWriteStream()
+				.end(transcriptBuffer)
+				.on("finish", () => {
+					createLinkFirebaseTranscript(transcriptFile, administration_id);
+				});
+
+			await Administration.update(
+				{
+					updated_by: user.id,
+					transcript: transcriptFile,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+		// file family card
+		if (req.files.family_card) {
+			checkIfExistFirebase(dataAdministration.family_card);
+
+			const familyCardFile = nameFile(req.files.family_card);
+			const familyCardBuffer = req.files.family_card[0].buffer;
+
+			bucket
+				.file(familyCardFile)
+				.createWriteStream()
+				.end(familyCardBuffer)
+				.on("finish", () => {
+					createLinkFirebaseFamilyCard(familyCardFile, administration_id);
+				});
+
+			await Administration.update(
+				{
+					family_card: familyCardFile,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+		// file certificate
+		if (req.files.certificate) {
+			checkIfExistFirebase(dataAdministration.certificate);
+
+			const certificateFile = nameFile(req.files.certificate);
+			const certificateBuffer = req.files.certificate[0].buffer;
+
+			bucket
+				.file(certificateFile)
+				.createWriteStream()
+				.end(certificateBuffer)
+				.on("finish", () => {
+					createLinkFirebaseCertificate(certificateFile, administration_id);
+				});
+
+			await Administration.update(
+				{
+					certificate: certificateFile,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+		// file photo
+		if (req.files.photo) {
+			checkIfExistFirebase(dataAdministration.photo);
+
+			const photoFile = nameFile(req.files.photo);
+			const photoBuffer = req.files.photo[0].buffer;
+
+			bucket
+				.file(photoFile)
+				.createWriteStream()
+				.end(photoBuffer)
+				.on("finish", () => {
+					createLinkFirebasePhoto(photoFile, administration_id);
+				});
+
+			await Administration.update(
+				{
+					photo: photoFile,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+
+		return res.sendJson(200, true, "update last data administration success", {
+			administration: data,
+		});
 	}),
 
 	/**
