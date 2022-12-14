@@ -11,7 +11,7 @@ module.exports = {
 				type: Sequelize.STRING,
 			},
 			time: {
-				type: Sequelize.DATE,
+				type: Sequelize.ARRAY(Sequelize.DATE),
 			},
 			place: {
 				type: Sequelize.STRING,
@@ -22,7 +22,7 @@ module.exports = {
 			description: {
 				type: Sequelize.STRING,
 			},
-			user_id: {
+			student_id: {
 				type: Sequelize.UUID,
 			},
 			assessor_id: {
@@ -31,6 +31,9 @@ module.exports = {
 			status: {
 				type: Sequelize.BOOLEAN,
 			},
+			pick_time: {
+				type: Sequelize.DATE,
+			},
 			score: {
 				type: Sequelize.FLOAT,
 			},
@@ -38,12 +41,14 @@ module.exports = {
 				type: Sequelize.STRING,
 			},
 			created_at: {
+				type: "TIMESTAMP",
+				defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
 				allowNull: false,
-				type: Sequelize.DATE,
 			},
 			updated_at: {
+				type: "TIMESTAMP",
+				defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
 				allowNull: false,
-				type: Sequelize.DATE,
 			},
 			deleted_at: {
 				allowNull: true,

@@ -64,6 +64,7 @@ exports.protection = asyncHandler(async (req, res, next) => {
 exports.authorize = (...roles) => {
 	return asyncHandler(async (req, res, next) => {
 		let student_id;
+		let lecturer_id;
 
 		if (req?.userData === undefined) {
 			req.student_id = null;
@@ -80,7 +81,10 @@ exports.authorize = (...roles) => {
 			let userRoles = [];
 
 			if (values[0] !== null) userRoles.push("user");
-			if (values[1] !== null) userRoles.push("lecturer");
+			if (values[1] !== null) {
+				userRoles.push("lecturer");
+				lecturer_id = values[1].id;
+			}
 			if (values[2] !== null) {
 				userRoles.push("student");
 				student_id = values[2].id;
@@ -104,6 +108,7 @@ exports.authorize = (...roles) => {
 			);
 		}
 
+		req.lecturer_id = lecturer_id;
 		req.student_id = student_id;
 		req.role = role;
 		next();
