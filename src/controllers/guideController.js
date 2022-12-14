@@ -44,7 +44,7 @@ module.exports = {
 	 * @access    Public
 	 */
 	getAllGlossaries: asyncHandler(async (req, res) => {
-		let { page, limit, search } = req.query;
+		let { page, limit, search, type } = req.query;
 
 		let search_query = "%%";
 
@@ -52,10 +52,14 @@ module.exports = {
 			search_query = "%" + search + "%";
 		}
 
+		if (!type) {
+			type = ["application", "material"];
+		}
 		let glossaries = await Glossary.findAll({
-			attributes: ["id", "word"],
+			attributes: ["id", "word", "definition"],
 			where: {
 				word: { [Op.iLike]: search_query },
+				type,
 			},
 		});
 		glossaries = await pagination(glossaries, page, limit);
