@@ -28,6 +28,7 @@ const calendarRoute = require("./calendar");
 const jobRoute = require("./job");
 const meetingRoute = require("./meeting");
 const serviceRoute = require("./services");
+const careerRoute = require("./career");
 
 const pingRoutes = require("./ping");
 
@@ -62,5 +63,6 @@ route.use("/jobs", jobRoute);
 route.use("/events", eventRoute);
 route.use("/meeting", meetingRoute);
 route.use("/services", serviceRoute);
+route.use("/career", careerRoute);
 
 module.exports = route;
