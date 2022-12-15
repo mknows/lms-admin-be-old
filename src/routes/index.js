@@ -27,6 +27,7 @@ const eventRoute = require("./event");
 const calendarRoute = require("./calendar");
 const jobRoute = require("./job");
 const meetingRoute = require("./meeting");
+const serviceRoute = require("./services");
 
 const pingRoutes = require("./ping");
 
@@ -60,5 +61,6 @@ route.use("/faculty", facultyRoute);
 route.use("/jobs", jobRoute);
 route.use("/events", eventRoute);
 route.use("/meeting", meetingRoute);
+route.use("/services", serviceRoute);
 
 module.exports = route;
