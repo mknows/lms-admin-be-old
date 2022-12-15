@@ -8,7 +8,9 @@ module.exports = (sequelize, DataTypes) => {
 		 * The `models/index` file will call this method automatically.
 		 */
 		static associate(models) {
-			// define association here
+			this.belongsTo(models.Major, {
+				foreignKey: "major_id",
+			});
 		}
 	}
 	Glossary.init(
@@ -20,6 +22,8 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			word: DataTypes.STRING,
 			definition: DataTypes.TEXT,
+			major_id: DataTypes.UUID,
+			type: DataTypes.STRING,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
 			deleted_at: DataTypes.DATE,
