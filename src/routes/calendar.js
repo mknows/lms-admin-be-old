@@ -11,5 +11,11 @@ route.get(
 	authorize("student"),
 	calendarController.getAllSchedule
 );
+route.get(
+	"/mobile/all",
+	protection,
+	authorize("student"),
+	calendarController.getAllScheduleMobile
+);
 
 module.exports = route;

@@ -1,12 +1,18 @@
-const { MaterialEnrolled, Assignment, Session, Subject } = require("../models");
-const { v4: uuidv4 } = require("uuid");
+const {
+	MaterialEnrolled,
+	Assignment,
+	Session,
+	Subject,
+	Student,
+	Event,
+} = require("../models");
 const asyncHandler = require("express-async-handler");
 const moment = require("moment");
 
 module.exports = {
 	/**
-	 * @desc      Create new certificate SUBJECT
-	 * @route     POST /api/v1/calendar/all
+	 * @desc      get schedule
+	 * @route     GET /api/v1/calendar/all
 	 * @access    Private
 	 **/
 	getAllSchedule: asyncHandler(async (req, res) => {
@@ -20,13 +26,36 @@ module.exports = {
 			},
 			include: {
 				model: Session,
-				attributes: ["session_no"],
+				attributes: ["session_no", "type"],
 				include: {
 					model: Subject,
 					attributes: ["name"],
 				},
 			},
 		});
+		const events = await Student.findOne({
+			attributes: [],
+			where: {
+				id: student_id,
+			},
+			include: {
+				model: Event,
+				attributes: ["name", "date_start", "id", "organizer"],
+				through: {
+					attributes: ["created_at"],
+				},
+			},
+		});
+		for (const event of events.Events) {
+			schedule.push({
+				id: event.id,
+				startAt: event.date_start,
+				endAt: event.date_end,
+				summary: event.name + " by " + event.organizer,
+				color: "orange",
+				allDay: event.date_start === event.date_end,
+			});
+		}
 		for (const material_enrolled of all_activities) {
 			const endAt =
 				material_enrolled.type === "ASSIGNMENT"
@@ -56,7 +85,69 @@ module.exports = {
 		}
 		return res.sendJson(200, true, "Success", schedule);
 	}),
+	/**
+	 * @desc      Get schedule mobile
+	 * @route     POST /api/v1/calendar/mobile/all
+	 * @access    Private
+	 **/
+	getAllScheduleMobile: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
+		let schedule = [];
+		const all_activities = await MaterialEnrolled.findAll({
+			attributes: ["created_at", "type", "id_referrer"],
+			where: {
+				student_id,
+				status: "ONGOING",
+			},
+			include: {
+				model: Session,
+				attributes: ["session_no", "type"],
+				include: {
+					model: Subject,
+					attributes: ["name"],
+				},
+			},
+		});
+		const events = await Student.findOne({
+			attributes: [],
+			where: {
+				id: student_id,
+			},
+			include: {
+				model: Event,
+				attributes: ["name", "date_start"],
+			},
+		});
+		for (const material_enrolled of all_activities) {
+			const date =
+				material_enrolled.type === "ASSIGNMENT"
+					? await AssignmentEndAt(
+							material_enrolled.created_at,
+							material_enrolled.id_referrer
+					  )
+					: material_enrolled.created_at;
+			schedule.push({
+				date,
+				name:
+					material_enrolled.Session.Subject.name +
+					" Session no. " +
+					material_enrolled.Session.session_no +
+					", " +
+					material_enrolled.type,
+				category: material_enrolled.type,
+			});
+		}
+		for (const event of events.Events) {
+			schedule.push({
+				date: event.date_start,
+				name: event.name + " by " + event.organizer,
+				category: "Event",
+			});
+		}
+		return res.sendJson(200, true, "Success", schedule);
+	}),
 };
+
 async function AssignmentEndAt(started_at, id_referrer) {
 	let date = new Date(started_at);
 	const assignment = await Assignment.findOne({
