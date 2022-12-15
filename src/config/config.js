@@ -25,6 +25,11 @@ module.exports = {
 		database: DB_NAME_GCP,
 		host: DB_HOST_GCP,
 		dialect: DB_DIALECT,
+		operatorsAliases: 0,
+		dialectOptions: {
+			useUTC: false,
+		},
+		timezone: "Asia/Jakarta",
 		define: {
 			paranoid: true,
 			timestamps: true,

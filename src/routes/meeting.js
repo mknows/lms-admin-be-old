@@ -8,10 +8,10 @@ const { validate, validatorMessage } = require("../middlewares/Validator");
 route.post(
 	"/create",
 	protection,
-	authorize("student"),
-	validate("createMeetingStudent"),
+	authorize("lecturer"),
+	validate("createMeetingByAssessor"),
 	validatorMessage,
-	meetingController.createMeeting
+	meetingController.createMeetingByAssessor
 );
 
 route.get(
@@ -21,13 +21,20 @@ route.get(
 	meetingController.getAllMeetingByStudent
 );
 
+route.get(
+	"/:id",
+	protection,
+	authorize("student"),
+	meetingController.getMeetingById
+);
+
 route.put(
 	"/assessor/:id",
 	protection,
-	authorize("lecturer"),
-	validate("accMeetingByAssessor"),
+	authorize("student"),
+	validate("accMeetingByStudent"),
 	validatorMessage,
-	meetingController.accMeetingByAssessor
+	meetingController.accMeetingByStudent
 );
 
 module.exports = route;

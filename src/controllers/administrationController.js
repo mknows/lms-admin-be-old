@@ -273,16 +273,10 @@ module.exports = {
 			return res.sendJson(400, false, eligible.message, {});
 		}
 
-		checkIfExistFirebase(data.integrity_pact);
-		checkIfExistFirebase(data.nin_card);
-		checkIfExistFirebase(data.family_card);
-		checkIfExistFirebase(data.certificate);
-		checkIfExistFirebase(data.photo);
-		checkIfExistFirebase(data.transcript);
-		checkIfExistFirebase(data.recommendation_letter);
-
 		// ? optional
 		if (req.files.transcript) {
+			checkIfExistFirebase(data.transcript);
+
 			const transcriptFile = nameFile(req.files.transcript);
 			const transcriptBuffer = req.files.transcript[0].buffer;
 
@@ -309,6 +303,8 @@ module.exports = {
 		}
 		// ? optional
 		if (req.files.recommendation_letter) {
+			checkIfExistFirebase(data.recommendation_letter);
+
 			const recommendationLetterFile = nameFile(
 				req.files.recommendation_letter
 			);
@@ -339,8 +335,9 @@ module.exports = {
 			);
 		}
 
-		// ?Add new optional
 		if (req.files.integrity_pact) {
+			checkIfExistFirebase(data.integrity_pact);
+
 			const integrityPactFile = nameFile(req.files.integrity_pact);
 			const integrityPactBuffer = req.files.integrity_pact[0].buffer;
 
@@ -364,8 +361,9 @@ module.exports = {
 			);
 		}
 
-		// ?Add new optional nin_cart
 		if (req.files.nin_card) {
+			checkIfExistFirebase(data.nin_card);
+
 			const ninCardFile = nameFile(req.files.nin_card);
 			const ninCardBuffer = req.files.nin_card[0].buffer;
 
@@ -390,8 +388,9 @@ module.exports = {
 			);
 		}
 
-		// ?Add new optional family_card
 		if (req.files.family_card) {
+			checkIfExistFirebase(data.family_card);
+
 			const familyCardFile = nameFile(req.files.family_card);
 			const familyCardBuffer = req.files.family_card[0].buffer;
 
@@ -416,8 +415,9 @@ module.exports = {
 			);
 		}
 
-		// ?Add new optional certificate
 		if (req.files.certificate) {
+			checkIfExistFirebase(data.certificate);
+
 			const certificateFile = nameFile(req.files.certificate);
 			const certificateBuffer = req.files.certificate[0].buffer;
 
@@ -443,6 +443,8 @@ module.exports = {
 		}
 
 		if (req.files.photo) {
+			checkIfExistFirebase(data.photo);
+
 			const photoFile = nameFile(req.files.photo);
 			const photoBuffer = req.files.photo[0].buffer;
 
@@ -457,6 +459,68 @@ module.exports = {
 			await Administration.update(
 				{
 					photo: photoFile,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+
+		if (req.files.last_certificate_diploma) {
+			checkIfExistFirebase(data.last_certificate_diploma);
+
+			const certificateDiplomaFile = nameFile(
+				req.files.last_certificate_diploma
+			);
+			const certificateDiplomaBuffer = req.files.photo[0].buffer;
+
+			bucket
+				.file(certificateDiplomaFile)
+				.createWriteStream()
+				.end(certificateDiplomaBuffer)
+				.on("finish", () => {
+					createLinkFirebaseCertificateDiploma(
+						certificateDiplomaFile,
+						administration_id
+					);
+				});
+
+			await Administration.update(
+				{
+					last_certificate_diploma: certificateDiplomaFile,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+
+		if (req.files.parent_statement) {
+			checkIfExistFirebase(data.parent_statement);
+
+			const parentStatementFile = nameFile(req.files.parent_statement);
+			const parentStatementBuffer = req.files.photo[0].buffer;
+
+			bucket
+				.file(parentStatementFile)
+				.createWriteStream()
+				.end(parentStatementBuffer)
+				.on("finish", () => {
+					createLinkFirebaseParentStatement(
+						parentStatementFile,
+						administration_id
+					);
+				});
+
+			await Administration.update(
+				{
+					parent_statement: parentStatementFile,
 				},
 				{
 					where: { id: administration_id },
@@ -1220,6 +1284,8 @@ async function sortData(data) {
 			photo: data.photo,
 			transcript: data.transcript,
 			recommendation_letter: data.recommendation_letter,
+			last_certificate_diploma: data.last_certificate_diploma,
+			parent_statement: data.parent_statement,
 		},
 
 		is_approved: data.is_approved,
@@ -1305,6 +1371,38 @@ const createLinkFirebasePhoto = (file, id) => {
 		await Administration.update(
 			{
 				photo_link: linkFile,
+			},
+			{
+				where: {
+					id,
+				},
+			}
+		);
+	});
+};
+
+const createLinkFirebaseCertificateDiploma = (file, id) => {
+	const storage = getStorage();
+	getDownloadURL(ref(storage, file)).then(async (linkFile) => {
+		await Administration.update(
+			{
+				last_certificate_diploma_link: linkFile,
+			},
+			{
+				where: {
+					id,
+				},
+			}
+		);
+	});
+};
+
+const createLinkFirebaseParentStatement = (file, id) => {
+	const storage = getStorage();
+	getDownloadURL(ref(storage, file)).then(async (linkFile) => {
+		await Administration.update(
+			{
+				parent_statement_link: linkFile,
 			},
 			{
 				where: {

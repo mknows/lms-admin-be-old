@@ -1,6 +1,6 @@
 const ErrorResponse = require("../utils/errorResponse");
 const Sentry = require("../helpers/sentry");
-const { logger } = require("../helpers/loggingGcp");
+// const { logger } = require("../helpers/loggingGcp");
 
 const errorHandler = (err, req, res, next) => {
 	let errors = { ...err };
@@ -10,7 +10,7 @@ const errorHandler = (err, req, res, next) => {
 
 	// Log to console for developer
 	console.log(errors);
-	logger.error(errors.message);
+	// logger.error(errors.message);
 
 	switch (errors.code) {
 		case 401: {

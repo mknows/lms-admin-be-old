@@ -64,11 +64,11 @@ exports.validate = (method) => {
 					.trim()
 					.isAlpha("en-US", { ignore: " " }),
 				body("email", "Invalid email").notEmpty().isEmail().trim(),
-				body("nin", "Invalid nin").notEmpty().trim(),
+				// body("nin", "Invalid nin").notEmpty().trim(),
 				body("study_program", "Invalid study program / major").notEmpty(),
 				body("semester", "Invalid semester").notEmpty().trim(),
 				body("nin_address", "Invalid nin address").notEmpty(),
-				body("residence_address", "Invalid residence address").notEmpty(),
+				// body("residence_address", "Invalid residence address").notEmpty(),
 				body("birth_place", "Invalid birth place").notEmpty(),
 				body("birth_date", "Invalid birth date").notEmpty(),
 				body("phone", "Invalid phone").notEmpty().trim(),
@@ -184,9 +184,9 @@ exports.validate = (method) => {
 			];
 		}
 
-		case "createMeetingStudent": {
+		case "createMeetingByAssessor": {
 			return [
-				body("time", "time is invalid").notEmpty(),
+				body("time", "time is invalid in array").notEmpty().isArray(),
 				body("topic", "topic is invalid").notEmpty().trim(),
 				body("description", "description is invalid").notEmpty().trim(),
 				body("place", "place is invalid").notEmpty().trim(),
@@ -197,10 +197,16 @@ exports.validate = (method) => {
 			];
 		}
 
-		case "accMeetingByAssessor": {
+		case "accMeetingByStudent": {
 			return [
-				body("status", "status bool is invalid").notEmpty().trim().isBoolean(),
-				param("id", "id params is invalid").notEmpty().trim().isUUID(),
+				param("id", "id params uuid is invalid").notEmpty().trim().isUUID(),
+				body("time", "time is invalid").notEmpty(),
+			];
+		}
+
+		case "getMeetingById": {
+			return [
+				param("id", "id params uuid is invalid").notEmpty().trim().isUUID(),
 			];
 		}
 	}
