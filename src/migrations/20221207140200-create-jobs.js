@@ -22,6 +22,9 @@ module.exports = {
 			type: {
 				type: Sequelize.STRING,
 			},
+			period: {
+				type: Sequelize.STRING,
+			},
 			position: {
 				type: Sequelize.STRING,
 			},

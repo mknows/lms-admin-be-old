@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
 			salary: DataTypes.INTEGER,
 			deadline: DataTypes.DATE,
 			type: DataTypes.STRING,
+			period: DataTypes.STRING,
 			position: DataTypes.STRING,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
