@@ -23,12 +23,14 @@ module.exports = {
 		let career =
 			career_choices[Math.floor(Math.random() * career_choices.length)];
 		let subjects = getSubject(subject_choices);
+		let accuracy = (Math.random() * (100 - 80) + 80).toFixed(2);
 		let result = {
 			career,
 			subjects_taken: subjects.slice(0, 3),
 			remaining_subjects: subjects.slice(3, 5),
+			accuracy,
 		};
-		return res.sendJson(201, true, result);
+		return res.sendJson(201, true, "Success", result);
 	}),
 };
 function getSubject(subjects) {

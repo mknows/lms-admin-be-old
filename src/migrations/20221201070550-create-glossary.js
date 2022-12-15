@@ -14,6 +14,12 @@ module.exports = {
 			definition: {
 				type: Sequelize.TEXT,
 			},
+			type: {
+				type: Sequelize.STRING,
+			},
+			major_id: {
+				type: Sequelize.UUID,
+			},
 			created_at: {
 				allowNull: true,
 				type: Sequelize.DATE,

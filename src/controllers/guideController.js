@@ -1,4 +1,4 @@
-const { Guide, Glossary } = require("../models");
+const { Guide, Glossary, Major } = require("../models");
 const asyncHandler = require("express-async-handler");
 const { Op } = require("sequelize");
 const pagination = require("../helpers/pagination");
@@ -44,7 +44,7 @@ module.exports = {
 	 * @access    Public
 	 */
 	getAllGlossaries: asyncHandler(async (req, res) => {
-		let { page, limit, search, type } = req.query;
+		let { page, limit, search, type, major } = req.query;
 
 		let search_query = "%%";
 
@@ -52,14 +52,27 @@ module.exports = {
 			search_query = "%" + search + "%";
 		}
 
+		let major_query = "%%";
+
+		if (major) {
+			major_query = "%" + major + "%";
+		}
+
 		if (!type) {
 			type = ["application", "material"];
 		}
 		let glossaries = await Glossary.findAll({
-			attributes: ["id", "word", "definition"],
+			attributes: ["id", "word", "definition", "major_id"],
 			where: {
 				word: { [Op.iLike]: search_query },
 				type,
+			},
+			include: {
+				model: Major,
+				attributes: ["name"],
+				where: {
+					name: { [Op.iLike]: major_query },
+				},
 			},
 		});
 		glossaries = await pagination(glossaries, page, limit);
