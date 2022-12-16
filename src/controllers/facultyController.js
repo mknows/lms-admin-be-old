@@ -7,6 +7,7 @@ const {
 	Lecturer,
 } = require("../models");
 const asyncHandler = require("express-async-handler");
+const { Op, fn, col } = require("sequelize");
 
 module.exports = {
 	/**
@@ -17,7 +18,18 @@ module.exports = {
 	getAllFaculty: asyncHandler(async (req, res) => {
 		let result;
 
-		result = await Faculty.findAll();
+		result = await Faculty.findAll({
+			attributes: {
+				include: [[fn("COUNT", col("Majors.id")), "major_count"]],
+			},
+			include: [
+				{
+					model: Major,
+					attributes: [],
+				},
+			],
+			group: ["Faculty.id"],
+		});
 		return res.sendJson(200, true, "Success", result);
 	}),
 
