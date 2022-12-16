@@ -50,7 +50,9 @@ module.exports = {
 				// ],
 				id: id_search,
 			},
-			attributes: { include: ["created_at", "updated_at"] },
+			attributes: {
+				include: ["created_at", "updated_at"],
+			},
 			include: [
 				{
 					model: User,
@@ -266,11 +268,21 @@ module.exports = {
 		const { content, title, session_id } = req.body;
 		const user_id = req.userData.id;
 
-		const data = await DiscussionForum.create({
+		let data = await DiscussionForum.create({
 			session_id: session_id,
 			content: content,
 			title: title,
 			author_id: user_id,
+		});
+
+		data = await DiscussionForum.findOne({
+			where: {
+				id: data.id,
+			},
+			include: {
+				model: User,
+				attributes: ["full_name", "username", "display_picture_link", "id"],
+			},
 		});
 		return res.sendJson(200, true, "sucess post discussion forum", data);
 	}),
@@ -283,10 +295,20 @@ module.exports = {
 		const { content, df_id } = req.body;
 		const user_id = req.userData.id;
 
-		const data = await Comment.create({
+		let data = await Comment.create({
 			df_id: df_id,
 			content: content,
 			author_id: user_id,
+		});
+
+		data = await Comment.findOne({
+			where: {
+				id: data.id,
+			},
+			include: {
+				model: User,
+				attributes: ["full_name", "username", "display_picture_link", "id"],
+			},
 		});
 		return res.sendJson(200, true, "sucess post comment", data);
 	}),
@@ -306,11 +328,21 @@ module.exports = {
 			attributes: ["df_id"],
 		});
 		const df_id = the_comment[0].dataValues.df_id;
-		const data = await Reply.create({
+		let data = await Reply.create({
 			df_id: df_id,
 			comment_id: comment_id,
 			content: content,
 			author_id: user_id,
+		});
+
+		data = await Reply.findOne({
+			where: {
+				id: data.id,
+			},
+			include: {
+				model: User,
+				attributes: ["full_name", "username", "display_picture_link", "id"],
+			},
 		});
 		return res.sendJson(200, true, "sucess post reply", data);
 	}),
@@ -368,10 +400,22 @@ module.exports = {
 			}
 		);
 
+		data = data[1][0].dataValues;
+
+		data = await DiscussionForum.findOne({
+			where: {
+				id: dfId,
+			},
+			include: {
+				model: User,
+				attributes: ["full_name", "username", "display_picture_link", "id"],
+			},
+		});
+
 		return res.status(200).json({
 			success: true,
 			message: `Edit Discussion Forum with ID ${dfId} successfully.`,
-			data: { ...data[1].dataValues },
+			data: data,
 		});
 	}),
 
@@ -410,7 +454,7 @@ module.exports = {
 			content = data.content;
 		}
 
-		data = await DiscussionForum.update(
+		data = await Comment.update(
 			{
 				content,
 			},
@@ -420,10 +464,20 @@ module.exports = {
 			}
 		);
 
+		data = await Comment.findOne({
+			where: {
+				id: comment_id,
+			},
+			include: {
+				model: User,
+				attributes: ["full_name", "username", "display_picture_link", "id"],
+			},
+		});
+
 		return res.status(200).json({
 			success: true,
 			message: `Edit comment with ID ${comment_id} successfully.`,
-			data: { ...data[1].dataValues },
+			data: data,
 		});
 	}),
 
@@ -472,10 +526,20 @@ module.exports = {
 			}
 		);
 
+		data = await Reply.findOne({
+			where: {
+				id: reply_id,
+			},
+			include: {
+				model: User,
+				attributes: ["full_name", "username", "display_picture_link", "id"],
+			},
+		});
+
 		return res.status(200).json({
 			success: true,
 			message: `Edit Discussion Forum with ID ${reply_id} successfully.`,
-			data: { ...data[1].dataValues },
+			data: data,
 		});
 	}),
 	/**
@@ -785,13 +849,20 @@ module.exports = {
 						}
 					);
 				}
-
 				break;
 		}
 
-		data = data[1];
+		data = data[1][0].dataValues;
+		let user = await User.findOne({
+			where: {
+				id: user_id,
+			},
+			attributes: ["full_name", "username", "display_picture_link", "id"],
+		});
+		data.User = user;
+		console.log(data);
 
-		return res.sendJson(200, true, "Success", ...data);
+		return res.sendJson(200, true, "Success", data);
 	}),
 };
 
