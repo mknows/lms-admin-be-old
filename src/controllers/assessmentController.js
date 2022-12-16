@@ -175,7 +175,6 @@ module.exports = {
 		});
 
 		const filterDate = convertToEpochTimes.filter((item) => {
-			console.log(item, timeToEpoch);
 			if (item == timeToEpoch) {
 				return item;
 			}
