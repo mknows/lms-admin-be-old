@@ -2,7 +2,7 @@ const express = require("express");
 const route = express.Router();
 
 const { protection, authorize } = require("../middlewares/Authentication");
-const meetingController = require("../controllers/meetingController");
+const assessmentController = require("../controllers/assessmentController");
 const { validate, validatorMessage } = require("../middlewares/Validator");
 
 route.post(
@@ -11,21 +11,21 @@ route.post(
 	authorize("lecturer"),
 	validate("createMeetingByAssessor"),
 	validatorMessage,
-	meetingController.createMeetingByAssessor
+	assessmentController.createMeetingByAssessor
 );
 
 route.get(
 	"/",
 	protection,
 	authorize("student"),
-	meetingController.getAllMeetingByStudent
+	assessmentController.getAllMeetingByStudent
 );
 
 route.get(
 	"/:id",
 	protection,
 	authorize("student"),
-	meetingController.getMeetingById
+	assessmentController.getMeetingById
 );
 
 route.put(
@@ -34,7 +34,7 @@ route.put(
 	authorize("student"),
 	validate("accMeetingByStudent"),
 	validatorMessage,
-	meetingController.accMeetingByStudent
+	assessmentController.accMeetingByStudent
 );
 
 module.exports = route;
