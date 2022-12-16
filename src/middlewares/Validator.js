@@ -190,10 +190,6 @@ exports.validate = (method) => {
 				body("topic", "topic is invalid").notEmpty().trim(),
 				body("description", "description is invalid").notEmpty().trim(),
 				body("place", "place is invalid").notEmpty().trim(),
-				body("assessor_id", "assessor_id is invalid")
-					.notEmpty()
-					.trim()
-					.isUUID(),
 			];
 		}
 
