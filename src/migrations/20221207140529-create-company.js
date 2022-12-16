@@ -19,6 +19,9 @@ module.exports = {
 			thumbnail: {
 				type: Sequelize.STRING,
 			},
+			partenered: {
+				type: Sequelize.BOOLEAN,
+			},
 			created_at: {
 				allowNull: true,
 				type: Sequelize.DATE,

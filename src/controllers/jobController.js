@@ -6,11 +6,11 @@ const { Op } = require("sequelize");
 module.exports = {
 	/**
 	 * @desc      Get all jobs
-	 * @route     GET /api/v1/jobs/getall?page=(number)&limit=(number)&position=(str)&name=(str)&location=(str)
+	 * @route     GET /api/v1/jobs/getall?page=(number)&limit=(number)&position=(str)&name=(str)&location=(str)&
 	 * @access    Private
 	 **/
 	getAllJobs: asyncHandler(async (req, res) => {
-		const { page, limit, position, name, location } = req.query;
+		const { page, limit, position, name, location, partnered } = req.query;
 		let { type } = req.body;
 		let available_type = ["finance", "sponsored", "design", "programming"];
 		if (!type || type.length === 0) {
@@ -50,6 +50,7 @@ module.exports = {
 				where: {
 					company_name: { [Op.iLike]: search_company_query },
 					location: { [Op.iLike]: location_query },
+					partnered,
 				},
 			},
 		});

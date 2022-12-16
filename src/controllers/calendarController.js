@@ -40,13 +40,14 @@ module.exports = {
 			},
 			include: {
 				model: Event,
-				attributes: ["name", "date_start", "id", "organizer"],
+				attributes: ["name", "date_start", "id", "organizer", "date_end"],
 				through: {
 					attributes: ["created_at"],
 				},
 			},
 		});
 		for (const event of events.Events) {
+			console.log(event);
 			schedule.push({
 				id: event.id,
 				startAt: event.date_start,
