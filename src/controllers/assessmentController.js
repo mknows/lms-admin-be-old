@@ -1,4 +1,4 @@
-const { Meeting, User, Student } = require("../models");
+const { Meeting, User, Student, Lecturer } = require("../models");
 const asyncHandler = require("express-async-handler");
 const Sequelize = require("sequelize");
 
@@ -9,16 +9,10 @@ module.exports = {
 	 * @access    Private (Assessor)
 	 */
 	createMeetingByAssessor: asyncHandler(async (req, res) => {
-		const {
-			student_id,
-			meeting_type,
-			place,
-			topic,
-			description,
-			assessor_id,
-			time,
-		} = req.body;
+		const { student_id, meeting_type, place, topic, description, time } =
+			req.body;
 		const user = req.userData;
+		const lecturer_id = req.lecturer_id;
 
 		const findStudent = await Student.findOne({
 			where: {
@@ -42,7 +36,7 @@ module.exports = {
 			place,
 			topic,
 			description,
-			assessor_id,
+			assessor_id: lecturer_id,
 			status: false,
 		});
 
@@ -150,9 +144,14 @@ module.exports = {
 				id: user.id,
 			},
 		});
-		const assessorName = await User.findOne({
+		const getUserIdAssessor = await Lecturer.findOne({
 			where: {
 				id: dataMeeting.assessor_id,
+			},
+		});
+		const assessorName = await User.findOne({
+			where: {
+				id: getUserIdAssessor.user_id,
 			},
 		});
 
@@ -176,7 +175,6 @@ module.exports = {
 		});
 
 		const filterDate = convertToEpochTimes.filter((item) => {
-			console.log(item, timeToEpoch);
 			if (item == timeToEpoch) {
 				return item;
 			}
