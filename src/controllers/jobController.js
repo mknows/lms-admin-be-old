@@ -10,8 +10,10 @@ module.exports = {
 	 * @access    Private
 	 **/
 	getAllJobs: asyncHandler(async (req, res) => {
-		const { page, limit, position, name, location, partnered } = req.query;
+		let { page, limit, position, name, location, partnered } = req.query;
 		let { type } = req.body;
+
+		partnered = partnered ? partnered : [true, false];
 		let available_type = ["finance", "sponsored", "design", "programming"];
 		if (!type || type.length === 0) {
 			type = available_type;
