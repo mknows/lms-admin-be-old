@@ -19,6 +19,7 @@ module.exports = {
 	 * @access    Private
 	 **/
 	getAllEvents: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
 		const { page, limit } = req.query;
 
 		let events = await Event.findAll({
@@ -28,8 +29,22 @@ module.exports = {
 					[Op.gte]: moment().toDate(),
 				},
 			},
+			include: {
+				model: Student,
+				required: false,
+				attributes: ["id"],
+				where: {
+					id: student_id,
+				},
+				through: {
+					attributes: ["id"],
+				},
+			},
 		});
 		events = await pagination(events, page, limit);
+		events.result.forEach((event) => {
+			event.dataValues.joined = event.Students[0] ? true : false;
+		});
 		return res.sendJson(200, true, "Success", events);
 	}),
 	/**
@@ -39,15 +54,25 @@ module.exports = {
 	 **/
 	getEvent: asyncHandler(async (req, res) => {
 		const { id } = req.params;
+		const student_id = req.student_id;
 
 		let event = await Event.findOne({
 			where: {
 				id,
-				registration_closed: {
-					[Op.gte]: moment().toDate(),
+			},
+			include: {
+				model: Student,
+				attributes: ["id"],
+				where: {
+					id: student_id,
 				},
+				through: {
+					attributes: ["id"],
+				},
+				required: false,
 			},
 		});
+		event.dataValues.joined = event.Students ? true : false;
 		return res.sendJson(200, true, "Success", event);
 	}),
 	/**

@@ -4,8 +4,18 @@ const route = express.Router();
 const eventController = require("../controllers/eventController");
 const { protection, authorize } = require("../middlewares/Authentication");
 
-route.get("/all", eventController.getAllEvents);
-route.get("/event/:id", eventController.getEvent);
+route.get(
+	"/all",
+	protection,
+	authorize("student", "user"),
+	eventController.getAllEvents
+);
+route.get(
+	"/event/:id",
+	protection,
+	authorize("student", "user"),
+	eventController.getEvent
+);
 route.get(
 	"/student",
 	protection,
