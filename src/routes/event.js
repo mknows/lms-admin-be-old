@@ -11,12 +11,6 @@ route.get(
 	eventController.getAllEvents
 );
 route.get(
-	"/event/:id",
-	protection,
-	authorize("student", "user"),
-	eventController.getEvent
-);
-route.get(
 	"/student",
 	protection,
 	authorize("student"),
@@ -28,5 +22,10 @@ route.post(
 	authorize("student"),
 	eventController.joinEvent
 );
-
+route.get(
+	"/:id",
+	protection,
+	authorize("student", "user"),
+	eventController.getEvent
+);
 module.exports = route;

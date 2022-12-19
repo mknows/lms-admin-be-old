@@ -49,7 +49,7 @@ module.exports = {
 	}),
 	/**
 	 * @desc      Get all events
-	 * @route     POST /api/v1/events/event/:id
+	 * @route     POST /api/v1/events/:id
 	 * @access    Private
 	 **/
 	getEvent: asyncHandler(async (req, res) => {
@@ -72,7 +72,7 @@ module.exports = {
 				required: false,
 			},
 		});
-		event.dataValues.joined = event.Students ? true : false;
+		event.dataValues.joined = event.Students[0] ? true : false;
 		return res.sendJson(200, true, "Success", event);
 	}),
 	/**
