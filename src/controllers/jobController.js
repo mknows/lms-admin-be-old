@@ -10,24 +10,20 @@ module.exports = {
 	 * @access    Private
 	 **/
 	getAllJobs: asyncHandler(async (req, res) => {
-		let { page, limit, position, name, location, partnered } = req.query;
-		let { type } = req.body;
+		let { page, limit, position, name, location, partnered, type } = req.query;
 
 		partnered = partnered ? partnered : [true, false];
 		let available_type = ["finance", "sponsored", "design", "programming"];
-		if (!type || type.length === 0) {
+		if (!type) {
 			type = available_type;
 		}
-		let wrong_type = type.filter((x) => !available_type.includes(x));
-		if (wrong_type.length !== 0) {
+		if (!available_type.includes(type)) {
 			return res.sendJson(
 				400,
-				true,
-				`Type is not included.(${wrong_type})`,
-				{}
+				false,
+				"Type is not listed. Type available : finance,sponsored,design,programming"
 			);
 		}
-
 		let search_company_query = "%%",
 			search_position_query = "%%",
 			location_query = "%%";
@@ -41,7 +37,7 @@ module.exports = {
 			location_query = "%" + location + "%";
 		}
 		let jobs = await Job.findAll({
-			attributes: ["position", "salary", "id"],
+			attributes: ["position", "salary", "id", "type"],
 			where: {
 				position: { [Op.iLike]: search_position_query },
 				type,
