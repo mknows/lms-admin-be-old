@@ -98,7 +98,7 @@ module.exports = {
 				"Student has already participated in this event"
 			);
 		}
-		const event = await StudentEvent.create({
+		let event = await StudentEvent.create({
 			student_id,
 			event_id,
 			status: "ONGOING",
@@ -109,6 +109,24 @@ module.exports = {
 		delete event.dataValues["updated_at"];
 		delete event.dataValues["created_by"];
 		delete event.dataValues["updated_by"];
+
+		event = await Event.findOne({
+			where: {
+				id: event_id,
+			},
+			include: {
+				model: Student,
+				attributes: ["id"],
+				where: {
+					id: student_id,
+				},
+				through: {
+					attributes: ["id"],
+				},
+				required: false,
+			},
+		});
+		event.dataValues.joined = event.Students[0] ? true : false;
 
 		return res.sendJson(200, true, "Success", event);
 	}),
