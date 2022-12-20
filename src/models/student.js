@@ -32,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
 				through: models.StudentEvent,
 				foreignKey: "student_id",
 			});
+			this.hasMany(models.StudentDatapool, { foreignKey: "student_id" });
 		}
 	}
 
