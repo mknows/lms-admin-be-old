@@ -12,6 +12,7 @@ const { Op } = require("sequelize");
 const asyncHandler = require("express-async-handler");
 const makeslug = require("../helpers/makeslug");
 const sequelize = require("sequelize");
+const pagination = require("../helpers/pagination");
 
 module.exports = {
 	/**
@@ -158,7 +159,9 @@ module.exports = {
 	 * @access    Public
 	 */
 	getAllDiscussionForumGlobal: asyncHandler(async (req, res) => {
-		const data = await DiscussionForum.findAll({
+		const { page, limit } = req.query;
+
+		let data = await DiscussionForum.findAll({
 			where: {
 				session_id: null,
 			},
@@ -171,6 +174,8 @@ module.exports = {
 				attributes: ["full_name", "display_picture_link"],
 			},
 		});
+		data = await pagination(data, page, limit);
+
 		return res.sendJson(
 			200,
 			true,
