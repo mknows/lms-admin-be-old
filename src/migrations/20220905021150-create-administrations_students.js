@@ -57,6 +57,8 @@ module.exports = {
 			last_certificate_diploma_link: Sequelize.STRING,
 			parent_statement: Sequelize.STRING,
 			parent_statement_link: Sequelize.STRING,
+			statement: Sequelize.STRING,
+			statement_link: Sequelize.STRING,
 
 			is_approved: Sequelize.JSON,
 			approved_by: Sequelize.UUID,

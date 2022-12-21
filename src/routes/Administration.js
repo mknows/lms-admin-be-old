@@ -36,6 +36,13 @@ route.get(
 	administrationController.getCurrentUserAdminData
 );
 
+route.get(
+	"/statement",
+	protection,
+	authorize("user"),
+	administrationController.getFileStatement
+);
+
 route.put(
 	"/biodata",
 	protection,
@@ -64,6 +71,7 @@ route.put(
 		{ name: "photo", maxCount: 1 },
 		{ name: "last_certificate_diploma", maxCount: 1 },
 		{ name: "parent_statement", maxCount: 1 },
+		{ name: "statement", maxCount: 1 },
 		// ?optional
 		{ name: "recommendation_letter", maxCount: 1 },
 		{ name: "transcript", maxCount: 1 },

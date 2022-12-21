@@ -475,7 +475,8 @@ module.exports = {
 			const certificateDiplomaFile = nameFile(
 				req.files.last_certificate_diploma
 			);
-			const certificateDiplomaBuffer = req.files.photo[0].buffer;
+			const certificateDiplomaBuffer =
+				req.files.last_certificate_diploma[0].buffer;
 
 			bucket
 				.file(certificateDiplomaFile)
@@ -505,7 +506,7 @@ module.exports = {
 			checkIfExistFirebase(data.parent_statement);
 
 			const parentStatementFile = nameFile(req.files.parent_statement);
-			const parentStatementBuffer = req.files.photo[0].buffer;
+			const parentStatementBuffer = req.files.parent_statement[0].buffer;
 
 			bucket
 				.file(parentStatementFile)
@@ -521,6 +522,33 @@ module.exports = {
 			await Administration.update(
 				{
 					parent_statement: parentStatementFile,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+
+		if (req.files.statement) {
+			checkIfExistFirebase(data.statement);
+
+			const statementFile = nameFile(req.files.statement);
+			const statementBuffer = req.files.statement[0].buffer;
+
+			bucket
+				.file(statementFile)
+				.createWriteStream()
+				.end(statementBuffer)
+				.on("finish", () => {
+					createLinkFirebaseStatement(statementFile, administration_id);
+				});
+
+			await Administration.update(
+				{
+					statement: statementFile,
 				},
 				{
 					where: { id: administration_id },
@@ -556,6 +584,27 @@ module.exports = {
 		});
 
 		return res.sendJson(201, true, "Successfully uploaded files");
+	}),
+
+	/**
+	 * @desc      GET file statement and parent statement
+	 * @route     PUT /api/v1/administration/files
+	 * @access    Private (User)
+	 */
+	getFileStatement: asyncHandler(async (req, res) => {
+		const fileStatement = {
+			statement_link:
+				"https://firebasestorage.googleapis.com/v0/b/kampus-gratis2.appspot.com/o/documents%2Fadministrations%2Fstatements%2FReklame%20pernyataan.pdf?alt=media&token=63c9f21e-d646-4589-a43e-8cbd11b54e5e",
+			statement_link_parent:
+				"https://firebasestorage.googleapis.com/v0/b/kampus-gratis2.appspot.com/o/documents%2Fadministrations%2Fstatements%2FSurat-Pernyataan-Orangtua.pdf?alt=media&token=d6e6aeca-609b-4203-869d-527e2dd0edaa",
+		};
+
+		return res.sendJson(
+			200,
+			true,
+			"Successfully get file statement",
+			fileStatement
+		);
 	}),
 
 	/**
@@ -1286,6 +1335,7 @@ async function sortData(data) {
 			// recommendation_letter: data.recommendation_letter,
 			last_certificate_diploma: data.last_certificate_diploma,
 			parent_statement: data.parent_statement,
+			statement: data.statement,
 		},
 
 		is_approved: data.is_approved,
@@ -1403,6 +1453,22 @@ const createLinkFirebaseParentStatement = (file, id) => {
 		await Administration.update(
 			{
 				parent_statement_link: linkFile,
+			},
+			{
+				where: {
+					id,
+				},
+			}
+		);
+	});
+};
+
+const createLinkFirebaseStatement = (file, id) => {
+	const storage = getStorage();
+	getDownloadURL(ref(storage, file)).then(async (linkFile) => {
+		await Administration.update(
+			{
+				statement_link: linkFile,
 			},
 			{
 				where: {
