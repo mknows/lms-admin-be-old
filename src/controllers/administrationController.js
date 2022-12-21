@@ -595,14 +595,14 @@ module.exports = {
 		const fileStatement = {
 			statement_link:
 				"https://firebasestorage.googleapis.com/v0/b/kampus-gratis2.appspot.com/o/documents%2Fadministrations%2Fstatements%2FReklame%20pernyataan.pdf?alt=media&token=63c9f21e-d646-4589-a43e-8cbd11b54e5e",
-			statement_link_parent:
+			statement_parent_link:
 				"https://firebasestorage.googleapis.com/v0/b/kampus-gratis2.appspot.com/o/documents%2Fadministrations%2Fstatements%2FSurat-Pernyataan-Orangtua.pdf?alt=media&token=d6e6aeca-609b-4203-869d-527e2dd0edaa",
 		};
 
 		return res.sendJson(
 			200,
 			true,
-			"Successfully get file statement",
+			"Successfully get file statement template",
 			fileStatement
 		);
 	}),
@@ -816,67 +816,6 @@ module.exports = {
 				}
 			);
 		}
-		// file recommendation letter
-		if (req.files.recommendation_letter) {
-			checkIfExistFirebase(dataAdministration.recommendation_letter);
-
-			const recommendationLetterFile = nameFile(
-				req.files.recommendation_letter
-			);
-			const recommendationLetterBuffer =
-				req.files.recommendation_letter[0].buffer;
-
-			bucket
-				.file(recommendationLetterFile)
-				.createWriteStream()
-				.end(recommendationLetterBuffer)
-				.on("finish", () => {
-					createLinkFirebaseRecommendationLetter(
-						recommendationLetterFile,
-						administration_id
-					);
-				});
-
-			await Administration.update(
-				{
-					recommendation_letter: recommendationLetterFile,
-				},
-				{
-					where: { id: administration_id },
-					returning: true,
-					plain: true,
-					include: User,
-				}
-			);
-		}
-		// file transcript
-		if (req.files.transcript) {
-			checkIfExistFirebase(dataAdministration.transcript);
-
-			const transcriptFile = nameFile(req.files.transcript);
-			const transcriptBuffer = req.files.transcript[0].buffer;
-
-			bucket
-				.file(transcriptFile)
-				.createWriteStream()
-				.end(transcriptBuffer)
-				.on("finish", () => {
-					createLinkFirebaseTranscript(transcriptFile, administration_id);
-				});
-
-			await Administration.update(
-				{
-					updated_by: user.id,
-					transcript: transcriptFile,
-				},
-				{
-					where: { id: administration_id },
-					returning: true,
-					plain: true,
-					include: User,
-				}
-			);
-		}
 		// file family card
 		if (req.files.family_card) {
 			checkIfExistFirebase(dataAdministration.family_card);
@@ -958,6 +897,127 @@ module.exports = {
 				}
 			);
 		}
+		// file parent statement
+		if (req.files.parent_statement) {
+			checkIfExistFirebase(data.parent_statement);
+
+			const parentStatementFile = nameFile(req.files.parent_statement);
+			const parentStatementBuffer = req.files.parent_statement[0].buffer;
+
+			bucket
+				.file(parentStatementFile)
+				.createWriteStream()
+				.end(parentStatementBuffer)
+				.on("finish", () => {
+					createLinkFirebaseParentStatement(
+						parentStatementFile,
+						administration_id
+					);
+				});
+
+			await Administration.update(
+				{
+					parent_statement: parentStatementFile,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+		// file statement
+		if (req.files.statement) {
+			checkIfExistFirebase(data.statement);
+
+			const statementFile = nameFile(req.files.statement);
+			const statementBuffer = req.files.statement[0].buffer;
+
+			bucket
+				.file(statementFile)
+				.createWriteStream()
+				.end(statementBuffer)
+				.on("finish", () => {
+					createLinkFirebaseStatement(statementFile, administration_id);
+				});
+
+			await Administration.update(
+				{
+					statement: statementFile,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+
+		// ?optional recommendation letter
+		// file recommendation letter
+		if (req.files.recommendation_letter) {
+			checkIfExistFirebase(dataAdministration.recommendation_letter);
+
+			const recommendationLetterFile = nameFile(
+				req.files.recommendation_letter
+			);
+			const recommendationLetterBuffer =
+				req.files.recommendation_letter[0].buffer;
+
+			bucket
+				.file(recommendationLetterFile)
+				.createWriteStream()
+				.end(recommendationLetterBuffer)
+				.on("finish", () => {
+					createLinkFirebaseRecommendationLetter(
+						recommendationLetterFile,
+						administration_id
+					);
+				});
+
+			await Administration.update(
+				{
+					recommendation_letter: recommendationLetterFile,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
+		// ?optional transcript
+		// file transcript
+		if (req.files.transcript) {
+			checkIfExistFirebase(dataAdministration.transcript);
+
+			const transcriptFile = nameFile(req.files.transcript);
+			const transcriptBuffer = req.files.transcript[0].buffer;
+
+			bucket
+				.file(transcriptFile)
+				.createWriteStream()
+				.end(transcriptBuffer)
+				.on("finish", () => {
+					createLinkFirebaseTranscript(transcriptFile, administration_id);
+				});
+
+			await Administration.update(
+				{
+					updated_by: user.id,
+					transcript: transcriptFile,
+				},
+				{
+					where: { id: administration_id },
+					returning: true,
+					plain: true,
+					include: User,
+				}
+			);
+		}
 
 		return res.sendJson(200, true, "update last data administration success", {
 			administration: data,
@@ -994,6 +1054,9 @@ module.exports = {
 				"photo",
 				"transcript",
 				"recommendation_letter",
+				"last_certificate_diploma",
+				"parent_statement",
+				"statement",
 			],
 		});
 
@@ -1004,6 +1067,9 @@ module.exports = {
 		checkIfExistFirebase(getFiles.photo);
 		checkIfExistFirebase(getFiles.transcript);
 		checkIfExistFirebase(getFiles.recommendation_letter);
+		checkIfExistFirebase(getFiles.last_certificate_diploma);
+		checkIfExistFirebase(getFiles.parent_statement);
+		checkIfExistFirebase(getFiles.statement);
 
 		await Administration.destroy({
 			where: {
@@ -1326,16 +1392,25 @@ async function sortData(data) {
 			financier: data.financier,
 		},
 		files: {
-			// integrity_pact: data.integrity_pact,
 			nin_card: data.nin_card,
+			nin_card_link: data.nin_card_link,
 			family_card: data.family_card,
+			family_card_link: data.family_card_link,
 			certificate: data.certificate,
+			certificate_link: data.certificate_link,
 			photo: data.photo,
-			transcript: data.transcript,
-			// recommendation_letter: data.recommendation_letter,
+			photo_link: data.photo_link,
 			last_certificate_diploma: data.last_certificate_diploma,
+			last_certificate_diploma_link: data.last_certificate_diploma_link,
+			integrity_pact: data.integrity_pact,
+			integrity_pact_link: data.integrity_pact_link,
 			parent_statement: data.parent_statement,
+			parent_statement_link: data.parent_statement_link,
 			statement: data.statement,
+			statement_link: data.statement_link,
+			// ?optional
+			// transcript: data.transcript,
+			// recommendation_letter: data.recommendation_letter,
 		},
 
 		is_approved: data.is_approved,
