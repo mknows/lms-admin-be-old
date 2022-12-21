@@ -37,6 +37,7 @@ const upload = multer({
 		}
 	},
 });
+route.get("/seed", protection, subjectController.seed);
 
 route.post(
 	"/create",

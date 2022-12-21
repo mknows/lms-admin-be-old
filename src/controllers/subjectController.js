@@ -5,6 +5,7 @@ const {
 	Major,
 	Lecturer,
 	User,
+	StudentDatapool,
 } = require("../models");
 const prerequisiteChecker = require("../helpers/prerequsitieChecker");
 const checkExistence = require("../helpers/checkExistence");
@@ -711,6 +712,44 @@ module.exports = {
 		};
 
 		return res.sendJson(200, true, "success", result);
+	}),
+	/**
+	 * @desc      enroll in a subject
+	 * @route     PUT /api/v1/subject/seed
+	 * @access    Private
+	 */
+	seed: asyncHandler(async (req, res) => {
+		// const student = await Student.findAll({
+		// 	attributes: ["id", "user_id", "semester"],
+		// 	include: [
+		// 		{
+		// 			model: Major,
+		// 			attributes: ["name"],
+		// 		},
+		// 		{
+		// 			model: User,
+		// 			attributes: ["gender"],
+		// 		},
+		// 	],
+		// });
+		// for (let i = 0; i < student.length; i++) {
+		// 	await StudentDatapool.create({
+		// 		user_id: student[i].user_id,
+		// 		student_id: student[i].id,
+		// 		semester: 6,
+		// 		gpa: parseFloat((Math.random() * 4).toFixed(2)),
+		// 		quickest_subject: Math.floor(Math.random() * 72),
+		// 		most_frequent_subject: Math.floor(Math.random() * 72),
+		// 		major: Math.floor(Math.random() * 3),
+		// 		highest_grade_subject: Math.floor(Math.random() * 72),
+		// 		lowest_grade_subject: Math.floor(Math.random() * 72),
+		// 		slowest_subject: Math.floor(Math.random() * 72),
+		// 		least_frequent_subject: Math.floor(Math.random() * 72),
+		// 		gender: student[i].User?.gender,
+		// 		age: Math.floor(Math.random() * 52 + 18),
+		// 		job_recommendation: Math.floor(Math.random() * 10),
+		// 	});
+		// }
 	}),
 };
 

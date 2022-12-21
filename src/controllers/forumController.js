@@ -159,11 +159,28 @@ module.exports = {
 	 * @access    Public
 	 */
 	getAllDiscussionForumGlobal: asyncHandler(async (req, res) => {
-		const { page, limit } = req.query;
+		const { page, limit, search } = req.query;
+		let search_query = "%%";
 
+		if (search) {
+			search_query = "%" + search + "%";
+		}
+		console.log(search_query);
 		let data = await DiscussionForum.findAll({
 			where: {
 				session_id: null,
+				[Op.or]: [
+					{
+						title: {
+							[Op.iLike]: search_query,
+						},
+					},
+					{
+						content: {
+							[Op.iLike]: search_query,
+						},
+					},
+				],
 			},
 			attributes: {
 				include: ["created_at", "updated_at"],

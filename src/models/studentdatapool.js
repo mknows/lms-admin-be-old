@@ -42,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		{
 			sequelize,
-			tableName: "student_datapool",
+			tableName: "student_datapools",
 		}
 	);
 	return StudentDatapool;
