@@ -65,7 +65,7 @@ exports.validate = (method) => {
 					.isAlpha("en-US", { ignore: " " }),
 				body("email", "Invalid email").notEmpty().isEmail().trim(),
 				// body("nin", "Invalid nin").notEmpty().trim(),
-				body("study_program", "Invalid study program / major").notEmpty(),
+				// body("study_program", "Invalid study program / major").notEmpty(),
 				body("semester", "Invalid semester").notEmpty().trim(),
 				body("nin_address", "Invalid nin address").notEmpty(),
 				// body("residence_address", "Invalid residence address").notEmpty(),
