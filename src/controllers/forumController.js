@@ -882,7 +882,6 @@ module.exports = {
 			attributes: ["full_name", "username", "display_picture_link", "id"],
 		});
 		data.User = user;
-		console.log(data);
 
 		return res.sendJson(200, true, "Success", data);
 	}),

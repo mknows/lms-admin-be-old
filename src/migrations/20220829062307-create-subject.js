@@ -25,32 +25,39 @@ module.exports = {
 			description: {
 				type: Sequelize.STRING,
 			},
-			basic_competencies:{
+			basic_competencies: {
 				type: Sequelize.STRING,
 			},
-			indicator:{
+			indicator: {
 				type: Sequelize.STRING,
 			},
-			study_experience:{
+			study_experience: {
 				type: Sequelize.STRING,
 			},
-			teaching_materials:{
-				type: Sequelize.STRING
+			teaching_materials: {
+				type: Sequelize.STRING,
 			},
 			credit: {
 				type: Sequelize.INTEGER,
 			},
-			tools_needed:{
-				type: Sequelize.STRING
-			},
-			scoring:{
+			tools_needed: {
 				type: Sequelize.STRING,
 			},
-			thumbnail:{
+			scoring: {
 				type: Sequelize.STRING,
 			},
-			thumbnail_link:{
+			thumbnail: {
 				type: Sequelize.STRING,
+			},
+			thumbnail_link: {
+				type: Sequelize.STRING,
+			},
+			subject_code: {
+				allowNull: false,
+				type: Sequelize.STRING,
+			},
+			analytic_index: {
+				type: Sequelize.INTEGER,
 			},
 			created_at: {
 				allowNull: false,

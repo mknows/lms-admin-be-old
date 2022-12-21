@@ -69,7 +69,6 @@ exports.updateLeaderboardGPA = async (user_id, gpa) => {
 
 	data = data[1][0].dataValues;
 	// #### DEBUG ####
-	console.log("UPDATE LOG gpa", data.gpa, data.forum_score, data.final_score);
 
 	await updateLeaederboardFinalScore(user_id);
 
@@ -95,7 +94,6 @@ exports.updateLeaderboardForum = async (user_id, forum_score) => {
 		});
 
 		// #### DEBUG ####
-		console.log("crete nerw log", data.gpa, data.forum_score, data.final_score);
 
 		return data;
 	}
