@@ -70,6 +70,8 @@ module.exports = (sequelize, DataTypes) => {
 			last_certificate_diploma_link: DataTypes.STRING,
 			parent_statement: DataTypes.STRING,
 			parent_statement_link: DataTypes.STRING,
+			statement: DataTypes.STRING,
+			statement_link: DataTypes.STRING,
 
 			degree: DataTypes.STRING,
 			is_approved: DataTypes.JSON,
