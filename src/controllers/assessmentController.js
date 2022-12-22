@@ -9,8 +9,15 @@ module.exports = {
 	 * @access    Private (Assessor)
 	 */
 	createMeetingByAssessor: asyncHandler(async (req, res) => {
-		const { student_id, meeting_type, place, topic, description, time } =
-			req.body;
+		const {
+			student_id,
+			meeting_type,
+			place,
+			subject,
+			topic,
+			description,
+			time,
+		} = req.body;
 		const user = req.userData;
 		const lecturer_id = req.lecturer_id;
 
@@ -34,6 +41,7 @@ module.exports = {
 			student_id,
 			meeting_type,
 			place,
+			subject,
 			topic,
 			description,
 			assessor_id: lecturer_id,

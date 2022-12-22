@@ -16,6 +16,9 @@ module.exports = {
 			place: {
 				type: Sequelize.STRING,
 			},
+			subject: {
+				type: Sequelize.STRING,
+			},
 			topic: {
 				type: Sequelize.STRING,
 			},
