@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			time: DataTypes.DATE,
 			place: DataTypes.STRING,
+			subject: DataTypes.STRING,
 			topic: DataTypes.STRING,
 			description: DataTypes.STRING,
 			student_id: DataTypes.UUID,
