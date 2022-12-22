@@ -7,6 +7,11 @@ module.exports = {
 				allowNull: false,
 				primaryKey: true,
 			},
+			user_id: {
+				type: Sequelize.UUID,
+				allowNull: false,
+				primaryKey: true,
+			},
 			name: {
 				type: Sequelize.STRING,
 			},

@@ -34,4 +34,8 @@ route.post(
 	serviceController.createServiceDocument
 );
 
+route.get("/", protection, serviceController.getStatusService);
+
+route.get("/:uuid", protection, serviceController.getStatusServiceById);
+
 module.exports = route;
