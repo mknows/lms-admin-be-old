@@ -18,6 +18,11 @@ module.exports = (sequelize, DataTypes) => {
 				primaryKey: true,
 				defaultValue: sequelize.literal("gen_random_uuid()"),
 			},
+			user_id: {
+				type: DataTypes.UUID,
+				primaryKey: true,
+				defaultValue: sequelize.literal("gen_random_uuid()"),
+			},
 			name: DataTypes.STRING,
 			nim: DataTypes.STRING,
 			email: DataTypes.STRING,
