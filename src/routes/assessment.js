@@ -29,7 +29,7 @@ route.get(
 );
 
 route.put(
-	"/assessor/:id",
+	"/pick/:id",
 	protection,
 	authorize("student"),
 	validate("accMeetingByStudent"),
