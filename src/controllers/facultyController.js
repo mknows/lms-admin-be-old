@@ -20,7 +20,11 @@ module.exports = {
 
 		result = await Faculty.findAll({
 			attributes: {
-				include: [[fn("COUNT", col("Majors.id")), "major_count"]],
+				include: [
+					[fn("COUNT", col("Majors.id")), "major_count"],
+					[fn("COUNT", col("Majors.id")), "subject_count"], // TODO STILL WRONG (NOT YET IJMPLEMENTED)
+					[fn("COUNT", col("Majors.id")), "sks_count"], // TODO STILL WRONG (NOT YET IMPLEMENTED), IS HERE ONLY TO PLEASE APPS MODEL
+				],
 			},
 			include: [
 				{
