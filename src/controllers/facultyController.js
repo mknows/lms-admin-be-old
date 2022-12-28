@@ -22,8 +22,8 @@ module.exports = {
 			attributes: {
 				include: [
 					[fn("COUNT", col("Majors.id")), "major_count"],
-					[fn("COUNT", col("Majors.id")), "subject_count"], // TODO STILL WRONG (NOT YET IJMPLEMENTED)
-					[fn("COUNT", col("Majors.id")), "sks_count"], // TODO STILL WRONG (NOT YET IMPLEMENTED), IS HERE ONLY TO PLEASE APPS MODEL
+					[fn("COUNT", col("Majors.Subjects.id")), "subject_count"],
+					[fn("SUM", col("Majors.Subjects.credit")), "sks_count"],
 				],
 				exclude: ["thumbnail"],
 			},
@@ -31,9 +31,13 @@ module.exports = {
 				{
 					model: Major,
 					attributes: [],
+					include: {
+						model: Subject,
+						attributes: [],
+					},
 				},
 			],
-			group: ["Faculty.id"],
+			group: ["Faculty.id", "Majors->Subjects->MajorSubject.id"],
 		});
 		return res.sendJson(200, true, "Success", result);
 	}),
@@ -50,9 +54,42 @@ module.exports = {
 			where: {
 				id: faculty_id,
 			},
+			attributes: {
+				exclude: ["thumbnail"],
+			},
 			include: {
 				model: Major,
+				attributes: [
+					[fn("SUM", col("Majors.Subjects.credit")), "credit_total"],
+					"id",
+					"name",
+					"head_of_major",
+					"thumbnail_link",
+					"description",
+					"faculty",
+				],
+				include: [
+					{
+						model: Lecturer,
+						attributes: ["title"],
+						include: {
+							model: User,
+							attributes: ["full_name"],
+						},
+					},
+					{
+						model: Subject,
+						attributes: [],
+					},
+				],
 			},
+			group: [
+				"Faculty.id",
+				"Majors.id",
+				"Majors->Subjects->MajorSubject.id",
+				"Majors->Lecturer.id",
+				"Majors->Lecturer->User.id",
+			],
 		});
 		return res.sendJson(200, true, "Success", result);
 	}),

@@ -34,6 +34,9 @@ module.exports = {
 			final_score: {
 				type: Sequelize.FLOAT,
 			},
+			semester: {
+				type: Sequelize.INTEGER,
+			},
 			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
