@@ -557,6 +557,7 @@ exports.getReport = async (student_id) => {
 			name: currsub.name,
 			credit: currsub.credit,
 			score: currsub_enrollment_data.final_score,
+			semester: currsub_enrollment_data.semester,
 			predicate: letterByPercent(currsub_enrollment_data.final_score),
 		};
 		subjects.push(subject);

@@ -35,6 +35,7 @@ module.exports = {
 				type: Sequelize.FLOAT,
 			},
 			semester: {
+				default: 0,
 				type: Sequelize.INTEGER,
 			},
 			created_at: {
