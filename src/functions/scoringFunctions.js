@@ -20,6 +20,7 @@ const {
 	Reply,
 
 	MaterialEnrolled,
+	StudentDatapool,
 
 	Quiz,
 	Assignment,
@@ -502,6 +503,107 @@ exports.getStudentGPA = async (student_id) => {
 	);
 
 	result = gpa;
+	return result;
+};
+
+exports.getReportSemestrial = async (student_id) => {
+	const student = await Student.findOne({
+		where: {
+			id: student_id,
+		},
+		include: [
+			{
+				model: User,
+				include: { model: Administration },
+			},
+			{
+				model: Major,
+			},
+			{
+				model: Subject,
+				through: {
+					where: {
+						status: FINISHED,
+					},
+				},
+			},
+		],
+	});
+
+	let parsedPlan = await getParsedPlan(student_id);
+
+	let student_information = {
+		student_name: student?.User?.full_name,
+		nsn: student?.User?.Administration?.nsn,
+		major: student?.Majors[0].name,
+		semester: student?.semester,
+		credit_finished: parsedPlan.finished.credit,
+		subjects_finished: parsedPlan.finished.subjects.length,
+		gpa: parseFloat((await GPACalculatorFromList(student.Subjects)).toFixed(2)),
+	};
+
+	// TODO GPA TESTS #######
+	user_id = await leaderboardFunctions.getUserId(student_id, "STUDENT");
+	await leaderboardFunctions.updateLeaderboardGPA(
+		user_id,
+		student_information.gpa
+	);
+
+	const current_student_semester = student_information.semester;
+
+	let subject_promises = [];
+
+	for (let i = 0; i < current_student_semester; i++) {
+		subject_promises.push(
+			StudentSubject.findAll({
+				where: {
+					semester: i,
+					student_id: student_id,
+				},
+				attributes: {
+					exclude: ["student_id", "proof", "proof_link"],
+				},
+			})
+		);
+
+		subject_promises.push(
+			StudentDatapool.findOne({
+				where: {
+					student_id: student_id,
+					semester: i,
+				},
+				attributes: ["gpa", "id", "semester"],
+			})
+		);
+	}
+
+	const raw_student_report = await Promise.all(subject_promises);
+
+	let final_report = [];
+
+	for (let i = 0; i < raw_student_report.length; i += 2) {
+		var subject_data = raw_student_report[i];
+		var analytic_data = raw_student_report[i + 1];
+
+		let current_semester =
+			analytic_data?.semester == null ? 0 : analytic_data?.semester;
+		let current_analytics_id =
+			analytic_data?.id == null ? null : analytic_data?.id;
+		let current_gpa = analytic_data?.gpa == null ? 0.0 : analytic_data?.gpa;
+
+		let semestrial_data = {
+			semester: current_semester,
+			analytics_id: current_analytics_id,
+			gpa: current_gpa,
+			subject_data: subject_data,
+		};
+		final_report.push(semestrial_data);
+	}
+
+	let result = {
+		student_information: student_information,
+		report: final_report,
+	};
 	return result;
 };
 

@@ -17,4 +17,11 @@ route.get(
 	studentStatisticController.getScoreReport
 );
 
+route.get(
+	"/semestrial",
+	protection,
+	authorize("user", "student"),
+	studentStatisticController.getSemestrialReport
+);
+
 module.exports = route;

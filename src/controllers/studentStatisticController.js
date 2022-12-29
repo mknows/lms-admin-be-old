@@ -22,6 +22,23 @@ module.exports = {
 	}),
 
 	/**
+	 * @desc      Get student Report
+	 * @route     GET /api/v1/report/semestrial
+	 * @access    Private
+	 */
+	getSemestrialReport: asyncHandler(async (req, res) => {
+		const student_id = req.student_id;
+
+		let report = await scoringFunctions.getReportSemestrial(student_id);
+
+		return res.status(200).json({
+			success: true,
+			message: "Successfuly retrieved semestrial report",
+			data: report,
+		});
+	}),
+
+	/**
 	 * @desc      Get student score
 	 * @route     GET /api/v1/report/likescore
 	 * @access    Private
