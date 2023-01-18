@@ -4,6 +4,7 @@ const asyncHandler = require("express-async-handler");
 const makeslug = require("../helpers/makeslug");
 const sequelize = require("sequelize");
 const pagination = require("../helpers/pagination");
+const analyticsFunctions = require("../functions/analyticsFunctions");
 
 module.exports = {
 	/**
@@ -11,16 +12,14 @@ module.exports = {
 	 * @route     GET /api/v1/analytics/insertall
 	 * @access    Public
 	 */
-	randomDataSeed: asyncHandler(async (req, res) => {
-		let result = 0;
-		const students = await Student.findAll({
-			attributes: ["id", "user_id"],
-		});
+	getStudentPrediction: asyncHandler(async (req, res) => {
+		const { student_id } = req.query;
+		const { semester } = req.query;
+		let result = await analyticsFunctions.getPrediction(student_id, semester);
 
-		result = students;
-
-		return res.sendJson(200, true, "Successfully updated", result);
+		return res.sendJson(200, true, "Successfully retrieved prediction", result);
 	}),
+
 	/**
 	 * @desc      posts data
 	 * @route     GET /api/v1/analytics/insertall

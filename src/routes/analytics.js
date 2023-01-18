@@ -11,4 +11,6 @@ route.get(
 	analyticsController.getStudentSemestrialAnalytics
 );
 
+route.get("/predict", protection, analyticsController.getStudentPrediction);
+
 module.exports = route;
