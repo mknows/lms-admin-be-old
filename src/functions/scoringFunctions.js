@@ -581,9 +581,11 @@ exports.getReportSemestrial = async (student_id) => {
 
 	let final_report = [];
 
+	let total_credit_finished = 0;
 	for (let i = 0; i < raw_student_report.length; i += 2) {
 		var subject_data = raw_student_report[i];
 		var analytic_data = raw_student_report[i + 1];
+		var total_credit_finished_this_semester = 0;
 
 		let current_semester =
 			analytic_data?.semester == null ? 0 : analytic_data?.semester;
@@ -591,10 +593,24 @@ exports.getReportSemestrial = async (student_id) => {
 			analytic_data?.id == null ? null : analytic_data?.id;
 		let current_gpa = analytic_data?.gpa == null ? 0.0 : analytic_data?.gpa;
 
+		for (let j = 0; j < subject_data.length; j++) {
+			const subject_j = await Subject.findOne({
+				where: {
+					id: subject_data[j].subject_id,
+				},
+			});
+			subject_data[j].dataValues.subject_name = subject_j.name;
+			subject_data[j].dataValues.credit = subject_j.credit;
+			total_credit_finished_this_semester += subject_j.credit;
+		}
+		total_credit_finished += total_credit_finished_this_semester;
+
 		let semestrial_data = {
 			semester: current_semester,
 			analytics_id: current_analytics_id,
 			gpa: current_gpa,
+			semester_credit: total_credit_finished_this_semester,
+			overall_credit: total_credit_finished,
 			subject_data: subject_data,
 		};
 		final_report.push(semestrial_data);
