@@ -586,6 +586,7 @@ exports.getReportSemestrial = async (student_id) => {
 		var subject_data = raw_student_report[i];
 		var analytic_data = raw_student_report[i + 1];
 		var total_credit_finished_this_semester = 0;
+		var total_credit_taken_this_semester = 0;
 
 		let current_semester =
 			analytic_data?.semester == null ? 0 : analytic_data?.semester;
@@ -601,7 +602,11 @@ exports.getReportSemestrial = async (student_id) => {
 			});
 			subject_data[j].dataValues.subject_name = subject_j.name;
 			subject_data[j].dataValues.credit = subject_j.credit;
-			total_credit_finished_this_semester += subject_j.credit;
+
+			if (subject_data[j].status === FINISHED) {
+				total_credit_finished_this_semester += subject_j.credit;
+			}
+			total_credit_taken_this_semester += subject_j.credit;
 		}
 		total_credit_finished += total_credit_finished_this_semester;
 
@@ -609,8 +614,9 @@ exports.getReportSemestrial = async (student_id) => {
 			semester: current_semester,
 			analytics_id: current_analytics_id,
 			gpa: current_gpa,
-			semester_credit: total_credit_finished_this_semester,
-			overall_credit: total_credit_finished,
+			semester_credit_taken: total_credit_taken_this_semester,
+			semester_credit_finished: total_credit_finished_this_semester,
+			overall_credit_taken: total_credit_finished,
 			subject_data: subject_data,
 		};
 		final_report.push(semestrial_data);
