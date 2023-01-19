@@ -67,6 +67,7 @@ exports.validate = (method) => {
 				// body("nin", "Invalid nin").notEmpty().trim(),
 				// body("study_program", "Invalid study program / major").notEmpty(),
 				body("semester", "Invalid semester").notEmpty().trim(),
+				// body("education", "Invalid education").notEmpty(),
 				body("nin_address", "Invalid nin address").notEmpty(),
 				// body("residence_address", "Invalid residence address").notEmpty(),
 				body("birth_place", "Invalid birth place").notEmpty(),
@@ -102,6 +103,14 @@ exports.validate = (method) => {
 				body("semester", "semester is Invalid").notEmpty().trim(),
 				body("nsn", "nsn is Invalid").notEmpty().trim(),
 				body("study_program", "study_program is Invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("education", "education is Invalid")
+					.notEmpty()
+					.trim()
+					.isAlpha("en-US", { ignore: " " }),
+				body("education", "education is Invalid")
 					.notEmpty()
 					.trim()
 					.isAlpha("en-US", { ignore: " " }),

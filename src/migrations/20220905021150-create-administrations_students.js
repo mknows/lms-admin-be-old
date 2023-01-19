@@ -17,6 +17,7 @@ module.exports = {
 			nin: Sequelize.STRING,
 			study_program: Sequelize.STRING,
 			semester: Sequelize.STRING,
+			education: Sequelize.STRING,
 			nin_address: Sequelize.STRING,
 			residence_address: Sequelize.STRING,
 			birth_place: Sequelize.STRING,
