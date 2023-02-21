@@ -99,6 +99,8 @@ module.exports = {
 			gender,
 			nsn,
 			university_of_origin,
+			company_name,
+			department,
 		} = req.body;
 
 		const exist = await Administration.findOne({
@@ -135,6 +137,8 @@ module.exports = {
 				gender,
 				nsn,
 				university_of_origin,
+				company_name,
+				department,
 
 				updated_by: user.id,
 			},
@@ -689,6 +693,8 @@ module.exports = {
 			gender,
 			nsn,
 			university_of_origin,
+			company_name,
+			department,
 
 			// familial
 			father_name,
@@ -741,6 +747,8 @@ module.exports = {
 				gender,
 				nsn,
 				university_of_origin,
+				company_name,
+				department,
 
 				// familial
 				father_name,
@@ -1382,6 +1390,8 @@ async function sortData(data) {
 			gender: data.gender,
 			nsn: data.nsn,
 			university_of_origin: data.university_of_origin,
+			company_name: data.company_name,
+			department: data.department,
 		},
 		familial: {
 			father_name: data.father_name,

@@ -40,6 +40,11 @@ module.exports = (sequelize, DataTypes) => {
 			nsn: DataTypes.STRING,
 			university_of_origin: DataTypes.STRING,
 
+			// lxp
+			company_name: DataTypes.STRING,
+			department: DataTypes.STRING,
+
+			// familial
 			father_name: DataTypes.STRING,
 			father_occupation: DataTypes.STRING,
 			father_income: DataTypes.STRING,

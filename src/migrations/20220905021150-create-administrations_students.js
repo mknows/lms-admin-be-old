@@ -27,6 +27,9 @@ module.exports = {
 			nsn: Sequelize.STRING,
 			university_of_origin: Sequelize.STRING,
 
+			company_name: Sequelize.STRING,
+			department: Sequelize.STRING,
+
 			father_name: Sequelize.STRING,
 			father_occupation: Sequelize.STRING,
 			father_income: Sequelize.STRING,
