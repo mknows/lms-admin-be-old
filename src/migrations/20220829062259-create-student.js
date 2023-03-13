@@ -16,7 +16,7 @@ module.exports = {
 			},
 			semester: {
 				allowNull: false,
-				type: Sequelize.INT,
+				type: Sequelize.INTEGER,
 			},
 			created_at: {
 				allowNull: false,

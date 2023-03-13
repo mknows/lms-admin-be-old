@@ -1,25 +1,14 @@
 require("dotenv").config();
-const {
-	DB_USERNAME,
-	DB_PASSWORD,
-	DB_NAME,
-	DB_PORT,
-	DB_HOST,
-	DB_DIALECT,
-
-	DB_USERNAME_GCP,
-	DB_PASSWORD_GCP,
-	DB_NAME_GCP,
-	DB_HOST_GCP,
-} = process.env;
+const { DB_USERNAME_GCP, DB_PASSWORD_GCP, DB_NAME_GCP, DB_HOST_GCP } =
+	process.env;
 
 module.exports = {
 	development: {
-		username: DB_USERNAME_GCP,
-		password: DB_PASSWORD_GCP,
-		database: DB_NAME_GCP,
-		host: DB_HOST_GCP,
-		dialect: DB_DIALECT,
+		username: "postgres",
+		password: "rboo8BF7H%pV>%{)",
+		database: "kg-old-v1",
+		host: "34.124.179.216",
+		dialect: "postgres",
 		operatorsAliases: 0,
 		dialectOptions: {
 			useUTC: false,
@@ -46,22 +35,5 @@ module.exports = {
 			},
 		},
 		logging: false,
-	},
-
-	production: {
-		username: DB_USERNAME,
-		password: DB_PASSWORD,
-		database: DB_NAME,
-		host: DB_HOST,
-		dialect: DB_DIALECT,
-		define: {
-			paranoid: true,
-			timestamps: true,
-			underscored: true,
-			underscoredAll: true,
-			createdAt: "created_at",
-			updatedAt: "updated_at",
-			deletedAt: "deleted_at",
-		},
 	},
 };
