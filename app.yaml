@@ -24,10 +24,10 @@ env_variables:
 
   # setting database gcp
   DB_USERNAME_GCP: "postgres"
-  DB_PASSWORD_GCP: "D^Eos<:#hyusu{P8"
-  DB_NAME_GCP: "kampus-gratis-develop"
+  DB_PASSWORD_GCP: "c*Q=<3k6R(kbooRD"
+  DB_NAME_GCP: kg-old-v1
   DB_PORT_GCP: 5432
-  DB_HOST_GCP: 34.101.250.5
+  DB_HOST_GCP: 34.124.179.216
 
   # setting OAuth2
   GOOGLE_CLIENT_ID: "888715233325-6umod6g1btsv85r100gh2mmji8h9r4b6.apps.googleusercontent.com"
