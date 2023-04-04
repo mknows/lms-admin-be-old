@@ -19,6 +19,9 @@ module.exports = {
 			thumbnail: {
 				type: Sequelize.STRING,
 			},
+			company_logo: {
+				type: Sequelize.STRING,
+			},
 			partenered: {
 				type: Sequelize.BOOLEAN,
 			},

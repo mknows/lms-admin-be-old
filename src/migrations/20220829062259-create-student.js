@@ -10,9 +10,8 @@ module.exports = {
 			user_id: {
 				type: Sequelize.UUID,
 			},
-			major_id: {
-				allowNull: false,
-				type: Sequelize.ARRAY(Sequelize.STRING),
+			supervisor_id: {
+				type: Sequelize.UUID,
 			},
 			semester: {
 				allowNull: false,
