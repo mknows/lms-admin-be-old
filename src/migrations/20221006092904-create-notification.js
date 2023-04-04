@@ -26,13 +26,25 @@ module.exports = {
 			sender_id: {
 				type: Sequelize.UUID,
 			},
-			createdAt: {
+			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
 			},
-			updatedAt: {
+			updated_at: {
 				allowNull: false,
 				type: Sequelize.DATE,
+			},
+			deleted_at: {
+				allowNull: false,
+				type: Sequelize.DATE,
+			},
+			created_by: {
+				allowNull: true,
+				type: Sequelize.UUID,
+			},
+			updated_by: {
+				allowNull: true,
+				type: Sequelize.UUID,
 			},
 		});
 	},

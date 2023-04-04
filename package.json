@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "herokuupdate": "./node_modules/.bin/herokuupdate.sh"
+    "herokuupdate": "./node_modules/.bin/herokuupdate.sh",
+    "remig": "cd src && sequelize db:migrate:undo:all && sequelize db:migrate && cd .."
   },
   "keywords": [],
   "author": "",

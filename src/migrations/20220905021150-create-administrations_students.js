@@ -65,6 +65,7 @@ module.exports = {
 			statement_link: Sequelize.STRING,
 
 			is_approved: Sequelize.JSON,
+			rejected_details: Sequelize.JSON,
 			approved_by: Sequelize.UUID,
 
 			degree: Sequelize.STRING,

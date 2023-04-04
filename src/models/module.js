@@ -9,17 +9,17 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			this.hasMany(models.Video, {
-				foreignKey: "id"
+				foreignKey: "id",
 			});
 			this.hasMany(models.Document, {
 				foreignKey: "id",
 			});
 			this.belongsTo(models.MaterialEnrolled, {
 				foreignKey: "id",
-				targetKey: "id_referrer"
+				targetKey: "id_referrer",
 			});
-			this.belongsTo(models.Session,{
-				foreignKey:"session_id"
+			this.belongsTo(models.Session, {
+				foreignKey: "session_id",
 			});
 		}
 	}
@@ -33,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
 			session_id: DataTypes.UUID,
 			video_id: { type: DataTypes.ARRAY(DataTypes.UUID), defaultValue: [] },
 			document_id: { type: DataTypes.ARRAY(DataTypes.UUID), defaultValue: [] },
+			description: DataTypes.STRING,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
 			deleted_at: DataTypes.DATE,

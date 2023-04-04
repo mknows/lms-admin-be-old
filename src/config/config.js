@@ -5,9 +5,9 @@ const { DB_USERNAME_GCP, DB_PASSWORD_GCP, DB_NAME_GCP, DB_HOST_GCP } =
 module.exports = {
 	development: {
 		username: "postgres",
-		password: "c*Q=<3k6R(kbooRD",
-		database: "kg-old-v1",
-		host: "34.124.179.216",
+		password: "@2(hb*1s07l,zTpF",
+		database: "old-v1",
+		host: "34.101.203.207",
 		dialect: "postgres",
 		operatorsAliases: 0,
 		dialectOptions: {

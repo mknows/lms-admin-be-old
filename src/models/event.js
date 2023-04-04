@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
 			capacity: DataTypes.INTEGER,
 			price: DataTypes.INTEGER,
 			type: DataTypes.STRING,
+			thumbnail: DataTypes.STRING,
 			material: DataTypes.ARRAY(DataTypes.STRING),
 			speaker_details: DataTypes.JSON,
 			created_at: DataTypes.DATE,

@@ -81,6 +81,7 @@ module.exports = (sequelize, DataTypes) => {
 
 			degree: DataTypes.STRING,
 			is_approved: DataTypes.JSON,
+			rejected_details: DataTypes.JSON,
 			approved_by: DataTypes.UUID,
 			created_at: {
 				allowNull: false,

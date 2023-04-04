@@ -16,6 +16,10 @@ module.exports = {
 			document_id: {
 				type: Sequelize.ARRAY(Sequelize.UUID),
 			},
+			description: {
+				allowNull: true,
+				type: Sequelize.STRING,
+			},
 			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE,

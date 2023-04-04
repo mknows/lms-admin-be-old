@@ -40,6 +40,9 @@ module.exports = {
 			speaker_details: {
 				type: Sequelize.JSON,
 			},
+			thumbnail: {
+				type: Sequelize.STRING,
+			},
 			created_at: {
 				allowNull: true,
 				type: Sequelize.DATE,
