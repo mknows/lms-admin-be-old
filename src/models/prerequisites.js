@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
 	class Prerequisite extends Model {
 		/**
@@ -21,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
 				defaultValue: sequelize.literal("gen_random_uuid()"),
 			},
 			subject_id: DataTypes.UUID,
-      prerequisite_subject_id: DataTypes.UUID,
+			prerequisite_subject_id: DataTypes.UUID,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
 			deleted_at: DataTypes.DATE,
