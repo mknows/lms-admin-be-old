@@ -38,11 +38,4 @@ route.post(
 );
 route.get("/logout", userController.signOutUser);
 
-route.get(
-	"/nukeusers",
-	protection,
-	authorize("admin"),
-	userController.deleteAllFirebaseUser
-);
-
 module.exports = route;

@@ -242,22 +242,6 @@ module.exports = {
 		});
 	}),
 
-	/**
-	 * @desc      delete all user
-	 * @route     GET /api/v1/auth/verify-email
-	 * @access    Public
-	 */
-	deleteAllFirebaseUser: asyncHandler(async (req, res) => {
-		const { users } = await admin.auth().listUsers(1000);
-
-		users.map(async (user) => {
-			// KODE HARAM
-			await admin.auth().deleteUser(user.uid);
-		});
-
-		return res.json({ users });
-	}),
-
 	signOutUser: asyncHandler(async (req, res) => {
 		req.logout(function (err) {
 			if (err) {

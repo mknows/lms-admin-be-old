@@ -30,6 +30,7 @@ const assessmentRoute = require("./assessment");
 const serviceRoute = require("./services");
 const careerRoute = require("./career");
 const analyticsRoute = require("./analytics");
+const shortcutsRoute = require("./shortcut");
 
 const pingRoutes = require("./ping");
 
@@ -66,5 +67,6 @@ route.use("/assessment", assessmentRoute);
 route.use("/services", serviceRoute);
 route.use("/career", careerRoute);
 route.use("/analytics", analyticsRoute);
+route.use("/shortcut", shortcutsRoute);
 
 module.exports = route;
