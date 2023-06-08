@@ -102,9 +102,11 @@ exports.authorize = (...roles) => {
 			role = "guest";
 		}
 
+		console.log(currentUserRole)
+
 		if (!currentUserRole.includes(...roles)) {
 			return next(
-				new ErrorResponse(`Not authorized to access this route`, 404)
+				new ErrorResponse(`Not authorized to access this route #1`, 404)
 			);
 		}
 

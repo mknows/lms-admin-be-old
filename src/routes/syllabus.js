@@ -16,6 +16,12 @@ route.get(
 	authorize("student", "user"),
 	syllabusController.getCurriculum
 );
+route.get(
+	"/curriculum-leveinshtein",
+	// protection,
+	// authorize("student", "user"),
+	syllabusController.getCurriculumLevenshtein
+);
 route.get("/subjects/all", protection, syllabusController.getAllSubjects);
 route.get(
 	"/subjects/paginate",
@@ -27,8 +33,8 @@ route.get(
 	protection,
 	syllabusController.subjectByMajor
 );
-route.get("/subject/:subject_id", 
-	protection, 
+route.get("/subject/:subject_id",
+	protection,
 	syllabusController.getSubject);
 route.get("/getCurrentKRS", protection, syllabusController.getKRS);
 

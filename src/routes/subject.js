@@ -23,7 +23,7 @@ const upload = multer({
 			file.mimetype == "application/pdf" ||
 			file.mimetype == "application/msword" ||
 			file.mimetype ==
-				"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 		) {
 			return cb(null, true);
 		} else {

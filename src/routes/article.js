@@ -24,6 +24,7 @@ const upload = multer({
 	},
 });
 
+route.get('/levenshtein', articleController.getArticleUsingLevenshteinDistance);
 route.get("/index", articleController.index);
 route.get("/:id", articleController.getArticleById);
 route.post("/create", upload.single("image"), articleController.create);

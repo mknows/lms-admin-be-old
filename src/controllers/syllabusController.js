@@ -14,6 +14,8 @@ const ErrorResponse = require("../utils/errorResponse");
 const pagination = require("../helpers/pagination");
 const { redisClient } = require("../helpers/redis");
 
+const levenshtein = require('js-levenshtein');
+
 module.exports = {
 	/**
 	 * @desc      update module enrolled
@@ -331,6 +333,58 @@ module.exports = {
 		enrolledSubjects[0].dataValues["totalCredit"] = sum;
 		return res.sendJson(200, true, "sucess get subject", enrolledSubjects);
 	}),
+
+	getCurriculumLevenshtein: asyncHandler(async (req, res) => {
+		const { search } = req.query;
+
+		await Subject.findAll({
+			where: {
+				name: {
+					[Op.ne]: null // Filter judul artikel yang tidak null
+				}
+			},
+			order: [['created_at', 'desc']],
+		}).then(articles => {
+			const titles = articles.map(article => article.name.trim());
+
+			const hardResults = titles.map(title => {
+				const distances = [];
+				const titlesSplit = title.split(" ");
+				const searchsSplit = search ? search?.split(" ") : [];
+
+				titlesSplit.forEach(titleWord => {
+					searchsSplit.forEach(searchWord => {
+						distances.push(levenshtein(titleWord, searchWord));
+					});
+				});
+
+				distances.sort((a, b) => a - b);
+
+				return { title, distance: distances };
+			});
+
+			let results = hardResults.map(({ title, distance }) => ({
+				title,
+				lowest_distance: Math.min(...distance),
+				total_distance: distance.reduce((total, number) => total + number, 0)
+			}));
+
+			results = results.sort((a, b) => {
+				if (a.lowest_distance === b.lowest_distance) {
+					return a.total_distance - b.total_distance;
+				} else {
+					return a.lowest_distance - b.lowest_distance;
+				}
+			});
+
+			res.sendJson(200, true, "Hello", { nearest: [...results] });
+		})
+			.catch((error) => {
+				console.error('Terjadi kesalahan:', error);
+				res.sendJson(500, false, "Terjadi kesalahan");
+			});
+	}),
+
 
 	/**
 	 * @desc      get curriculum

@@ -13,7 +13,60 @@ const { redisClient } = require("../helpers/redis");
 const pagination = require("../helpers/pagination");
 const { Op } = require("sequelize");
 
+const levenshtein = require('js-levenshtein');
+
 module.exports = {
+	getArticleUsingLevenshteinDistance: asyncHandler(async (req, res) => {
+		const { search } = req.query;
+
+		await Article.findAll({
+			where: {
+				title: {
+					[Op.ne]: null // Filter judul artikel yang tidak null
+				}
+			},
+			order: [['created_at', 'desc']],
+		}).then(articles => {
+			const titles = articles.map(article => article.title.trim());
+
+			const hardResults = titles.map(title => {
+				const distances = [];
+				const titlesSplit = title.split(" ");
+				const searchsSplit = search.split(" ");
+
+				titlesSplit.forEach(titleWord => {
+					searchsSplit.forEach(searchWord => {
+						distances.push(levenshtein(titleWord, searchWord));
+					});
+				});
+
+				distances.sort((a, b) => a - b);
+
+				return { title, distance: distances };
+			});
+
+			let results = hardResults.map(({ title, distance }) => ({
+				title,
+				lowest_distance: Math.min(...distance),
+				total_distance: distance.reduce((total, number) => total + number, 0)
+			}));
+
+			results = results.sort((a, b) => {
+				if (a.lowest_distance === b.lowest_distance) {
+					return a.total_distance - b.total_distance;
+				} else {
+					return a.lowest_distance - b.lowest_distance;
+				}
+			});
+
+			res.sendJson(200, true, "Hello", { nearest: [...results] });
+		})
+			.catch((error) => {
+				console.error('Terjadi kesalahan:', error);
+				res.sendJson(500, false, "Terjadi kesalahan");
+			});
+	}),
+
 	/**
 	 * @desc      Get All data Article
 	 * @route     GET /api/v1/article/index?page=(number)&limit=(number)&search=(str)
@@ -27,44 +80,34 @@ module.exports = {
 		if (search) {
 			search_query = "%" + search.charAt(0) + "%";
 		}
-		const key = "get-all-data-articleeeeeee";
 
-		let cacheResult = await redisClient.get(key);
-		if (cacheResult) {
-			results = JSON.parse(cacheResult);
-			const length = results.length;
-			var index = 0;
-			const regExpConstructor = new RegExp(search, "i");
-			for (let i = 0; i < length; i++) {
-				if (results[index].title.search(regExpConstructor) === -1) {
-					results.splice(index, 1);
-				} else {
-					index++;
-				}
-			}
-			results = await pagination(results, page, limit);
+		results = await Article.findAll({
+			attributes: {
+				include: ["created_at"],
+			},
+			order: [["created_at", "desc"]],
+		});
 
-			if (results.length == 0) {
-				return res.sendJson(200, true, "success get, but no article is found");
+		const length = results.length;
+		var index = 0;
+		const regExpConstructor = new RegExp(search, "i");
+		for (let i = 0; i < length; i++) {
+			if (results[index].title.search(regExpConstructor) === -1) {
+				results.splice(index, 1);
 			} else {
-				return res.sendJson(200, true, "success get all data", results);
+				index++;
 			}
+		}
+
+		// await redisClient.set(key, JSON.stringify(results), {
+		// 	EX: 600,
+		// });
+		results = await pagination(results, page, limit);
+
+		if (results.length == 0) {
+			return res.sendJson(200, true, "success get, but no article is found");
 		} else {
-			results = await Article.findAll({
-				attributes: {
-					include: ["created_at"],
-				},
-				order: [["created_at", "desc"]],
-			});
-			await redisClient.set(key, JSON.stringify(results), {
-				EX: 600,
-			});
-			results = await pagination(results, page, limit);
-			if (results.result.length == 0) {
-				return res.sendJson(200, true, "success get, but no article is found");
-			} else {
-				return res.sendJson(200, true, "success get all data", results);
-			}
+			return res.sendJson(200, true, "success get all data", results);
 		}
 	}),
 
