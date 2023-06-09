@@ -24,6 +24,15 @@ if (config.use_env_variable) {
 	);
 }
 
+sequelize
+	.authenticate()
+	.then(() => {
+		console.log("[SERVER] Database terhubung");
+	})
+	.catch((error) => {
+		console.error("[SERVER] Gagal terhubung ke database:", error);
+	});
+
 const sortDir = (mainDirectory) => {
 	const folders = [];
 	const CheckFile = (filePath) => fs.statSync(filePath).isFile();
