@@ -1,4 +1,4 @@
-const { Subject, MajorSubject } = require("../models");
+const { Major, Subject, MajorSubject } = require("../models");
 const { v4: uuidv4 } = require("uuid");
 
 const subjectsName = [
@@ -53,29 +53,54 @@ const subjectsName = [
   'Kecerdasan Komputasional',
   'Rekayasa Data',
   'Mata Kuliah Terakhir'
-]
+];
 
-function seeder() {
+(async () => {
   const majorId = "1db6f467-dd00-4c10-8aa3-56c6fbcf10de";
 
-  subjectsName.forEach(async (subject, index) => {
-    const uuid = uuidv4();
+  const major = await Major.findOne({
+    where: {
+      id: majorId
+    }
+  });
 
-    await Subject.create({
-      id: uuid,
-      name: subject,
-      subject_code: subject.split(" ").join(" ").toLocaleLowerCase(),
-      description: `This is the description for ${index}`,
+  if (!major) {
+    await Major.create({
+      id: majorId,
+      name: "Ilmu Komputer",
     });
 
-    await MajorSubject.create({
-      id: uuidv4(),
-      major_id: majorId,
-      subject_id: uuid,
-      degree: "S1",
-      semester: Math.floor(Math.random() * 8) + 1
-    })
-  });
-}
+    console.log(`[SERVER] Jurusan Ilmu Komputer dibuat`);
+  } else console.log(`[SERVER] Seeder Jurusan Ilmu Komputer telah dilakukan`);
 
-seeder()
+  const subject = await Subject.findOne({
+    where: {
+      name: subjectsName[0]
+    }
+  });
+
+  if (!subject) {
+    console.log(`[SERVER] Memulai seeder Mata Kuliah Ilmu Komputer`);
+
+    subjectsName.forEach(async (subject, index) => {
+      console.log(`[SERVER] Mata Kuliah ${subject} dibuat`);
+      const uuid = uuidv4();
+
+      await Subject.create({
+        id: uuid,
+        name: subject,
+        subject_code: subject.split(" ").join(" ").toLocaleLowerCase(),
+        description: `This is the description for ${index}`,
+      });
+
+      await MajorSubject.create({
+        id: uuidv4(),
+        major_id: majorId,
+        subject_id: uuid,
+        degree: "S1",
+        semester: Math.floor(Math.random() * 8) + 1
+      })
+    });
+  } else console.log(`[SERVER] Mata Kuliah seeder sudah dilakukan. Reset ulang table subjects untuk memulai ulang`);
+
+})();
