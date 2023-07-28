@@ -10,6 +10,7 @@ const {
 	Student,
 	Major,
 	MaterialEnrolled,
+	StudentSubject,
 } = require("../models");
 require("dotenv").config();
 const {
@@ -98,6 +99,44 @@ module.exports = {
 			{
 				where: {
 					id: materialenrolled_id,
+				},
+			}
+		);
+
+		return res.sendJson(
+			200,
+			true,
+			"Successfully graded assignment",
+			assignment
+		);
+	}),
+
+	/**
+	 * @desc      delete all user
+	 * @route     DELETE /api/v1/auth/nukeusers
+	 * @access    Public
+	 */
+	acceptStudentStudyPlan: asyncHandler(async (req, res) => {
+		const { student_id } = req.body;
+
+		let plan = await StudentSubject.findAll({
+			where: {
+				student_id: student_id,
+				status: PENDING,
+			},
+		});
+		if (plan === null) {
+			return res.sendJson(404, false, "No PENDING plan found", plan);
+		}
+
+		plan = await StudentSubject.update(
+			{
+				status: ONGOING,
+			},
+			{
+				where: {
+					student_id: student_id,
+					status: PENDING,
 				},
 			}
 		);
