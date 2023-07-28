@@ -11,4 +11,9 @@ route.put(
 
 route.post("/makeuser/student", studentManagementController.makeUserToStudent);
 
+route.get(
+	"/getpendingstudentplans",
+	studentManagementController.getPendingStudyPlan
+);
+
 module.exports = route;

@@ -141,11 +141,21 @@ module.exports = {
 			}
 		);
 
-		return res.sendJson(
-			200,
-			true,
-			"Successfully graded assignment",
-			assignment
-		);
+		return res.sendJson(200, true, "Successfully graded assignment", plan);
+	}),
+
+	/**
+	 * @desc      delete all user
+	 * @route     DELETE /api/v1/auth/nukeusers
+	 * @access    Public
+	 */
+	getPendingStudyPlan: asyncHandler(async (req, res) => {
+		const studentPlans = await StudentSubject.findAll({
+			where: {
+				status: PENDING,
+			},
+		});
+
+		return res.sendJson(200, true, "SUCCESS", studentPlans);
 	}),
 };
