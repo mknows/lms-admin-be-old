@@ -48,4 +48,56 @@ module.exports = {
 
 		return res.sendJson(200, true, "sucess create data admin", created);
 	}),
+
+	/**
+	 * @desc      Login Account Using Email and Password
+	 * @route     POST /api/v1/auth/login
+	 * @access    Public
+	 */
+	loginAdmin: asyncHandler(async (req, res) => {
+		const { email, password } = req.body;
+
+		const auth = getClientAuth();
+		const credential = await signInWithEmailAndPassword(auth, email, password);
+
+		// NOTE: check email verified in firebase
+		// if (credential.user.emailVerified == false) {
+		// 	return res.sendJson(
+		// 		401,
+		// 		false,
+		// 		"sorry, please verify your email address"
+		// 	);
+		// }
+
+		const dataPostgre = await Admin.findOne({
+			where: { email },
+		});
+
+		if (!dataPostgre) {
+			return res.sendJson(
+				401,
+				false,
+				"sorry, your account is not in the database"
+			);
+		}
+
+		await insertLogActivity(
+			req,
+			dataPostgre.dataValues.id,
+			"Login with Email and Password"
+		);
+
+		const token = await auth.currentUser.getIdToken();
+
+		return res.sendJson(
+			200,
+			true,
+			`Login success as ADMIN ${credential.user.displayName}!`,
+			{ token },
+			{
+				name: "token",
+				value: token,
+			}
+		);
+	}),
 };

@@ -8,6 +8,7 @@ const {
 	Major,
 	Quiz,
 	MaterialEnrolled,
+	Admin,
 } = require("../models");
 require("dotenv").config();
 const { MODULE } = process.env;
@@ -102,7 +103,7 @@ exports.authorize = (...roles) => {
 			role = "guest";
 		}
 
-		console.log(currentUserRole)
+		console.log(currentUserRole);
 
 		if (!currentUserRole.includes(...roles)) {
 			return next(
@@ -113,6 +114,34 @@ exports.authorize = (...roles) => {
 		req.lecturer_id = lecturer_id;
 		req.student_id = student_id;
 		req.role = role;
+		next();
+	});
+};
+
+exports.authorizeAdmin = () => {
+	return asyncHandler(async (req, res, next) => {
+		let student_id;
+		let lecturer_id;
+
+		if (req?.userData === undefined) {
+			return next(
+				new ErrorResponse(`Not authorized to access this route`, 404)
+			);
+		}
+
+		const adminData = await Admin.findOne({
+			where: { id: req.userData.id },
+		});
+
+		if (adminData == null) {
+			return next(
+				new ErrorResponse(`Not authorized to access this route`, 404)
+			);
+		}
+
+		req.lecturer_id = lecturer_id;
+		req.student_id = student_id;
+		req.role = "admin";
 		next();
 	});
 };
