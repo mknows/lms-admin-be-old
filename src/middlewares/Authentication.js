@@ -118,26 +118,21 @@ exports.authorize = (...roles) => {
 	});
 };
 
-exports.authorizeAdmin = () => {
-	return asyncHandler(async (req, res, next) => {
-		if (req?.userData === undefined) {
-			return next(
-				new ErrorResponse(`Not authorized to access this route`, 404)
-			);
-		}
+exports.authorizeAdmin = asyncHandler(async (req, res, next) => {
+	if (req?.userData === undefined) {
+		return next(new ErrorResponse(`Not authorized to access this route`, 404));
+	}
 
-		const adminData = await Admin.findOne({
-			where: { id: req.userData.id },
-		});
-
-		if (adminData == null) {
-			return next(
-				new ErrorResponse(`Not authorized to access this route`, 404)
-			);
-		}
-		next();
+	const adminData = await Admin.findOne({
+		where: { id: req.userData.id },
 	});
-};
+
+	if (adminData == null) {
+		return next(new ErrorResponse(`Not authorized to access this route`, 404));
+	}
+	req.role = "admin";
+	next();
+});
 
 exports.enrolled = (Model) => {
 	return asyncHandler(async (req, res, next) => {

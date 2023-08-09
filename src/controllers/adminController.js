@@ -65,4 +65,28 @@ module.exports = {
 		});
 		return res.sendJson(200, true, "USER_SEARCH_SUCCESS", users);
 	}),
+
+	/**
+	 * @desc      Get User Login Data (Profile)
+	 * @route     GET /api/v1/admin/me
+	 * @access    Private
+	 */
+	getAdminProfile: asyncHandler(async (req, res) => {
+		let user = req.userData;
+
+		const data = await User.findOne({
+			where: {
+				firebase_uid: user.firebase_uid,
+			},
+			attributes: {
+				exclude: ["id", "firebase_uid", "password", "deleted_at", "updated_at"],
+			},
+		});
+
+		return res.status(200).json({
+			success: true,
+			message: "Account connected.",
+			data: { ...data.dataValues, role: req.role },
+		});
+	}),
 };

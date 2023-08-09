@@ -11,6 +11,8 @@ const adminController = require("../controllers/adminController");
 
 route.get("/all", protection, authorizeAdmin, adminController.getAllAdmin);
 route.get("/user", protection, authorizeAdmin, adminController.searchUser);
+route.get("/me", protection, authorizeAdmin, adminController.getAdminProfile);
+
 route.post("/create", protection, authorizeAdmin, adminController.createAdmin);
 
 // route.post(
