@@ -120,9 +120,6 @@ exports.authorize = (...roles) => {
 
 exports.authorizeAdmin = () => {
 	return asyncHandler(async (req, res, next) => {
-		let student_id;
-		let lecturer_id;
-
 		if (req?.userData === undefined) {
 			return next(
 				new ErrorResponse(`Not authorized to access this route`, 404)
@@ -138,10 +135,6 @@ exports.authorizeAdmin = () => {
 				new ErrorResponse(`Not authorized to access this route`, 404)
 			);
 		}
-
-		req.lecturer_id = lecturer_id;
-		req.student_id = student_id;
-		req.role = "admin";
 		next();
 	});
 };

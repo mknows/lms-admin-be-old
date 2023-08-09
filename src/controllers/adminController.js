@@ -3,15 +3,10 @@ const bcrypt = require("bcryptjs");
 const asyncHandler = require("express-async-handler");
 
 module.exports = {
-	getAllAdmin: async (req, res) => {
-		try {
-			const data = await Admins.findAll();
-
-			return res.sendJson(200, true, "sucess get all data admin", data);
-		} catch (error) {
-			return res.sendJson(500, false, error, {});
-		}
-	},
+	getAllAdmin: asyncHandler(async (req, res) => {
+		const data = await Admin.findAll();
+		return res.sendJson(200, true, "GET_ALL_ADMIN_SUCCESS");
+	}),
 
 	createAdmin: asyncHandler(async (req, res) => {
 		let { user_id } = req.body;
@@ -50,54 +45,24 @@ module.exports = {
 	}),
 
 	/**
-	 * @desc      Login Account Using Email and Password
-	 * @route     POST /api/v1/auth/login
+	 * @desc      search users
+	 * @route     POST /api/v1/admin/user
 	 * @access    Public
 	 */
-	loginAdmin: asyncHandler(async (req, res) => {
-		const { email, password } = req.body;
+	searchUser: asyncHandler(async (req, res) => {
+		const { user_query } = req.body;
 
-		const auth = getClientAuth();
-		const credential = await signInWithEmailAndPassword(auth, email, password);
-
-		// NOTE: check email verified in firebase
-		// if (credential.user.emailVerified == false) {
-		// 	return res.sendJson(
-		// 		401,
-		// 		false,
-		// 		"sorry, please verify your email address"
-		// 	);
-		// }
-
-		const dataPostgre = await Admin.findOne({
-			where: { email },
-		});
-
-		if (!dataPostgre) {
-			return res.sendJson(
-				401,
-				false,
-				"sorry, your account is not in the database"
-			);
+		let whereClause = {};
+		if (user_query !== undefined) {
+			whereClause = {
+				email: {
+					[Op.like]: `%${user_query}%`,
+				},
+			};
 		}
-
-		await insertLogActivity(
-			req,
-			dataPostgre.dataValues.id,
-			"Login with Email and Password"
-		);
-
-		const token = await auth.currentUser.getIdToken();
-
-		return res.sendJson(
-			200,
-			true,
-			`Login success as ADMIN ${credential.user.displayName}!`,
-			{ token },
-			{
-				name: "token",
-				value: token,
-			}
-		);
+		const users = await User.findAll({
+			where: whereClause,
+		});
+		return res.sendJson(200, true, "USER_SEARCH_SUCCESS", users);
 	}),
 };
