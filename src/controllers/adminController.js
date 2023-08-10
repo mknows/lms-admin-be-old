@@ -5,7 +5,7 @@ const asyncHandler = require("express-async-handler");
 module.exports = {
 	getAllAdmin: asyncHandler(async (req, res) => {
 		const data = await Admin.findAll();
-		return res.sendJson(200, true, "GET_ALL_ADMIN_SUCCESS");
+		return res.sendJson(200, true, "GET_ALL_ADMIN_SUCCESS", data);
 	}),
 
 	createAdmin: asyncHandler(async (req, res) => {
