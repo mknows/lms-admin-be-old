@@ -27,7 +27,7 @@ const {
 } = process.env;
 const asyncHandler = require("express-async-handler");
 const { STATUS_CODES } = require("http");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 
 module.exports = {
 	/**
@@ -132,8 +132,10 @@ module.exports = {
 
 		const studentPlans = await Student.findAll({
 			include: {
-				model: StudentSubject,
-				where: whereClause,
+				model: Subject,
+				through: {
+					where: whereClause,
+				},
 			},
 		});
 
