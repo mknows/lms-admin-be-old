@@ -47,7 +47,7 @@ module.exports = {
 			},
 		});
 
-		let student_id = "Not a STUDENT";
+		let student_id = "NOT_A_STUDENT";
 
 		if (req.role === "student") {
 			student_id = req.student_id;
@@ -60,23 +60,21 @@ module.exports = {
 		});
 	}),
 
-	// TODO: DEPRICATE
 	/**
 	 * @desc      Get student Report
-	 * @route     GET /api/v1/profile/report
+	 * @route     GET /api/v1/profile/dashboard
 	 * @access    Private
 	 */
-	getReport: asyncHandler(async (req, res) => {
-		let token = req.firebaseToken;
+	getDashboard: asyncHandler(async (req, res) => {
 		const student_id = req.student_id;
 
-		let report = await scoringFunctions.getReport(student_id);
-
-		return res.status(200).json({
-			success: true,
-			message: "Account connected.",
-			data: report,
+		let data = await StudentSubject.findAll({
+			where: {
+				student_id: student_id,
+			},
 		});
+
+		return res.sendJson(200, true, "GET_DASHBOARD_SUCCESS", data);
 	}),
 
 	/**
@@ -91,7 +89,7 @@ module.exports = {
 		let subjects_taken = 0;
 
 		if (!student_id) {
-			return res.sendJson(400, false, "User is not a student", {});
+			return res.sendJson(400, false, "USER_IS_NOT_A_STUDENT", {});
 		}
 
 		const subjects = await Student.findOne({
@@ -248,7 +246,7 @@ module.exports = {
 				assignment_info: agenda[3][i],
 			});
 		}
-		return res.sendJson(200, true, "success get achievement", {
+		return res.sendJson(200, true, "SUCCESS_GET_ACHIEVMENT", {
 			finished_subjects: finished_subjects,
 			subject_taken: subjects_taken,
 			students_certificate: students_certificate.length,
@@ -308,7 +306,7 @@ module.exports = {
 			full_name: titleCase(full_name),
 		});
 
-		let student_id = "Not a STUDENT";
+		let student_id = "NOT_A_STUDENT";
 
 		if (req.role === "student") {
 			student_id = req.student_id;
@@ -366,7 +364,7 @@ module.exports = {
 				});
 		}
 
-		return res.sendJson(200, true, "success update data user", {
+		return res.sendJson(200, true, "SUCCESS_UPDATE_USER", {
 			...data[1].dataValues,
 			role: req.role,
 			student_id: student_id,

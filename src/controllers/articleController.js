@@ -13,7 +13,7 @@ const { redisClient } = require("../helpers/redis");
 const pagination = require("../helpers/pagination");
 const { Op } = require("sequelize");
 
-const levenshtein = require('js-levenshtein');
+const levenshtein = require("js-levenshtein");
 
 module.exports = {
 	getArticleUsingLevenshteinDistance: asyncHandler(async (req, res) => {
@@ -22,47 +22,48 @@ module.exports = {
 		await Article.findAll({
 			where: {
 				title: {
-					[Op.ne]: null // Filter judul artikel yang tidak null
-				}
+					[Op.ne]: null, // Filter judul artikel yang tidak null
+				},
 			},
-			order: [['created_at', 'desc']],
-		}).then(articles => {
-			const titles = articles.map(article => article.title.trim());
+			order: [["created_at", "desc"]],
+		})
+			.then((articles) => {
+				const titles = articles.map((article) => article.title.trim());
 
-			const hardResults = titles.map(title => {
-				const distances = [];
-				const titlesSplit = title.split(" ");
-				const searchsSplit = search.split(" ");
+				const hardResults = titles.map((title) => {
+					const distances = [];
+					const titlesSplit = title.split(" ");
+					const searchsSplit = search.split(" ");
 
-				titlesSplit.forEach(titleWord => {
-					searchsSplit.forEach(searchWord => {
-						distances.push(levenshtein(titleWord, searchWord));
+					titlesSplit.forEach((titleWord) => {
+						searchsSplit.forEach((searchWord) => {
+							distances.push(levenshtein(titleWord, searchWord));
+						});
 					});
+
+					distances.sort((a, b) => a - b);
+
+					return { title, distance: distances };
 				});
 
-				distances.sort((a, b) => a - b);
+				let results = hardResults.map(({ title, distance }) => ({
+					title,
+					lowest_distance: Math.min(...distance),
+					total_distance: distance.reduce((total, number) => total + number, 0),
+				}));
 
-				return { title, distance: distances };
-			});
+				results = results.sort((a, b) => {
+					if (a.lowest_distance === b.lowest_distance) {
+						return a.total_distance - b.total_distance;
+					} else {
+						return a.lowest_distance - b.lowest_distance;
+					}
+				});
 
-			let results = hardResults.map(({ title, distance }) => ({
-				title,
-				lowest_distance: Math.min(...distance),
-				total_distance: distance.reduce((total, number) => total + number, 0)
-			}));
-
-			results = results.sort((a, b) => {
-				if (a.lowest_distance === b.lowest_distance) {
-					return a.total_distance - b.total_distance;
-				} else {
-					return a.lowest_distance - b.lowest_distance;
-				}
-			});
-
-			res.sendJson(200, true, "Hello", { nearest: [...results] });
-		})
+				res.sendJson(200, true, "Hello", { nearest: [...results] });
+			})
 			.catch((error) => {
-				console.error('Terjadi kesalahan:', error);
+				console.error("Terjadi kesalahan:", error);
 				res.sendJson(500, false, "Terjadi kesalahan");
 			});
 	}),
@@ -99,9 +100,6 @@ module.exports = {
 			}
 		}
 
-		// await redisClient.set(key, JSON.stringify(results), {
-		// 	EX: 600,
-		// });
 		results = await pagination(results, page, limit);
 
 		if (results.length == 0) {

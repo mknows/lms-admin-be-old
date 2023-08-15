@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// define association here
+			this.belongsTo(models.User, {
+				foreignKey: "user_id",
+			});
 		}
 	}
 	Admin.init(
@@ -18,9 +21,9 @@ module.exports = (sequelize, DataTypes) => {
 				primaryKey: true,
 				defaultValue: sequelize.literal("gen_random_uuid()"),
 			},
+			user_id: DataTypes.UUID,
 			email: DataTypes.STRING,
 			name: DataTypes.STRING,
-			password: DataTypes.STRING,
 			created_at: DataTypes.DATE,
 			updated_at: DataTypes.DATE,
 			deleted_at: DataTypes.DATE,

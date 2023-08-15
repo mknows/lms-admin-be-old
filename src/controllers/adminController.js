@@ -1,10 +1,31 @@
 const { Admin, User } = require("../models");
-const bcrypt = require("bcryptjs");
 const asyncHandler = require("express-async-handler");
+const admin = require("firebase-admin");
 
 module.exports = {
+	/**
+	 * @desc      delete all user firebase
+	 * @route     DELETE /api/v1/admin/nukeusers
+	 * @access    Admin
+	 */
+	deleteAllUser: asyncHandler(async (req, res) => {
+		const { password } = req.body;
+		const { users } = await admin.auth().listUsers(1000);
+
+		users.map(async (user) => {
+			// KODE HARAM
+			await admin.auth().deleteUser(user.uid);
+		});
+
+		return res.sendJson(200, true, "SUCCESS_DELETE_ALL_USER_FIREBASE", users);
+	}),
+
 	getAllAdmin: asyncHandler(async (req, res) => {
-		const data = await Admin.findAll();
+		const data = await Admin.findAll({
+			include: {
+				model: User,
+			},
+		});
 		return res.sendJson(200, true, "GET_ALL_ADMIN_SUCCESS", data);
 	}),
 
@@ -18,30 +39,25 @@ module.exports = {
 		});
 
 		if (!user) {
-			return res.sendJson(400, false, "Invalid user Id", {});
+			return res.sendJson(400, false, "INVALID_USER_ID", {});
 		}
 
 		let admin = await Admin.findOne({
 			where: {
-				id: user_id,
+				user_id: user_id,
 			},
 		});
 
 		if (admin) {
-			return res.sendJson(
-				400,
-				false,
-				`user with id ${user_id} is already an admin`,
-				admin
-			);
+			return res.sendJson(400, false, "USER_ALREADY_ADMIN", admin);
 		}
 
 		const created = await Admin.create({
-			id: user_id,
+			user_id: user_id,
 			name: user.full_name,
 		});
 
-		return res.sendJson(200, true, "sucess create data admin", created);
+		return res.sendJson(200, true, "SUCCESS_CREATE_ADMIN", created);
 	}),
 
 	/**

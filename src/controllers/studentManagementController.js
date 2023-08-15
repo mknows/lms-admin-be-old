@@ -26,43 +26,17 @@ const {
 	MAX_CREDIT,
 } = process.env;
 const asyncHandler = require("express-async-handler");
-const admin = require("firebase-admin");
+const { STATUS_CODES } = require("http");
+const { Op } = require("sequelize");
 
 module.exports = {
 	/**
-	 * @desc      delete all user
-	 * @route     DELETE /api/v1/auth/nukeusers
-	 * @access    Public
-	 */
-	deleteAllFirebaseUser: asyncHandler(async (req, res) => {
-		const { password } = req.body;
-		const { users } = await admin.auth().listUsers(1000);
-		const actual_password = "lukas123321passworddeleteuserdarifirebase";
-
-		if (password === actual_password) {
-			return res.sendJson(401, false, "wrong pass bro");
-		}
-
-		users.map(async (user) => {
-			// KODE HARAM
-			await admin.auth().deleteUser(user.uid);
-		});
-
-		return res.json({ users });
-	}),
-
-	/**
-	 * @desc      delete all user
-	 * @route     DELETE /api/v1/auth/nukeusers
-	 * @access    Public
+	 * @desc      make user student
+	 * @route     POST /api/v1/studentmanagement/makeuser/student
+	 * @access    Admin
 	 */
 	makeUserToStudent: asyncHandler(async (req, res) => {
 		const { password, user_id } = req.body;
-		const actual_password = "lukas123321passwordconvertusertostudent";
-
-		// if (password === actual_password) {
-		// 	return res.sendJson(401, false, "wrong pass bro");
-		// }
 
 		const stud = await Student.create({
 			user_id: user_id,
@@ -70,13 +44,13 @@ module.exports = {
 			supervisor: user_id,
 		});
 
-		return res.sendJson(200, true, "message", stud);
+		return res.sendJson(200, true, "SUCCESS_MAKE_STUDENT", stud);
 	}),
 
 	/**
-	 * @desc      delete all user
-	 * @route     DELETE /api/v1/auth/nukeusers
-	 * @access    Public
+	 * @desc      grade assignment
+	 * @route     PUT /api/v1/studentmanagement/nukeusers
+	 * @access    Admin
 	 */
 	gradeAssignment: asyncHandler(async (req, res) => {
 		const { materialenrolled_id, status, score } = req.body;
@@ -88,7 +62,7 @@ module.exports = {
 		});
 
 		if (assignment === null || assignment.type != "ASSIGNMENT") {
-			return res.sendJson(404, false, "No assignment found", assignment);
+			return res.sendJson(404, false, "ASSIGNMENT_NOT_FOUND", assignment);
 		}
 
 		assignment = await MaterialEnrolled.update(
@@ -103,18 +77,13 @@ module.exports = {
 			}
 		);
 
-		return res.sendJson(
-			200,
-			true,
-			"Successfully graded assignment",
-			assignment
-		);
+		return res.sendJson(200, true, "SUCCESS_GRADE_ASSIGNMENT", assignment);
 	}),
 
 	/**
-	 * @desc      delete all user
-	 * @route     DELETE /api/v1/auth/nukeusers
-	 * @access    Public
+	 * @desc      PUT all user
+	 * @route     PUT /api/v1/studentmanagement/accept
+	 * @access    Admin
 	 */
 	acceptStudentStudyPlan: asyncHandler(async (req, res) => {
 		const { student_id } = req.body;
@@ -126,7 +95,7 @@ module.exports = {
 			},
 		});
 		if (plan === null) {
-			return res.sendJson(404, false, "No PENDING plan found", plan);
+			return res.sendJson(404, false, "PENDING_STUDYPLAN_NOT_FOUND", plan);
 		}
 
 		plan = await StudentSubject.update(
@@ -141,21 +110,58 @@ module.exports = {
 			}
 		);
 
-		return res.sendJson(200, true, "Successfully graded assignment", plan);
+		return res.sendJson(200, true, "SUCCESS_ACCEPT_STUDYPLAN", plan);
 	}),
 
 	/**
-	 * @desc      delete all user
-	 * @route     DELETE /api/v1/auth/nukeusers
-	 * @access    Public
+	 * @desc      get pending study plans of students
+	 * @route     DELETE /api/v1/studentmanagement/studentsubjects/pending
+	 * @access    Admin
 	 */
-	getPendingStudyPlan: asyncHandler(async (req, res) => {
-		const studentPlans = await StudentSubject.findAll({
-			where: {
-				status: PENDING,
+	getStudyPlan: asyncHandler(async (req, res) => {
+		const { subject_status } = req.body;
+
+		let whereClause = {};
+		if (subject_status !== undefined || subject_status === []) {
+			whereClause = {
+				status: {
+					[Op.or]: statusTagQueryBuilder(subject_status),
+				},
+			};
+		}
+
+		const studentPlans = await Student.findAll({
+			include: {
+				model: StudentSubject,
+				where: whereClause,
 			},
 		});
 
-		return res.sendJson(200, true, "SUCCESS", studentPlans);
+		return res.sendJson(200, true, "SUCCESS_GET_STUDYPLAN", studentPlans);
 	}),
 };
+
+function statusTagQueryBuilder(status_list) {
+	let status = [];
+	for (let i = 0; i < status_list.length; i++) {
+		switch (status_list[i]) {
+			case "DRAFT":
+				status.push(DRAFT);
+			case "PENDING":
+				status.push(PENDING);
+			case "ONGOING":
+				status.push(ONGOING);
+			case "GRADING":
+				status.push(GRADING);
+			case "PASSED":
+				status.push(PASSED);
+			case "FAILED":
+				status.push(FAILED);
+			case "FINISHED":
+				status.push(FINISHED);
+			case "ABANDONED":
+				status.push(ABANDONED);
+		}
+	}
+	return status;
+}

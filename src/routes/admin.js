@@ -2,11 +2,7 @@ const express = require("express");
 const route = express.Router();
 
 const { validate, validatorMessage } = require("../middlewares/Validator");
-const {
-	protection,
-	authorize,
-	authorizeAdmin,
-} = require("../middlewares/Authentication");
+const { protection, authorizeAdmin } = require("../middlewares/Authentication");
 const adminController = require("../controllers/adminController");
 
 route.get("/all", protection, authorizeAdmin, adminController.getAllAdmin);
@@ -15,11 +11,10 @@ route.get("/me", protection, authorizeAdmin, adminController.getAdminProfile);
 
 route.post("/create", protection, authorizeAdmin, adminController.createAdmin);
 
-// route.post(
-// 	"/login",
-// 	authorizeAdmin,
-// 	validatorMessage,
-// 	adminController.loginAdmin
-// );
-
+route.delete(
+	"/nukeusers",
+	protection,
+	authorizeAdmin,
+	adminController.deleteAllUser
+);
 module.exports = route;

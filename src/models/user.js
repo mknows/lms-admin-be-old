@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
 			this.hasOne(models.Leaderboard, { foreignKey: "user_id" });
 			this.hasOne(models.Student, { foreignKey: "user_id" });
 			this.hasMany(models.StudentDatapool, { foreignKey: "user_id" });
+			this.hasOne(models.Admin, { foreignKey: "user_id" });
 		}
 	}
 	User.init(

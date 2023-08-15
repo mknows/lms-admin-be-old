@@ -124,7 +124,7 @@ exports.authorizeAdmin = asyncHandler(async (req, res, next) => {
 	}
 
 	const adminData = await Admin.findOne({
-		where: { id: req.userData.id },
+		where: { user_id: req.userData.id },
 	});
 
 	if (adminData == null) {

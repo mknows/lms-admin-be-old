@@ -41,10 +41,10 @@ route.get(
 	profileController.achievements
 );
 route.get(
-	"/report",
+	"/dashboard",
 	protection,
 	authorize("student"),
-	profileController.getReport
+	profileController.getDashboard
 );
 route.put(
 	"/me",
