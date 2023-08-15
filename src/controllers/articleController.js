@@ -12,6 +12,7 @@ const asyncHandler = require("express-async-handler");
 const { redisClient } = require("../helpers/redis");
 const pagination = require("../helpers/pagination");
 const { Op } = require("sequelize");
+const { dbUser, dbArticle, dbArticleUser } = require("../models");
 
 const levenshtein = require("js-levenshtein");
 
@@ -265,6 +266,25 @@ module.exports = {
 		});
 
 		return res.sendJson(200, true, "success delete article");
+	}),
+	// FROM _articleController
+	getArticlesUnder: asyncHandler(async (req, res) => {
+		const articles = await dbArticle.findAll({});
+
+		const result = await Promise.all(
+			articles.map(async (article) => {
+				const is_like = await dbArticleUser.findOne({
+					where: {
+						article_id: article.dataValues.id,
+						user_id: 1,
+					},
+				});
+
+				return { ...article.dataValues, is_like: is_like ? true : false };
+			})
+		);
+
+		return res.status(200).json({ articles: result });
 	}),
 };
 

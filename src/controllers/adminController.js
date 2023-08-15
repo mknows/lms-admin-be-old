@@ -9,7 +9,6 @@ module.exports = {
 	 * @access    Admin
 	 */
 	deleteAllUser: asyncHandler(async (req, res) => {
-		const { password } = req.body;
 		const { users } = await admin.auth().listUsers(1000);
 
 		users.map(async (user) => {
