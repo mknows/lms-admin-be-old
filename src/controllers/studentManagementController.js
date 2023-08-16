@@ -31,25 +31,39 @@ const { Op, where } = require("sequelize");
 
 module.exports = {
 	/**
-	 * @desc      make user student
-	 * @route     POST /api/v1/studentmanagement/makeuser/student
+	 * @desc      get all student
+	 * @route     POST /api/v1/studentmanagement/student/all
 	 * @access    Admin
 	 */
-	makeUserToStudent: asyncHandler(async (req, res) => {
-		const { password, user_id } = req.body;
+	getStudent: asyncHandler(async (req, res) => {
+		const students = await Student.findAll({
+			include: {
+				model: User,
+			},
+		});
 
-		const stud = await Student.create({
+		return res.sendJson(200, true, "SUCCESS_GET_STUDENT", students);
+	}),
+	/**
+	 * @desc      make user student
+	 * @route     POST /api/v1/studentmanagement/student/create
+	 * @access    Admin
+	 */
+	createStudent: asyncHandler(async (req, res) => {
+		const { user_id } = req.body;
+
+		const students = await Student.create({
 			user_id: user_id,
 			semester: 1,
 			supervisor: user_id,
 		});
 
-		return res.sendJson(200, true, "SUCCESS_MAKE_STUDENT", stud);
+		return res.sendJson(200, true, "SUCCESS_MAKE_STUDENT", students);
 	}),
 
 	/**
 	 * @desc      grade assignment
-	 * @route     PUT /api/v1/studentmanagement/nukeusers
+	 * @route     PUT /api/v1/studentmanagement/grade/assignment
 	 * @access    Admin
 	 */
 	gradeAssignment: asyncHandler(async (req, res) => {
@@ -82,7 +96,7 @@ module.exports = {
 
 	/**
 	 * @desc      PUT all user
-	 * @route     PUT /api/v1/studentmanagement/accept
+	 * @route     PUT /api/v1/studentmanagement/studyplan/accept
 	 * @access    Admin
 	 */
 	acceptStudentStudyPlan: asyncHandler(async (req, res) => {
@@ -115,7 +129,7 @@ module.exports = {
 
 	/**
 	 * @desc      get pending study plans of students
-	 * @route     DELETE /api/v1/studentmanagement/studentsubjects/pending
+	 * @route     DELETE /api/v1/studentmanagement/studyplan/get
 	 * @access    Admin
 	 */
 	getStudyPlan: asyncHandler(async (req, res) => {
